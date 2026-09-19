@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Resources
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener
+import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
@@ -38,14 +39,16 @@ import kotlin.time.Duration.Companion.hours
 @Suppress("EmptyMethod")
 @OptIn(ExperimentalCoroutinesApi::class)
 class BillingImplTest {
-
     private val resources: Resources = mock {
         on { getString(R.string.app_name_pro) } doReturn "GeoShare Pro"
         on { getString(R.string.billing_offers_error) } doReturn "Failed to fetch offers"
         on { getString(R.string.billing_purchase_error_cancelled) } doReturn "Purchase cancelled"
-        on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make the purchase"
-        on { getString(eq(R.string.billing_purchase_success), any()) } doReturn "Thanks for buying GeoShare Pro"
+        on { getString(R.string.billing_purchase_error_insufficient_funds) } doReturn "Insufficient funds"
+        on { getString(R.string.billing_purchase_error_unknown) } doReturn "Failed to make purchase"
+        on { getString(R.string.billing_purchase_error_user_ineligible) } doReturn "You are not eligible for this offer"
         on { getString(R.string.billing_setup_error_unknown) } doReturn "Failed to fetch purchases"
+        on { getString(R.string.billing_unavailable) } doReturn "Google Play is not available on this device"
+        on { getString(eq(R.string.billing_purchase_success), any()) } doReturn "Thanks for buying GeoShare Pro"
     }
     private val context: Context = mock()
 
@@ -55,7 +58,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -89,43 +93,55 @@ class BillingImplTest {
     @Test
     fun status_whenBillingSetupResponseIsError_isLoading() {
         val purchaseTimeValue = System.currentTimeMillis()
-        val billingClient = object : FakeBillingClient() {
-            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
-                p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
-                        mock<Purchase> {
-                            on { products } doReturn listOf("test_lifetime")
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
-                            on { purchaseTime } doReturn purchaseTimeValue
-                            on { purchaseToken } doReturn "test_purchased"
-                        },
-                    )
-                )
-            }
-
-            override fun startConnection(p0: BillingClientStateListener) {
-                p0.onBillingSetupFinished(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.ERROR).build()
-                )
-            }
-        }
-        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val billingImpl = BillingImpl(
-            context,
-            billingClientBuilder,
-            products = persistentListOf(
-                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
-                BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
+        for ((responseCode, expectedMessageText) in listOf(
+            Pair(
+                BillingClient.BillingResponseCode.BILLING_UNAVAILABLE,
+                "Google Play is not available on this device",
             ),
-            resources = resources,
-            log = FakeLog,
-        )
-        billingImpl.startConnection()
-        assertTrue(billingImpl.status.value is BillingStatus.Loading)
-        assertEquals(
-            Message("Failed to fetch purchases", isError = true),
-            billingImpl.message.value,
-        )
+            Pair(
+                BillingClient.BillingResponseCode.ERROR,
+                "Failed to fetch purchases",
+            ),
+        )) {
+            val billingClient = object : FakeBillingClient() {
+                override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                    p1.onQueryPurchasesResponse(
+                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                        listOf(
+                            mock<Purchase> {
+                                on { products } doReturn listOf("test_lifetime")
+                                on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                                on { purchaseTime } doReturn purchaseTimeValue
+                                on { purchaseToken } doReturn "test_purchased"
+                            },
+                        )
+                    )
+                }
+
+                override fun startConnection(p0: BillingClientStateListener) {
+                    p0.onBillingSetupFinished(
+                        BillingResult.newBuilder().setResponseCode(responseCode).build()
+                    )
+                }
+            }
+            val billingClientBuilder = FakeBillingClientBuilder(billingClient)
+            val billingImpl = BillingImpl(
+                context,
+                billingClientBuilder,
+                products = persistentListOf(
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                    BillingProduct("test_monthly", BillingProduct.Type.SUBSCRIPTION),
+                ),
+                resources = resources,
+                log = FakeLog,
+            )
+            billingImpl.startConnection()
+            assertTrue(billingImpl.status.value is BillingStatus.Loading)
+            assertEquals(
+                Message(expectedMessageText, isError = true),
+                billingImpl.message.value,
+            )
+        }
     }
 
     @Test
@@ -134,7 +150,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.ERROR).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.ERROR).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -165,7 +182,7 @@ class BillingImplTest {
         billingImpl.startConnection()
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            Message("Failed to make the purchase", isError = true),
+            Message("Failed to make purchase", isError = true),
             billingImpl.message.value,
         )
     }
@@ -176,7 +193,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -222,7 +240,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_monthly")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -269,7 +288,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -315,7 +335,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("spam")
                             on { purchaseState } doReturn Purchase.PurchaseState.PENDING
@@ -353,7 +374,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.UNSPECIFIED_STATE
@@ -391,7 +413,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("spam_1")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -450,7 +473,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("spam")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -492,7 +516,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf(responseProductIds.next())
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -542,7 +567,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn responsePurchaseStates.next()
@@ -588,7 +614,8 @@ class BillingImplTest {
         val billingClient = object : FakeBillingClient() {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf(responseProductIds.next())
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -1028,14 +1055,15 @@ class BillingImplTest {
 
             override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
                 purchasesUpdatedListener?.onPurchasesUpdated(
-                    BillingResult.newBuilder()
-                        .setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
                             on { purchaseToken } doReturn "test_purchased"
-                        })
+                        },
+                    )
                 )
                 return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
             }
@@ -1071,7 +1099,7 @@ class BillingImplTest {
         billingImpl.launchBillingFlow(mock(), "spam")
         assertTrue(billingImpl.status.value is BillingStatus.Loading)
         assertEquals(
-            Message("Failed to make the purchase", isError = true),
+            Message("Failed to make purchase", isError = true),
             billingImpl.message.value,
         )
     }
@@ -1102,14 +1130,15 @@ class BillingImplTest {
 
             override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
                 purchasesUpdatedListener?.onPurchasesUpdated(
-                    BillingResult.newBuilder()
-                        .setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf("test_lifetime")
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
                             on { purchaseTime } doReturn System.currentTimeMillis()
                             on { purchaseToken } doReturn "test_purchased"
-                        })
+                        },
+                    )
                 )
                 return BillingResult.newBuilder().setResponseCode(BillingResponseCode.ERROR).build()
             }
@@ -1147,159 +1176,112 @@ class BillingImplTest {
         billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
         assertTrue(billingImpl.status.value is BillingStatus.Purchased)
         assertEquals(
-            Message("Failed to make the purchase", isError = true),
-            billingImpl.message.value,
-        )
-    }
-
-    @Test
-    fun launchBillingFlow_whenOfferTokenIsKnownAndPurchasesUpdatedResponseIsUserCancelled_setsErrorMessage() = runTest {
-        val responseProductDetailsLists = listOf(
-            listOf(
-                mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_lifetime_details"
-                    on { formattedPrice } doReturn "$3.33"
-                }.let { oneTimePurchaseOfferDetailsParam ->
-                    mock<ProductDetails> {
-                        on { productId } doReturn "test_lifetime"
-                        on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
-                    }
-                },
-            ),
-            emptyList(),
-        ).iterator()
-        val billingClient = object : FakeBillingClient() {
-            override fun acknowledgePurchase(
-                p0: AcknowledgePurchaseParams,
-                p1: AcknowledgePurchaseResponseListener,
-            ) {
-            }
-
-            override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
-                purchasesUpdatedListener?.onPurchasesUpdated(
-                    BillingResult.newBuilder()
-                        .setResponseCode(BillingResponseCode.USER_CANCELED).build(), listOf(
-                        mock<Purchase> {
-                            on { products } doReturn listOf("test_lifetime")
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
-                            on { purchaseTime } doReturn System.currentTimeMillis()
-                            on { purchaseToken } doReturn "test_purchased"
-                        })
-                )
-                return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
-            }
-
-            override fun queryProductDetailsAsync(
-                p0: QueryProductDetailsParams,
-                p1: ProductDetailsResponseListener,
-            ) {
-                p1.onProductDetailsResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
-                    QueryProductDetailsResult.create(
-                        responseProductDetailsLists.next(),
-                        emptyList(),
-                    )
-                )
-            }
-
-            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
-            }
-
-            override fun startConnection(p0: BillingClientStateListener) {}
-        }
-        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val billingImpl = BillingImpl(
-            context,
-            billingClientBuilder,
-            products = persistentListOf(
-                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
-            ),
-            productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
-            billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
-            resources = resources,
-            log = FakeLog,
-        )
-        billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
-        assertTrue(billingImpl.status.value is BillingStatus.Loading)
-        assertEquals(
-            Message("Purchase cancelled", isError = true),
+            Message("Failed to make purchase", isError = true),
             billingImpl.message.value,
         )
     }
 
     @Test
     fun launchBillingFlow_whenOfferTokenIsKnownAndPurchasesUpdatedResponseIsError_setsErrorMessage() = runTest {
-        val responseProductDetailsLists = listOf(
-            listOf(
-                mock<ProductDetails.OneTimePurchaseOfferDetails> {
-                    on { offerToken } doReturn "offer_lifetime_details"
-                    on { formattedPrice } doReturn "$3.33"
-                }.let { oneTimePurchaseOfferDetailsParam ->
-                    mock<ProductDetails> {
-                        on { productId } doReturn "test_lifetime"
-                        on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
-                    }
-                },
+        for ((responseCode, subResponseCode, expectedMessageText) in listOf(
+            Triple(
+                BillingClient.BillingResponseCode.USER_CANCELED,
+                BillingClient.OnPurchasesUpdatedSubResponseCode.NO_APPLICABLE_SUB_RESPONSE_CODE,
+                "Purchase cancelled",
             ),
-            emptyList(),
-        ).iterator()
-        val billingClient = object : FakeBillingClient() {
-            override fun acknowledgePurchase(
-                p0: AcknowledgePurchaseParams,
-                p1: AcknowledgePurchaseResponseListener,
-            ) {
-            }
+            Triple(
+                BillingClient.BillingResponseCode.ERROR,
+                BillingClient.OnPurchasesUpdatedSubResponseCode.NO_APPLICABLE_SUB_RESPONSE_CODE,
+                "Failed to make purchase",
+            ),
+            Triple(
+                BillingClient.BillingResponseCode.ERROR,
+                BillingClient.OnPurchasesUpdatedSubResponseCode.PAYMENT_DECLINED_DUE_TO_INSUFFICIENT_FUNDS,
+                "Insufficient funds",
+            ),
+            Triple(
+                BillingClient.BillingResponseCode.ERROR,
+                BillingClient.OnPurchasesUpdatedSubResponseCode.USER_INELIGIBLE,
+                "You are not eligible for this offer",
+            )
+        )) {
+            val responseProductDetailsLists = listOf(
+                listOf(
+                    mock<ProductDetails.OneTimePurchaseOfferDetails> {
+                        on { offerToken } doReturn "offer_lifetime_details"
+                        on { formattedPrice } doReturn "$3.33"
+                    }.let { oneTimePurchaseOfferDetailsParam ->
+                        mock<ProductDetails> {
+                            on { productId } doReturn "test_lifetime"
+                            on { oneTimePurchaseOfferDetails } doReturn oneTimePurchaseOfferDetailsParam
+                        }
+                    },
+                ),
+                emptyList(),
+            ).iterator()
+            val billingClient = object : FakeBillingClient() {
+                override fun acknowledgePurchase(
+                    p0: AcknowledgePurchaseParams,
+                    p1: AcknowledgePurchaseResponseListener,
+                ) {
+                }
 
-            override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
-                purchasesUpdatedListener?.onPurchasesUpdated(
-                    BillingResult.newBuilder()
-                        .setResponseCode(BillingResponseCode.ERROR).build(), listOf(
-                        mock<Purchase> {
-                            on { products } doReturn listOf("test_lifetime")
-                            on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
-                            on { purchaseTime } doReturn System.currentTimeMillis()
-                            on { purchaseToken } doReturn "test_purchased"
-                        })
-                )
-                return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
-            }
-
-            override fun queryProductDetailsAsync(
-                p0: QueryProductDetailsParams,
-                p1: ProductDetailsResponseListener,
-            ) {
-                p1.onProductDetailsResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
-                    QueryProductDetailsResult.create(
-                        responseProductDetailsLists.next(),
-                        emptyList(),
+                override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
+                    purchasesUpdatedListener?.onPurchasesUpdated(
+                        BillingResult
+                            .newBuilder()
+                            .setResponseCode(responseCode)
+                            .setOnPurchasesUpdatedSubResponseCode(subResponseCode)
+                            .build(),
+                        listOf(
+                            mock<Purchase> {
+                                on { products } doReturn listOf("test_lifetime")
+                                on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
+                                on { purchaseTime } doReturn System.currentTimeMillis()
+                                on { purchaseToken } doReturn "test_purchased"
+                            },
+                        )
                     )
-                )
-            }
+                    return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
+                }
 
-            override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
-            }
+                override fun queryProductDetailsAsync(
+                    p0: QueryProductDetailsParams,
+                    p1: ProductDetailsResponseListener,
+                ) {
+                    p1.onProductDetailsResponse(
+                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                        QueryProductDetailsResult.create(
+                            responseProductDetailsLists.next(),
+                            emptyList(),
+                        )
+                    )
+                }
 
-            override fun startConnection(p0: BillingClientStateListener) {}
+                override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+                }
+
+                override fun startConnection(p0: BillingClientStateListener) {}
+            }
+            val billingClientBuilder = FakeBillingClientBuilder(billingClient)
+            val billingImpl = BillingImpl(
+                context,
+                billingClientBuilder,
+                products = persistentListOf(
+                    BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
+                ),
+                productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
+                billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
+                resources = resources,
+                log = FakeLog,
+            )
+            billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
+            assertTrue(billingImpl.status.value is BillingStatus.Loading)
+            assertEquals(
+                Message(expectedMessageText, isError = true),
+                billingImpl.message.value,
+            )
         }
-        val billingClientBuilder = FakeBillingClientBuilder(billingClient)
-        val billingImpl = BillingImpl(
-            context,
-            billingClientBuilder,
-            products = persistentListOf(
-                BillingProduct("test_lifetime", BillingProduct.Type.ONE_TIME),
-            ),
-            productDetailsParamsBuilder = { FakeProductDetailsParamsBuilder() },
-            billingFlowParamsBuilder = { FakeBillingFlowParamsBuilder() },
-            resources = resources,
-            log = FakeLog,
-        )
-        billingImpl.launchBillingFlow(mock(), "offer_lifetime_details")
-        assertTrue(billingImpl.status.value is BillingStatus.Loading)
-        assertEquals(
-            Message("Failed to make the purchase", isError = true),
-            billingImpl.message.value,
-        )
     }
 
     @Test
@@ -1330,7 +1312,8 @@ class BillingImplTest {
 
                 override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
                     purchasesUpdatedListener?.onPurchasesUpdated(
-                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                        listOf(
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_lifetime")
                                 on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -1442,7 +1425,8 @@ class BillingImplTest {
 
                 override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
                     purchasesUpdatedListener?.onPurchasesUpdated(
-                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                        listOf(
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_lifetime")
                                 on { purchaseToken } doReturn "test_purchased"
@@ -1539,7 +1523,8 @@ class BillingImplTest {
 
                 override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
                     purchasesUpdatedListener?.onPurchasesUpdated(
-                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                        listOf(
                             mock<Purchase> {
                                 on { products } doReturn listOf("test_monthly")
                                 on { purchaseToken } doReturn "test_purchased"
@@ -1627,7 +1612,8 @@ class BillingImplTest {
 
                 override fun launchBillingFlow(p0: Activity, p1: BillingFlowParams): BillingResult {
                     purchasesUpdatedListener?.onPurchasesUpdated(
-                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                        BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                        listOf(
                             mock<Purchase> {
                                 on { products } doReturn listOf("spam")
                                 on { purchaseToken } doReturn "test_purchased"
@@ -1701,7 +1687,8 @@ class BillingImplTest {
 
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf(purchasedProductIds.next())
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED
@@ -1760,10 +1747,9 @@ class BillingImplTest {
                 p2: InAppMessageResponseListener,
             ): BillingResult {
                 p2.onInAppMessageResponse(
-                    InAppMessageResult(
-                        InAppMessageResult.InAppMessageResponseCode.SUBSCRIPTION_STATUS_UPDATED,
-                        null,
-                    )
+                    mock {
+                        on { responseCode } doReturn InAppMessageResult.InAppMessageResponseCode.SUBSCRIPTION_STATUS_UPDATED
+                    }
                 )
                 return BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build()
             }
@@ -1771,7 +1757,8 @@ class BillingImplTest {
             override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
                 val (productId, autoRenewing) = purchasedProductIdsAndAutoRenewing.next()
                 p1.onQueryPurchasesResponse(
-                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(), listOf(
+                    BillingResult.newBuilder().setResponseCode(BillingResponseCode.OK).build(),
+                    listOf(
                         mock<Purchase> {
                             on { products } doReturn listOf(productId)
                             on { purchaseState } doReturn Purchase.PurchaseState.PURCHASED

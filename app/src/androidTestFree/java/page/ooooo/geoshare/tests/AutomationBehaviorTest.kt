@@ -1,13 +1,17 @@
 package page.ooooo.geoshare.tests
 
+import androidx.test.uiautomator.UiAutomatorTestScope
+import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenRouteOnePointGpxAutomation
@@ -64,7 +68,7 @@ class AutomationBehaviorTest {
         assertNull(onElementOrNull(3_000) { packageName == PackageNames.GOOGLE_MAPS })
 
         // Google Maps opens
-        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+        waitAndAssertGoogleMapsContainsElement { true }
 
         // Go back to app
         launchApplication()
@@ -194,3 +198,10 @@ class AutomationBehaviorTest {
         assertContactContainsText(CoordinateFormatter.formatDecCoords(point))
     }
 }
+
+fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
+    onElementOrScrollToElement(
+        10_000,
+        scrollableElement = { onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" } }) {
+        viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
+    }

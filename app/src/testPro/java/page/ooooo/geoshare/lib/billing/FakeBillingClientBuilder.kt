@@ -8,11 +8,14 @@ import com.android.billingclient.api.AcknowledgePurchaseResponseListener
 import com.android.billingclient.api.AlternativeBillingOnlyAvailabilityListener
 import com.android.billingclient.api.AlternativeBillingOnlyInformationDialogListener
 import com.android.billingclient.api.AlternativeBillingOnlyReportingDetailsListener
+import com.android.billingclient.api.BillingChoiceInfoResponseListener
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingConfigResponseListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingProgramAvailabilityListener
+import com.android.billingclient.api.BillingProgramInformationDialogListener
+import com.android.billingclient.api.BillingProgramInformationDialogParams
 import com.android.billingclient.api.BillingProgramReportingDetailsListener
 import com.android.billingclient.api.BillingProgramReportingDetailsParams
 import com.android.billingclient.api.BillingResult
@@ -21,6 +24,7 @@ import com.android.billingclient.api.ConsumeResponseListener
 import com.android.billingclient.api.ExternalOfferAvailabilityListener
 import com.android.billingclient.api.ExternalOfferInformationDialogListener
 import com.android.billingclient.api.ExternalOfferReportingDetailsListener
+import com.android.billingclient.api.GetBillingChoiceInfoParams
 import com.android.billingclient.api.GetBillingConfigParams
 import com.android.billingclient.api.InAppMessageParams
 import com.android.billingclient.api.InAppMessageResponseListener
@@ -97,6 +101,10 @@ open class FakeBillingClient : BillingClient() {
         throw NotImplementedError()
     }
 
+    override fun getBillingChoiceInfoAsync(p0: GetBillingChoiceInfoParams, p1: BillingChoiceInfoResponseListener) {
+        throw NotImplementedError()
+    }
+
     override fun getBillingConfigAsync(p0: GetBillingConfigParams, p1: BillingConfigResponseListener) {
         throw NotImplementedError()
     }
@@ -127,6 +135,14 @@ open class FakeBillingClient : BillingClient() {
     }
 
     override fun queryPurchasesAsync(p0: QueryPurchasesParams, p1: PurchasesResponseListener) {
+        throw NotImplementedError()
+    }
+
+    override fun showBillingProgramInformationDialog(
+        p0: Activity,
+        p1: BillingProgramInformationDialogParams,
+        p2: BillingProgramInformationDialogListener,
+    ) {
         throw NotImplementedError()
     }
 

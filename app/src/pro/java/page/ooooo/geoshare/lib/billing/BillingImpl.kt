@@ -90,8 +90,13 @@ class BillingImpl(
                 queryPurchases()
             }
 
+            BillingClient.BillingResponseCode.BILLING_UNAVAILABLE -> {
+                log.i(TAG, "Billing setup: billing unavailable")
+                _message.value = Message(resources.getString(R.string.billing_unavailable), isError = true)
+            }
+
             else -> {
-                log.e(TAG, "Billing setup: error ${billingResult.debugMessage}")
+                log.e(TAG, "Billing setup: error ${billingResult.toDebugString()}")
                 _message.value = Message(resources.getString(R.string.billing_setup_error_unknown), isError = true)
             }
         }
@@ -131,8 +136,20 @@ class BillingImpl(
             }
 
             else -> {
-                log.e(TAG, "Purchase update: error ${billingResult.debugMessage}")
-                _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
+                log.e(TAG, "Purchase update: error ${billingResult.toDebugString()}")
+                _message.value = Message(
+                    when (billingResult.onPurchasesUpdatedSubResponseCode) {
+                        BillingClient.OnPurchasesUpdatedSubResponseCode.PAYMENT_DECLINED_DUE_TO_INSUFFICIENT_FUNDS ->
+                            resources.getString(R.string.billing_purchase_error_insufficient_funds)
+
+                        BillingClient.OnPurchasesUpdatedSubResponseCode.USER_INELIGIBLE ->
+                            resources.getString(R.string.billing_purchase_error_user_ineligible)
+
+                        else ->
+                            resources.getString(R.string.billing_purchase_error_unknown)
+                    },
+                    isError = true,
+                )
             }
         }
     }
@@ -239,7 +256,7 @@ class BillingImpl(
             }
 
             else -> {
-                log.e(TAG, "Billing flow: error ${billingResult.debugMessage}")
+                log.e(TAG, "Billing flow: error ${billingResult.toDebugString()}")
                 _message.value = Message(resources.getString(R.string.billing_purchase_error_unknown), isError = true)
             }
         }
@@ -353,6 +370,9 @@ class BillingImpl(
     override fun dismissMessage() {
         _message.value = null
     }
+
+    private fun BillingResult.toDebugString(): String =
+        "BillingResult(responseCode=${responseCode},onPurchasesUpdatedSubResponseCode=${onPurchasesUpdatedSubResponseCode},debugMessage=${debugMessage})"
 
     companion object {
         const val TAG = "Billing"

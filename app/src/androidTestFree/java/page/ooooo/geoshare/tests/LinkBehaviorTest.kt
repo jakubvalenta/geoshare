@@ -39,8 +39,7 @@ class LinkBehaviorTest {
 
         // Tap copy link in the context menu
         scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareAppLabel" && textAsString() == "My New Maps" }
-            .longClick()
+        scrollToLinkIcon("My New Maps").longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString() in setOf(
                 "Copy My New Maps link",
@@ -49,9 +48,7 @@ class LinkBehaviorTest {
         }.click()
 
         // Shows success message
-        onMainScrollablePane()
-            // Swipe instead of scrolling, because we need to check the message before it disappears
-            .swipe(Direction.DOWN, 1f)
+        onMainScrollablePane().scrollToTop()
         onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
     }
 

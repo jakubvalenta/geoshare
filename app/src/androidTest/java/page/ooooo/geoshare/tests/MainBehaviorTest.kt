@@ -41,10 +41,10 @@ class MainBehaviorTest {
         )
 
         // Tap the Google Maps icon
-        clickAppIcon(PackageNames.GOOGLE_MAPS)
+        scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()
 
         // Wait for Google Maps
-        onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+        waitAndAssertGoogleMapsContainsElement { true }
 
         // Go back to app
         launchApplication()
@@ -68,7 +68,7 @@ class MainBehaviorTest {
         assertConversionSucceeds(WGS84Point(52.5067296, 13.2599309, z = 11.0, source = Source.MAP_CENTER))
 
         // Tap the Google Maps icon
-        clickAppIcon(PackageNames.GOOGLE_MAPS)
+        scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement { textAsString() in setOf("Westend", "Berlin-Westend") }
@@ -100,7 +100,7 @@ class MainBehaviorTest {
         assertConversionSucceeds(expectedPoint)
 
         // Tap the Google Maps icon
-        clickAppIcon(PackageNames.GOOGLE_MAPS)
+        scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement {
@@ -165,7 +165,7 @@ class MainBehaviorTest {
 
         // Tap the messaging app icon
         scrollToAppIcons()
-        clickAppIcon(messagingAppPackageName)
+        scrollToAppIcon(messagingAppPackageName).clickAppIcon()
 
         // Opens the messaging app
         onElement { packageName == messagingAppPackageName }
@@ -187,7 +187,7 @@ class MainBehaviorTest {
 
         // Click the link
         scrollToLinkIcons()
-        onElement { viewIdResourceName == "geoShareLink_Google Maps" }.longClick()
+        scrollToLinkIcon("Google Maps").longClick()
         onElement {
             viewIdResourceName == "geoShareAppOutput" && textAsString()?.contains("Google Maps search") == true
         }.click()
@@ -207,14 +207,15 @@ class MainBehaviorTest {
             shareUri()
 
             // Launch navigation in TomTom
-            scrollToAppIcons()
-            launchNavigationInApp(PackageNames.TOMTOM)
+            scrollToAppIcon(PackageNames.TOMTOM).longClick()
+            launchNavigationInApp()
 
             // Dismiss the location rationale dialog
             onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.dismissDialog()
 
             // Launch navigation in TomTom again
-            launchNavigationInApp(PackageNames.TOMTOM)
+            scrollToAppIcon(PackageNames.TOMTOM).longClick()
+            launchNavigationInApp()
 
             // Confirm location rationale
             onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
@@ -223,7 +224,8 @@ class MainBehaviorTest {
             denySystemPermission()
 
             // Launch navigation in TomTom again
-            launchNavigationInApp(PackageNames.TOMTOM)
+            scrollToAppIcon(PackageNames.TOMTOM).longClick()
+            launchNavigationInApp()
 
             // Confirm location rationale
             onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.confirmDialog()
@@ -329,13 +331,11 @@ class MainBehaviorTest {
 
         // Help message OPEN_BY_DEFAULT is visible
         quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
-        onMainScrollablePane()
-            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
-            .scroll(Direction.DOWN, 3f)
+        onMainScrollablePane().scrollToBottom()
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
 
         // Help message SHARE_SOURCE is not visible
-        onMainScrollablePane().scroll(Direction.UP, 3f) // Scroll up to see the message
+        onMainScrollablePane().scrollToTop()
         assertNull(
             onElementOrNull(1_000) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}"
@@ -343,9 +343,7 @@ class MainBehaviorTest {
         )
 
         // Dismiss help message OPEN_BY_DEFAULT
-        onMainScrollablePane()
-            // Scroll by percents not to element, because it's more reliable due to the lazy list loading
-            .scroll(Direction.DOWN, 3f)
+        onMainScrollablePane().scrollToBottom()
         onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
