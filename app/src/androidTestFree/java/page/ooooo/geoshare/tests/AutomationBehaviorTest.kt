@@ -1,9 +1,7 @@
 package page.ooooo.geoshare.tests
 
-import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
-import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.Dispatchers
@@ -202,7 +200,6 @@ class AutomationBehaviorTest {
 }
 
 fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
-    // FIXME
     onElementOrScrollToElement(scrollableElement = { onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" } }) {
         viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
     }

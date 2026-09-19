@@ -48,6 +48,7 @@ import page.ooooo.geoshare.tests.goBackToMainForm
 import page.ooooo.geoshare.tests.goToInputList
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.grantSystemPermission
+import page.ooooo.geoshare.tests.hideKeyboard
 import page.ooooo.geoshare.tests.isAppInstalled
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.launchNavigationInApp
@@ -160,7 +161,7 @@ class ScreenshotsFreeBehaviorTest {
         // Help - Message - Open by default
         shareUri()
         quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
-        onMainScrollablePane().scrollToElement(Direction.DOWN) {
+        onElementOrScrollToElement(scrollableElement = { onMainScrollablePane() }) {
             viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
         }
         saveScreenshot("main_strings/help_message_open_by_default")
@@ -730,7 +731,7 @@ class ScreenshotsFreeBehaviorTest {
             .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareLinkListInsert" }
             .click()
         quickWaitForStableInActiveWindow()
-        pressBack() // Hide IME
+        hideKeyboard()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/web_maps_insert")
 
@@ -751,7 +752,7 @@ class ScreenshotsFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
         onElement { viewIdResourceName == "geoShareLinkListItemMenuDetail_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
         quickWaitForStableInActiveWindow()
-        pressBack() // Hide IME
+        hideKeyboard()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/web_maps_detail_page_1")
 
@@ -948,7 +949,7 @@ class ScreenshotsFreeBehaviorTest {
             .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListInsert" }
             .click()
         quickWaitForStableInActiveWindow()
-        pressBack() // Hide IME
+        hideKeyboard()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_insert_api_key")
 
@@ -987,7 +988,7 @@ class ScreenshotsFreeBehaviorTest {
             )
         )
         quickWaitForStableInActiveWindow()
-        pressBack() // Hide IME
+        hideKeyboard()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_update")
 

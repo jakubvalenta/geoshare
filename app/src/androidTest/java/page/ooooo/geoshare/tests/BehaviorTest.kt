@@ -9,6 +9,7 @@ import android.location.provider.ProviderProperties
 import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.core.graphics.scale
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
@@ -955,6 +956,21 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsPlace_null" }.click()
             }
         }
+    }
+}
+
+private fun isKeyboardOpen(): Boolean {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
+    return inputMethodManager.isAcceptingText()
+}
+
+fun UiAutomatorTestScope.hideKeyboard() {
+    if (isKeyboardOpen()) {
+        device.executeShellCommand(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            "input keyevent 111"
+        )
     }
 }
 
