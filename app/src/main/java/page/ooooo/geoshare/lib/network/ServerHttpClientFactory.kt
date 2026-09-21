@@ -9,6 +9,7 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.RefreshTokensParams
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
@@ -101,11 +102,13 @@ class ServerHttpClientFactory @Inject constructor(
                                         json()
                                     }
                                 }.use { client ->
-                                    val challenge = client.attestationChallenge(response, server.challengeUrl)
-                                    client.attestationLogin(challenge, server.loginUrl)
-                                        ?: client.attestationRegister(challenge, server.registerUrl)
+                                    val challenge = response.parseChallenge()
+                                        ?: attestationChallenge(client, server.challengeUrl)
+                                    attestationLogin(client, challenge, server.loginUrl)
+                                        ?: attestationRegister(client, challenge, server.registerUrl)
                                 }
                             }
+                            sendWithoutRequest { true }
                         }
                     }
             }
@@ -115,22 +118,31 @@ class ServerHttpClientFactory @Inject constructor(
         userPreferencesRepository.getValue(CachedServerTokenPreference)
             ?.let { BearerTokens(it.token, it.publicKey) }
 
-    private suspend fun HttpClient.attestationChallenge(response: HttpResponse, challengeUrl: String): ByteArray =
+    private suspend fun HttpResponse.parseChallenge(): ByteArray? =
         try {
-            response.body<ChallengeResponse>().challenge.base64Decode()
+            body<ChallengeResponse>().challenge.base64Decode()
         } catch (_: NoTransformationFoundException) {
-            try {
-                post(challengeUrl)
-            } catch (e: ClientRequestException) {
-                with(e.response) {
-                    log.e(TAG, "Login challenge error ${status.value} ${bodyAsErrorMessage()}")
-                }
-                throw e
-            }
-                .body<ChallengeResponse>().challenge.base64Decode()
+            null
         }
 
-    private suspend fun HttpClient.attestationLogin(challenge: ByteArray, loginUrl: String): BearerTokens? {
+    private suspend fun RefreshTokensParams.attestationChallenge(client: HttpClient, challengeUrl: String): ByteArray =
+        try {
+            client.post(challengeUrl) {
+                markAsRefreshTokenRequest() // TODO Test request is marked
+            }
+        } catch (e: ClientRequestException) {
+            with(e.response) {
+                log.e(TAG, "Login challenge error ${status.value} ${bodyAsErrorMessage()}")
+            }
+            throw e
+        }
+            .body<ChallengeResponse>().challenge.base64Decode()
+
+    private suspend fun RefreshTokensParams.attestationLogin(
+        client: HttpClient,
+        challenge: ByteArray,
+        loginUrl: String,
+    ): BearerTokens? {
         // Get key
         val key = keyStoreTools.getKey() ?: return null
         val publicKeyBase64 = key.publicKey.encoded.base64Encode()
@@ -138,7 +150,8 @@ class ServerHttpClientFactory @Inject constructor(
         // Login
         val loginSignature = key.privateKey.sign(challenge)
         val token = try {
-            post(loginUrl) {
+            client.post(loginUrl) {
+                markAsRefreshTokenRequest() // TODO Test request is marked
                 contentType(ContentType.Application.Json)
                 setBody(
                     LoginRequest(
@@ -166,7 +179,11 @@ class ServerHttpClientFactory @Inject constructor(
         return BearerTokens(token, publicKeyBase64)
     }
 
-    private suspend fun HttpClient.attestationRegister(challenge: ByteArray, registerUrl: String): BearerTokens {
+    private suspend fun RefreshTokensParams.attestationRegister(
+        client: HttpClient,
+        challenge: ByteArray,
+        registerUrl: String,
+    ): BearerTokens {
         // Generate key
         val key = keyStoreTools.generateKey()
         val publicKeyBase64 = key.publicKey.encoded.base64Encode()
@@ -174,7 +191,8 @@ class ServerHttpClientFactory @Inject constructor(
         // Register
         val registrationSignature = key.privateKey.sign(challenge)
         val token = try {
-            post(registerUrl) {
+            client.post(registerUrl) {
+                markAsRefreshTokenRequest() // TODO Test request is marked
                 contentType(ContentType.Application.Json)
                 setBody(
                     RegisterRequest(
