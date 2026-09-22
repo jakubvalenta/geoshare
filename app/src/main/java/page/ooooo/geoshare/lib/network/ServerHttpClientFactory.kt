@@ -131,7 +131,7 @@ class ServerHttpClientFactory @Inject constructor(
     private suspend fun RefreshTokensParams.attestationChallenge(client: HttpClient, challengeUrl: String): ByteArray =
         try {
             client.post(challengeUrl) {
-                markAsRefreshTokenRequest() // TODO Test request is marked
+                markAsRefreshTokenRequest()
             }
         } catch (e: ClientRequestException) {
             with(e.response) {
@@ -154,7 +154,7 @@ class ServerHttpClientFactory @Inject constructor(
         val loginSignature = key.privateKey.sign(loginChallenge)
         val token = try {
             client.post(loginUrl) {
-                markAsRefreshTokenRequest() // TODO Test request is marked
+                markAsRefreshTokenRequest()
                 contentType(ContentType.Application.Json)
                 setBody(
                     LoginRequest(
@@ -195,7 +195,7 @@ class ServerHttpClientFactory @Inject constructor(
         val registrationSignature = key.privateKey.sign(registrationChallenge)
         val token = try {
             client.post(registerUrl) {
-                markAsRefreshTokenRequest() // TODO Test request is marked
+                markAsRefreshTokenRequest()
                 contentType(ContentType.Application.Json)
                 setBody(
                     RegisterRequest(
