@@ -68,6 +68,7 @@ class ServerHttpClientFactory @Inject constructor(
     fun createHttpClient(server: Server): HttpClient =
         HttpClient(engine) {
             expectSuccess = true
+            configureLogging(log)
             setDefaultTimeouts()
             rethrowExceptionsAsNetworkException(log)
 
@@ -102,6 +103,7 @@ class ServerHttpClientFactory @Inject constructor(
     private suspend fun attestationLogin(challengeUrl: String, loginUrl: String): BearerTokens? =
         HttpClient(engine) {
             expectSuccess = true
+            configureLogging(log)
             setDefaultTimeouts()
 
             install(ContentNegotiation) {

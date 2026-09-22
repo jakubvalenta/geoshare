@@ -13,6 +13,9 @@ import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.head
 import io.ktor.client.statement.request
@@ -95,6 +98,18 @@ fun HttpClientConfig<*>.setDefaultTimeouts() {
         requestTimeoutMillis = REQUEST_TIMEOUT
         connectTimeoutMillis = CONNECT_TIMEOUT
         socketTimeoutMillis = SOCKET_TIMEOUT
+    }
+}
+
+fun HttpClientConfig<*>.configureLogging(log: Log) {
+    install(Logging) {
+        logger = object : Logger {
+            override fun log(message: String) {
+                log.d(TAG, message)
+            }
+        }
+        level = LogLevel.HEADERS
+        sanitizeHeader { header -> header == HttpHeaders.Authorization }
     }
 }
 
