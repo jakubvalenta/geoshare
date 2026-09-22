@@ -27,6 +27,7 @@ import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.extensions.verifySignature
+import kotlin.random.Random
 
 class ServerHttpClientFactoryTest {
     private val apiKeyServer = Server(
@@ -44,7 +45,6 @@ class ServerHttpClientFactoryTest {
         loginUrl = "https://api.example.com/auth/login",
         registerUrl = "https://api.example.com/auth/register",
     )
-    private val challenge = "test challenge".toByteArray()
     private val log = FakeLog
     private val query = "Cherbourg, France"
     private val correctToken = "correct token"
@@ -176,6 +176,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns400_throwsException() = runTest {
+        val challenges = mutableSetOf<String>()
         val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
@@ -186,11 +187,16 @@ class ServerHttpClientFactoryTest {
                     }
 
                 attestationServer.challengeUrl ->
-                    respond(
-                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                        HttpStatusCode.OK,
-                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                    )
+                    Random.nextBytes(8).base64Encode().let { challenge ->
+                        challenges.add(challenge)
+                        respond(
+                            Json.encodeToString(
+                                ServerHttpClientFactory.ChallengeResponse(challenge)
+                            ),
+                            HttpStatusCode.OK,
+                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                        )
+                    }
 
                 attestationServer.loginUrl ->
                     respondError(HttpStatusCode.BadRequest)
@@ -207,6 +213,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = ServerResponseNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginReturns5xx_throwsException() = runTest {
+        val challenges = mutableSetOf<String>()
         val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
@@ -217,11 +224,16 @@ class ServerHttpClientFactoryTest {
                     }
 
                 attestationServer.challengeUrl ->
-                    respond(
-                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                        HttpStatusCode.OK,
-                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                    )
+                    Random.nextBytes(8).base64Encode().let { challenge ->
+                        challenges.add(challenge)
+                        respond(
+                            Json.encodeToString(
+                                ServerHttpClientFactory.ChallengeResponse(challenge)
+                            ),
+                            HttpStatusCode.OK,
+                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                        )
+                    }
 
                 attestationServer.loginUrl ->
                     respondError(HttpStatusCode.InternalServerError)
@@ -238,6 +250,7 @@ class ServerHttpClientFactoryTest {
 
     @Test(expected = UnauthorizedNetworkException::class)
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationFails_throwsException() = runTest {
+        val challenges = mutableSetOf<String>()
         val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
@@ -248,11 +261,16 @@ class ServerHttpClientFactoryTest {
                     }
 
                 attestationServer.challengeUrl ->
-                    respond(
-                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                        HttpStatusCode.OK,
-                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                    )
+                    Random.nextBytes(8).base64Encode().let { challenge ->
+                        challenges.add(challenge)
+                        respond(
+                            Json.encodeToString(
+                                ServerHttpClientFactory.ChallengeResponse(challenge)
+                            ),
+                            HttpStatusCode.OK,
+                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                        )
+                    }
 
                 attestationServer.loginUrl ->
                     respondError(HttpStatusCode.Unauthorized)
@@ -273,6 +291,7 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsMissingAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
+            val challenges = mutableSetOf<String>()
             val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
@@ -284,22 +303,27 @@ class ServerHttpClientFactoryTest {
                         }
 
                     attestationServer.challengeUrl ->
-                        respond(
-                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                            HttpStatusCode.OK,
-                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                        )
+                        Random.nextBytes(8).base64Encode().let { challenge ->
+                            challenges.add(challenge)
+                            respond(
+                                Json.encodeToString(
+                                    ServerHttpClientFactory.ChallengeResponse(challenge)
+                                ),
+                                HttpStatusCode.OK,
+                                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                            )
+                        }
 
                     attestationServer.loginUrl -> {
                         val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
+                        val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
+                            body.signature.base64Decode(), body.challenge.base64Decode()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
-                        if (signatureOk && publicKeyOk) {
+                        if (challengeOk && signatureOk && publicKeyOk) {
                             respondError(HttpStatusCode.Unauthorized)
                         } else {
                             throw NotImplementedError()
@@ -310,12 +334,12 @@ class ServerHttpClientFactoryTest {
                         val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
+                        val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
+                            body.signature.base64Decode(), body.challenge.base64Decode()
                         )
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
-                        if (signatureOk && chainOk) {
+                        if (challengeOk && signatureOk && chainOk) {
                             respond(
                                 Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
@@ -344,6 +368,7 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsMissingAndPrivateKeyIsNotGeneratedAndRegistrationSucceeds_returnsResponse() =
         runTest {
+            val challenges = mutableSetOf<String>()
             val keyStoreTools = FakeKeyStoreTools()
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
@@ -355,22 +380,27 @@ class ServerHttpClientFactoryTest {
                         }
 
                     attestationServer.challengeUrl ->
-                        respond(
-                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                            HttpStatusCode.OK,
-                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                        )
+                        Random.nextBytes(8).base64Encode().let { challenge ->
+                            challenges.add(challenge)
+                            respond(
+                                Json.encodeToString(
+                                    ServerHttpClientFactory.ChallengeResponse(challenge)
+                                ),
+                                HttpStatusCode.OK,
+                                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                            )
+                        }
 
                     attestationServer.loginUrl -> {
                         val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
+                        val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
+                            body.signature.base64Decode(), body.challenge.base64Decode()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
-                        if (signatureOk && publicKeyOk) {
+                        if (challengeOk && signatureOk && publicKeyOk) {
                             throw NotImplementedError()
                         } else {
                             respondError(HttpStatusCode.Unauthorized)
@@ -381,12 +411,12 @@ class ServerHttpClientFactoryTest {
                         val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
+                        val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
+                            body.signature.base64Decode(), body.challenge.base64Decode()
                         )
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
-                        if (signatureOk && chainOk) {
+                        if (challengeOk && signatureOk && chainOk) {
                             respond(
                                 Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
@@ -415,6 +445,7 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsIncorrectAndLoginFailsAndRegistrationSucceeds_returnsResponse() =
         runTest {
+            val challenges = mutableSetOf<String>()
             val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
@@ -426,22 +457,27 @@ class ServerHttpClientFactoryTest {
                         }
 
                     attestationServer.challengeUrl ->
-                        respond(
-                            Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                            HttpStatusCode.OK,
-                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                        )
+                        Random.nextBytes(8).base64Encode().let { challenge ->
+                            challenges.add(challenge)
+                            respond(
+                                Json.encodeToString(
+                                    ServerHttpClientFactory.ChallengeResponse(challenge)
+                                ),
+                                HttpStatusCode.OK,
+                                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                            )
+                        }
 
                     attestationServer.loginUrl -> {
                         val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
+                        val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
+                            body.signature.base64Decode(), body.challenge.base64Decode()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
-                        if (signatureOk && publicKeyOk) {
+                        if (challengeOk && signatureOk && publicKeyOk) {
                             respondError(HttpStatusCode.Unauthorized)
                         } else {
                             throw NotImplementedError()
@@ -452,12 +488,12 @@ class ServerHttpClientFactoryTest {
                         val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
+                        val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
+                            body.signature.base64Decode(), body.challenge.base64Decode()
                         )
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
-                        if (signatureOk && chainOk) {
+                        if (challengeOk && signatureOk && chainOk) {
                             respond(
                                 Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
@@ -493,6 +529,7 @@ class ServerHttpClientFactoryTest {
 
     @Test
     fun createHttpClient_attestation_whenTokenIsIncorrectAndRefreshTokenIsCorrect_returnsResponse() = runTest {
+        val challenges = mutableSetOf<String>()
         val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
         val engine = MockEngine { request ->
             when (request.url.toString()) {
@@ -504,22 +541,27 @@ class ServerHttpClientFactoryTest {
                     }
 
                 attestationServer.challengeUrl ->
-                    respond(
-                        Json.encodeToString(ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())),
-                        HttpStatusCode.OK,
-                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                    )
+                    Random.nextBytes(8).base64Encode().let { challenge ->
+                        challenges.add(challenge)
+                        respond(
+                            Json.encodeToString(
+                                ServerHttpClientFactory.ChallengeResponse(challenge)
+                            ),
+                            HttpStatusCode.OK,
+                            headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                        )
+                    }
 
                 attestationServer.loginUrl -> {
                     val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                     val body =
                         Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
+                    val challengeOk = challenges.remove(body.challenge)
                     val signatureOk = key.publicKey.verifySignature(
-                        body.signature.base64Decode(),
-                        body.challenge.base64Decode(),
+                        body.signature.base64Decode(), body.challenge.base64Decode()
                     )
                     val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
-                    if (signatureOk && publicKeyOk) {
+                    if (challengeOk && signatureOk && publicKeyOk) {
                         respond(
                             Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                             HttpStatusCode.OK,
@@ -555,18 +597,23 @@ class ServerHttpClientFactoryTest {
     @Test
     fun createHttpClient_attestation_whenTokenIsIncorrectAndEndpointReturnsChallenge_doesNotRequestChallengeAndReturnsResponse() =
         runTest {
+            val challenges = mutableSetOf<String>()
             val keyStoreTools = FakeKeyStoreTools().apply { generateKey() }
             val engine = MockEngine { request ->
                 when (request.url.toString()) {
                     attestationServer.getUrl(query, uriQuote) ->
                         when (request.headers[HttpHeaders.Authorization]) {
-                            "Bearer $incorrectToken" -> respondError(
-                                HttpStatusCode.Unauthorized,
-                                Json.encodeToString(
-                                    ServerHttpClientFactory.ChallengeResponse(challenge = challenge.base64Encode())
-                                ),
-                                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                            )
+                            "Bearer $incorrectToken" ->
+                                Random.nextBytes(8).base64Encode().let { challenge ->
+                                    challenges.add(challenge)
+                                    respondError(
+                                        HttpStatusCode.Unauthorized,
+                                        Json.encodeToString(
+                                            ServerHttpClientFactory.ChallengeResponse(challenge)
+                                        ),
+                                        headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                                    )
+                                }
 
                             "Bearer $newToken" -> respondOk("success")
                             else -> throw NotImplementedError()
@@ -579,12 +626,12 @@ class ServerHttpClientFactoryTest {
                         val key = keyStoreTools.getKey() ?: throw NotImplementedError()
                         val body =
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
+                        val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(),
-                            body.challenge.base64Decode(),
+                            body.signature.base64Decode(), body.challenge.base64Decode()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
-                        if (signatureOk && publicKeyOk) {
+                        if (challengeOk && signatureOk && publicKeyOk) {
                             respond(
                                 Json.encodeToString(ServerHttpClientFactory.TokenResponse(token = newToken)),
                                 HttpStatusCode.OK,
