@@ -24,9 +24,12 @@ import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
+import page.ooooo.geoshare.lib.SigningPurpose
+import page.ooooo.geoshare.lib.buildSigningPayloadV1
 import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
-import page.ooooo.geoshare.lib.extensions.verifySignature
+import page.ooooo.geoshare.lib.fingerprint
+import page.ooooo.geoshare.lib.verifySignature
 import kotlin.random.Random
 
 class ServerHttpClientFactoryTest {
@@ -320,7 +323,12 @@ class ServerHttpClientFactoryTest {
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(), body.challenge.base64Decode()
+                            body.signature.base64Decode(),
+                            buildSigningPayloadV1(
+                                SigningPurpose.LOGIN,
+                                key.publicKey.fingerprint(),
+                                body.challenge.base64Decode(),
+                            ).toByteArray()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
                         if (challengeOk && signatureOk && publicKeyOk) {
@@ -336,7 +344,12 @@ class ServerHttpClientFactoryTest {
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(), body.challenge.base64Decode()
+                            body.signature.base64Decode(),
+                            buildSigningPayloadV1(
+                                SigningPurpose.REGISTRATION,
+                                key.publicKey.fingerprint(),
+                                body.challenge.base64Decode(),
+                            ).toByteArray()
                         )
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
                         if (challengeOk && signatureOk && chainOk) {
@@ -397,7 +410,12 @@ class ServerHttpClientFactoryTest {
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(), body.challenge.base64Decode()
+                            body.signature.base64Decode(),
+                            buildSigningPayloadV1(
+                                SigningPurpose.LOGIN,
+                                key.publicKey.fingerprint(),
+                                body.challenge.base64Decode(),
+                            ).toByteArray()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
                         if (challengeOk && signatureOk && publicKeyOk) {
@@ -413,7 +431,12 @@ class ServerHttpClientFactoryTest {
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(), body.challenge.base64Decode()
+                            body.signature.base64Decode(),
+                            buildSigningPayloadV1(
+                                SigningPurpose.REGISTRATION,
+                                key.publicKey.fingerprint(),
+                                body.challenge.base64Decode(),
+                            ).toByteArray()
                         )
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
                         if (challengeOk && signatureOk && chainOk) {
@@ -474,7 +497,12 @@ class ServerHttpClientFactoryTest {
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(), body.challenge.base64Decode()
+                            body.signature.base64Decode(),
+                            buildSigningPayloadV1(
+                                SigningPurpose.LOGIN,
+                                key.publicKey.fingerprint(),
+                                body.challenge.base64Decode(),
+                            ).toByteArray()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
                         if (challengeOk && signatureOk && publicKeyOk) {
@@ -490,7 +518,12 @@ class ServerHttpClientFactoryTest {
                             Json.decodeFromString<ServerHttpClientFactory.RegisterRequest>((request.body as TextContent).text)
                         val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(), body.challenge.base64Decode()
+                            body.signature.base64Decode(),
+                            buildSigningPayloadV1(
+                                SigningPurpose.REGISTRATION,
+                                key.publicKey.fingerprint(),
+                                body.challenge.base64Decode(),
+                            ).toByteArray()
                         )
                         val chainOk = key.certificateChain.map { it.encoded.base64Encode() } == body.certificateChain
                         if (challengeOk && signatureOk && chainOk) {
@@ -558,7 +591,12 @@ class ServerHttpClientFactoryTest {
                         Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                     val challengeOk = challenges.remove(body.challenge)
                     val signatureOk = key.publicKey.verifySignature(
-                        body.signature.base64Decode(), body.challenge.base64Decode()
+                        body.signature.base64Decode(),
+                        buildSigningPayloadV1(
+                            SigningPurpose.LOGIN,
+                            key.publicKey.fingerprint(),
+                            body.challenge.base64Decode(),
+                        ).toByteArray()
                     )
                     val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
                     if (challengeOk && signatureOk && publicKeyOk) {
@@ -628,7 +666,12 @@ class ServerHttpClientFactoryTest {
                             Json.decodeFromString<ServerHttpClientFactory.LoginRequest>((request.body as TextContent).text)
                         val challengeOk = challenges.remove(body.challenge)
                         val signatureOk = key.publicKey.verifySignature(
-                            body.signature.base64Decode(), body.challenge.base64Decode()
+                            body.signature.base64Decode(),
+                            buildSigningPayloadV1(
+                                SigningPurpose.LOGIN,
+                                key.publicKey.fingerprint(),
+                                body.challenge.base64Decode(),
+                            ).toByteArray()
                         )
                         val publicKeyOk = key.publicKey.encoded.base64Encode() == body.publicKey
                         if (challengeOk && signatureOk && publicKeyOk) {
