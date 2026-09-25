@@ -20,6 +20,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
+import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.local.preferences.DismissedHelpMessagesPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
@@ -94,6 +95,21 @@ fun UserPreferenceDeveloperOptionsControls(
         userPreferenceTextControl(
             key = "cached_purchase_control",
             userPreference = CachedPurchasePreference,
+            values = values,
+            onValueChange = onValueChange,
+        )
+        item(key = "cached_server_token_label", contentType = "paragraph_text") {
+            ParagraphText(
+                stringResource(R.string.user_preferences_cached_server_token),
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.small, bottom = spacing.tiny),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+        userPreferenceTextControl(
+            key = "cached_server_token_control",
+            userPreference = CachedServerTokenPreference,
             values = values,
             onValueChange = onValueChange,
         )
