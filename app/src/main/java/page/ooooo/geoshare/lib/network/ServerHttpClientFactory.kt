@@ -29,10 +29,13 @@ import page.ooooo.geoshare.data.local.preferences.CachedServerToken
 import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.SigningPurpose
 import page.ooooo.geoshare.lib.android.KeyStoreTools
+import page.ooooo.geoshare.lib.buildSigningPayloadV1
 import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
-import page.ooooo.geoshare.lib.extensions.sign
+import page.ooooo.geoshare.lib.fingerprint
+import page.ooooo.geoshare.lib.sign
 import javax.inject.Inject
 
 class ServerHttpClientFactory @Inject constructor(
@@ -149,9 +152,16 @@ class ServerHttpClientFactory @Inject constructor(
         // Get key
         val key = keyStoreTools.getKey() ?: return null
         val publicKeyBase64 = key.publicKey.encoded.base64Encode()
+        val publicKeyFingerprint = key.publicKey.fingerprint()
 
         // Login
-        val loginSignature = key.privateKey.sign(loginChallenge)
+        val loginSignature = key.privateKey.sign(
+            buildSigningPayloadV1(
+                SigningPurpose.LOGIN,
+                publicKeyFingerprint,
+                loginChallenge,
+            ).toByteArray()
+        )
         val token = try {
             client.post(loginUrl) {
                 markAsRefreshTokenRequest()
@@ -190,9 +200,16 @@ class ServerHttpClientFactory @Inject constructor(
         // Generate key
         val key = keyStoreTools.generateKey()
         val publicKeyBase64 = key.publicKey.encoded.base64Encode()
+        val publicKeyFingerprint = key.publicKey.fingerprint()
 
         // Register
-        val registrationSignature = key.privateKey.sign(registrationChallenge)
+        val registrationSignature = key.privateKey.sign(
+            buildSigningPayloadV1(
+                SigningPurpose.REGISTRATION,
+                publicKeyFingerprint,
+                registrationChallenge,
+            ).toByteArray()
+        )
         val token = try {
             client.post(registerUrl) {
                 markAsRefreshTokenRequest()
