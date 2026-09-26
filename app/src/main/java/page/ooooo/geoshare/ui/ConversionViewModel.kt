@@ -1,53 +1,54 @@
 package page.ooooo.geoshare.ui
 
 import android.content.Intent
+import android.content.res.Resources
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppRepository
+import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.StateMachine
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.getUriString
-import page.ooooo.geoshare.lib.conversion.ActionAutomationFailed
-import page.ooooo.geoshare.lib.conversion.ActionAutomationSucceeded
-import page.ooooo.geoshare.lib.conversion.ActionCompleted
-import page.ooooo.geoshare.lib.conversion.ActionFailed
-import page.ooooo.geoshare.lib.conversion.ActionRan
-import page.ooooo.geoshare.lib.conversion.ActionReady
-import page.ooooo.geoshare.lib.conversion.ActionSucceeded
-import page.ooooo.geoshare.lib.conversion.ActionWaiting
-import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
-import page.ooooo.geoshare.lib.conversion.FileActionReady
-import page.ooooo.geoshare.lib.conversion.FileUriRequested
-import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.LocationActionReady
-import page.ooooo.geoshare.lib.conversion.LocationFindingFailed
-import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
-import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
-import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
-import page.ooooo.geoshare.lib.conversion.LocationReceived
+import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.SourceReceived
 import page.ooooo.geoshare.lib.extensions.zipWithNextLastNull
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.ActionAutomationFailed
+import page.ooooo.geoshare.lib.outputs.ActionAutomationSucceeded
+import page.ooooo.geoshare.lib.outputs.ActionCompleted
+import page.ooooo.geoshare.lib.outputs.ActionFailed
+import page.ooooo.geoshare.lib.outputs.ActionRan
+import page.ooooo.geoshare.lib.outputs.ActionReady
 import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.ActionState
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.ActionSucceeded
+import page.ooooo.geoshare.lib.outputs.ActionWaiting
+import page.ooooo.geoshare.lib.outputs.BasicActionReady
+import page.ooooo.geoshare.lib.outputs.FileActionReady
+import page.ooooo.geoshare.lib.outputs.FileUriRequested
 import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.LocationActionReady
+import page.ooooo.geoshare.lib.outputs.LocationFindingFailed
+import page.ooooo.geoshare.lib.outputs.LocationPermissionReceived
+import page.ooooo.geoshare.lib.outputs.LocationRationaleConfirmed
+import page.ooooo.geoshare.lib.outputs.LocationRationaleShown
+import page.ooooo.geoshare.lib.outputs.LocationReceived
 import page.ooooo.geoshare.lib.outputs.Output
 import javax.inject.Inject
 import kotlin.time.ComparableTimeMark
@@ -102,13 +103,35 @@ object LocationPermissionReceivedDetail : ActionDetail
 
 @HiltViewModel
 class ConversionViewModel @Inject constructor(
-    private val stateContext: ConversionStateContext,
+    private val actionStateContext: ActionStateContext,
+    private val conversionStateContext: ConversionStateContext,
+    log: Log,
+    resources: Resources,
     appRepository: AppRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    val currentState = stateContext.currentState
+    // TODO Connect conversionStateMachine to actionStateMachine
+    private val conversionStateMachine = StateMachine(
+        initialState = ConversionState.Initial,
+        exceptionState = { tr ->
+            ConversionFailed(
+                _source.value,
+                resources.getString(R.string.conversion_failed_reason_exception),
+                stackTrace = tr.stackTraceToString(),
+            )
+        },
+        log = log,
+    )
+    val currentConversionState = conversionStateMachine.currentState
 
-    val actionDetail: StateFlow<ActionDetail?> = stateContext.currentState
+    private val actionStateMachine = StateMachine(
+        initialState = ActionState.Initial,
+        exceptionState = { ActionCompleted(ActionResult.FAILED) },
+        log = log,
+    )
+    val currentActionState = actionStateMachine.currentState
+
+    val actionDetail: StateFlow<ActionDetail?> = actionStateMachine.currentState
         .combine(appRepository.appDetails) { currentState, appDetails ->
             when (currentState) {
                 is ActionWaiting -> ActionWaitingDetail(
@@ -150,13 +173,13 @@ class ConversionViewModel @Inject constructor(
             null,
         )
 
-    val extendedStateLog: StateFlow<List<ExtendedConversionStateLogItem>> = stateContext.stateLog
+    val conversionStateLog: StateFlow<List<ConversionStateLogItem>> = conversionStateMachine.stateLog
         .map { stateLog ->
             stateLog
                 .zipWithNextLastNull { logItem, nextLogItem ->
                     if (logItem.state is ConversionState.HasDescription) {
                         if (nextLogItem != null) {
-                            ExtendedConversionStateLogItem.Finished(
+                            ConversionStateLogItem.Finished(
                                 id = logItem.id,
                                 state = logItem.state,
                                 start = logItem.start,
@@ -168,7 +191,7 @@ class ConversionViewModel @Inject constructor(
                                 },
                             )
                         } else {
-                            ExtendedConversionStateLogItem.Pending(
+                            ConversionStateLogItem.Pending(
                                 id = logItem.id,
                                 state = logItem.state,
                                 start = logItem.start,
@@ -186,7 +209,7 @@ class ConversionViewModel @Inject constructor(
             emptyList(),
         )
 
-    val start: StateFlow<ComparableTimeMark?> = stateContext.stateLog
+    val start: StateFlow<ComparableTimeMark?> = conversionStateMachine.stateLog
         .map { it.firstOrNull()?.start }
         .stateIn(
             viewModelScope,
@@ -200,55 +223,44 @@ class ConversionViewModel @Inject constructor(
     private val _sourceComesFromIntent = savedStateHandle.getMutableStateFlow("sourceComesFromIntent", false)
     val sourceComesFromIntent: StateFlow<Boolean> = _sourceComesFromIntent.asStateFlow()
 
-    private var transitionJob: Job? = null
-    private val transitionExceptionHandler = CoroutineExceptionHandler { _, tr ->
-        stateContext.setExceptionState(
-            tr,
-            ConversionFailed(
-                _source.value,
-                stateContext.resources.getString(R.string.conversion_failed_reason_exception),
-                stackTrace = tr.stackTraceToString(),
-            )
-        )
-    }
-
     // Methods
 
     fun start(sourceComesFromIntent: Boolean) {
         _sourceComesFromIntent.value = sourceComesFromIntent
-        transition(resetLog = true) { SourceReceived(_source.value) }
-    }
-
-    private fun transition(resetLog: Boolean = false, initialState: (suspend () -> ConversionState)) {
-        transitionJob?.cancel()
-        transitionJob = viewModelScope.launch(transitionExceptionHandler) {
-            stateContext.transition(initialState(), resetLog)
+        conversionStateMachine.transition(conversionStateContext, viewModelScope, resetLog = true) {
+            SourceReceived(_source.value)
         }
     }
 
     fun grant(doNotAsk: Boolean) {
-        (stateContext.currentState.value as? ConversionState.HasPermission)?.apply {
-            transition { grant(stateContext, doNotAsk) }
+        (conversionStateMachine.currentState.value as? ConversionState.HasPermission)?.apply {
+            conversionStateMachine.transition(conversionStateContext, viewModelScope) {
+                grant(conversionStateContext, doNotAsk)
+            }
         }
     }
 
     fun deny(doNotAsk: Boolean) {
-        (stateContext.currentState.value as? ConversionState.HasPermission)?.apply {
-            transition { deny(stateContext, doNotAsk) }
+        (conversionStateMachine.currentState.value as? ConversionState.HasPermission)?.apply {
+            conversionStateMachine.transition(conversionStateContext, viewModelScope) {
+                deny(conversionStateContext, doNotAsk)
+            }
         }
     }
 
     fun cancel() {
-        transitionJob?.cancel()
+        conversionStateMachine.cancel()
     }
 
     fun reset() {
-        transition(resetLog = true) { Initial }
+        conversionStateMachine.reset(conversionStateContext, viewModelScope)
     }
 
     fun retry() {
-        (stateContext.currentState.value as? ConversionState.HasError)?.apply {
-            transition { SourceReceived(source) }
+        (conversionStateMachine.currentState.value as? ConversionState.HasError)?.apply {
+            conversionStateMachine.transition(conversionStateContext, viewModelScope) {
+                SourceReceived(source)
+            }
         }
     }
 
@@ -259,72 +271,94 @@ class ConversionViewModel @Inject constructor(
     // Any action
 
     fun startAction(action: Action<*>) {
-        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
-            transition { ActionReady(source, points, action, isAutomation = false) }
+        (actionStateMachine.currentState.value as? ConversionState.HasResult)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                ActionReady(action, isAutomation = false)
+            }
         }
     }
 
     fun completeBasicAction(actionResult: ActionResult) {
-        (stateContext.currentState.value as? BasicActionReady)?.apply {
-            transition { ActionRan(source, points, action, actionResult, isAutomation) }
+        (actionStateMachine.currentState.value as? BasicActionReady)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                ActionRan(action, actionResult, isAutomation)
+            }
         }
     }
 
     // File action
 
     fun receiveFileUri(uri: Uri) {
-        (stateContext.currentState.value as? FileUriRequested)?.apply {
-            transition { FileActionReady(source, points, action, isAutomation, uri) }
+        (actionStateMachine.currentState.value as? FileUriRequested)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                FileActionReady(action, isAutomation, uri)
+            }
         }
     }
 
     fun cancelFileUriRequest() {
-        (stateContext.currentState.value as? FileUriRequested)?.apply {
-            transition { ActionCompleted(source, points, ActionResult.FAILED) }
+        (actionStateMachine.currentState.value as? FileUriRequested)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                ActionCompleted(ActionResult.FAILED)
+            }
         }
     }
 
     fun completeFileAction(actionResult: ActionResult) {
-        (stateContext.currentState.value as? FileActionReady)?.apply {
-            transition { ActionRan(source, points, action, actionResult, isAutomation) }
+        (actionStateMachine.currentState.value as? FileActionReady)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                ActionRan(action, actionResult, isAutomation)
+            }
         }
     }
 
     // Location action
 
     fun showLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
-            transition { LocationRationaleShown(source, points, action, isAutomation) }
+        (actionStateMachine.currentState.value as? ConversionState.HasResult)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                LocationRationaleShown(action, isAutomation)
+            }
         }
     }
 
     fun skipLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
-            transition { LocationPermissionReceived(source, points, action, isAutomation) }
+        (actionStateMachine.currentState.value as? ConversionState.HasResult)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                LocationPermissionReceived(action, isAutomation)
+            }
         }
     }
 
     fun receiveLocationPermission() {
-        (stateContext.currentState.value as? LocationRationaleConfirmed)?.apply {
-            transition { LocationPermissionReceived(source, points, action, isAutomation) }
+        (actionStateMachine.currentState.value as? LocationRationaleConfirmed)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                LocationPermissionReceived(action, isAutomation)
+            }
         }
     }
 
     fun receiveLocation(action: LocationAction<*>, isAutomation: Boolean, location: Point?) {
-        (stateContext.currentState.value as? ConversionState.HasResult)?.apply {
-            transition { LocationReceived(source, points, action, isAutomation, location) }
+        (actionStateMachine.currentState.value as? ConversionState.HasResult)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                LocationReceived(action, isAutomation, location)
+            }
         }
     }
 
     fun cancelLocationFinding() {
-        (stateContext.currentState.value as? LocationPermissionReceived)?.apply {
-            transition { ActionCompleted(source, points, ActionResult.FAILED) }
+        (actionStateMachine.currentState.value as? LocationPermissionReceived)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                ActionCompleted(ActionResult.FAILED)
+            }
         }
     }
 
     fun completeLocationAction(actionResult: ActionResult) {
-        (stateContext.currentState.value as? LocationActionReady)?.apply {
-            transition { ActionRan(source, points, action, actionResult, isAutomation) }
+        (actionStateMachine.currentState.value as? LocationActionReady)?.apply {
+            actionStateMachine.transition(actionStateContext, viewModelScope) {
+                ActionRan(action, actionResult, isAutomation)
+            }
         }
     }
 

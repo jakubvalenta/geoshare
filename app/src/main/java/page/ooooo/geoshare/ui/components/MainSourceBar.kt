@@ -46,7 +46,7 @@ import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.paste
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
-import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
+import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
@@ -63,7 +63,7 @@ fun MainSourceBar(
     logExpanded: Boolean,
     source: StateFlow<String>,
     start: StateFlow<ComparableTimeMark?>,
-    stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
+    stateLog: StateFlow<List<ConversionStateLogItem>>,
     onSelectUri: (uriString: String) -> Unit,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
@@ -169,7 +169,7 @@ fun MainSourceBar(
 @Composable
 private fun MainSourceTimeButton(
     start: StateFlow<ComparableTimeMark?>,
-    stateLog: List<ExtendedConversionStateLogItem>,
+    stateLog: List<ConversionStateLogItem>,
     logExpanded: Boolean,
     textPadding: Dp = LocalSpacing.current.small,
     iconPadding: Dp = textPadding - 10.dp,
@@ -180,7 +180,7 @@ private fun MainSourceTimeButton(
 
     val text = start?.let { start ->
         when (lastLogItem) {
-            is ExtendedConversionStateLogItem.Finished -> {
+            is ConversionStateLogItem.Finished -> {
                 val elapsedTime = lastLogItem.end - start
                 if (elapsedTime > 10.milliseconds) {
                     @Composable {
@@ -193,7 +193,7 @@ private fun MainSourceTimeButton(
                 }
             }
 
-            is ExtendedConversionStateLogItem.Pending -> {
+            is ConversionStateLogItem.Pending -> {
                 @Composable {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                         ElapsedTimeText(start)

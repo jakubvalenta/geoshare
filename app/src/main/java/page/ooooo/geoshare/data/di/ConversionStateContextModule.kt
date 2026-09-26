@@ -100,7 +100,7 @@ class FakeConversionStateContext(
         throw NotImplementedError()
     }
 
-    override fun setExceptionState(tr: Throwable, newState: ConversionState) {
+    override fun onException(tr: Throwable, newState: ConversionState) {
         throw NotImplementedError()
     }
 }

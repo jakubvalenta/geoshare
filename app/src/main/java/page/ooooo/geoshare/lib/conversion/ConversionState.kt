@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.conversion
 
 import android.content.res.Resources
-import android.net.Uri
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -14,8 +13,9 @@ import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.LinkRepository
+import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
-import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.local.preferences.AutomationPreference
 import page.ooooo.geoshare.data.local.preferences.BasicAutomation
 import page.ooooo.geoshare.data.local.preferences.CachedPurchase
@@ -26,10 +26,16 @@ import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.data.toOutput
 import page.ooooo.geoshare.lib.Attempt
+import page.ooooo.geoshare.lib.DefaultLog
+import page.ooooo.geoshare.lib.DefaultUriQuote
+import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.lib.State
+import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.AutomationFeature
+import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
-import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -40,24 +46,15 @@ import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.merge
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.ActionResult
-import page.ooooo.geoshare.lib.outputs.BasicAction
-import page.ooooo.geoshare.lib.outputs.FileAction
-import page.ooooo.geoshare.lib.outputs.LocationAction
-import page.ooooo.geoshare.lib.outputs.NoopAction
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.StringOutput
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-interface ConversionState {
-    suspend fun transition(stateContext: ConversionStateContext): ConversionState? = null
+interface ConversionState : State<ConversionStateContext> {
+    override suspend fun transition(stateContext: ConversionStateContext): ConversionState? = null
 
     interface HasSource {
         val source: String
@@ -82,19 +79,41 @@ interface ConversionState {
         val points: Points
     }
 
-    interface HasPermission : HasSource {
-        suspend fun grant(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState
-        suspend fun deny(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState
+    interface HasPermission : State.HasPermission<ConversionStateContext>, HasSource { // TODO Try to remove HasSource
+        override suspend fun grant(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState
+        override suspend fun deny(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState
     }
 
     interface HasAttempt : HasSource {
         val lastAttempt: Attempt<RecoverableNetworkException>?
     }
+
+    object Initial : ConversionState {
+        override fun toString() = "Initial"
+    }
 }
 
-object Initial : ConversionState {
-    override fun toString() = "Initial"
+interface ConversionStateContext {
+    val billing: Billing
+    val coordinateConverter: CoordinateConverter
+    val inputs: List<Input>
+    val linkRepository: LinkRepository
+    val log: Log
+    val resources: Resources
+    val uriQuote: UriQuote
+    val userPreferencesRepository: UserPreferencesRepository
 }
+
+class DefaultConversionStateContext(
+    override val billing: Billing,
+    override val coordinateConverter: CoordinateConverter,
+    override val inputs: List<Input> = emptyList(),
+    override val linkRepository: LinkRepository,
+    override val log: Log = DefaultLog,
+    override val resources: Resources,
+    override val uriQuote: UriQuote = DefaultUriQuote,
+    override val userPreferencesRepository: UserPreferencesRepository,
+) : ConversionStateContext
 
 typealias Results = Map<MatchedInput<*>, ParseResult.Success>
 
@@ -476,7 +495,6 @@ data class ConversionSucceeded(
 ) : ConversionState, ConversionState.HasResult {
     @OptIn(FlowPreview::class)
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState? {
-        val lastPoint = points.lastOrNull() ?: return null
         val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
         if (automation is NoopAutomation) {
             return null
@@ -533,16 +551,7 @@ data class ConversionSucceeded(
                     automation.toOutput(stateContext.coordinateConverter, link)
                 }
             } ?: return null
-            val action = when (output) {
-                is PointOutput -> output.toAction(lastPoint)
-                is PointsOutput -> output.toAction(points)
-                is StringOutput -> NoopAction
-            }
-            if (output is Output.HasAutomationDelay) {
-                val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
-                return ActionWaiting(source, points, action, output, isAutomation = true, delay = delay)
-            }
-            return ActionReady(source, points, action, isAutomation = true)
+            return AutomationRequested(points, output)
         }
         return null
     }
@@ -552,6 +561,13 @@ data class ConversionSucceeded(
     private companion object {
         private const val TAG = "ConversionSucceeded"
     }
+}
+
+data class AutomationRequested(
+    val points: Points,
+    val output: Output,
+) : ConversionState {
+    override fun toString() = "AutomationRequested(points=$points, output=$output)"
 }
 
 data class ConversionFailed(
@@ -564,356 +580,5 @@ data class ConversionFailed(
 
     private companion object {
         private const val TAG = "ConversionFailed"
-    }
-}
-
-data class ActionWaiting(
-    override val source: String,
-    override val points: Points,
-    val action: Action<*>,
-    val output: Output.HasAutomationDelay,
-    @Suppress("SameParameterValue") val isAutomation: Boolean,
-    val delay: Duration,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState = try {
-        if (delay.isPositive()) {
-            delay(delay)
-        }
-        ActionReady(source, points, action, isAutomation)
-    } catch (_: CancellationException) {
-        ActionCompleted(source, points, ActionResult.FAILED)
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "ActionWaiting"
-    }
-}
-
-data class ActionReady(
-    override val source: String,
-    override val points: Points,
-    val action: Action<*>,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState = when (action) {
-        is BasicAction -> BasicActionReady(source, points, action, isAutomation)
-        is FileAction -> FileUriRequested(source, points, action, isAutomation)
-        is LocationAction -> LocationRationaleRequested(source, points, action, isAutomation)
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "ActionReady"
-    }
-}
-
-data class BasicActionReady(
-    override val source: String,
-    override val points: Points,
-    val action: BasicAction<*>,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "BasicActionReady"
-    }
-}
-
-data class FileActionReady(
-    override val source: String,
-    override val points: Points,
-    val action: FileAction<*>,
-    val isAutomation: Boolean,
-    val uri: Uri,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, uri=$uri)"
-
-    private companion object {
-        private const val TAG = "FileActionReady"
-    }
-}
-
-data class LocationActionReady(
-    override val source: String,
-    override val points: Points,
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
-    val location: Point,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, location=$location)"
-
-    private companion object {
-        private const val TAG = "LocationActionReady"
-    }
-}
-
-data class ActionRan(
-    override val source: String,
-    override val points: Points,
-    val action: Action<*>,
-    val actionResult: ActionResult,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState =
-        action.output.let { output ->
-            if (!isAutomation) {
-                when (actionResult) {
-                    ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
-                        if (output is Output.HasSuccessText) {
-                            ActionSucceeded(source, points, actionResult, output)
-                        } else {
-                            ActionCompleted(source, points, actionResult)
-                        }
-
-                    ActionResult.FAILED ->
-                        if (output is Output.HasErrorText) {
-                            ActionFailed(source, points, actionResult, output)
-                        } else {
-                            ActionCompleted(source, points, actionResult)
-                        }
-                }
-            } else {
-                when (actionResult) {
-                    ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP ->
-                        if (output is Output.HasAutomationSuccessText) {
-                            ActionAutomationSucceeded(source, points, actionResult, output)
-                        } else {
-                            ActionCompleted(source, points, actionResult)
-                        }
-
-                    ActionResult.FAILED ->
-                        if (output is Output.HasAutomationErrorText) {
-                            ActionAutomationFailed(source, points, actionResult, output)
-                        } else {
-                            ActionCompleted(source, points, actionResult)
-                        }
-                }
-            }
-        }
-
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, actionResult=$actionResult, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "ActionRan"
-    }
-}
-
-data class ActionSucceeded(
-    override val source: String,
-    override val points: Points,
-    val actionResult: ActionResult,
-    val output: Output.HasSuccessText,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState {
-        try {
-            delay(3.seconds)
-        } catch (_: CancellationException) {
-            // Do nothing
-        }
-        return ActionCompleted(source, points, actionResult)
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
-
-    private companion object {
-        private const val TAG = "ActionSucceeded"
-    }
-}
-
-data class ActionAutomationSucceeded(
-    override val source: String,
-    override val points: Points,
-    val actionResult: ActionResult,
-    val output: Output.HasAutomationSuccessText,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState {
-        try {
-            delay(3.seconds)
-        } catch (_: CancellationException) {
-            // Do nothing
-        }
-        return ActionCompleted(source, points, actionResult)
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
-
-    private companion object {
-        private const val TAG = "ActionAutomationSucceeded"
-    }
-}
-
-data class ActionFailed(
-    override val source: String,
-    override val points: Points,
-    val actionResult: ActionResult,
-    val output: Output.HasErrorText,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState {
-        try {
-            delay(3.seconds)
-        } catch (_: CancellationException) {
-            // Do nothing
-        }
-        return ActionCompleted(source, points, actionResult)
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
-
-    private companion object {
-        private const val TAG = "ActionFailed"
-    }
-}
-
-data class ActionAutomationFailed(
-    override val source: String,
-    override val points: Points,
-    val actionResult: ActionResult,
-    val output: Output.HasAutomationErrorText,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState {
-        try {
-            delay(3.seconds)
-        } catch (_: CancellationException) {
-            // Do nothing
-        }
-        return ActionCompleted(source, points, actionResult)
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
-
-    private companion object {
-        private const val TAG = "ActionAutomationFailed"
-    }
-}
-
-data class ActionCompleted(
-    override val source: String,
-    override val points: Points,
-    val actionResult: ActionResult,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
-
-    private companion object {
-        private const val TAG = "ActionCompleted"
-    }
-}
-
-data class FileUriRequested(
-    override val source: String,
-    override val points: Points,
-    val action: FileAction<*>,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "FileUriRequested"
-    }
-}
-
-data class LocationRationaleRequested(
-    override val source: String,
-    override val points: Points,
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "LocationRationaleRequested"
-    }
-}
-
-data class LocationRationaleShown(
-    override val source: String,
-    override val points: Points,
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasPermission, ConversionState.HasResult {
-    override suspend fun grant(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState =
-        LocationRationaleConfirmed(source, points, action, isAutomation)
-
-    override suspend fun deny(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState =
-        ActionCompleted(source, points, ActionResult.FAILED)
-
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "LocationRationaleShown"
-    }
-}
-
-data class LocationRationaleConfirmed(
-    override val source: String,
-    override val points: Points,
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "LocationRationaleConfirmed"
-    }
-}
-
-data class LocationPermissionReceived(
-    override val source: String,
-    override val points: Points,
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() = "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation)"
-
-    private companion object {
-        private const val TAG = "LocationPermissionReceived"
-    }
-}
-
-data class LocationReceived(
-    override val source: String,
-    override val points: Points,
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
-    val location: Point?,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState = if (location == null) {
-        LocationFindingFailed(source, points, ActionResult.FAILED)
-    } else {
-        LocationActionReady(source, points, action, isAutomation, location)
-    }
-
-    override fun toString() =
-        "$TAG(source=$source, points=$points, action=$action, isAutomation=$isAutomation, location=$location)"
-
-    private companion object {
-        private const val TAG = "LocationReceived"
-    }
-}
-
-data class LocationFindingFailed(
-    override val source: String,
-    override val points: Points,
-    val actionResult: ActionResult,
-) : ConversionState, ConversionState.HasResult {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState {
-        try {
-            delay(3.seconds)
-        } catch (_: CancellationException) {
-            // Do nothing
-        }
-        return ActionCompleted(source, points, actionResult)
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points, actionResult=$actionResult)"
-
-    private companion object {
-        private const val TAG = "LocationFindingFailed"
     }
 }

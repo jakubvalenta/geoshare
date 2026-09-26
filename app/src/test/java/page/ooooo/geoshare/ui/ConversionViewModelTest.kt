@@ -26,7 +26,7 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
-import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
+import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.conversion.SourceReceived
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
@@ -76,18 +76,18 @@ class ConversionViewModelTest {
             userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
-            stateContext = stateContext,
+            conversionStateContext = stateContext,
             appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
             // Start collecting the StateFlow, so that we can read its value later
-            conversionViewModel.extendedStateLog.collect {}
+            conversionViewModel.conversionStateLog.collect {}
         }
 
         // Assert initial extended state log value
         advanceUntilIdle()
-        assertTrue(conversionViewModel.extendedStateLog.value.isEmpty())
+        assertTrue(conversionViewModel.conversionStateLog.value.isEmpty())
 
         // Set new state
         val firstState = PermissionGrantedBasicInput(
@@ -109,7 +109,7 @@ class ConversionViewModelTest {
         advanceUntilIdle()
         assertEquals(
             listOf(
-                ExtendedConversionStateLogItem.Finished(
+                ConversionStateLogItem.Finished(
                     id = 0,
                     state = firstState,
                     start = firstStart,
@@ -117,7 +117,7 @@ class ConversionViewModelTest {
                     succeeded = false,
                 ),
             ),
-            conversionViewModel.extendedStateLog.value,
+            conversionViewModel.conversionStateLog.value,
         )
     }
 
@@ -134,18 +134,18 @@ class ConversionViewModelTest {
             userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
-            stateContext = stateContext,
+            conversionStateContext = stateContext,
             appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
             // Start collecting the StateFlow, so that we can read its value later
-            conversionViewModel.extendedStateLog.collect {}
+            conversionViewModel.conversionStateLog.collect {}
         }
 
         // Assert initial extended state log value
         advanceUntilIdle()
-        assertTrue(conversionViewModel.extendedStateLog.value.isEmpty())
+        assertTrue(conversionViewModel.conversionStateLog.value.isEmpty())
 
         // Set new state
         val firstState = PermissionGrantedBasicInput(
@@ -170,20 +170,20 @@ class ConversionViewModelTest {
         advanceUntilIdle()
         assertEquals(
             listOf(
-                ExtendedConversionStateLogItem.Finished(
+                ConversionStateLogItem.Finished(
                     id = 0,
                     state = firstState,
                     start = firstStart,
                     end = secondStart,
                     succeeded = false,
                 ),
-                ExtendedConversionStateLogItem.Pending(
+                ConversionStateLogItem.Pending(
                     id = 1,
                     state = secondState,
                     start = secondStart,
                 ),
             ),
-            conversionViewModel.extendedStateLog.value,
+            conversionViewModel.conversionStateLog.value,
         )
     }
 
@@ -200,18 +200,18 @@ class ConversionViewModelTest {
             userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
-            stateContext = stateContext,
+            conversionStateContext = stateContext,
             appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
             // Start collecting the StateFlow, so that we can read its value later
-            conversionViewModel.extendedStateLog.collect {}
+            conversionViewModel.conversionStateLog.collect {}
         }
 
         // Assert initial extended state log value
         advanceUntilIdle()
-        assertTrue(conversionViewModel.extendedStateLog.value.isEmpty())
+        assertTrue(conversionViewModel.conversionStateLog.value.isEmpty())
 
         // Set new state
         val firstState = PermissionGrantedBasicInput(
@@ -235,20 +235,20 @@ class ConversionViewModelTest {
         advanceUntilIdle()
         assertEquals(
             listOf(
-                ExtendedConversionStateLogItem.Finished(
+                ConversionStateLogItem.Finished(
                     id = 0,
                     state = firstState,
                     start = firstStart,
                     end = secondStart,
                     succeeded = true,
                 ),
-                ExtendedConversionStateLogItem.Pending(
+                ConversionStateLogItem.Pending(
                     id = 1,
                     state = secondState,
                     start = secondStart,
                 ),
             ),
-            conversionViewModel.extendedStateLog.value,
+            conversionViewModel.conversionStateLog.value,
         )
     }
 
@@ -265,18 +265,18 @@ class ConversionViewModelTest {
             userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
-            stateContext = stateContext,
+            conversionStateContext = stateContext,
             appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
             // Start collecting the StateFlow, so that we can read its value later
-            conversionViewModel.extendedStateLog.collect {}
+            conversionViewModel.conversionStateLog.collect {}
         }
 
         // Assert initial extended state log value
         advanceUntilIdle()
-        assertTrue(conversionViewModel.extendedStateLog.value.isEmpty())
+        assertTrue(conversionViewModel.conversionStateLog.value.isEmpty())
 
         // Set new state
         val firstState = PermissionGrantedBasicInput(
@@ -292,13 +292,13 @@ class ConversionViewModelTest {
         advanceUntilIdle()
         assertEquals(
             listOf(
-                ExtendedConversionStateLogItem.Pending(
+                ConversionStateLogItem.Pending(
                     id = 0,
                     state = firstState,
                     start = firstStart,
                 ),
             ),
-            conversionViewModel.extendedStateLog.value,
+            conversionViewModel.conversionStateLog.value,
         )
     }
 
@@ -315,18 +315,18 @@ class ConversionViewModelTest {
             userPreferencesRepository = userPreferencesRepository,
         )
         val conversionViewModel = ConversionViewModel(
-            stateContext = stateContext,
+            conversionStateContext = stateContext,
             appRepository = appRepository,
             savedStateHandle = savedStateHandle,
         )
         backgroundScope.launch {
             // Start collecting the StateFlow, so that we can read its value later
-            conversionViewModel.extendedStateLog.collect {}
+            conversionViewModel.conversionStateLog.collect {}
         }
 
         // Assert initial extended state log value
         advanceUntilIdle()
-        assertTrue(conversionViewModel.extendedStateLog.value.isEmpty())
+        assertTrue(conversionViewModel.conversionStateLog.value.isEmpty())
 
         // Set new state
         val firstState = SourceReceived(
@@ -353,7 +353,7 @@ class ConversionViewModelTest {
         advanceUntilIdle()
         assertEquals(
             listOf(
-                ExtendedConversionStateLogItem.Finished(
+                ConversionStateLogItem.Finished(
                     id = 1,
                     state = secondState,
                     start = secondStart,
@@ -361,7 +361,7 @@ class ConversionViewModelTest {
                     succeeded = true,
                 ),
             ),
-            conversionViewModel.extendedStateLog.value,
+            conversionViewModel.conversionStateLog.value,
         )
     }
 }

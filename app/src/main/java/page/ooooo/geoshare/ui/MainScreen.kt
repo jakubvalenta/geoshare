@@ -87,7 +87,7 @@ import page.ooooo.geoshare.lib.conversion.BasicActionReady
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
-import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
+import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.FileActionReady
 import page.ooooo.geoshare.lib.conversion.FileUriRequested
 import page.ooooo.geoshare.lib.conversion.Initial
@@ -166,7 +166,7 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
+    val currentState by conversionViewModel.currentConversionState.collectAsStateWithLifecycle()
 
     // Action
 
@@ -283,7 +283,7 @@ fun MainScreen(
         outputsForUriByCategory = outputViewModel.outputsForUriByCategory,
         selectedUri = outputViewModel.selectedUri,
         start = conversionViewModel.start,
-        stateLog = conversionViewModel.extendedStateLog,
+        stateLog = conversionViewModel.conversionStateLog,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferenceViewModel.message,
@@ -361,7 +361,7 @@ private fun MainScreen(
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
     start: StateFlow<ComparableTimeMark?>,
-    stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
+    stateLog: StateFlow<List<ConversionStateLogItem>>,
     userPreferenceMessage: StateFlow<Message?>,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
     onCancel: () -> Unit,
