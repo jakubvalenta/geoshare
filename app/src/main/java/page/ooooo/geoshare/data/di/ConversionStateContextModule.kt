@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.data.di
 
 import android.content.Context
-import android.content.res.Resources
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,24 +8,14 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
-import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
-import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
-import page.ooooo.geoshare.lib.conversion.DefaultConversionStateContext
-import page.ooooo.geoshare.lib.conversion.Initial
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.inputs.Input
-import kotlin.time.ComparableTimeMark
 
 /**
  * Injects [ConversionStateContext] into a view model.
@@ -51,7 +40,7 @@ object ConversionStateContextModule {
         uriQuote: UriQuote,
         userPreferencesRepository: UserPreferencesRepository,
     ): ConversionStateContext =
-        DefaultConversionStateContext(
+        ConversionStateContext(
             coordinateConverter = coordinateConverter,
             inputs = inputRepository.all,
             linkRepository = linkRepository,
@@ -61,46 +50,4 @@ object ConversionStateContextModule {
             billing = billing,
             uriQuote = uriQuote,
         )
-}
-
-/**
- * An implementation of [ConversionStateContext] that allows setting the state using a public method [setState].
- *
- * For testing purposes only.
- */
-class FakeConversionStateContext(
-    override val billing: Billing,
-    override val coordinateConverter: CoordinateConverter,
-    override val inputs: List<Input>,
-    override val linkRepository: LinkRepository,
-    override val log: Log,
-    override val resources: Resources,
-    override val uriQuote: UriQuote,
-    override val userPreferencesRepository: UserPreferencesRepository,
-) : ConversionStateContext {
-    private var counter: Int = 0
-
-    private var _currentState: MutableStateFlow<ConversionState> = MutableStateFlow(Initial)
-    override val currentState: StateFlow<ConversionState> = _currentState.asStateFlow()
-
-    private var _stateLog: MutableStateFlow<List<ConversionStateLogItem>> = MutableStateFlow(emptyList())
-    override val stateLog: StateFlow<List<ConversionStateLogItem>> = _stateLog.asStateFlow()
-
-    fun setState(newState: ConversionState, start: ComparableTimeMark, resetLog: Boolean = false) {
-        _currentState.value = newState
-        val newLogItem = ConversionStateLogItem(counter++, newState, start)
-        if (resetLog) {
-            _stateLog.value = listOf(newLogItem)
-        } else {
-            _stateLog.update { it + newLogItem }
-        }
-    }
-
-    override suspend fun transition(newState: ConversionState, resetLog: Boolean) {
-        throw NotImplementedError()
-    }
-
-    override fun onException(tr: Throwable, newState: ConversionState) {
-        throw NotImplementedError()
-    }
 }

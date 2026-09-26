@@ -13,13 +13,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppRepository
+import page.ooooo.geoshare.lib.DefaultStateMachine
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.StateMachine
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.getUriString
+import page.ooooo.geoshare.lib.conversion.AutomationRequested
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
 import page.ooooo.geoshare.lib.conversion.ConversionStateContext
@@ -39,6 +42,7 @@ import page.ooooo.geoshare.lib.outputs.ActionState
 import page.ooooo.geoshare.lib.outputs.ActionStateContext
 import page.ooooo.geoshare.lib.outputs.ActionSucceeded
 import page.ooooo.geoshare.lib.outputs.ActionWaiting
+import page.ooooo.geoshare.lib.outputs.AutomationReceived
 import page.ooooo.geoshare.lib.outputs.BasicActionReady
 import page.ooooo.geoshare.lib.outputs.FileActionReady
 import page.ooooo.geoshare.lib.outputs.FileUriRequested
@@ -111,7 +115,7 @@ class ConversionViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     // TODO Connect conversionStateMachine to actionStateMachine
-    private val conversionStateMachine = StateMachine(
+    private val conversionStateMachine = DefaultStateMachine(
         initialState = ConversionState.Initial,
         exceptionState = { tr ->
             ConversionFailed(
@@ -122,14 +126,27 @@ class ConversionViewModel @Inject constructor(
         },
         log = log,
     )
-    val currentConversionState = conversionStateMachine.currentState
+    val conversionState = conversionStateMachine.currentState
 
-    private val actionStateMachine = StateMachine(
+    private val actionStateMachine = DefaultStateMachine(
         initialState = ActionState.Initial,
         exceptionState = { ActionCompleted(ActionResult.FAILED) },
         log = log,
     )
-    val currentActionState = actionStateMachine.currentState
+    val actionState = actionStateMachine.currentState
+
+    init {
+        // TODO Connect conversion state to action state
+        conversionStateMachine.currentState
+            .onEach { conversionState ->
+                if (conversionState is AutomationRequested) {
+                    actionStateMachine.transition(actionStateContext, viewModelScope, resetLog = true) {
+                        AutomationReceived(conversionState.points, conversionState.output)
+                    }
+                }
+            }
+            .shareIn(viewModelScope, SharingStarted.Eagerly)
+    }
 
     val actionDetail: StateFlow<ActionDetail?> = actionStateMachine.currentState
         .combine(appRepository.appDetails) { currentState, appDetails ->

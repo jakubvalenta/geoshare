@@ -93,27 +93,16 @@ interface ConversionState : State<ConversionStateContext> {
     }
 }
 
-interface ConversionStateContext {
-    val billing: Billing
-    val coordinateConverter: CoordinateConverter
-    val inputs: List<Input>
-    val linkRepository: LinkRepository
-    val log: Log
-    val resources: Resources
-    val uriQuote: UriQuote
-    val userPreferencesRepository: UserPreferencesRepository
-}
-
-class DefaultConversionStateContext(
-    override val billing: Billing,
-    override val coordinateConverter: CoordinateConverter,
-    override val inputs: List<Input> = emptyList(),
-    override val linkRepository: LinkRepository,
-    override val log: Log = DefaultLog,
-    override val resources: Resources,
-    override val uriQuote: UriQuote = DefaultUriQuote,
-    override val userPreferencesRepository: UserPreferencesRepository,
-) : ConversionStateContext
+class ConversionStateContext(
+    val billing: Billing,
+    val coordinateConverter: CoordinateConverter,
+    val inputs: List<Input> = emptyList(),
+    val linkRepository: LinkRepository,
+    val log: Log = DefaultLog,
+    val resources: Resources,
+    val uriQuote: UriQuote = DefaultUriQuote,
+    val userPreferencesRepository: UserPreferencesRepository,
+)
 
 typealias Results = Map<MatchedInput<*>, ParseResult.Success>
 
@@ -551,7 +540,7 @@ data class ConversionSucceeded(
                     automation.toOutput(stateContext.coordinateConverter, link)
                 }
             } ?: return null
-            return AutomationRequested(points, output)
+            return AutomationRequested(source, points, output)
         }
         return null
     }
@@ -564,9 +553,10 @@ data class ConversionSucceeded(
 }
 
 data class AutomationRequested(
-    val points: Points,
+    override val source: String,
+    override val points: Points,
     val output: Output,
-) : ConversionState {
+) : ConversionState, ConversionState.HasResult {
     override fun toString() = "AutomationRequested(points=$points, output=$output)"
 }
 

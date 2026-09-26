@@ -22,11 +22,7 @@ interface ActionState : State<ActionStateContext> {
     }
 }
 
-interface ActionStateContext {
-    val userPreferencesRepository: UserPreferencesRepository
-}
-
-class DefaultActionStateContext(
+class ActionStateContext(
     val userPreferencesRepository: UserPreferencesRepository,
 )
 
