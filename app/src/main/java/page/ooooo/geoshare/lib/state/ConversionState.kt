@@ -78,7 +78,7 @@ interface ConversionState : State<ConversionStateContext> {
         val points: Points
     }
 
-    interface HasPermission : State.HasPermission<ConversionStateContext>, HasSource { // TODO Try to remove HasSource
+    interface HasPermission : State.HasPermission<ConversionStateContext> {
         override suspend fun grant(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState
         override suspend fun deny(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState
     }
@@ -164,7 +164,7 @@ data class PermissionRequested(
     override val source: String,
     val matchedInput: MatchedInput<*>,
     val results: Results = emptyMap(),
-) : ConversionState, ConversionState.HasPermission {
+) : ConversionState, ConversionState.HasPermission, ConversionState.HasSource {
     override suspend fun grant(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)

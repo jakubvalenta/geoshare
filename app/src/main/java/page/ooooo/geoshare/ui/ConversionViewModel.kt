@@ -158,11 +158,12 @@ class ConversionViewModel @Inject constructor(
         conversionJob?.cancel()
         conversionJob = viewModelScope.launch(conversionExceptionHandler) {
             val newState = newState()
-            log.d(TAG, "Set conversion state to $newState")
             _conversionState.value = newState
+            log.d(TAG, "Set conversion state to $newState")
             _conversionStateLog.append(newState, clear = clearLog)
             newState.transitionRecursively(conversionStateContext) { newState ->
                 _conversionState.value = newState as ConversionState
+                log.d(TAG, "Transitioned action state to $newState")
                 _conversionStateLog.append(newState)
             }
         }
@@ -221,9 +222,10 @@ class ConversionViewModel @Inject constructor(
         actionJob?.cancel()
         actionJob = viewModelScope.launch(actionExceptionHandler) {
             val newState = newState()
-            log.d(TAG, "Set action state to $newState")
             _actionState.value = newState
+            log.d(TAG, "Set action state to $newState")
             newState.transitionRecursively(actionStateContext) { newState ->
+                log.d(TAG, "Transitioned action state to $newState")
                 _actionState.value = newState as ActionState
             }
         }
@@ -282,9 +284,7 @@ class ConversionViewModel @Inject constructor(
     // Any action
 
     fun startAction(action: Action<*>) {
-        (_actionState.value as? ConversionState.HasResult)?.apply {
-            transitionAction { ActionReady(action, isAutomation = false) }
-        }
+        transitionAction { ActionReady(action, isAutomation = false) }
     }
 
     fun completeBasicAction(actionResult: ActionResult) {
@@ -320,15 +320,11 @@ class ConversionViewModel @Inject constructor(
     // Location action
 
     fun showLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (_actionState.value as? ConversionState.HasResult)?.apply {
-            transitionAction { LocationRationaleShown(action, isAutomation) }
-        }
+        transitionAction { LocationRationaleShown(action, isAutomation) }
     }
 
     fun skipLocationRationale(action: LocationAction<*>, isAutomation: Boolean) {
-        (_actionState.value as? ConversionState.HasResult)?.apply {
-            transitionAction { LocationPermissionReceived(action, isAutomation) }
-        }
+        transitionAction { LocationPermissionReceived(action, isAutomation) }
     }
 
     fun receiveLocationPermission() {
@@ -338,9 +334,7 @@ class ConversionViewModel @Inject constructor(
     }
 
     fun receiveLocation(action: LocationAction<*>, isAutomation: Boolean, location: Point?) {
-        (_actionState.value as? ConversionState.HasResult)?.apply {
-            transitionAction { LocationReceived(action, isAutomation, location) }
-        }
+        transitionAction { LocationReceived(action, isAutomation, location) }
     }
 
     fun cancelLocationFinding() {

@@ -20,7 +20,6 @@ suspend fun <C> State<C>.transitionRecursively(
     var i = 0
     while (i < maxIterations) {
         currentState = currentState.transition(stateContext) ?: break
-        // TODO log.d(TAG, "Transitioned state to $newState")
         onStateChange(currentState)
         i++
     }
