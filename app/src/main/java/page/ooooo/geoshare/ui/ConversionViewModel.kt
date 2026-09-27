@@ -14,9 +14,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
@@ -24,39 +25,39 @@ import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.getUriString
-import page.ooooo.geoshare.lib.state.AutomationRequested
-import page.ooooo.geoshare.lib.state.ConversionFailed
-import page.ooooo.geoshare.lib.state.ConversionState
-import page.ooooo.geoshare.lib.state.ConversionStateContext
-import page.ooooo.geoshare.lib.state.SourceReceived
 import page.ooooo.geoshare.lib.extensions.zipWithNextLastNull
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.outputs.Action
+import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.state.ActionAutomationFailed
 import page.ooooo.geoshare.lib.state.ActionAutomationSucceeded
 import page.ooooo.geoshare.lib.state.ActionCompleted
 import page.ooooo.geoshare.lib.state.ActionFailed
 import page.ooooo.geoshare.lib.state.ActionRan
 import page.ooooo.geoshare.lib.state.ActionReady
-import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.state.ActionState
 import page.ooooo.geoshare.lib.state.ActionStateContext
 import page.ooooo.geoshare.lib.state.ActionSucceeded
 import page.ooooo.geoshare.lib.state.ActionWaiting
 import page.ooooo.geoshare.lib.state.AutomationReceived
+import page.ooooo.geoshare.lib.state.AutomationRequested
 import page.ooooo.geoshare.lib.state.BasicActionReady
+import page.ooooo.geoshare.lib.state.ConversionFailed
+import page.ooooo.geoshare.lib.state.ConversionState
+import page.ooooo.geoshare.lib.state.ConversionStateContext
+import page.ooooo.geoshare.lib.state.ExtendedStateLog
+import page.ooooo.geoshare.lib.state.ExtendedStateLogItem
 import page.ooooo.geoshare.lib.state.FileActionReady
 import page.ooooo.geoshare.lib.state.FileUriRequested
-import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.state.LocationActionReady
 import page.ooooo.geoshare.lib.state.LocationFindingFailed
 import page.ooooo.geoshare.lib.state.LocationPermissionReceived
 import page.ooooo.geoshare.lib.state.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.state.LocationRationaleShown
 import page.ooooo.geoshare.lib.state.LocationReceived
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.state.ExtendedStateLog
-import page.ooooo.geoshare.lib.state.ExtendedStateLogItem
+import page.ooooo.geoshare.lib.state.SourceReceived
 import page.ooooo.geoshare.lib.state.StateLog
 import page.ooooo.geoshare.lib.state.append
 import page.ooooo.geoshare.lib.state.transitionRecursively
@@ -144,17 +145,16 @@ class ConversionViewModel @Inject constructor(
     }
 
     init {
-        // TODO Connect conversion state to action state
+        // Start automation action when conversion succeeds
         _conversionState
+            .filterIsInstance<AutomationRequested>()
             .onEach { conversionState ->
-                if (conversionState is AutomationRequested) {
-                    transitionAction { AutomationReceived(conversionState.points, conversionState.output) }
-                }
+                transitionAction { AutomationReceived(conversionState.points, conversionState.output) }
             }
-            .shareIn(viewModelScope, SharingStarted.Eagerly)
+            .launchIn(viewModelScope)
     }
 
-    fun transitionConversion(clearLog: Boolean = false, newState: (suspend () -> ConversionState)) {
+    private fun transitionConversion(clearLog: Boolean = false, newState: (suspend () -> ConversionState)) {
         conversionJob?.cancel()
         conversionJob = viewModelScope.launch(conversionExceptionHandler) {
             val newState = newState()
@@ -218,7 +218,7 @@ class ConversionViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    fun transitionAction(newState: (suspend () -> ActionState)) {
+    private fun transitionAction(newState: (suspend () -> ActionState)) {
         actionJob?.cancel()
         actionJob = viewModelScope.launch(actionExceptionHandler) {
             val newState = newState()
