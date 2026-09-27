@@ -41,12 +41,12 @@ import page.ooooo.geoshare.lib.state.ActionState
 import page.ooooo.geoshare.lib.state.ActionStateContext
 import page.ooooo.geoshare.lib.state.ActionSucceeded
 import page.ooooo.geoshare.lib.state.ActionWaiting
-import page.ooooo.geoshare.lib.state.AutomationReceived
 import page.ooooo.geoshare.lib.state.AutomationRequested
 import page.ooooo.geoshare.lib.state.BasicActionReady
 import page.ooooo.geoshare.lib.state.ConversionFailed
 import page.ooooo.geoshare.lib.state.ConversionState
 import page.ooooo.geoshare.lib.state.ConversionStateContext
+import page.ooooo.geoshare.lib.state.ConversionSucceeded
 import page.ooooo.geoshare.lib.state.ExtendedStateLog
 import page.ooooo.geoshare.lib.state.ExtendedStateLogItem
 import page.ooooo.geoshare.lib.state.FileActionReady
@@ -221,11 +221,11 @@ class MainViewModel @Inject constructor(
     }
 
     init {
-        // Start automation action when conversion succeeds
+        // Start automation when conversion succeeds
         _conversionState
-            .filterIsInstance<AutomationRequested>()
+            .filterIsInstance<ConversionSucceeded>()
             .onEach { conversionState ->
-                transitionAction { AutomationReceived(conversionState.points, conversionState.output) }
+                transitionAction { AutomationRequested(conversionState.points) }
             }
             .launchIn(viewModelScope)
     }

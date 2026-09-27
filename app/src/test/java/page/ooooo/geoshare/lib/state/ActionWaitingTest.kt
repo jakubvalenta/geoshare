@@ -7,7 +7,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.UriScheme
@@ -28,7 +27,7 @@ class ActionWaitingTest {
         coordinateConverter,
     )
     private val action = output.toAction(points.last())
-    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
+    private val actionStateContext: ActionStateContext = mock()
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionReady() = runTest {

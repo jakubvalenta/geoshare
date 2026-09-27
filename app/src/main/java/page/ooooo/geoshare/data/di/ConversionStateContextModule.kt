@@ -9,13 +9,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import page.ooooo.geoshare.data.InputRepository
-import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.billing.Billing
 import page.ooooo.geoshare.lib.state.ConversionStateContext
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 
 /**
  * Injects [ConversionStateContext] into a view model.
@@ -32,22 +29,16 @@ object ConversionStateContextModule {
     @ViewModelScoped
     fun provideConversionStateContext(
         @ApplicationContext context: Context,
-        billing: Billing,
-        coordinateConverter: CoordinateConverter,
         inputRepository: InputRepository,
-        linkRepository: LinkRepository,
         log: Log,
         uriQuote: UriQuote,
         userPreferencesRepository: UserPreferencesRepository,
     ): ConversionStateContext =
         ConversionStateContext(
-            coordinateConverter = coordinateConverter,
             inputs = inputRepository.all,
-            linkRepository = linkRepository,
             resources = context.resources,
             userPreferencesRepository = userPreferencesRepository,
             log = log,
-            billing = billing,
             uriQuote = uriQuote,
         )
 }

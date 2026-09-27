@@ -3,12 +3,12 @@ package page.ooooo.geoshare.lib.state
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.outputs.NoopAction
 
 class BasicActionReadyTest {
     private val action = NoopAction
-    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
+    private val actionStateContext: ActionStateContext = mock()
 
     @Test
     fun transition_returnsNull() = runTest {

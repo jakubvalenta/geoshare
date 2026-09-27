@@ -9,6 +9,7 @@ import io.ktor.http.Url
 import io.ktor.utils.io.CancellationException
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -87,9 +88,8 @@ class PermissionGrantedWebViewInputTest {
         val state = PermissionGrantedWebViewInput(
             source, matchedInput, permission, results, dispatcher = testScheduler
         )
-        var res: ConversionState? = null
-        launch {
-            res = state.transition(stateContext)
+        val res = async {
+            state.transition(stateContext)
         }
         state.pendingData.complete("$source-data")
         advanceUntilIdle()
@@ -100,7 +100,7 @@ class PermissionGrantedWebViewInputTest {
                 permission,
                 results + (matchedInput to result.copy(next = next.copy(match = "$source-data"))),
             ),
-            res,
+            res.await(),
         )
     }
 
@@ -122,9 +122,8 @@ class PermissionGrantedWebViewInputTest {
             val state = PermissionGrantedWebViewInput(
                 source, matchedInput, permission, results, dispatcher = testScheduler
             )
-            var res: ConversionState? = null
-            launch {
-                res = state.transition(stateContext)
+            val res = async {
+                state.transition(stateContext)
             }
             state.pendingData.complete("$source-data")
             advanceUntilIdle()
@@ -134,7 +133,7 @@ class PermissionGrantedWebViewInputTest {
                     resources.getString(R.string.conversion_failed_unsupported_source_place_list),
                     warning = true,
                 ),
-                res,
+                res.await(),
             )
         }
 
@@ -150,9 +149,8 @@ class PermissionGrantedWebViewInputTest {
             maxAttempts,
             dispatcher = testScheduler,
         )
-        var res: ConversionState? = null
-        launch {
-            res = state.transition(stateContext)
+        val res = async {
+            state.transition(stateContext)
         }
         state.pendingData.completeExceptionally(cause)
         advanceUntilIdle()
@@ -165,7 +163,7 @@ class PermissionGrantedWebViewInputTest {
                 lastAttempt = Attempt(1, cause),
                 maxAttempts,
             ),
-            res,
+            res.await(),
         )
     }
 
@@ -182,9 +180,8 @@ class PermissionGrantedWebViewInputTest {
             maxAttempts,
             dispatcher = testScheduler,
         )
-        var res: ConversionState? = null
-        launch {
-            res = state.transition(stateContext)
+        val res = async {
+            state.transition(stateContext)
         }
         state.pendingData.completeExceptionally(cause)
         advanceUntilIdle()
@@ -197,7 +194,7 @@ class PermissionGrantedWebViewInputTest {
                 lastAttempt = Attempt(2, cause),
                 maxAttempts,
             ),
-            res,
+            res.await(),
         )
     }
 
@@ -246,9 +243,8 @@ class PermissionGrantedWebViewInputTest {
             maxAttempts,
             dispatcher = testScheduler,
         )
-        var res: ConversionState? = null
-        launch {
-            res = state.transition(stateContext)
+        val res = async {
+            state.transition(stateContext)
         }
         state.pendingData.completeExceptionally(cause)
         advanceUntilIdle()
@@ -258,7 +254,7 @@ class PermissionGrantedWebViewInputTest {
                 resources.getString(R.string.network_exception_response_error, HttpStatusCode.NotFound.value),
                 stackTrace = "Request URL: $requestUrl",
             ),
-            res,
+            res.await(),
         )
     }
 
@@ -296,15 +292,14 @@ class PermissionGrantedWebViewInputTest {
         val state = PermissionGrantedWebViewInput(
             source, matchedInput, permission, results, dispatcher = testScheduler
         )
-        var res: ConversionState? = null
-        launch {
-            res = state.transition(stateContext)
+        val res = async {
+            state.transition(stateContext)
         }
         state.pendingData.complete("$source-data")
         advanceUntilIdle()
         assertEquals(
             ConversionFailed(source, resources.getString(R.string.conversion_failed_cancelled)),
-            res,
+            res.await(),
         )
     }
 

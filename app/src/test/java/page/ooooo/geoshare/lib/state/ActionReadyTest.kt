@@ -5,7 +5,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
@@ -21,7 +20,7 @@ class ActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val log = FakeLog
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
+    private val actionStateContext: ActionStateContext = mock()
 
     @Test
     fun transition_whenActionIsCopyCoordsDec_returnsBasicActionReady() = runTest {

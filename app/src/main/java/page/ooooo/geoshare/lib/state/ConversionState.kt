@@ -7,34 +7,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.ActivityAutomation
-import page.ooooo.geoshare.data.local.preferences.AutomationPreference
-import page.ooooo.geoshare.data.local.preferences.BasicAutomation
-import page.ooooo.geoshare.data.local.preferences.CachedPurchase
-import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.LinkAutomation
-import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.data.toOutput
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.billing.AutomationFeature
-import page.ooooo.geoshare.lib.billing.Billing
-import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
 import page.ooooo.geoshare.lib.inputs.Input
@@ -45,12 +29,9 @@ import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.inputs.merge
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
-import page.ooooo.geoshare.lib.outputs.Output
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 interface ConversionState : State<ConversionStateContext> {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState? = null
@@ -92,11 +73,8 @@ interface ConversionState : State<ConversionStateContext> {
     }
 }
 
-class ConversionStateContext(
-    val billing: Billing,
-    val coordinateConverter: CoordinateConverter,
+data class ConversionStateContext(
     val inputs: List<Input> = emptyList(),
-    val linkRepository: LinkRepository,
     val log: Log = DefaultLog,
     val resources: Resources,
     val uriQuote: UriQuote = DefaultUriQuote,
@@ -127,11 +105,7 @@ data class SourceReceived(
         )
     }
 
-    override fun toString() = "$TAG(source=$source)"
-
-    private companion object {
-        private const val TAG = "SourceReceived"
-    }
+    override fun toString() = "SourceReceived(source=$source)"
 }
 
 data class InputMatched(
@@ -153,11 +127,7 @@ data class InputMatched(
     }
 
     override fun toString() =
-        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
-
-    private companion object {
-        private const val TAG = "InputMatched"
-    }
+        "InputMatched(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
 }
 
 data class PermissionRequested(
@@ -179,11 +149,7 @@ data class PermissionRequested(
         return PermissionDenied(source, matchedInput, results)
     }
 
-    override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
-
-    private companion object {
-        private const val TAG = "PermissionRequested"
-    }
+    override fun toString() = "PermissionRequested(source=$source, matchedInput=$matchedInput, results=$results)"
 }
 
 data class PermissionGranted(
@@ -209,11 +175,7 @@ data class PermissionGranted(
         }
 
     override fun toString() =
-        "$TAG(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
-
-    private companion object {
-        private const val TAG = "PermissionGranted"
-    }
+        "PermissionGranted(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
 }
 
 /**
@@ -408,11 +370,7 @@ data class PermissionDenied(
     override suspend fun transition(stateContext: ConversionStateContext) =
         DataParsed(source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult.Success()))
 
-    override fun toString() = "$TAG(source=$source, matchedInput=$matchedInput, results=$results)"
-
-    private companion object {
-        private const val TAG = "PermissionDenied"
-    }
+    override fun toString() = "PermissionDenied(source=$source, matchedInput=$matchedInput, results=$results)"
 }
 
 data class DataParsed(
@@ -479,88 +437,9 @@ data class DataParsed(
 data class ConversionSucceeded(
     override val source: String,
     override val points: Points,
-    val billingStatusTimeout: Duration = 3.seconds,
 ) : ConversionState, ConversionState.HasResult {
     @OptIn(FlowPreview::class)
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState? {
-        if (points.isEmpty()) {
-            return null
-        }
-
-        val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
-        if (automation is NoopAutomation) {
-            return null
-        }
-
-        val billingStatus: BillingStatus = try {
-            // Wait for billing status to appear; it should appear, because we call Billing.startConnection() in onCreate
-            stateContext.billing.status
-                .filter {
-                    when (it) {
-                        is BillingStatus.Loading -> false
-
-                        is BillingStatus.Pending, is BillingStatus.NotPurchased -> true
-
-                        is BillingStatus.Purchased -> {
-                            // If billing status appeared within timeout, cache it
-                            stateContext.userPreferencesRepository.setValue(
-                                CachedPurchasePreference,
-                                CachedPurchase(productId = it.product.id, token = it.token),
-                            )
-                            true
-                        }
-                    }
-                }
-                .timeout(billingStatusTimeout)
-                .first()
-        } catch (_: TimeoutCancellationException) {
-            // If billing status didn't appear, try to read it from cache
-            stateContext.log.w(TAG, "Billing status didn't appear within $billingStatusTimeout")
-            stateContext.userPreferencesRepository.getValue(CachedPurchasePreference)
-                ?.let { cachedPurchase ->
-                    stateContext.billing.products.firstOrNull { product -> cachedPurchase.productId == product.id }
-                        ?.let { product ->
-                            stateContext.log.w(TAG, "Found cached billing status")
-                            BillingStatus.Purchased(
-                                product,
-                                expired = false,
-                                refundable = true,
-                                token = cachedPurchase.token,
-                            )
-                        }
-                }
-                ?: run {
-                    stateContext.log.w(TAG, "Didn't find cached billing status")
-                    BillingStatus.Loading()
-                }
-        }
-
-        if (billingStatus is BillingStatus.Purchased && stateContext.billing.features.contains(AutomationFeature)) {
-            val output = when (automation) {
-                is BasicAutomation -> automation.toOutput(stateContext.coordinateConverter)
-                is ActivityAutomation -> automation.toOutput(stateContext.coordinateConverter, stateContext.log)
-                is LinkAutomation -> stateContext.linkRepository.getByUUID(automation.linkUUID)?.let { link ->
-                    automation.toOutput(stateContext.coordinateConverter, link)
-                }
-            } ?: return null
-            return AutomationRequested(source, points, output)
-        }
-        return null
-    }
-
-    override fun toString() = "$TAG(source=$source, points=$points)"
-
-    private companion object {
-        private const val TAG = "ConversionSucceeded"
-    }
-}
-
-data class AutomationRequested(
-    override val source: String,
-    override val points: Points,
-    val output: Output,
-) : ConversionState, ConversionState.HasResult {
-    override fun toString() = "AutomationRequested(points=$points, output=$output)"
+    override fun toString() = "ConversionSucceeded(source=$source, points=$points)"
 }
 
 data class ConversionFailed(
@@ -569,9 +448,5 @@ data class ConversionFailed(
     override val stackTrace: String? = null,
     override val warning: Boolean = false,
 ) : ConversionState, ConversionState.HasError {
-    override fun toString() = "$TAG(source=$source, message=$message, warning=$warning)"
-
-    private companion object {
-        private const val TAG = "ConversionFailed"
-    }
+    override fun toString() = "ConversionFailed(source=$source, message=$message, warning=$warning)"
 }

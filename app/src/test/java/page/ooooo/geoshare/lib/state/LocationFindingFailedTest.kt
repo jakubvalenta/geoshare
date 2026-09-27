@@ -5,7 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.lib.outputs.ActionResult
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
@@ -13,10 +13,10 @@ import kotlin.time.measureTime
 
 class LocationFindingFailedTest {
     private val actionResult = ActionResult.FAILED
-    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
+    private val actionStateContext: ActionStateContext = mock()
 
     @Test
-    fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
+    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
         val state = LocationFindingFailed(actionResult)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
@@ -28,7 +28,7 @@ class LocationFindingFailedTest {
     }
 
     @Test
-    fun locationFindingFailed_executionIsCancelled_returnsActionCompleted() = runTest {
+    fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
         val state = LocationFindingFailed(actionResult)
         var res: ActionState? = null
         val job = launch {

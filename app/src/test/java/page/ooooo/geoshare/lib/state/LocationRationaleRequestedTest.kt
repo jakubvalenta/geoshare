@@ -25,7 +25,7 @@ class LocationRationaleRequestedTest {
         log,
     )
     private val action = output.toAction(points.last())
-    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
+    private val actionStateContext: ActionStateContext = mock()
 
     @Test
     fun transition_returnsNull() = runTest {

@@ -82,13 +82,6 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.state.AutomationRequested
-import page.ooooo.geoshare.lib.state.ConversionFailed
-import page.ooooo.geoshare.lib.state.ConversionState
-import page.ooooo.geoshare.lib.state.ConversionSucceeded
-import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
-import page.ooooo.geoshare.lib.state.PermissionGrantedWebViewInput
-import page.ooooo.geoshare.lib.state.PermissionRequested
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -99,20 +92,25 @@ import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
+import page.ooooo.geoshare.lib.outputs.LocationAction
+import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.lib.state.ActionState
 import page.ooooo.geoshare.lib.state.BasicActionReady
-import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
+import page.ooooo.geoshare.lib.state.ConversionFailed
+import page.ooooo.geoshare.lib.state.ConversionState
+import page.ooooo.geoshare.lib.state.ConversionSucceeded
+import page.ooooo.geoshare.lib.state.ExtendedStateLog
 import page.ooooo.geoshare.lib.state.FileActionReady
 import page.ooooo.geoshare.lib.state.FileUriRequested
-import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.state.LocationActionReady
 import page.ooooo.geoshare.lib.state.LocationPermissionReceived
 import page.ooooo.geoshare.lib.state.LocationRationaleConfirmed
 import page.ooooo.geoshare.lib.state.LocationRationaleRequested
 import page.ooooo.geoshare.lib.state.LocationRationaleShown
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.state.ExtendedStateLog
+import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
+import page.ooooo.geoshare.lib.state.PermissionGrantedWebViewInput
+import page.ooooo.geoshare.lib.state.PermissionRequested
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionStateLogList
 import page.ooooo.geoshare.ui.components.ConversionUriSheet
@@ -1003,7 +1001,7 @@ private fun SucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            conversionState = AutomationRequested(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1013,7 +1011,6 @@ private fun SucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                output = CopyCoordsDecOutput(coordinateConverter),
             ),
             actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
@@ -1108,7 +1105,7 @@ private fun DarkSucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            conversionState = AutomationRequested(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1118,7 +1115,6 @@ private fun DarkSucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                output = CopyCoordsDecOutput(coordinateConverter),
             ),
             actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
@@ -1213,7 +1209,7 @@ private fun SmallSucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            conversionState = AutomationRequested(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1222,7 +1218,6 @@ private fun SmallSucceededPreview() {
                         name = "Wikimedia Foundation, Inc.",
                     ),
                 ),
-                output = CopyCoordsDecOutput(coordinateConverter),
             ),
             actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
@@ -1317,7 +1312,7 @@ private fun TabletSucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            conversionState = AutomationRequested(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1327,7 +1322,6 @@ private fun TabletSucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                output = CopyCoordsDecOutput(coordinateConverter),
             ),
             actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
