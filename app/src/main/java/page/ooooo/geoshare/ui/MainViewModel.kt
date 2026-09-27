@@ -113,7 +113,7 @@ object LocationFindingFailedDetail : ActionDetail
 object LocationPermissionReceivedDetail : ActionDetail
 
 @HiltViewModel
-class ConversionViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val actionStateContext: ActionStateContext,
     private val conversionStateContext: ConversionStateContext,
     private val log: Log,
@@ -144,16 +144,6 @@ class ConversionViewModel @Inject constructor(
         _conversionStateLog.append(newState)
     }
 
-    init {
-        // Start automation action when conversion succeeds
-        _conversionState
-            .filterIsInstance<AutomationRequested>()
-            .onEach { conversionState ->
-                transitionAction { AutomationReceived(conversionState.points, conversionState.output) }
-            }
-            .launchIn(viewModelScope)
-    }
-
     private fun transitionConversion(clearLog: Boolean = false, newState: (suspend () -> ConversionState)) {
         conversionJob?.cancel()
         conversionJob = viewModelScope.launch(conversionExceptionHandler) {
@@ -179,7 +169,6 @@ class ConversionViewModel @Inject constructor(
         val newState = ActionCompleted(ActionResult.FAILED)
         _actionState.value = newState
     }
-
     val actionDetail: StateFlow<ActionDetail?> = _actionState
         .combine(appRepository.appDetails) { currentState, appDetails ->
             when (currentState) {
@@ -229,6 +218,16 @@ class ConversionViewModel @Inject constructor(
                 _actionState.value = newState as ActionState
             }
         }
+    }
+
+    init {
+        // Start automation action when conversion succeeds
+        _conversionState
+            .filterIsInstance<AutomationRequested>()
+            .onEach { conversionState ->
+                transitionAction { AutomationReceived(conversionState.points, conversionState.output) }
+            }
+            .launchIn(viewModelScope)
     }
 
     // Conversion state log

@@ -22,7 +22,7 @@ import page.ooooo.geoshare.lib.state.StateLogItem
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TestTimeSource
 
-class ConversionViewModelTest {
+class MainViewModelTest {
     private val resources: Resources = mock {
         on { getString(R.string.conversion_failed_cancelled) } doReturn "Cancelled"
         on { getString(R.string.conversion_failed_reason_no_points) } doReturn "No points found"

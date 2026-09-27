@@ -45,11 +45,11 @@ private const val TAG = "MainNavigation"
 @Composable
 fun MainNavigation(
     billingViewModel: BillingViewModel,
-    conversionViewModel: ConversionViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = hiltViewModel(),
     onFinish: () -> Unit = {},
 ) {
     val navController = rememberNavController()
-    val source = conversionViewModel.source
+    val source = mainViewModel.source
 
     /**
      * Go to main screen if we're on another screen and a new map link has been shared with the app.
@@ -89,7 +89,7 @@ fun MainNavigation(
                 onNavigateToLinkScreen = { navController.navigate(LinkRoute) },
                 onNavigateToUserPreferencesScreen = { groupId -> navController.navigate(UserPreferencesRoute(groupId)) },
                 billingViewModel = billingViewModel,
-                conversionViewModel = conversionViewModel,
+                mainViewModel = mainViewModel,
             )
         }
         composable<InputsRoute> { backStackEntry ->

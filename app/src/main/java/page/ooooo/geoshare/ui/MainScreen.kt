@@ -154,7 +154,7 @@ fun MainScreen(
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     billingViewModel: BillingViewModel,
-    conversionViewModel: ConversionViewModel,
+    mainViewModel: MainViewModel,
     helpViewModel: HelpViewModel = hiltViewModel(),
     inputViewModel: InputViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
@@ -166,21 +166,21 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val conversionState by conversionViewModel.conversionState.collectAsStateWithLifecycle()
-    val actionState by conversionViewModel.actionState.collectAsStateWithLifecycle()
+    val conversionState by mainViewModel.conversionState.collectAsStateWithLifecycle()
+    val actionState by mainViewModel.actionState.collectAsStateWithLifecycle()
 
     // Action
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            conversionViewModel.receiveLocationPermission()
+            mainViewModel.receiveLocationPermission()
         }
     val saveFileLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
-                conversionViewModel.receiveFileUri(uri)
-            } ?: conversionViewModel.cancelFileUriRequest()
+                mainViewModel.receiveFileUri(uri)
+            } ?: mainViewModel.cancelFileUriRequest()
         }
 
     LaunchedEffect(actionState) {
@@ -194,7 +194,7 @@ fun MainScreen(
                     if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
-                    conversionViewModel.completeBasicAction(actionResult)
+                    mainViewModel.completeBasicAction(actionResult)
                 }
 
                 // File action
@@ -209,7 +209,7 @@ fun MainScreen(
                             }
                         )
                     } catch (_: ActivityNotFoundException) {
-                        conversionViewModel.cancelFileUriRequest()
+                        mainViewModel.cancelFileUriRequest()
                     }
                 }
 
@@ -219,16 +219,16 @@ fun MainScreen(
                     if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
-                    conversionViewModel.completeFileAction(actionResult)
+                    mainViewModel.completeFileAction(actionResult)
                 }
 
                 // Location action
 
                 is LocationRationaleRequested -> {
                     if (context.hasLocationPermission()) {
-                        conversionViewModel.skipLocationRationale(actionState.action, actionState.isAutomation)
+                        mainViewModel.skipLocationRationale(actionState.action, actionState.isAutomation)
                     } else {
-                        conversionViewModel.showLocationRationale(actionState.action, actionState.isAutomation)
+                        mainViewModel.showLocationRationale(actionState.action, actionState.isAutomation)
                     }
                 }
 
@@ -244,10 +244,10 @@ fun MainScreen(
                         val location = try {
                             context.getLocation()
                         } catch (_: CancellationException) {
-                            conversionViewModel.cancelLocationFinding()
+                            mainViewModel.cancelLocationFinding()
                             return@launch
                         }
-                        conversionViewModel.receiveLocation(actionState.action, actionState.isAutomation, location)
+                        mainViewModel.receiveLocation(actionState.action, actionState.isAutomation, location)
                     }
                 }
 
@@ -257,7 +257,7 @@ fun MainScreen(
                     if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
-                    conversionViewModel.completeLocationAction(actionResult)
+                    mainViewModel.completeLocationAction(actionResult)
                 }
             }
         }
@@ -266,7 +266,7 @@ fun MainScreen(
     MainScreen(
         conversionState = conversionState,
         actionState = actionState,
-        actionDetail = conversionViewModel.actionDetail,
+        actionDetail = mainViewModel.actionDetail,
         billingAppNameResId = billingViewModel.billingAppNameResId,
         billingFeatures = billingViewModel.billingFeatures,
         billingStatus = billingViewModel.billingStatus,
@@ -284,54 +284,54 @@ fun MainScreen(
         outputsForSharing = outputViewModel.outputsForSharing,
         outputsForUriByCategory = outputViewModel.outputsForUriByCategory,
         selectedUri = outputViewModel.selectedUri,
-        start = conversionViewModel.conversionStart,
-        stateLog = conversionViewModel.extendedConversionStateLog,
-        source = conversionViewModel.source,
-        sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
+        start = mainViewModel.conversionStart,
+        stateLog = mainViewModel.extendedConversionStateLog,
+        source = mainViewModel.source,
+        sourceComesFromIntent = mainViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferenceViewModel.message,
         userPreferencesValues = userPreferenceViewModel.values,
         onCancelAction = {
             locationJob?.cancel()
-            conversionViewModel.cancelAction()
+            mainViewModel.cancelAction()
         },
-        onCancelConversion = { conversionViewModel.cancelConversion() },
-        onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
+        onCancelConversion = { mainViewModel.cancelConversion() },
+        onDeny = { doNotAsk -> mainViewModel.deny(doNotAsk) },
         onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
         onDismissHelpMessage = { helpMessage -> helpViewModel.dismissHelpMessage(helpMessage) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
-        onExecute = { action -> conversionViewModel.startAction(action) },
-        onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
+        onExecute = { action -> mainViewModel.startAction(action) },
+        onGrant = { doNotAsk -> mainViewModel.grant(doNotAsk) },
         onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
-            conversionViewModel.cancelAction()
+            mainViewModel.cancelAction()
             onNavigateToAboutScreen()
         },
         onNavigateToBillingScreen = {
-            conversionViewModel.cancelAction()
+            mainViewModel.cancelAction()
             onNavigateToBillingScreen()
         },
         onNavigateToFaqScreen = { itemId ->
-            conversionViewModel.cancelAction()
+            mainViewModel.cancelAction()
             onNavigateToFaqScreen(itemId)
         },
         onNavigateToInputsScreen = {
-            conversionViewModel.cancelAction()
+            mainViewModel.cancelAction()
             onNavigateToInputsScreen()
         },
         onNavigateToLinkScreen = {
-            conversionViewModel.cancelAction()
+            mainViewModel.cancelAction()
             onNavigateToLinkScreen()
         },
         onNavigateToUserPreferencesScreen = { groupId ->
-            conversionViewModel.cancelAction()
+            mainViewModel.cancelAction()
             onNavigateToUserPreferencesScreen(groupId)
         },
-        onReset = { conversionViewModel.reset() },
-        onRetry = { conversionViewModel.retry() },
+        onReset = { mainViewModel.reset() },
+        onRetry = { mainViewModel.retry() },
         onSelectUri = { outputViewModel.setSelectedUri(it) },
-        onSetSource = { conversionViewModel.setSource(it) },
-        onSubmit = { conversionViewModel.start(false) },
+        onSetSource = { mainViewModel.setSource(it) },
+        onSubmit = { mainViewModel.start(false) },
     )
 }
 
