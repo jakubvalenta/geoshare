@@ -259,7 +259,7 @@ class ConversionViewModel @Inject constructor(
         }
     }
 
-    fun cancel() {
+    fun cancelConversion() {
         conversionJob?.cancel()
     }
 
@@ -291,6 +291,10 @@ class ConversionViewModel @Inject constructor(
         (_actionState.value as? BasicActionReady)?.apply {
             transitionAction { ActionRan(action, actionResult, isAutomation) }
         }
+    }
+
+    fun cancelAction() {
+        actionJob?.cancel()
     }
 
     // File action

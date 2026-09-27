@@ -290,43 +290,41 @@ fun MainScreen(
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferenceViewModel.message,
         userPreferencesValues = userPreferenceViewModel.values,
-        onCancel = {
+        onCancelAction = {
             locationJob?.cancel()
-            conversionViewModel.cancel()
+            conversionViewModel.cancelAction()
         },
+        onCancelConversion = { conversionViewModel.cancelConversion() },
         onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
         onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
         onDismissHelpMessage = { helpMessage -> helpViewModel.dismissHelpMessage(helpMessage) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
-        onExecute = { action ->
-            conversionViewModel.cancel()
-            conversionViewModel.startAction(action)
-        },
+        onExecute = { action -> conversionViewModel.startAction(action) },
         onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
         onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
-            conversionViewModel.cancel()
+            conversionViewModel.cancelAction()
             onNavigateToAboutScreen()
         },
         onNavigateToBillingScreen = {
-            conversionViewModel.cancel()
+            conversionViewModel.cancelAction()
             onNavigateToBillingScreen()
         },
         onNavigateToFaqScreen = { itemId ->
-            conversionViewModel.cancel()
+            conversionViewModel.cancelAction()
             onNavigateToFaqScreen(itemId)
         },
         onNavigateToInputsScreen = {
-            conversionViewModel.cancel()
+            conversionViewModel.cancelAction()
             onNavigateToInputsScreen()
         },
         onNavigateToLinkScreen = {
-            conversionViewModel.cancel()
+            conversionViewModel.cancelAction()
             onNavigateToLinkScreen()
         },
         onNavigateToUserPreferencesScreen = { groupId ->
-            conversionViewModel.cancel()
+            conversionViewModel.cancelAction()
             onNavigateToUserPreferencesScreen(groupId)
         },
         onReset = { conversionViewModel.reset() },
@@ -367,7 +365,8 @@ private fun MainScreen(
     stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     userPreferenceMessage: StateFlow<Message?>,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
-    onCancel: () -> Unit,
+    onCancelAction: () -> Unit,
+    onCancelConversion: () -> Unit,
     onDeny: (Boolean) -> Unit,
     onDisableLinkGroup: (String?) -> Unit,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
@@ -495,7 +494,7 @@ private fun MainScreen(
                                         onExecute = onExecute,
                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         onSelect = { index ->
-                                            onCancel()
+                                            onCancelAction()
                                             selectedPointIndex = index
                                         },
                                     ) { paddingValues ->
@@ -514,7 +513,7 @@ private fun MainScreen(
                                         MainLoadingIndicator(
                                             currentState = conversionState,
                                             title = title,
-                                            onCancel = onCancel,
+                                            onCancel = onCancelConversion,
                                         )
                                     }
                             }
@@ -601,7 +600,7 @@ private fun MainScreen(
                         actionDetail = actionDetail,
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
-                        onCancel = onCancel,
+                        onCancel = onCancelAction,
                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 }
@@ -771,7 +770,8 @@ private fun DefaultPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -834,7 +834,8 @@ private fun DarkPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -897,7 +898,8 @@ private fun SmallPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -960,7 +962,8 @@ private fun TabletPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1064,7 +1067,8 @@ private fun SucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1168,7 +1172,8 @@ private fun DarkSucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1271,7 +1276,8 @@ private fun SmallSucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1375,7 +1381,8 @@ private fun TabletSucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1449,7 +1456,8 @@ private fun ErrorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1523,7 +1531,8 @@ private fun DarkErrorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1597,7 +1606,8 @@ private fun TabletErrorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1672,7 +1682,8 @@ private fun WarningPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1747,7 +1758,8 @@ private fun DarkWarningPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1826,7 +1838,8 @@ private fun LoadingIndicatorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1905,7 +1918,8 @@ private fun DarkLoadingIndicatorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1984,7 +1998,8 @@ private fun TabletLoadingIndicatorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -2060,7 +2075,8 @@ private fun WebViewPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -2136,7 +2152,8 @@ private fun DarkWebViewPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -2213,7 +2230,8 @@ private fun TabletWebViewPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -2288,7 +2306,8 @@ private fun EmptyPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
