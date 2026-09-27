@@ -10,7 +10,14 @@ interface State<C> {
     }
 }
 
-// TODO Docstring
+/**
+ * Transitions the state and then takes the resulting state and transitions it too and so on until a transition returns
+ * null.
+ *
+ * Calls [onStateChange] with the new state after each transition.
+ *
+ * Throws [IllegalStateException] if the chain of transitions reaches [maxIterations].
+ */
 suspend fun <C> State<C>.transitionRecursively(
     stateContext: C,
     maxIterations: Int = 30,

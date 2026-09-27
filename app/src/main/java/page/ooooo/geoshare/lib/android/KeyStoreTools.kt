@@ -84,7 +84,7 @@ class DefaultKeyStoreTools @Inject constructor(
     }
 
     private companion object {
-        private const val KEYSTORE_ALIAS = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "geoshare_api"
+        private const val KEYSTORE_ALIAS = "geoshare_api"
         private const val TAG = "KeyStoreService"
     }
 }

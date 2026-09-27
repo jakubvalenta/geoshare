@@ -255,7 +255,6 @@ data class ActionSucceeded(
     override fun toString() = "ActionSucceeded(actionResult=$actionResult, output=$output)"
 }
 
-// TODO Test
 data class ActionAutomationSucceeded(
     val actionResult: ActionResult,
     val output: Output.HasAutomationSuccessText,
@@ -287,7 +286,6 @@ data class ActionFailed(
     override fun toString() = "ActionFailed(output=$output)"
 }
 
-// TODO Test
 data class ActionAutomationFailed(
     val output: Output.HasAutomationErrorText,
 ) : ActionState {

@@ -5,7 +5,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
