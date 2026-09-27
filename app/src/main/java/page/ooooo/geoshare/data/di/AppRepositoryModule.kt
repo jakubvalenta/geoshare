@@ -107,8 +107,3 @@ fun getFakeAppDetails(context: Context) =
             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
         ),
     )
-
-class FakeAppRepository(val context: Context) : AppRepository {
-    override val activities = flow { emit(fakeActivities) }
-    override val appDetails = flow { emit(getFakeAppDetails(context)) }
-}

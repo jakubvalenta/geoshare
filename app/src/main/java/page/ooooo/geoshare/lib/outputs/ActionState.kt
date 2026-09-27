@@ -4,9 +4,9 @@ import android.net.Uri
 import kotlinx.coroutines.delay
 import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.data.local.preferences.AutomationDelayPreference
-import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.state.State
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds

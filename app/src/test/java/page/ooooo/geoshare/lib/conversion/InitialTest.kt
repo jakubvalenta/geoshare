@@ -10,7 +10,7 @@ class InitialTest {
 
     @Test
     fun initial_returnsNull() = runTest {
-        val state = Initial
+        val state = ConversionState.Initial
         assertNull(state.transition(stateContext))
     }
 }

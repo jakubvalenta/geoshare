@@ -49,10 +49,11 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
+import page.ooooo.geoshare.lib.state.ExtendedStateLog
+import page.ooooo.geoshare.lib.state.ExtendedStateLogItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.milliseconds
@@ -61,7 +62,7 @@ import kotlin.time.TestTimeSource
 @Composable
 fun ConversionStateLogList(
     expanded: Boolean,
-    stateLog: StateFlow<List<ConversionStateLogItem>>,
+    stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     animationsEnabled: Boolean = true,
     initialItemsExpanded: Boolean = false,
     onUriClick: (uriString: String) -> Unit,
@@ -106,7 +107,7 @@ fun ConversionStateLogList(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ConversionStateLogListItem(
-    item: ConversionStateLogItem,
+    item: ExtendedStateLogItem<ConversionState.HasDescription>,
     animationsEnabled: Boolean = true,
     iconSize: Dp = 24.dp,
     initialExpanded: Boolean = false,
@@ -135,14 +136,14 @@ private fun ConversionStateLogListItem(
                 horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
             ) {
                 when (item) {
-                    is ConversionStateLogItem.Finished ->
+                    is ExtendedStateLogItem.Finished ->
                         Icon(
                             if (item.succeeded) Icons.Default.Check else Icons.Default.Close,
                             contentDescription = null,
                             modifier = Modifier.size(iconSize),
                         )
 
-                    is ConversionStateLogItem.Pending ->
+                    is ExtendedStateLogItem.Pending ->
                         LoadingIndicator(Modifier.size(iconSize), color = LocalContentColor.current)
                 }
                 Text(
@@ -152,8 +153,8 @@ private fun ConversionStateLogListItem(
                 )
                 CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
                     when (item) {
-                        is ConversionStateLogItem.Finished -> SecondsTimeText(item.end - item.start)
-                        is ConversionStateLogItem.Pending -> ElapsedTimeText(item.start)
+                        is ExtendedStateLogItem.Finished -> SecondsTimeText(item.end - item.start)
+                        is ExtendedStateLogItem.Pending -> ElapsedTimeText(item.start)
                     }
                 }
             }
@@ -183,8 +184,8 @@ private fun ConversionStateLogListItem(
 }
 
 @Composable
-fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
-    ConversionStateLogItem.Finished(
+fun fakeStateLog(source: String, timeSource: TestTimeSource): ExtendedStateLog<ConversionState.HasDescription> = listOf(
+    ExtendedStateLogItem.Finished(
         id = 0,
         state = object : ConversionState, ConversionState.HasDescription {
             override fun getDescription(resources: Resources) =
@@ -199,7 +200,7 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
         start = timeSource.markNow(),
         end = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),
     ),
-    ConversionStateLogItem.Finished(
+    ExtendedStateLogItem.Finished(
         id = 1,
         state = PermissionGrantedBasicInput(
             source,
@@ -211,7 +212,7 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
         start = timeSource.markNow(),
         end = timeSource.apply { plusAssign(657.milliseconds) }.markNow(),
     ),
-    ConversionStateLogItem.Finished(
+    ExtendedStateLogItem.Finished(
         id = 2,
         state = PermissionGrantedBasicInput(
             source,
@@ -223,7 +224,7 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
         start = timeSource.markNow(),
         end = timeSource.apply { plusAssign(92.milliseconds) }.markNow(),
     ),
-    ConversionStateLogItem.Finished(
+    ExtendedStateLogItem.Finished(
         id = 3,
         state = PermissionGrantedBasicInput(
             source,
@@ -235,7 +236,7 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource) = listOf(
         start = timeSource.markNow(),
         end = timeSource.apply { plusAssign(2011.milliseconds) }.markNow(),
     ),
-    ConversionStateLogItem.Pending(
+    ExtendedStateLogItem.Pending(
         id = 4,
         state = PermissionGrantedBasicInput(
             source,

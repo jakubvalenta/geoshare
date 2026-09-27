@@ -29,7 +29,6 @@ import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.State
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.AutomationFeature
 import page.ooooo.geoshare.lib.billing.Billing
@@ -47,6 +46,7 @@ import page.ooooo.geoshare.lib.inputs.merge
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Output
+import page.ooooo.geoshare.lib.state.State
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -484,6 +484,10 @@ data class ConversionSucceeded(
 ) : ConversionState, ConversionState.HasResult {
     @OptIn(FlowPreview::class)
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState? {
+        if (points.isEmpty()) {
+            return null
+        }
+
         val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
         if (automation is NoopAutomation) {
             return null

@@ -7,13 +7,19 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionCompleted
+import page.ooooo.geoshare.lib.outputs.ActionReady
 import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.ActionState
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.ActionWaiting
 import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
@@ -21,22 +27,21 @@ import kotlin.time.measureTime
 
 class ActionWaitingTest {
     private val coordinateConverter: CoordinateConverter = mock()
-    private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = OpenDisplayGeoUriOutput(
         UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
         coordinateConverter,
     )
     private val action = output.toAction(points.last())
-    private val stateContext: ConversionStateContext = mock()
+    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionReady() = runTest {
-        val state = ActionWaiting(source, points, action, output, isAutomation = true, 3.seconds)
+        val state = ActionWaiting(action, output, isAutomation = true, 3.seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                ActionReady(source, points, action, isAutomation = true),
-                state.transition(stateContext),
+                ActionReady(action, isAutomation = true),
+                state.transition(actionStateContext),
             )
         }
         assertEquals(3.seconds, workDuration)
@@ -44,11 +49,11 @@ class ActionWaitingTest {
 
     @Test
     fun transition_whenExecutionIsNotCancelledAndDelayIsNotPositive_doesNotWaitAndReturnsActionReady() = runTest {
-        val state = ActionWaiting(source, points, action, output, isAutomation = true, (-1).seconds)
+        val state = ActionWaiting(action, output, isAutomation = true, (-1).seconds)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                ActionReady(source, points, action, isAutomation = true),
-                state.transition(stateContext),
+                ActionReady(action, isAutomation = true),
+                state.transition(actionStateContext),
             )
         }
         assertEquals(0.seconds, workDuration)
@@ -56,10 +61,10 @@ class ActionWaitingTest {
 
     @Test
     fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
-        val state = ActionWaiting(source, points, action, output, isAutomation = true, 3.seconds)
-        var res: ConversionState? = null
+        val state = ActionWaiting(action, output, isAutomation = true, 3.seconds)
+        var res: ActionState? = null
         val job = launch {
-            res = state.transition(stateContext)
+            res = state.transition(actionStateContext)
         }
         testScheduler.runCurrent()
         testScheduler.advanceTimeBy(1.seconds)
@@ -70,7 +75,7 @@ class ActionWaitingTest {
         }
         assertEquals(
             res,
-            ActionCompleted(source, points, ActionResult.FAILED),
+            ActionCompleted(ActionResult.FAILED),
         )
     }
 }

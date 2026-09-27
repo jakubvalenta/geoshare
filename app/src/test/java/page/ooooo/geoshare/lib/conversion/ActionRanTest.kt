@@ -5,28 +5,34 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionAutomationSucceeded
+import page.ooooo.geoshare.lib.outputs.ActionCompleted
+import page.ooooo.geoshare.lib.outputs.ActionFailed
+import page.ooooo.geoshare.lib.outputs.ActionRan
 import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.ActionSucceeded
 import page.ooooo.geoshare.lib.outputs.NoopAction
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
 class ActionRanTest {
     private val coordinateConverter: CoordinateConverter = mock()
-    private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = SavePointsGpxOutput(coordinateConverter)
     private val action = output.toAction(points)
-    private val stateContext: ConversionStateContext = mock()
+    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun transition_whenAutomationIsFalseAndResultIsSucceededAndOutputHasSuccessText_returnsActionSucceeded() = runTest {
         for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
             val action = output.toAction(points)
             assertEquals(
-                ActionSucceeded(source, points, actionResult, output),
-                ActionRan(source, points, action, actionResult, isAutomation = false).transition(stateContext),
+                ActionSucceeded(actionResult, output),
+                ActionRan(action, actionResult, isAutomation = false).transition(actionStateContext),
             )
         }
     }
@@ -36,8 +42,8 @@ class ActionRanTest {
         runTest {
             for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
-                    ActionCompleted(source, points, actionResult),
-                    ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(stateContext),
+                    ActionCompleted(actionResult),
+                    ActionRan(NoopAction, actionResult, isAutomation = false).transition(actionStateContext),
                 )
             }
         }
@@ -46,8 +52,8 @@ class ActionRanTest {
     fun transition_whenAutomationIsFalseAndResultIsFailedAndOutputHasErrorText_returnsActionFailed() = runTest {
         val actionResult = ActionResult.FAILED
         assertEquals(
-            ActionFailed(source, points, actionResult, output),
-            ActionRan(source, points, action, actionResult, isAutomation = false).transition(stateContext),
+            ActionFailed( output),
+            ActionRan(action, actionResult, isAutomation = false).transition(actionStateContext),
         )
     }
 
@@ -56,8 +62,8 @@ class ActionRanTest {
         runTest {
             val actionResult = ActionResult.FAILED
             assertEquals(
-                ActionCompleted(source, points, actionResult),
-                ActionRan(source, points, NoopAction, actionResult, isAutomation = false).transition(stateContext),
+                ActionCompleted(actionResult),
+                ActionRan(NoopAction, actionResult, isAutomation = false).transition(actionStateContext),
             )
         }
 
@@ -66,8 +72,8 @@ class ActionRanTest {
         runTest {
             for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
-                    ActionAutomationSucceeded(source, points, actionResult, output),
-                    ActionRan(source, points, action, actionResult, isAutomation = true).transition(stateContext),
+                    ActionAutomationSucceeded(actionResult, output),
+                    ActionRan(action, actionResult, isAutomation = true).transition(actionStateContext),
                 )
             }
         }
@@ -77,8 +83,8 @@ class ActionRanTest {
         runTest {
             for (actionResult in setOf(ActionResult.SUCCEEDED, ActionResult.SUCCEEDED_AND_OPENED_APP)) {
                 assertEquals(
-                    ActionCompleted(source, points, actionResult),
-                    ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(stateContext),
+                    ActionCompleted(actionResult),
+                    ActionRan(NoopAction, actionResult, isAutomation = true).transition(actionStateContext),
                 )
             }
         }
@@ -88,8 +94,8 @@ class ActionRanTest {
         runTest {
             val actionResult = ActionResult.FAILED
             assertEquals(
-                ActionCompleted(source, points, actionResult),
-                ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(stateContext),
+                ActionCompleted(actionResult),
+                ActionRan(NoopAction, actionResult, isAutomation = true).transition(actionStateContext),
             )
         }
 
@@ -98,8 +104,8 @@ class ActionRanTest {
         runTest {
             val actionResult = ActionResult.FAILED
             assertEquals(
-                ActionCompleted(source, points, actionResult),
-                ActionRan(source, points, NoopAction, actionResult, isAutomation = true).transition(stateContext),
+                ActionCompleted(actionResult),
+                ActionRan(NoopAction, actionResult, isAutomation = true).transition(actionStateContext),
             )
         }
 }

@@ -1,16 +1,18 @@
 package page.ooooo.geoshare.lib.conversion
 
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionCompleted
 import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.ActionState
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.ActionSucceeded
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
@@ -18,19 +20,17 @@ import kotlin.time.measureTime
 
 class ActionSucceededTest {
     private val coordinateConverter: CoordinateConverter = mock()
-    private val source = "https://maps.google.com/foo"
-    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = SavePointsGpxOutput(coordinateConverter)
     private val actionResult = ActionResult.SUCCEEDED_AND_OPENED_APP
-    private val stateContext: ConversionStateContext = mock()
+    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
-        val state = ActionSucceeded(source, points, actionResult, output)
+        val state = ActionSucceeded(actionResult, output)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
-                ActionCompleted(source, points, actionResult),
-                state.transition(stateContext),
+                ActionCompleted(actionResult),
+                state.transition(actionStateContext),
             )
         }
         assertEquals(3.seconds, workDuration)
@@ -38,10 +38,10 @@ class ActionSucceededTest {
 
     @Test
     fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
-        val state = ActionSucceeded(source, points, actionResult, output)
-        var res: ConversionState? = null
+        val state = ActionSucceeded(actionResult, output)
+        var res: ActionState? = null
         val job = launch {
-            res = state.transition(stateContext)
+            res = state.transition(actionStateContext)
         }
         testScheduler.runCurrent()
         testScheduler.advanceTimeBy(1.seconds)
@@ -52,7 +52,7 @@ class ActionSucceededTest {
         }
         assertEquals(
             res,
-            ActionCompleted(source, points, actionResult),
+            ActionCompleted(actionResult),
         )
     }
 }

@@ -14,7 +14,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.di.FakeBilling
-import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.local.database.Link
@@ -22,23 +21,15 @@ import page.ooooo.geoshare.data.local.preferences.CachedPurchase
 import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
-import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
-import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.android.UriActivity
-import page.ooooo.geoshare.lib.android.UriScheme
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
-import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
-import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
-import page.ooooo.geoshare.lib.outputs.ShareLinkUriOutput
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -128,9 +119,9 @@ class ConversionSucceededTest {
     }
 
     @Test
-    fun transition_whenBillingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsActionReady() = runTest {
+    fun transition_whenBillingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsAutomationRequested() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val output = CopyCoordsDecOutput(coordinateConverter)
         val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(
@@ -147,7 +138,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(source, points)
         assertEquals(
-            ActionReady(source, points, action, isAutomation = true),
+            AutomationRequested(source, points, output),
             state.transition(stateContext),
         )
         assertEquals(
@@ -188,9 +179,9 @@ class ConversionSucceededTest {
     }
 
     @Test
-    fun transition_whenBillingStatusContainsAutomationFeature_returnsActionReady() = runTest {
+    fun transition_whenBillingStatusContainsAutomationFeature_returnsAutomationRequested() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val output = CopyCoordsDecOutput(coordinateConverter)
         val billing = FakeBilling(
             context,
             initialStatus = BillingStatus.Purchased(
@@ -212,7 +203,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(source, points)
         assertEquals(
-            ActionReady(source, points, action, isAutomation = true),
+            AutomationRequested(source, points, output),
             state.transition(stateContext),
         )
         assertEquals(
@@ -222,9 +213,9 @@ class ConversionSucceededTest {
     }
 
     @Test
-    fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsActionReady() = runTest {
+    fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsAutomationRequested() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val output = CopyCoordsDecOutput(coordinateConverter)
         val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
@@ -252,7 +243,7 @@ class ConversionSucceededTest {
         )
         advanceUntilIdle()
         assertEquals(
-            ActionReady(source, points, action, isAutomation = true),
+            AutomationRequested(source, points, output),
             res,
         )
         assertEquals(
@@ -331,9 +322,9 @@ class ConversionSucceededTest {
     }
 
     @Test
-    fun transition_whenUserPreferenceAutomationIsCopyCoords_returnsActionReady() = runTest {
+    fun transition_whenUserPreferenceAutomationIsCopyCoords_returnsAutomationRequested() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val output = CopyCoordsDecOutput(coordinateConverter)
         val billing = FakeBilling(
             context,
             initialStatus = BillingStatus.Purchased(
@@ -355,74 +346,7 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(source, points)
         assertEquals(
-            ActionReady(source, points, action, isAutomation = true),
-            state.transition(stateContext),
-        )
-    }
-
-    @Test
-    fun transition_whenUserPreferenceAutomationIsOpenApp_returnsActionWaiting() = runTest {
-        val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
-        val output = OpenDisplayGeoUriOutput(
-            UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
-            coordinateConverter,
-        )
-        val action = output.toAction(points.last())
-        val delay = 2.seconds
-        val billing = FakeBilling(
-            context,
-            initialStatus = BillingStatus.Purchased(
-                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            )
-        )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
-        )
-        val stateContext: ConversionStateContext = mock {
-            on { this@on.billing } doReturn billing
-            on { this@on.coordinateConverter } doReturn coordinateConverter
-            on { this@on.linkRepository } doReturn linkRepository
-            on { this@on.log } doReturn log
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
-        }
-        val state = ConversionSucceeded(source, points)
-        assertEquals(
-            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
-            state.transition(stateContext),
-        )
-    }
-
-    @Test
-    fun transition_whenUserPreferenceAutomationIsOpenLink_returnsActionWaiting() = runTest {
-        val automation = ShareLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid)
-        val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter)
-        val action = output.toAction(points.last())
-        val delay = 2.seconds
-        val billing = FakeBilling(
-            context,
-            initialStatus = BillingStatus.Purchased(
-                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            )
-        )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
-        )
-        val stateContext: ConversionStateContext = mock {
-            on { this@on.billing } doReturn billing
-            on { this@on.coordinateConverter } doReturn coordinateConverter
-            on { this@on.linkRepository } doReturn linkRepository
-            on { this@on.log } doReturn log
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
-        }
-        val state = ConversionSucceeded(source, points)
-        assertEquals(
-            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
+            AutomationRequested(source, points, output),
             state.transition(stateContext),
         )
     }
@@ -452,72 +376,5 @@ class ConversionSucceededTest {
         }
         val state = ConversionSucceeded(source, points)
         assertNull(state.transition(stateContext))
-    }
-
-    @Test
-    fun transition_whenUserPreferenceAutomationIsSaveGpx_returnsActionWaiting() = runTest {
-        val automation = SavePointsGpxAutomation
-        val output = SavePointsGpxOutput(coordinateConverter)
-        val action = output.toAction(points)
-        val delay = 2.seconds
-        val billing = FakeBilling(
-            context,
-            initialStatus = BillingStatus.Purchased(
-                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            )
-        )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
-        )
-        val stateContext: ConversionStateContext = mock {
-            on { this@on.billing } doReturn billing
-            on { this@on.coordinateConverter } doReturn coordinateConverter
-            on { this@on.linkRepository } doReturn linkRepository
-            on { this@on.log } doReturn log
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
-        }
-        val state = ConversionSucceeded(source, points)
-        assertEquals(
-            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
-            state.transition(stateContext),
-        )
-    }
-
-    @Test
-    fun transition_whenUserPreferenceAutomationIsShare_returnsActionWaiting() = runTest {
-        val automation = OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)
-        val output = OpenDisplayGeoUriOutput(
-            UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
-            coordinateConverter,
-        )
-        val action = output.toAction(points.last())
-        val delay = 2.seconds
-        val billing = FakeBilling(
-            context,
-            initialStatus = BillingStatus.Purchased(
-                product = BillingProduct("fake_one_time", BillingProduct.Type.ONE_TIME),
-                expired = false,
-                refundable = true,
-                token = "test_purchased",
-            )
-        )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
-        )
-        val stateContext: ConversionStateContext = mock {
-            on { this@on.billing } doReturn billing
-            on { this@on.coordinateConverter } doReturn coordinateConverter
-            on { this@on.linkRepository } doReturn linkRepository
-            on { this@on.log } doReturn log
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
-        }
-        val state = ConversionSucceeded(source, points)
-        assertEquals(
-            ActionWaiting(source, points, action, output, isAutomation = true, delay = delay),
-            state.transition(stateContext),
-        )
     }
 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
@@ -12,13 +13,16 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionCompleted
 import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.LocationRationaleConfirmed
+import page.ooooo.geoshare.lib.outputs.LocationRationaleShown
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationRationaleShownTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val log = FakeLog
-    private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = OpenRouteOnePointGpxOutput(
         FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
@@ -26,23 +30,23 @@ class LocationRationaleShownTest {
         log,
     )
     private val action = output.toAction(points.last())
-    private val stateContext: ConversionStateContext = mock()
+    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun grant_returnsLocationRationaleConfirmed() = runTest {
-        val state = LocationRationaleShown(source, points, action, isAutomation = false)
+        val state = LocationRationaleShown(action, isAutomation = false)
         assertEquals(
-            LocationRationaleConfirmed(source, points, action, isAutomation = false),
-            state.grant(stateContext, false),
+            LocationRationaleConfirmed(action, isAutomation = false),
+            state.grant(actionStateContext, false),
         )
     }
 
     @Test
     fun deny_returnsActionCompleted() = runTest {
-        val state = LocationRationaleShown(source, points, action, isAutomation = false)
+        val state = LocationRationaleShown(action, isAutomation = false)
         assertEquals(
-            ActionCompleted(source, points, ActionResult.FAILED),
-            state.deny(stateContext, false),
+            ActionCompleted(ActionResult.FAILED),
+            state.deny(actionStateContext, false),
         )
     }
 }

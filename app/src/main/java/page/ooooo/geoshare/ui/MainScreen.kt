@@ -85,7 +85,6 @@ import page.ooooo.geoshare.lib.billing.Feature
 import page.ooooo.geoshare.lib.conversion.AutomationRequested
 import page.ooooo.geoshare.lib.conversion.ConversionFailed
 import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionStateLogItem
 import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.conversion.PermissionGrantedWebViewInput
@@ -113,6 +112,7 @@ import page.ooooo.geoshare.lib.outputs.LocationRationaleRequested
 import page.ooooo.geoshare.lib.outputs.LocationRationaleShown
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.state.ExtendedStateLog
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionStateLogList
 import page.ooooo.geoshare.ui.components.ConversionUriSheet
@@ -284,8 +284,8 @@ fun MainScreen(
         outputsForSharing = outputViewModel.outputsForSharing,
         outputsForUriByCategory = outputViewModel.outputsForUriByCategory,
         selectedUri = outputViewModel.selectedUri,
-        start = conversionViewModel.start,
-        stateLog = conversionViewModel.conversionStateLog,
+        start = conversionViewModel.conversionStart,
+        stateLog = conversionViewModel.extendedConversionStateLog,
         source = conversionViewModel.source,
         sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferenceViewModel.message,
@@ -364,7 +364,7 @@ private fun MainScreen(
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
     start: StateFlow<ComparableTimeMark?>,
-    stateLog: StateFlow<List<ConversionStateLogItem>>,
+    stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     userPreferenceMessage: StateFlow<Message?>,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
     onCancel: () -> Unit,

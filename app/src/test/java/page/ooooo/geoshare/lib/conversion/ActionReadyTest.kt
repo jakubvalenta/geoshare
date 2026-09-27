@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
@@ -12,34 +13,38 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionReady
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.BasicActionReady
 import page.ooooo.geoshare.lib.outputs.CopyCoordsDecOutput
+import page.ooooo.geoshare.lib.outputs.FileUriRequested
+import page.ooooo.geoshare.lib.outputs.LocationRationaleRequested
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
 class ActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val log = FakeLog
-    private val source = "https://maps.google.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val stateContext: ConversionStateContext = mock()
+    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun transition_whenActionIsCopyCoordsDec_returnsBasicActionReady() = runTest {
         val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
-        val state = ActionReady(source, points, action, isAutomation = true)
+        val state = ActionReady(action, isAutomation = true)
         assertEquals(
-            BasicActionReady(source, points, action, isAutomation = true),
-            state.transition(stateContext),
+            BasicActionReady(action, isAutomation = true),
+            state.transition(actionStateContext),
         )
     }
 
     @Test
     fun transition_whenActionIsSavePointsGpx_returnsFileUriRequested() = runTest {
         val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
-        val state = ActionReady(source, points, action, isAutomation = true)
+        val state = ActionReady(action, isAutomation = true)
         assertEquals(
-            FileUriRequested(source, points, action, isAutomation = true),
-            state.transition(stateContext),
+            FileUriRequested(action, isAutomation = true),
+            state.transition(actionStateContext),
         )
     }
 
@@ -51,10 +56,10 @@ class ActionReadyTest {
             log,
         )
         val action = output.toAction(points.last())
-        val state = ActionReady(source, points, action, isAutomation = true)
+        val state = ActionReady(action, isAutomation = true)
         assertEquals(
-            LocationRationaleRequested(source, points, action, isAutomation = true),
-            state.transition(stateContext),
+            LocationRationaleRequested(action, isAutomation = true),
+            state.transition(actionStateContext),
         )
     }
 }

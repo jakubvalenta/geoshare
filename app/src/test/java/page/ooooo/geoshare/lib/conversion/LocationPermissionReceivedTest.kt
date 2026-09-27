@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.FileType
@@ -12,12 +13,13 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.LocationPermissionReceived
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
 class LocationPermissionReceivedTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val log = FakeLog
-    private val source = "https://maps.apple.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val output = OpenRouteOnePointGpxOutput(
         FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
@@ -25,11 +27,11 @@ class LocationPermissionReceivedTest {
         log,
     )
     private val action = output.toAction(points.last())
-    private val stateContext: ConversionStateContext = mock()
+    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun transition_returnsNull() = runTest {
-        val state = LocationPermissionReceived(source, points, action, isAutomation = false)
-        assertNull(state.transition(stateContext))
+        val state = LocationPermissionReceived(action, isAutomation = false)
+        assertNull(state.transition(actionStateContext))
     }
 }

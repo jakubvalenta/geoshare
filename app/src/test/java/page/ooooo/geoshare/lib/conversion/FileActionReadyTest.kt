@@ -6,22 +6,24 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.outputs.FileActionReady
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
 class FileActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
-    private val source = "https://maps.apple.com/foo"
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val stateContext: ConversionStateContext = mock()
+    private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun transition_returnsNull() = runTest {
         val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
         val fileUri: Uri = mock()
-        val state = FileActionReady(source, points, action, isAutomation = true, fileUri)
-        assertNull(state.transition(stateContext))
+        val state = FileActionReady(action, isAutomation = true, fileUri)
+        assertNull(state.transition(actionStateContext))
     }
 }
