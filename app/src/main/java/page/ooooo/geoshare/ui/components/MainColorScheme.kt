@@ -3,7 +3,7 @@ package page.ooooo.geoshare.ui.components
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import page.ooooo.geoshare.lib.conversion.ConversionState
+import page.ooooo.geoshare.lib.state.ConversionState
 
 @Composable
 fun mainContainerColor(currentState: ConversionState): Color =

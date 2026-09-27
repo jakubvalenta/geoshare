@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf

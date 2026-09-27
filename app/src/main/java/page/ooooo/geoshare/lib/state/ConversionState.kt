@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import android.content.res.Resources
 import kotlinx.coroutines.CancellationException
@@ -46,7 +46,6 @@ import page.ooooo.geoshare.lib.inputs.merge
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.UnrecoverableNetworkException
 import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.state.State
 import java.net.MalformedURLException
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration

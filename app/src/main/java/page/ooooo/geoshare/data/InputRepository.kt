@@ -60,7 +60,7 @@ interface InputRepository {
     /**
      * All [Input] objects.
      *
-     * Order matters, because [page.ooooo.geoshare.lib.conversion.ConversionState] will try the inputs in order when
+     * Order matters, because [page.ooooo.geoshare.lib.state.ConversionState] will try the inputs in order when
      * parsing a URI.
      */
     val all: List<Input>

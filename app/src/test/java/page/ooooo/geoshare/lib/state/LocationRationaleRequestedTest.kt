@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
@@ -13,11 +13,9 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
-import page.ooooo.geoshare.lib.outputs.LocationPermissionReceived
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
-class LocationPermissionReceivedTest {
+class LocationRationaleRequestedTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val log = FakeLog
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -31,7 +29,7 @@ class LocationPermissionReceivedTest {
 
     @Test
     fun transition_returnsNull() = runTest {
-        val state = LocationPermissionReceived(action, isAutomation = false)
+        val state = LocationRationaleRequested(action, isAutomation = false)
         assertNull(state.transition(actionStateContext))
     }
 }

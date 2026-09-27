@@ -1,38 +1,23 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.android.UriActivity
-import page.ooooo.geoshare.lib.android.UriScheme
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.outputs.ActionCompleted
-import page.ooooo.geoshare.lib.outputs.ActionFailed
 import page.ooooo.geoshare.lib.outputs.ActionResult
-import page.ooooo.geoshare.lib.outputs.ActionState
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
-import page.ooooo.geoshare.lib.outputs.OpenDisplayGeoUriOutput
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
-class ActionFailedTest {
-    private val coordinateConverter: CoordinateConverter = mock()
-    private val output = OpenDisplayGeoUriOutput(
-        UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
-        coordinateConverter,
-    )
+class LocationFindingFailedTest {
     private val actionResult = ActionResult.FAILED
     private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
-    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
-        val state = ActionFailed( output)
+    fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
+        val state = LocationFindingFailed(actionResult)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionCompleted(actionResult),
@@ -43,8 +28,8 @@ class ActionFailedTest {
     }
 
     @Test
-    fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
-        val state = ActionFailed(output)
+    fun locationFindingFailed_executionIsCancelled_returnsActionCompleted() = runTest {
+        val state = LocationFindingFailed(actionResult)
         var res: ActionState? = null
         val job = launch {
             res = state.transition(actionStateContext)

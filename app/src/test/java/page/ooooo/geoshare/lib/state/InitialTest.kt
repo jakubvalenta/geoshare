@@ -1,17 +1,16 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class ConversionFailedTest {
-    private val source = "https://maps.google.com/foo"
+class InitialTest {
     private val stateContext: ConversionStateContext = mock()
 
     @Test
-    fun transition_returnsNull() = runTest {
-        val state = ConversionFailed(source, "Test message")
+    fun initial_returnsNull() = runTest {
+        val state = ConversionState.Initial
         assertNull(state.transition(stateContext))
     }
 }

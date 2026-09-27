@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
+import page.ooooo.geoshare.lib.state.ActionStateContext
 
 @Module
 @InstallIn(ViewModelComponent::class)

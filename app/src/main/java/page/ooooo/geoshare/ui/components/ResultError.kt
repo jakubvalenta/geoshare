@@ -20,8 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.conversion.ConversionFailed
-import page.ooooo.geoshare.lib.conversion.ConversionState
+import page.ooooo.geoshare.lib.state.ConversionFailed
+import page.ooooo.geoshare.lib.state.ConversionState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 

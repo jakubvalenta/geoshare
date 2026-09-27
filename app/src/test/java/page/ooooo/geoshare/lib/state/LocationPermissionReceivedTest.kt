@@ -1,8 +1,8 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
@@ -13,14 +13,9 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.ActionCompleted
-import page.ooooo.geoshare.lib.outputs.ActionResult
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
-import page.ooooo.geoshare.lib.outputs.LocationRationaleConfirmed
-import page.ooooo.geoshare.lib.outputs.LocationRationaleShown
 import page.ooooo.geoshare.lib.outputs.OpenRouteOnePointGpxOutput
 
-class LocationRationaleShownTest {
+class LocationPermissionReceivedTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val log = FakeLog
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
@@ -33,20 +28,8 @@ class LocationRationaleShownTest {
     private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
-    fun grant_returnsLocationRationaleConfirmed() = runTest {
-        val state = LocationRationaleShown(action, isAutomation = false)
-        assertEquals(
-            LocationRationaleConfirmed(action, isAutomation = false),
-            state.grant(actionStateContext, false),
-        )
-    }
-
-    @Test
-    fun deny_returnsActionCompleted() = runTest {
-        val state = LocationRationaleShown(action, isAutomation = false)
-        assertEquals(
-            ActionCompleted(ActionResult.FAILED),
-            state.deny(actionStateContext, false),
-        )
+    fun transition_returnsNull() = runTest {
+        val state = LocationPermissionReceived(action, isAutomation = false)
+        assertNull(state.transition(actionStateContext))
     }
 }

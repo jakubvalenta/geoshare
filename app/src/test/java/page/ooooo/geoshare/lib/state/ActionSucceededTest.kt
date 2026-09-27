@@ -1,27 +1,28 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.outputs.ActionCompleted
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.outputs.ActionResult
-import page.ooooo.geoshare.lib.outputs.ActionState
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
-import page.ooooo.geoshare.lib.outputs.LocationFindingFailed
+import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
-class LocationFindingFailedTest {
-    private val actionResult = ActionResult.FAILED
+class ActionSucceededTest {
+    private val coordinateConverter: CoordinateConverter = mock()
+    private val output = SavePointsGpxOutput(coordinateConverter)
+    private val actionResult = ActionResult.SUCCEEDED_AND_OPENED_APP
     private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
-    fun locationFindingFailed_executionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
-        val state = LocationFindingFailed(actionResult)
+    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
+        val state = ActionSucceeded(actionResult, output)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionCompleted(actionResult),
@@ -32,8 +33,8 @@ class LocationFindingFailedTest {
     }
 
     @Test
-    fun locationFindingFailed_executionIsCancelled_returnsActionCompleted() = runTest {
-        val state = LocationFindingFailed(actionResult)
+    fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
+        val state = ActionSucceeded(actionResult, output)
         var res: ActionState? = null
         val job = launch {
             res = state.transition(actionStateContext)

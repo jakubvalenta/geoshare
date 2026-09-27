@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
@@ -9,13 +9,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.ActionAutomationSucceeded
-import page.ooooo.geoshare.lib.outputs.ActionCompleted
-import page.ooooo.geoshare.lib.outputs.ActionFailed
-import page.ooooo.geoshare.lib.outputs.ActionRan
 import page.ooooo.geoshare.lib.outputs.ActionResult
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
-import page.ooooo.geoshare.lib.outputs.ActionSucceeded
 import page.ooooo.geoshare.lib.outputs.NoopAction
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 

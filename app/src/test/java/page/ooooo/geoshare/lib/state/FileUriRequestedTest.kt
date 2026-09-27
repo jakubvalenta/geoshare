@@ -1,6 +1,5 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
-import android.net.Uri
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
@@ -10,11 +9,9 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
-import page.ooooo.geoshare.lib.outputs.FileActionReady
 import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
 
-class FileActionReadyTest {
+class FileUriRequestedTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
@@ -22,8 +19,7 @@ class FileActionReadyTest {
     @Test
     fun transition_returnsNull() = runTest {
         val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
-        val fileUri: Uri = mock()
-        val state = FileActionReady(action, isAutomation = true, fileUri)
+        val state = FileUriRequested(action, isAutomation = false)
         assertNull(state.transition(actionStateContext))
     }
 }

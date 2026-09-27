@@ -44,9 +44,9 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.paste
-import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
+import page.ooooo.geoshare.lib.state.ConversionState
+import page.ooooo.geoshare.lib.state.ConversionSucceeded
+import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.state.ExtendedStateLog
 import page.ooooo.geoshare.lib.state.ExtendedStateLogItem

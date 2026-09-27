@@ -14,7 +14,7 @@ import page.ooooo.geoshare.data.UserPreferencesRepository
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.billing.Billing
-import page.ooooo.geoshare.lib.conversion.ConversionStateContext
+import page.ooooo.geoshare.lib.state.ConversionStateContext
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 
 /**

@@ -1,20 +1,17 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.lib.outputs.ActionStateContext
-import page.ooooo.geoshare.lib.outputs.BasicActionReady
-import page.ooooo.geoshare.lib.outputs.NoopAction
+import page.ooooo.geoshare.lib.outputs.ActionResult
 
-class BasicActionReadyTest {
-    private val action = NoopAction
+class ActionCompletedTest {
     private val actionStateContext = ActionStateContext(FakeUserPreferencesRepository())
 
     @Test
     fun transition_returnsNull() = runTest {
-        val state = BasicActionReady(action, isAutomation = true)
+        val state = ActionCompleted(ActionResult.SUCCEEDED_AND_OPENED_APP)
         assertNull(state.transition(actionStateContext))
     }
 }

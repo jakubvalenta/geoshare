@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib.conversion
+package page.ooooo.geoshare.lib.state
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
