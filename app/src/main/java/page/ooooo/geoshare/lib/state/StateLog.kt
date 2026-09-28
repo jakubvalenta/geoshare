@@ -19,7 +19,6 @@ fun <S> MutableStateFlow<StateLog<S>>.append(
     timeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic,
 ) {
     update { prevLog ->
-        // TODO Increment id forever
         val newLogItem = StateLogItem(prevLog.size, state, timeSource.markNow())
         if (clear) {
             listOf(newLogItem)
