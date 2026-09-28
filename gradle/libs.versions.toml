@@ -26,7 +26,7 @@ kotlinxCoroutinesTest = "1.11.0"
 kotlinxSerializationJson = "1.11.0"
 ksp = "2.3.6"
 ktor = "3.6.0"
-mockitoKotlin = "6.3.0"
+mockitoKotlin = "6.4.0"
 openLocationCode = "1.0.4"
 
 [libraries]
