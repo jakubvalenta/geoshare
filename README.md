@@ -69,42 +69,24 @@ navigation, you can easily switch from Google Maps to your favorite
   with it.
 - Interface adapts to **tablets**.
 
-## Intro
+## Screenshots
 
-### How to show a map location in another map app
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"
+alt="Screenshot of GeoShare’s main screen"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"
+alt="Screenshot of GeoShare’s result screen"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png)
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"
+alt="Screenshot of GeoShare’s automation configuration screen"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
+[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
+alt="Screenshot of GeoShare asking for permission to connect to Google"
+width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
 
-Share a location from your map app or web browser.
+## FAQ
 
-![Screenshot of Google Maps’ share screen](./docs/map_app.webp)
-
-Choose _GeoShare_ and the app will let you open the same location in any
-installed map app.
-
-![Screenshot of GeoShare’s share screen](./docs/geo_share_open.webp)
-
-### Configure Android to open links to Google Maps in alternative maps (optional)
-
-First, go to Settings > Apps > Maps > _Open by default_ and turn off the opening
-of links in this app.
-
-![Screenshot of Google Maps’ Open by default
-settings](./docs/open_by_default_google_maps.webp)
-
-Then go to Settings > Apps > GeoShare > _Open by default_, turn on the opening
-of links in this app, and tap _Add links_.
-
-![Screenshot of GeoShare’s Open by default
-settings](./docs/open_by_default_geo_share.webp)
-
-Select **maps.app.goog.gl**, **maps.google.com**, and **www.google.com**. These
-are the common Google Maps links. You can choose other maps or the more rare
-links too, but it’s not essential.
-
-If some links are grayed out, other map apps are set to open them by default.
-You can find these apps and turn off the opening of links for them, like we did
-for Google Maps.
-
-## How it works
+### How it works
 
 GeoShare converts map links (e.g. https://maps.app.goo.gl/…) into geo: links
 that can be opened by other map apps. To create a geo: link, geographic
@@ -129,7 +111,16 @@ particular link.
 To permanently allow or deny connecting to the map service instead of always
 asking (the default), go to the app’s preferences.
 
-## Privacy considerations
+### Failed to find coordinates, using a place name
+
+GeoShare is able to extract only a place name, e.g. “Mount Kilimanjaro”, from
+certain map links. When you open this location in another map app, it might show
+a different place than the original link, because several places with the same
+name might exist.
+
+Points identified only by name are not included in GPX routes.
+
+### Privacy considerations
 
 When possible, GeoShare converts map links **offline**. If the map link requires
 online conversion, the app will ask you before connecting to the map service
@@ -146,33 +137,35 @@ For some map links, GeoShare loads the **live web page** of the map service and
 executes its JavaScript. This happens in a restricted environment, which blocks
 tracking scripts and doesn’t store cookies.
 
-## Location permission
+### Location permission
 
 GeoShare asks for location permission when launching the TomTom navigation and
 when sharing a GPX route, because in these cases the app needs to create a GPX
 route that starts at your current location. The location information is
 discarded immediately after the creation of the route.
 
-## Reporting issues
+### How to always open links in GeoShare
 
-GeoShare supports many types of map links. If you still find a link that
-doesn’t work,
-please [report an issue](https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml).
+First, go to Settings > Apps > Maps > _Open by default_ and turn off the opening
+of links in this app.
 
-## Screenshots
+![Screenshot of Google Maps’ Open by default
+settings](./docs/open_by_default_google_maps.webp)
 
-[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png"
-alt="Screenshot of GeoShare’s main screen"
-width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
-[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png"
-alt="Screenshot of GeoShare’s result screen"
-width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png)
-[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png"
-alt="Screenshot of GeoShare’s automation configuration screen"
-width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png)
-[<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png"
-alt="Screenshot of GeoShare asking for permission to connect to Google"
-width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
+Then go to Settings > Apps > GeoShare > _Open by default_, turn on the opening
+of links in this app, and tap _Add links_.
+
+![Screenshot of GeoShare’s Open by default
+settings](./docs/open_by_default_geo_share.webp)
+
+Select **maps.app.goog.gl**, **maps.google.com**, and **www.google.com**. These
+are the common Google Maps links. You can choose other maps or the more rare
+links too, but it’s not essential.
+
+If some links are grayed out, other map apps are set to open them by default.
+You can find these apps and turn off the opening of links for them, like we did
+for Google Maps. Check also apps installed in private space, if you use this
+Android feature.
 
 ## Installation
 
