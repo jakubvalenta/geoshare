@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.tests
 
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
 import androidx.test.uiautomator.textAsString
@@ -20,8 +21,11 @@ import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.outputs.CopyGeoUriOutput
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import kotlin.time.Duration.Companion.seconds
 
@@ -196,6 +200,38 @@ class AutomationBehaviorTest {
 
         // The test contact contains coordinates
         assertContactContainsText(CoordinateFormatter.formatDecCoords(point))
+    }
+
+    @Test
+    fun whenAutomationIsWaitingAndAnotherActionIsStarted_automationIsCanceled() = uiAutomator {
+        // Launch app
+        launchApplication()
+        waitForAppToBeVisible()
+
+        // Configure automation
+        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
+        // Use a custom point of the click, instead of the default center, otherwise the click doesn't work on Redmi 8
+        // for some reason
+        scrollToAutomationItem(SavePointsGpxAutomation).click(android.graphics.Point(10, 10))
+
+        // Share a URI with the app
+        shareUri()
+
+        // Shows automation counter
+        onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
+
+        // Tap the copy geo: URI chip
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val output = CopyGeoUriOutput(coordinateConverter)
+        onElement { viewIdResourceName == "geoShareResultChip_${output.id}"}.click()
+
+        // Doesn't show automation counter
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareResultAutomationCounter" })
+
+        // Shows automation success message
+        onElement(pollIntervalMs = 50) { viewIdResourceName == "geoShareResultMessageSuccess" }
     }
 }
 

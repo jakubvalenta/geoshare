@@ -298,7 +298,6 @@ fun MainScreen(
         onDismissHelpMessage = { helpMessage -> helpViewModel.dismissHelpMessage(helpMessage) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
-        // TODO Behavior test that execute cancels automation
         onExecute = { action -> mainViewModel.startAction(action) },
         onGrant = { doNotAsk -> mainViewModel.grant(doNotAsk) },
         onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
