@@ -25,7 +25,7 @@ class ConversionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.i(TAG, "Create: ${intent.data}")
+        Log.i(TAG, "Creating activity with data \"${intent.data}\"")
         mainViewModel.onCreateOrNewIntent(intent)
 
         enableEdgeToEdge()
@@ -34,7 +34,14 @@ class ConversionActivity : ComponentActivity() {
 
             // See MainActivity.onCreate()
             AppTheme(dynamicColor = userPreferencesValues.dynamicColor) {
-                MainNavigation(billingViewModel, mainViewModel, onFinish = { finish() })
+                MainNavigation(
+                    billingViewModel,
+                    mainViewModel,
+                    onFinish = {
+                        Log.i(TAG, "Finishing activity")
+                        finish()
+                    },
+                )
             }
         }
     }
