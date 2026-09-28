@@ -38,8 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.Initial
+import page.ooooo.geoshare.lib.state.ConversionState
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -63,7 +62,7 @@ fun MainMenu(
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
     val changelogShown by changelogShown.collectAsStateWithLifecycle()
 
-    if (currentState is Initial && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
+    if (currentState is ConversionState.Initial && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
         FeatureBadgeSmall(
             onClick = onNavigateToBillingScreen,
             modifier = Modifier.testTag("geoShareMainBillingIcon"),
@@ -176,7 +175,7 @@ private fun DefaultPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial,
+                            currentState = ConversionState.Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
                             changelogShown = MutableStateFlow(false),
@@ -206,7 +205,7 @@ private fun DarkPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial,
+                            currentState = ConversionState.Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
                             changelogShown = MutableStateFlow(false),
@@ -236,7 +235,7 @@ private fun DonationPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial,
+                            currentState = ConversionState.Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = MutableStateFlow(
                                 BillingStatus.Purchased(
@@ -273,7 +272,7 @@ private fun DarkDonationPreview() {
                     title = {},
                     actions = {
                         MainMenu(
-                            currentState = Initial,
+                            currentState = ConversionState.Initial,
                             billingAppNameResId = R.string.app_name_pro,
                             billingStatus = MutableStateFlow(
                                 BillingStatus.Purchased(

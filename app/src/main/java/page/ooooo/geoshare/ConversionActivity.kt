@@ -11,7 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.ui.BillingViewModel
-import page.ooooo.geoshare.ui.ConversionViewModel
+import page.ooooo.geoshare.ui.MainViewModel
 import page.ooooo.geoshare.ui.MainNavigation
 import page.ooooo.geoshare.ui.UserPreferenceViewModel
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -19,14 +19,14 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @AndroidEntryPoint
 class ConversionActivity : ComponentActivity() {
     private val billingViewModel: BillingViewModel by viewModels()
-    private val conversionViewModel: ConversionViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
     private val userPreferenceViewModel: UserPreferenceViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.i(TAG, "Create: ${intent.data}")
-        conversionViewModel.onCreateOrNewIntent(intent)
+        Log.i(TAG, "Creating activity with data \"${intent.data}\"")
+        mainViewModel.onCreateOrNewIntent(intent)
 
         enableEdgeToEdge()
         setContent {
@@ -34,7 +34,14 @@ class ConversionActivity : ComponentActivity() {
 
             // See MainActivity.onCreate()
             AppTheme(dynamicColor = userPreferencesValues.dynamicColor) {
-                MainNavigation(billingViewModel, conversionViewModel, onFinish = { finish() })
+                MainNavigation(
+                    billingViewModel,
+                    mainViewModel,
+                    onFinish = {
+                        Log.i(TAG, "Finishing activity")
+                        finish()
+                    },
+                )
             }
         }
     }
@@ -47,7 +54,7 @@ class ConversionActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         Log.i(TAG, "New intent: ${intent.data}")
-        conversionViewModel.onCreateOrNewIntent(intent)
+        mainViewModel.onCreateOrNewIntent(intent)
     }
 
     companion object {

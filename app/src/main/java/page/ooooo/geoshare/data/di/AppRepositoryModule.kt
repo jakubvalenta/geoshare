@@ -8,7 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.flow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.data.DefaultAppRepository
@@ -107,8 +106,3 @@ fun getFakeAppDetails(context: Context) =
             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
         ),
     )
-
-class FakeAppRepository(val context: Context) : AppRepository {
-    override val activities = flow { emit(fakeActivities) }
-    override val appDetails = flow { emit(getFakeAppDetails(context)) }
-}

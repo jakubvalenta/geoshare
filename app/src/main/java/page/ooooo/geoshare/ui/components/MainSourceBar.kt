@@ -44,12 +44,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.paste
-import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
-import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
-import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
+import page.ooooo.geoshare.lib.state.ConversionState
+import page.ooooo.geoshare.lib.state.ConversionSucceeded
+import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
+import page.ooooo.geoshare.lib.state.ExtendedStateLog
+import page.ooooo.geoshare.lib.state.ExtendedStateLogItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.ComparableTimeMark
@@ -63,7 +63,7 @@ fun MainSourceBar(
     logExpanded: Boolean,
     source: StateFlow<String>,
     start: StateFlow<ComparableTimeMark?>,
-    stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
+    stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     onSelectUri: (uriString: String) -> Unit,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
@@ -78,7 +78,7 @@ fun MainSourceBar(
     val stateLog by stateLog.collectAsStateWithLifecycle()
 
     when (currentState) {
-        is Initial -> {
+        is ConversionState.Initial -> {
             OutlinedTextField(
                 value = source,
                 onValueChange = {
@@ -169,7 +169,7 @@ fun MainSourceBar(
 @Composable
 private fun MainSourceTimeButton(
     start: StateFlow<ComparableTimeMark?>,
-    stateLog: List<ExtendedConversionStateLogItem>,
+    stateLog: ExtendedStateLog<ConversionState.HasDescription>,
     logExpanded: Boolean,
     textPadding: Dp = LocalSpacing.current.small,
     iconPadding: Dp = textPadding - 10.dp,
@@ -180,7 +180,7 @@ private fun MainSourceTimeButton(
 
     val text = start?.let { start ->
         when (lastLogItem) {
-            is ExtendedConversionStateLogItem.Finished -> {
+            is ExtendedStateLogItem.Finished -> {
                 val elapsedTime = lastLogItem.end - start
                 if (elapsedTime > 10.milliseconds) {
                     @Composable {
@@ -193,7 +193,7 @@ private fun MainSourceTimeButton(
                 }
             }
 
-            is ExtendedConversionStateLogItem.Pending -> {
+            is ExtendedStateLogItem.Pending -> {
                 @Composable {
                     CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                         ElapsedTimeText(start)
@@ -245,7 +245,7 @@ private fun DefaultPreview() {
         Surface {
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = Initial,
+                currentState = ConversionState.Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow(""),
@@ -268,7 +268,7 @@ private fun DarkPreview() {
         Surface {
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = Initial,
+                currentState = ConversionState.Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow(""),
@@ -291,7 +291,7 @@ private fun FilledPreview() {
         Surface {
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = Initial,
+                currentState = ConversionState.Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
@@ -314,7 +314,7 @@ private fun DarkFilledPreview() {
         Surface {
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = Initial,
+                currentState = ConversionState.Initial,
                 errorMessageResId = null,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
@@ -337,7 +337,7 @@ private fun ErrorPreview() {
         Surface {
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = Initial,
+                currentState = ConversionState.Initial,
                 errorMessageResId = R.string.conversion_failed_missing_url,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
@@ -360,7 +360,7 @@ private fun DarkErrorPreview() {
         Surface {
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = Initial,
+                currentState = ConversionState.Initial,
                 errorMessageResId = R.string.conversion_failed_missing_url,
                 logExpanded = false,
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),

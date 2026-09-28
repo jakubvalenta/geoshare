@@ -1,0 +1,53 @@
+package page.ooooo.geoshare.lib.state
+
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.geo.CoordinateConverter
+import page.ooooo.geoshare.lib.outputs.ActionResult
+import page.ooooo.geoshare.lib.outputs.SavePointsGpxOutput
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.measureTime
+
+class ActionAutomationSucceededTest {
+    private val coordinateConverter: CoordinateConverter = mock()
+    private val output = SavePointsGpxOutput(coordinateConverter)
+    private val actionResult = ActionResult.SUCCEEDED_AND_OPENED_APP
+    private val actionStateContext: ActionStateContext = mock()
+
+    @Test
+    fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
+        val state = ActionAutomationSucceeded(actionResult, output)
+        val workDuration = testScheduler.timeSource.measureTime {
+            assertEquals(
+                ActionCompleted(actionResult),
+                state.transition(actionStateContext),
+            )
+        }
+        assertEquals(3.seconds, workDuration)
+    }
+
+    @Test
+    fun transition_whenExecutionIsCancelled_returnsActionCompleted() = runTest {
+        val state = ActionAutomationSucceeded(actionResult, output)
+        var res: ActionState? = null
+        val job = launch {
+            res = state.transition(actionStateContext)
+        }
+        testScheduler.runCurrent()
+        testScheduler.advanceTimeBy(1.seconds)
+        try {
+            job.cancelAndJoin()
+        } catch (_: CancellationException) {
+            // Do nothing
+        }
+        assertEquals(
+            res,
+            ActionCompleted(actionResult),
+        )
+    }
+}

@@ -187,6 +187,7 @@ fun ResultCoordinates(
                 outputsForPointChips.forEach { outputDetail ->
                     StyledChip(
                         label = outputDetail.label(),
+                        modifier = Modifier.testTag("geoShareResultChip_${outputDetail.output.id}"),
                         icon = outputDetail.icon?.let {
                             { IconFromDescriptor(it, contentDescription = null) }
                         },

@@ -142,6 +142,16 @@ class MainBehaviorTest {
         // Share a Google Maps place link with the app
         shareUri("https://www.google.com/maps/place/Park+am+Gleisdreieck/@52.4911357,13.3764779,15z/data=!4m6!3m5!1s0x47a850301366c17b:0x5c368c54cfd1eb6!8m2!3d52.4945256!4d13.3765945!16s")
 
+        // Wait for the conversion to succeed
+        assertConversionSucceeds(
+            WGS84Point(
+                52.4945256, 13.3765945,
+                z = 15.0,
+                name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Park am Gleisdreieck",
+                source = Source.URI,
+            )
+        )
+
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
@@ -153,6 +163,62 @@ class MainBehaviorTest {
         waitAndAssertGoogleMapsContainsElement {
             textAsString() == @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Park am Gleisdreieck"
         }
+
+        // Go back to app
+        launchApplication()
+        waitForAppToBeVisible()
+
+        // Shows main screen instead of result screen, because the app finished
+        onElement { viewIdResourceName == "geoShareMainSourceTextField" }
+    }
+
+    @Test
+    fun whenLinkIsShared_allowsOpeningUriSourceAndDoesNotCancelPendingConversion() = uiAutomator {
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
+
+        val output = withNetworkOff {
+            // Share a Google Maps place link with the app
+            shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
+
+            // Grant connection permission
+            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+
+            // Open the source sheet
+            onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+            val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
+            onElement { viewIdResourceName == "geoShareConversionUriSheet" }
+                .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+        }
+
+        // Tap an app after enabling network, so that Google Maps work
+        output.click()
+
+        // Google Maps shows precise location
+        waitAndAssertGoogleMapsContainsElement {
+            textAsString() == @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Hermannstraße 10"
+        }
+
+        // Go back to app
+        launchApplication()
+        waitForAppToBeVisible()
+
+        // Assert that the conversion wasn't canceled
+        assertConversionSucceeds(
+            GCJ02Point(
+                52.4848232, 13.4240791,
+                name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Hermannstraße 10, 12049 Berlin",
+                source = Source.URI,
+            ),
+            fallbackNames = setOf(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Allemagne",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Hermannstraße 10, 12049 Berlin-Bezirk Neukölln, Germany",
+            ),
+        )
     }
 
     @Test

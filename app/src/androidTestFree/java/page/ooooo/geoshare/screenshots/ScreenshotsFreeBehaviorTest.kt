@@ -71,6 +71,7 @@ import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.submitMainForm
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
+import page.ooooo.geoshare.tests.withNetworkOff
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import java.util.UUID
@@ -1019,17 +1020,6 @@ class ScreenshotsFreeBehaviorTest {
     private fun UiObject2.collapseSheet() {
         swipe(Direction.DOWN, 1f)
         swipe(Direction.DOWN, 1f)
-    }
-
-    private inline fun <T> UiAutomatorTestScope.withNetworkOff(block: () -> T): T {
-        device.executeShellCommand("svc wifi disable")
-        device.executeShellCommand("svc data disable")
-        try {
-            return block()
-        } finally {
-            device.executeShellCommand("svc wifi enable")
-            device.executeShellCommand("svc data enable")
-        }
     }
 
     private fun UiAutomatorTestScope.scrollToShareItem(): UiObject2 =

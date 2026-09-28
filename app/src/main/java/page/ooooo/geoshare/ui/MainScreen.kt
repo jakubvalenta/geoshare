@@ -82,23 +82,6 @@ import page.ooooo.geoshare.lib.billing.BillingProduct
 import page.ooooo.geoshare.lib.billing.BillingStatus
 import page.ooooo.geoshare.lib.billing.CustomLinkFeature
 import page.ooooo.geoshare.lib.billing.Feature
-import page.ooooo.geoshare.lib.conversion.ActionCompleted
-import page.ooooo.geoshare.lib.conversion.BasicActionReady
-import page.ooooo.geoshare.lib.conversion.ConversionFailed
-import page.ooooo.geoshare.lib.conversion.ConversionState
-import page.ooooo.geoshare.lib.conversion.ConversionSucceeded
-import page.ooooo.geoshare.lib.conversion.ExtendedConversionStateLogItem
-import page.ooooo.geoshare.lib.conversion.FileActionReady
-import page.ooooo.geoshare.lib.conversion.FileUriRequested
-import page.ooooo.geoshare.lib.conversion.Initial
-import page.ooooo.geoshare.lib.conversion.LocationActionReady
-import page.ooooo.geoshare.lib.conversion.LocationPermissionReceived
-import page.ooooo.geoshare.lib.conversion.LocationRationaleConfirmed
-import page.ooooo.geoshare.lib.conversion.LocationRationaleRequested
-import page.ooooo.geoshare.lib.conversion.LocationRationaleShown
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedBasicInput
-import page.ooooo.geoshare.lib.conversion.PermissionGrantedWebViewInput
-import page.ooooo.geoshare.lib.conversion.PermissionRequested
 import page.ooooo.geoshare.lib.extensions.truncateMiddle
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
@@ -109,10 +92,25 @@ import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
-import page.ooooo.geoshare.lib.outputs.ActionResult
 import page.ooooo.geoshare.lib.outputs.LocationAction
 import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.lib.state.ActionState
+import page.ooooo.geoshare.lib.state.BasicActionReady
+import page.ooooo.geoshare.lib.state.ConversionFailed
+import page.ooooo.geoshare.lib.state.ConversionState
+import page.ooooo.geoshare.lib.state.ConversionSucceeded
+import page.ooooo.geoshare.lib.state.ExtendedStateLog
+import page.ooooo.geoshare.lib.state.FileActionReady
+import page.ooooo.geoshare.lib.state.FileUriRequested
+import page.ooooo.geoshare.lib.state.LocationActionReady
+import page.ooooo.geoshare.lib.state.LocationPermissionReceived
+import page.ooooo.geoshare.lib.state.LocationRationaleConfirmed
+import page.ooooo.geoshare.lib.state.LocationRationaleRequested
+import page.ooooo.geoshare.lib.state.LocationRationaleShown
+import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
+import page.ooooo.geoshare.lib.state.PermissionGrantedWebViewInput
+import page.ooooo.geoshare.lib.state.PermissionRequested
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionStateLogList
 import page.ooooo.geoshare.ui.components.ConversionUriSheet
@@ -154,7 +152,7 @@ fun MainScreen(
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     billingViewModel: BillingViewModel,
-    conversionViewModel: ConversionViewModel,
+    mainViewModel: MainViewModel,
     helpViewModel: HelpViewModel = hiltViewModel(),
     inputViewModel: InputViewModel = hiltViewModel(),
     outputViewModel: OutputViewModel = hiltViewModel(),
@@ -166,34 +164,35 @@ fun MainScreen(
     val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
 
-    val currentState by conversionViewModel.currentState.collectAsStateWithLifecycle()
+    val conversionState by mainViewModel.conversionState.collectAsStateWithLifecycle()
+    val actionState by mainViewModel.actionState.collectAsStateWithLifecycle()
 
     // Action
 
     var locationJob by remember { mutableStateOf<Job?>(null) }
     val locationPermissionRequest =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            conversionViewModel.receiveLocationPermission()
+            mainViewModel.receiveLocationPermission()
         }
     val saveFileLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
-                conversionViewModel.receiveFileUri(uri)
-            } ?: conversionViewModel.cancelFileUriRequest()
+                mainViewModel.receiveFileUri(uri)
+            } ?: mainViewModel.cancelFileUriRequest()
         }
 
-    LaunchedEffect(currentState) {
-        currentState.let { currentState ->
-            when (currentState) {
+    LaunchedEffect(actionState) {
+        actionState.let { actionState ->
+            when (actionState) {
                 // Basic action
 
                 is BasicActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
-                    val actionResult = currentState.action.execute(actionContext)
+                    val actionResult = actionState.action.execute(actionContext)
                     if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
-                    conversionViewModel.completeBasicAction(actionResult)
+                    mainViewModel.completeBasicAction(actionResult)
                 }
 
                 // File action
@@ -203,31 +202,31 @@ fun MainScreen(
                         saveFileLauncher.launch(
                             Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                                 addCategory(Intent.CATEGORY_OPENABLE)
-                                type = currentState.action.mimeType
-                                putExtra(Intent.EXTRA_TITLE, currentState.action.getFilename(resources))
+                                type = actionState.action.mimeType
+                                putExtra(Intent.EXTRA_TITLE, actionState.action.getFilename(resources))
                             }
                         )
                     } catch (_: ActivityNotFoundException) {
-                        conversionViewModel.cancelFileUriRequest()
+                        mainViewModel.cancelFileUriRequest()
                     }
                 }
 
                 is FileActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
-                    val actionResult = currentState.action.execute(currentState.uri, actionContext)
+                    val actionResult = actionState.action.execute(actionState.uri, actionContext)
                     if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
-                    conversionViewModel.completeFileAction(actionResult)
+                    mainViewModel.completeFileAction(actionResult)
                 }
 
                 // Location action
 
                 is LocationRationaleRequested -> {
                     if (context.hasLocationPermission()) {
-                        conversionViewModel.skipLocationRationale(currentState.action, currentState.isAutomation)
+                        mainViewModel.skipLocationRationale(actionState.action, actionState.isAutomation)
                     } else {
-                        conversionViewModel.showLocationRationale(currentState.action, currentState.isAutomation)
+                        mainViewModel.showLocationRationale(actionState.action, actionState.isAutomation)
                     }
                 }
 
@@ -243,28 +242,29 @@ fun MainScreen(
                         val location = try {
                             context.getLocation()
                         } catch (_: CancellationException) {
-                            conversionViewModel.cancelLocationFinding()
+                            mainViewModel.cancelLocationFinding()
                             return@launch
                         }
-                        conversionViewModel.receiveLocation(currentState.action, currentState.isAutomation, location)
+                        mainViewModel.receiveLocation(actionState.action, actionState.isAutomation, location)
                     }
                 }
 
                 is LocationActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
-                    val actionResult = currentState.action.execute(currentState.location, actionContext)
+                    val actionResult = actionState.action.execute(actionState.location, actionContext)
                     if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
                         onFinish()
                     }
-                    conversionViewModel.completeLocationAction(actionResult)
+                    mainViewModel.completeLocationAction(actionResult)
                 }
             }
         }
     }
 
     MainScreen(
-        currentState = currentState,
-        actionDetail = conversionViewModel.actionDetail,
+        conversionState = conversionState,
+        actionState = actionState,
+        actionDetail = mainViewModel.actionDetail,
         billingAppNameResId = billingViewModel.billingAppNameResId,
         billingFeatures = billingViewModel.billingFeatures,
         billingStatus = billingViewModel.billingStatus,
@@ -282,56 +282,54 @@ fun MainScreen(
         outputsForSharing = outputViewModel.outputsForSharing,
         outputsForUriByCategory = outputViewModel.outputsForUriByCategory,
         selectedUri = outputViewModel.selectedUri,
-        start = conversionViewModel.start,
-        stateLog = conversionViewModel.extendedStateLog,
-        source = conversionViewModel.source,
-        sourceComesFromIntent = conversionViewModel.sourceComesFromIntent,
+        start = mainViewModel.conversionStart,
+        stateLog = mainViewModel.extendedConversionStateLog,
+        source = mainViewModel.source,
+        sourceComesFromIntent = mainViewModel.sourceComesFromIntent,
         userPreferenceMessage = userPreferenceViewModel.message,
         userPreferencesValues = userPreferenceViewModel.values,
-        onCancel = {
+        onCancelAction = {
             locationJob?.cancel()
-            conversionViewModel.cancel()
+            mainViewModel.cancelAction()
         },
-        onDeny = { doNotAsk -> conversionViewModel.deny(doNotAsk) },
+        onCancelConversion = { mainViewModel.cancelConversion() },
+        onDeny = { doNotAsk -> mainViewModel.deny(doNotAsk) },
         onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
         onDismissHelpMessage = { helpMessage -> helpViewModel.dismissHelpMessage(helpMessage) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
-        onExecute = { action ->
-            conversionViewModel.cancel()
-            conversionViewModel.startAction(action)
-        },
-        onGrant = { doNotAsk -> conversionViewModel.grant(doNotAsk) },
+        onExecute = { action -> mainViewModel.startAction(action) },
+        onGrant = { doNotAsk -> mainViewModel.grant(doNotAsk) },
         onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
         onNavigateToAboutScreen = {
-            conversionViewModel.cancel()
+            mainViewModel.cancelAction()
             onNavigateToAboutScreen()
         },
         onNavigateToBillingScreen = {
-            conversionViewModel.cancel()
+            mainViewModel.cancelAction()
             onNavigateToBillingScreen()
         },
         onNavigateToFaqScreen = { itemId ->
-            conversionViewModel.cancel()
+            mainViewModel.cancelAction()
             onNavigateToFaqScreen(itemId)
         },
         onNavigateToInputsScreen = {
-            conversionViewModel.cancel()
+            mainViewModel.cancelAction()
             onNavigateToInputsScreen()
         },
         onNavigateToLinkScreen = {
-            conversionViewModel.cancel()
+            mainViewModel.cancelAction()
             onNavigateToLinkScreen()
         },
         onNavigateToUserPreferencesScreen = { groupId ->
-            conversionViewModel.cancel()
+            mainViewModel.cancelAction()
             onNavigateToUserPreferencesScreen(groupId)
         },
-        onReset = { conversionViewModel.reset() },
-        onRetry = { conversionViewModel.retry() },
+        onReset = { mainViewModel.reset() },
+        onRetry = { mainViewModel.retry() },
         onSelectUri = { outputViewModel.setSelectedUri(it) },
-        onSetSource = { conversionViewModel.setSource(it) },
-        onSubmit = { conversionViewModel.start(false) },
+        onSetSource = { mainViewModel.setSource(it) },
+        onSubmit = { mainViewModel.start(false) },
     )
 }
 
@@ -339,7 +337,8 @@ fun MainScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen(
-    currentState: ConversionState,
+    conversionState: ConversionState,
+    actionState: ActionState,
     actionDetail: StateFlow<ActionDetail?>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -361,10 +360,11 @@ private fun MainScreen(
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
     start: StateFlow<ComparableTimeMark?>,
-    stateLog: StateFlow<List<ExtendedConversionStateLogItem>>,
+    stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     userPreferenceMessage: StateFlow<Message?>,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
-    onCancel: () -> Unit,
+    onCancelAction: () -> Unit,
+    onCancelConversion: () -> Unit,
     onDeny: (Boolean) -> Unit,
     onDisableLinkGroup: (String?) -> Unit,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
@@ -397,7 +397,7 @@ private fun MainScreen(
     val selectedUri by selectedUri.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    BackHandler(currentState !is Initial) {
+    BackHandler(conversionState !is ConversionState.Initial) {
         onReset()
     }
 
@@ -425,7 +425,7 @@ private fun MainScreen(
         MainScaffold(
             actions = {
                 MainMenu(
-                    currentState = currentState,
+                    currentState = conversionState,
                     billingAppNameResId = billingAppNameResId,
                     billingStatus = billingStatus,
                     changelogShown = changelogShown,
@@ -439,7 +439,7 @@ private fun MainScreen(
             topContent = {
                 item(key = "main_source_bar", contentType = "main_source_bar") {
                     MainSourceBar(
-                        currentState = currentState,
+                        currentState = conversionState,
                         errorMessageResId = errorMessageResId,
                         logExpanded = logExpanded,
                         source = source,
@@ -459,7 +459,7 @@ private fun MainScreen(
                         onUriClick = onSelectUri,
                     )
                 }
-                if (currentState is Initial) {
+                if (conversionState is ConversionState.Initial) {
                     item(key = "main_submit", contentType = "main_submit") {
                         MainSubmit(
                             source = source,
@@ -471,20 +471,20 @@ private fun MainScreen(
                     item(key = "result", contentType = "result") {
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = mainContainerColor(currentState),
+                                containerColor = mainContainerColor(conversionState),
                             ),
                         ) {
-                            when (currentState) {
+                            when (conversionState) {
                                 is ConversionState.HasError ->
                                     ResultError(
-                                        currentState = currentState,
+                                        currentState = conversionState,
                                         onNavigateToInputsScreen = onNavigateToInputsScreen,
                                         onRetry = onRetry,
                                     )
 
                                 is ConversionState.HasResult ->
                                     ResultCoordinates(
-                                        points = currentState.points,
+                                        points = conversionState.points,
                                         coordinateConverter = coordinateConverter,
                                         outputsForPointChips = outputsForPointChips,
                                         outputsForPointsChips = outputsForPointsChips,
@@ -492,7 +492,7 @@ private fun MainScreen(
                                         onExecute = onExecute,
                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
                                         onSelect = { index ->
-                                            onCancel()
+                                            onCancelAction()
                                             selectedPointIndex = index
                                         },
                                     ) { paddingValues ->
@@ -507,11 +507,11 @@ private fun MainScreen(
                                     }
 
                                 is ConversionState.HasDescription ->
-                                    currentState.getLoadingIndicatorTitle(resources)?.let { title ->
+                                    conversionState.getLoadingIndicatorTitle(resources)?.let { title ->
                                         MainLoadingIndicator(
-                                            currentState = currentState,
+                                            currentState = conversionState,
                                             title = title,
-                                            onCancel = onCancel,
+                                            onCancel = onCancelConversion,
                                         )
                                     }
                             }
@@ -519,18 +519,18 @@ private fun MainScreen(
                     }
                 }
 
-                if (currentState is PermissionGrantedWebViewInput) {
+                if (conversionState is PermissionGrantedWebViewInput) {
                     item(key = "main_web_view", contentType = "main_web_view") {
                         MainWebView(
-                            matchedInput = currentState.matchedInput,
-                            pendingData = currentState.pendingData,
+                            matchedInput = conversionState.matchedInput,
+                            pendingData = conversionState.pendingData,
                         )
                     }
                 }
             },
             bottomContent = {
-                when (currentState) {
-                    is Initial ->
+                when (conversionState) {
+                    is ConversionState.Initial ->
                         item(key = "main_help", contentType = "main_help") {
                             MainHelp(
                                 inputRepository = inputRepository,
@@ -553,7 +553,7 @@ private fun MainScreen(
                                 outputsForAppsByCategory = outputsForAppsByCategory,
                                 outputsForLinks = outputsForLinks,
                                 outputsForSharing = outputsForSharing,
-                                points = currentState.points,
+                                points = conversionState.points,
                                 source = source,
                                 modifier = Modifier.padding(top = spacing.tiny),
                                 onDisableLinkGroup = onDisableLinkGroup,
@@ -572,12 +572,12 @@ private fun MainScreen(
                         }
                 }
             },
-            mainExpandedHeight = if (currentState is Initial) {
+            mainExpandedHeight = if (conversionState is ConversionState.Initial) {
                 spacing.largeTopAppBarExpandedHeight + spacing.medium
             } else {
                 spacing.largeTopAppBarExpandedHeight
             },
-            mainTitle = if (currentState is Initial) {
+            mainTitle = if (conversionState is ConversionState.Initial) {
                 {
                     val billingStatus by billingStatus.collectAsStateWithLifecycle()
                     MainHeadline(
@@ -592,20 +592,20 @@ private fun MainScreen(
             } else {
                 null
             },
-            supportingTitle = if (currentState is ConversionState.HasResult) {
+            supportingTitle = if (conversionState is ConversionState.HasResult) {
                 {
                     ResultTitle(
                         actionDetail = actionDetail,
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
-                        onCancel = onCancel,
+                        onCancel = onCancelAction,
                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 }
             } else {
                 null
             },
-            onBack = if (currentState !is Initial) {
+            onBack = if (conversionState !is ConversionState.Initial) {
                 onReset
             } else {
                 null
@@ -622,10 +622,10 @@ private fun MainScreen(
         )
     }
 
-    if (currentState is ConversionState.HasResult) {
+    if (conversionState is ConversionState.HasResult) {
         selectedPointIndex?.let { index ->
             ResultSheet(
-                points = currentState.points,
+                points = conversionState.points,
                 selectedPointIndex = index,
                 outputsForPoint = outputsForPoint,
                 outputsForPoints = outputsForPoints,
@@ -635,12 +635,12 @@ private fun MainScreen(
         }
     }
 
-    when (currentState) {
+    when (conversionState) {
         is PermissionRequested ->
             PermissionDialog(
                 title = stringResource(
                     R.string.conversion_permission,
-                    currentState.matchedInput.input.group.getName(resources),
+                    conversionState.matchedInput.input.group.getName(resources),
                 ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
@@ -655,14 +655,16 @@ private fun MainScreen(
                     AnnotatedString.fromHtml(
                         stringResource(
                             R.string.conversion_permission_common_text,
-                            currentState.matchedInput.match.truncateMiddle(),
+                            conversionState.matchedInput.match.truncateMiddle(),
                             appName,
                         )
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
                 )
             }
+    }
 
+    when (actionState) {
         is LocationRationaleShown ->
             ConfirmationDialog(
                 title = stringResource(R.string.conversion_succeeded_location_rationale_dialog_title),
@@ -674,9 +676,9 @@ private fun MainScreen(
                     .semantics { testTagsAsResourceId = true }
                     .testTag("geoShareLocationRationaleDialog"),
             ) {
-                when (currentState.action) {
-                    is LocationAction.WithPoint -> currentState.action.output.permissionText()
-                    is LocationAction.WithPoints -> currentState.action.output.permissionText()
+                when (actionState.action) {
+                    is LocationAction.WithPoint -> actionState.action.output.permissionText()
+                    is LocationAction.WithPoints -> actionState.action.output.permissionText()
                 }.let { text ->
                     Text(
                         AnnotatedString.fromHtml(text),
@@ -736,7 +738,8 @@ private fun DefaultPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = Initial,
+            conversionState = ConversionState.Initial,
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -765,7 +768,8 @@ private fun DefaultPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -798,7 +802,8 @@ private fun DarkPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = Initial,
+            conversionState = ConversionState.Initial,
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -827,7 +832,8 @@ private fun DarkPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -860,7 +866,8 @@ private fun SmallPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = Initial,
+            conversionState = ConversionState.Initial,
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -889,7 +896,8 @@ private fun SmallPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -922,7 +930,8 @@ private fun TabletPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = Initial,
+            conversionState = ConversionState.Initial,
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -951,7 +960,8 @@ private fun TabletPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -991,7 +1001,7 @@ private fun SucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            currentState = ActionCompleted(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1001,8 +1011,8 @@ private fun SucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1054,7 +1064,8 @@ private fun SucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1094,7 +1105,7 @@ private fun DarkSucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            currentState = ActionCompleted(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1104,8 +1115,8 @@ private fun DarkSucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1157,7 +1168,8 @@ private fun DarkSucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1197,7 +1209,7 @@ private fun SmallSucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            currentState = ActionCompleted(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1206,8 +1218,8 @@ private fun SmallSucceededPreview() {
                         name = "Wikimedia Foundation, Inc.",
                     ),
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1259,7 +1271,8 @@ private fun SmallSucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1299,7 +1312,7 @@ private fun TabletSucceededPreview() {
         val timeSource = TestTimeSource()
         val appDetails = getFakeAppDetails(context)
         MainScreen(
-            currentState = ActionCompleted(
+            conversionState = ConversionSucceeded(
                 source = source,
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
@@ -1309,8 +1322,8 @@ private fun TabletSucceededPreview() {
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
                 ),
-                actionResult = ActionResult.SUCCEEDED,
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1362,7 +1375,8 @@ private fun TabletSucceededPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1396,10 +1410,11 @@ private fun ErrorPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
+            conversionState = ConversionFailed(
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1435,7 +1450,8 @@ private fun ErrorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1469,10 +1485,11 @@ private fun DarkErrorPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
+            conversionState = ConversionFailed(
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1508,7 +1525,8 @@ private fun DarkErrorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1542,10 +1560,11 @@ private fun TabletErrorPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
+            conversionState = ConversionFailed(
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1581,7 +1600,8 @@ private fun TabletErrorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1615,11 +1635,12 @@ private fun WarningPreview() {
         val source = "https://share.google/diIxnYa8dIA6dZfpy"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
+            conversionState = ConversionFailed(
                 source = source,
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1655,7 +1676,8 @@ private fun WarningPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1689,11 +1711,12 @@ private fun DarkWarningPreview() {
         val source = "https://share.google/diIxnYa8dIA6dZfpy"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = ConversionFailed(
+            conversionState = ConversionFailed(
                 source = source,
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1729,7 +1752,8 @@ private fun DarkWarningPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1763,7 +1787,7 @@ private fun LoadingIndicatorPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = PermissionGrantedBasicInput(
+            conversionState = PermissionGrantedBasicInput(
                 source = source,
                 matchedInput = MatchedInput(
                     FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
@@ -1772,6 +1796,7 @@ private fun LoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1807,7 +1832,8 @@ private fun LoadingIndicatorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1841,7 +1867,7 @@ private fun DarkLoadingIndicatorPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = PermissionGrantedBasicInput(
+            conversionState = PermissionGrantedBasicInput(
                 source = source,
                 matchedInput = MatchedInput(
                     FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
@@ -1850,6 +1876,7 @@ private fun DarkLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1885,7 +1912,8 @@ private fun DarkLoadingIndicatorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1919,7 +1947,7 @@ private fun TabletLoadingIndicatorPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = PermissionGrantedBasicInput(
+            conversionState = PermissionGrantedBasicInput(
                 source = source,
                 matchedInput = MatchedInput(
                     FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
@@ -1928,6 +1956,7 @@ private fun TabletLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1963,7 +1992,8 @@ private fun TabletLoadingIndicatorPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -1997,12 +2027,13 @@ private fun WebViewPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = PermissionGrantedWebViewInput(
+            conversionState = PermissionGrantedWebViewInput(
                 source = source,
                 matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2038,7 +2069,8 @@ private fun WebViewPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -2072,12 +2104,13 @@ private fun DarkWebViewPreview() {
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
         MainScreen(
-            currentState = PermissionGrantedWebViewInput(
+            conversionState = PermissionGrantedWebViewInput(
                 source = source,
                 matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2113,7 +2146,8 @@ private fun DarkWebViewPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -2153,7 +2187,8 @@ private fun TabletWebViewPreview() {
             results = emptyMap(),
         )
         MainScreen(
-            currentState = currentState,
+            conversionState = currentState,
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2189,7 +2224,8 @@ private fun TabletWebViewPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
@@ -2227,7 +2263,8 @@ private fun EmptyPreview() {
             points = persistentListOf(),
         )
         MainScreen(
-            currentState = currentState,
+            conversionState = currentState,
+            actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2263,7 +2300,8 @@ private fun EmptyPreview() {
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
             userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-            onCancel = {},
+            onCancelAction = {},
+            onCancelConversion = {},
             onDeny = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},

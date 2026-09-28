@@ -70,7 +70,7 @@ class MainPermissionBehaviorTest {
             assumeDomainResolvable("maps.apple")
         }
 
-        // Share a Google Maps short link with the app
+        // Share a short link with the app
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Deny connection permission
@@ -79,7 +79,7 @@ class MainPermissionBehaviorTest {
         // Shows permission denied error
         assertPermissionDenied()
 
-        // Share the Google Maps short link with the app again
+        // Share the short link with the app again
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Connection permission dialog is visible again
@@ -92,7 +92,7 @@ class MainPermissionBehaviorTest {
             assumeDomainResolvable("maps.apple")
         }
 
-        // Share a Google Maps short link with the app
+        // Share a short link with the app
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Deny connection permission
@@ -104,7 +104,7 @@ class MainPermissionBehaviorTest {
         // Shows permission denied error
         assertPermissionDenied()
 
-        // Share the Google Maps short link with the app again
+        // Share the short link with the app again
         shareUri("https://maps.apple/p/7E-Brjrk_THN14")
 
         // Shows permission denied error
@@ -117,7 +117,7 @@ class MainPermissionBehaviorTest {
             assumeDomainResolvable("maps.app.goo.gl")
         }
 
-        // Share a Google Maps short non-existent link with the app
+        // Share a non-existent short link with the app
         shareUri("https://maps.app.goo.gl/spam")
 
         // Grant connection permission
