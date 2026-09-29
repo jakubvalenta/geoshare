@@ -43,7 +43,6 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
@@ -59,6 +58,7 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.OutputDetail
+import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.toOutputDetail
@@ -396,18 +396,18 @@ private fun DescriptionPreview() {
                 onNavigateToFaqScreen = {},
                 onSelect = {},
             ) { paddingValues ->
-                HelpMessageCard(
-                    helpMessage = HelpMessage.WELCOME,
-                    dismissedHelpMessages = MutableStateFlow(emptySet()),
-                    title = { Text(stringResource(R.string.help_welcome_title)) },
-                    modifier = Modifier.padding(paddingValues),
-                    onDismiss = {},
-                ) {
-                    ParagraphText(
-                        stringResource(
-                            R.string.help_welcome_text,
-                            stringResource(R.string.main_create_geo_uri),
-                        )
+                if (helpLifecycleMessage != null) {
+                    helpLifecycleMessage(Modifier.padding(paddingValues))
+                } else {
+                    HelpShareSourceMessage(
+                        dismissedHelpMessages = MutableStateFlow(emptySet()),
+                        outputsForAppsByCategory = MutableStateFlow(
+                            OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+                        ),
+                        sourceComesFromIntent = MutableStateFlow(false),
+                        modifier = Modifier.padding(paddingValues),
+                        onDismissHelpMessage = {},
+                        onExecute = {},
                     )
                 }
             }
@@ -443,18 +443,18 @@ private fun DarkDescriptionPreview() {
                 onNavigateToFaqScreen = {},
                 onSelect = {},
             ) { paddingValues ->
-                HelpMessageCard(
-                    helpMessage = HelpMessage.WELCOME,
-                    dismissedHelpMessages = MutableStateFlow(emptySet()),
-                    title = { Text(stringResource(R.string.help_welcome_title)) },
-                    modifier = Modifier.padding(paddingValues),
-                    onDismiss = {},
-                ) {
-                    ParagraphText(
-                        stringResource(
-                            R.string.help_welcome_text,
-                            stringResource(R.string.main_create_geo_uri),
-                        )
+                if (helpLifecycleMessage != null) {
+                    helpLifecycleMessage(Modifier.padding(paddingValues))
+                } else {
+                    HelpShareSourceMessage(
+                        dismissedHelpMessages = MutableStateFlow(emptySet()),
+                        outputsForAppsByCategory = MutableStateFlow(
+                            OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
+                        ),
+                        sourceComesFromIntent = MutableStateFlow(false),
+                        modifier = Modifier.padding(paddingValues),
+                        onDismissHelpMessage = {},
+                        onExecute = {},
                     )
                 }
             }

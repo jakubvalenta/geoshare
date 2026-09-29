@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.Input
@@ -134,18 +133,13 @@ private fun MessagePreview() {
                 onSetErrorMessageResId = {},
                 onSetSource = {},
             ) { paddingValues ->
-                HelpMessageCard(
-                    helpMessage = HelpMessage.WELCOME,
-                    dismissedHelpMessages = MutableStateFlow(emptySet()),
-                    title = { Text(stringResource(R.string.help_welcome_title)) },
-                    modifier = Modifier.padding(paddingValues),
-                    onDismiss = {},
-                ) {
-                    ParagraphText(
-                        stringResource(
-                            R.string.help_welcome_text,
-                            stringResource(R.string.main_create_geo_uri),
-                        )
+                if (helpLifecycleMessage != null) {
+                    helpLifecycleMessage(Modifier.padding(paddingValues))
+                } else {
+                    HelpWelcomeMessage(
+                        dismissedHelpMessages = MutableStateFlow(emptySet()),
+                        modifier = Modifier.padding(paddingValues),
+                        onDismissHelpMessage = {},
                     )
                 }
             }
@@ -165,18 +159,13 @@ private fun DarkMessagePreview() {
                 onSetErrorMessageResId = {},
                 onSetSource = {},
             ) { paddingValues ->
-                HelpMessageCard(
-                    helpMessage = HelpMessage.WELCOME,
-                    dismissedHelpMessages = MutableStateFlow(emptySet()),
-                    title = { Text(stringResource(R.string.help_welcome_title)) },
-                    modifier = Modifier.padding(paddingValues),
-                    onDismiss = {},
-                ) {
-                    ParagraphText(
-                        stringResource(
-                            R.string.help_welcome_text,
-                            stringResource(R.string.main_create_geo_uri),
-                        )
+                if (helpLifecycleMessage != null) {
+                    helpLifecycleMessage(Modifier.padding(paddingValues))
+                } else {
+                    HelpWelcomeMessage(
+                        dismissedHelpMessages = MutableStateFlow(emptySet()),
+                        modifier = Modifier.padding(paddingValues),
+                        onDismissHelpMessage = {},
                     )
                 }
             }

@@ -136,6 +136,7 @@ import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.mainContainerColor
+import page.ooooo.geoshare.ui.components.helpLifecycleMessage
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
@@ -496,14 +497,18 @@ private fun MainScreen(
                                             selectedPointIndex = index
                                         },
                                     ) { paddingValues ->
-                                        HelpShareSourceMessage(
-                                            dismissedHelpMessages = dismissedHelpMessages,
-                                            outputsForAppsByCategory = outputsForAppsByCategory,
-                                            sourceComesFromIntent = sourceComesFromIntent,
-                                            modifier = Modifier.padding(paddingValues),
-                                            onDismissHelpMessage = onDismissHelpMessage,
-                                            onExecute = onExecute,
-                                        )
+                                        if (helpLifecycleMessage != null) {
+                                            helpLifecycleMessage(Modifier.padding(paddingValues))
+                                        } else {
+                                            HelpShareSourceMessage(
+                                                dismissedHelpMessages = dismissedHelpMessages,
+                                                outputsForAppsByCategory = outputsForAppsByCategory,
+                                                sourceComesFromIntent = sourceComesFromIntent,
+                                                modifier = Modifier.padding(paddingValues),
+                                                onDismissHelpMessage = onDismissHelpMessage,
+                                                onExecute = onExecute,
+                                            )
+                                        }
                                     }
 
                                 is ConversionState.HasDescription ->
@@ -539,11 +544,15 @@ private fun MainScreen(
                                 onSetErrorMessageResId = { errorMessageResId = it },
                                 onSetSource = onSetSource,
                             ) { paddingValues ->
-                                HelpWelcomeMessage(
-                                    dismissedHelpMessages = dismissedHelpMessages,
-                                    modifier = Modifier.padding(paddingValues),
-                                    onDismissHelpMessage = onDismissHelpMessage,
-                                )
+                                if (helpLifecycleMessage != null) {
+                                    helpLifecycleMessage(Modifier.padding(paddingValues))
+                                } else {
+                                    HelpWelcomeMessage(
+                                        dismissedHelpMessages = dismissedHelpMessages,
+                                        modifier = Modifier.padding(paddingValues),
+                                        onDismissHelpMessage = onDismissHelpMessage,
+                                    )
+                                }
                             }
                         }
 
