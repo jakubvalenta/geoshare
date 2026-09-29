@@ -19,7 +19,7 @@ import page.ooooo.geoshare.lib.parseFormatString
 sealed interface FormatArg {
     data class Text(val text: String, val style: SpanStyle? = null) : FormatArg
     data class InlineContent(val id: String) : FormatArg
-    data class Link(val text: String, val onClick: () -> Unit) : FormatArg
+    data class Link(val text: String, val styles: TextLinkStyles? = null, val onClick: () -> Unit) : FormatArg
 }
 
 @Composable
@@ -46,7 +46,7 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
                         appendInlineContent(argument.id)
 
                     is FormatArg.Link ->
-                        ClickableLink(argument.text, onClick = argument.onClick)
+                        ClickableLink(argument.text, argument.styles, onClick = argument.onClick)
                 }
             }
         }
@@ -56,11 +56,11 @@ fun annotatedStringResource(@StringRes id: Int, vararg formatArgs: FormatArg): A
 @Composable
 fun AnnotatedString.Builder.ClickableLink(
     text: String,
-    styles: TextLinkStyles = AnnotatedString.DefaultLinkStyles,
+    styles: TextLinkStyles? = null,
     onClick: () -> Unit,
 ) {
     withLink(
-        LinkAnnotation.Clickable(tag = "link", styles = styles) {
+        LinkAnnotation.Clickable(tag = "link", styles = styles ?: AnnotatedString.DefaultLinkStyles) {
             onClick()
         }
     ) {
