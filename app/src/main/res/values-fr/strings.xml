@@ -88,9 +88,9 @@
     </plurals>
     <string name="conversion_automation_share_failed">Échec du partage automatique du lien</string>
     <plurals name="conversion_automation_share_waiting">
-        <item quantity="one">Lien de partage automatique dans %1$ds</item>
-        <item quantity="many">Lien de partage automatique dans %1$ds</item>
-        <item quantity="other">Lien de partage automatique dans %1$ds</item>
+        <item quantity="one">Partage automatique du lien dans %1$ds</item>
+        <item quantity="many">Partage automatique du lien dans %1$ds</item>
+        <item quantity="other">Partage automatique du lien dans %1$ds</item>
     </plurals>
     <string name="conversion_succeeded_copy_coordinates">Copier les coordonnées</string>
     <string name="conversion_succeeded_copy_link">Copier le lien %1$s</string>
