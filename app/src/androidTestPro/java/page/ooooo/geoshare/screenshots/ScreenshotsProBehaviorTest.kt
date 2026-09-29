@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.screenshots
 
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
@@ -79,7 +80,9 @@ class ScreenshotsProBehaviorTest {
         // Conversion - Check - Name only
         shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
         onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         saveScreenshot("main_strings/conversion_result_check_name_only")
 

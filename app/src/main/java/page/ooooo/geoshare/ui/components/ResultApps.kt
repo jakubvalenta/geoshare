@@ -46,7 +46,6 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.android.PackageNames
@@ -544,18 +543,13 @@ private fun LoadingPreview() {
                 onHideApp = {},
                 onNavigateToLinkScreen = {},
             ) { paddingValues ->
-                HelpMessageCard(
-                    helpMessage = HelpMessage.WELCOME,
-                    dismissedHelpMessages = MutableStateFlow(emptySet()),
-                    title = { Text(stringResource(R.string.help_welcome_title)) },
-                    modifier = Modifier.padding(paddingValues),
-                    onDismiss = {},
-                ) {
-                    ParagraphText(
-                        stringResource(
-                            R.string.help_welcome_text,
-                            stringResource(R.string.main_create_geo_uri),
-                        )
+                if (helpLifecycleMessage == null) {
+                    HelpOpenByDefaultMessage(
+                        dismissedHelpMessages = MutableStateFlow(emptySet()),
+                        sourceComesFromIntent = MutableStateFlow(true),
+                        modifier = Modifier.padding(paddingValues),
+                        onDismissHelpMessage = {},
+                        onNavigateToFaqScreen = {},
                     )
                 }
             }
@@ -608,18 +602,13 @@ private fun DarkLoadingPreview() {
                 onHideApp = {},
                 onNavigateToLinkScreen = {},
             ) { paddingValues ->
-                HelpMessageCard(
-                    helpMessage = HelpMessage.WELCOME,
-                    dismissedHelpMessages = MutableStateFlow(emptySet()),
-                    title = { Text(stringResource(R.string.help_welcome_title)) },
-                    modifier = Modifier.padding(paddingValues),
-                    onDismiss = {},
-                ) {
-                    ParagraphText(
-                        stringResource(
-                            R.string.help_welcome_text,
-                            stringResource(R.string.main_create_geo_uri),
-                        )
+                if (helpLifecycleMessage == null) {
+                    HelpOpenByDefaultMessage(
+                        dismissedHelpMessages = MutableStateFlow(emptySet()),
+                        sourceComesFromIntent = MutableStateFlow(true),
+                        modifier = Modifier.padding(paddingValues),
+                        onDismissHelpMessage = {},
+                        onNavigateToFaqScreen = {},
                     )
                 }
             }

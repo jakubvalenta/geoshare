@@ -209,13 +209,13 @@ and instrumented tests.
 ### Running unit tests using the command line
 
 ```shell
-./gradlew testFreeDebugUnitTest testProDebugUnitTest
+./gradlew testFreeActiveDebugUnitTest testProActiveDebugUnitTest
 ```
 
 ### Lint using the command line
 
 ```shell
-./gradlew lintFreeDebug lintProDebug
+./gradlew lintFreeActiveDebug lintProActiveDebug
 ```
 
 ### Generating a signed release APK
@@ -280,8 +280,8 @@ fastlane metadata
    to have an emulator set up. Run:
 
     ```shell
-    ./gradlew :app:mediumPhoneApi37FreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
-    ./gradlew :app:mediumPhoneApi37ProDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:mediumPhoneApi37FreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:mediumPhoneApi37ProActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
     ./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
     ./gradlew :app:copyScreenshots
     ```
@@ -290,7 +290,7 @@ fastlane metadata
    Install these apps in an emulator, start it, and run:
 
     ```shell
-    ./gradlew :app:connectedFreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:connectedFreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
     ```
 
    Then copy the following screenshots from
@@ -308,7 +308,7 @@ fastlane metadata
    device, start it, and run:
 
     ```shell
-    ./gradlew :app:connectedFreeDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:connectedFreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
     ```
 
    Then copy the following screenshots from

@@ -3,6 +3,7 @@ package page.ooooo.geoshare.screenshots
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
+import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
@@ -151,14 +152,18 @@ class ScreenshotsFreeBehaviorTest {
         // Help - Message - Welcome
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
         saveScreenshot("main_strings/help_message_welcome")
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.WELCOME}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
 
         // Help - Message - Share source
         setMainInput()
         submitMainForm()
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
         saveScreenshot("main_strings/help_message_share_source")
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.SHARE_SOURCE}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
 
         // Help - Message - Open by default
         shareUri()
@@ -167,7 +172,9 @@ class ScreenshotsFreeBehaviorTest {
             viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
         }
         saveScreenshot("main_strings/help_message_open_by_default")
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
 
         goBackToMainForm()
     }

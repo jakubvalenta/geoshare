@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.metadata
 
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.uiAutomator
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -55,7 +56,9 @@ class MetadataBehaviorTest {
         waitForAppToBeVisible()
 
         // Main form
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.WELCOME}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("1")
 
@@ -67,7 +70,9 @@ class MetadataBehaviorTest {
         // Result screen
         dialog.confirmDialog()
         assertConversionSucceeds(WGS84Point(42.5784957, 1.8955661, source = Source.URI))
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         Screengrab.screenshot("2")
 

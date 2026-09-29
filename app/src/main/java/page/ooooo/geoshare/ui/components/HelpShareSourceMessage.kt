@@ -9,9 +9,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
@@ -25,6 +27,7 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.data.local.preferences.isDismissed
 import page.ooooo.geoshare.lib.DefaultLog
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.isMessagingApp
@@ -78,11 +81,15 @@ fun HelpShareSourceMessage(
                 }
             }
         } ?: Pair(null, null)
+
+        val helpMessage = HelpMessage.SHARE_SOURCE
+        val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
+        val visible = remember(dismissedHelpMessages) { !helpMessage.isDismissed(dismissedHelpMessages) }
+
         HelpMessageCard(
-            helpMessage = HelpMessage.SHARE_SOURCE,
-            dismissedHelpMessages = dismissedHelpMessages,
             title = { Text(stringResource(R.string.help_share_source_title)) },
-            modifier = modifier,
+            visible = visible,
+            modifier = modifier.testTag("geoShareHelpMessage_$helpMessage"),
             actionText = exampleAppLabel?.let { exampleAppLabel ->
                 { stringResource(R.string.help_share_source_action, exampleAppLabel) }
             },
@@ -91,7 +98,7 @@ fun HelpShareSourceMessage(
                     onExecute(exampleAppOutput.toAction(examplePoint))
                 }
             },
-            onDismiss = onDismissHelpMessage,
+            onDismissRequest = { onDismissHelpMessage(helpMessage) },
         ) {
             val shareIconId = "shareIcon"
             val shareIconSize = 14.sp

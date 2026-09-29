@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.tests
 
 import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
@@ -384,7 +385,9 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
 
         // Dismiss help message WELCOME
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.WELCOME}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
             onElementOrNull(1_000) {
@@ -410,7 +413,9 @@ class MainBehaviorTest {
 
         // Dismiss help message OPEN_BY_DEFAULT
         onMainScrollablePane().scrollToBottom()
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.OPEN_BY_DEFAULT}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
             onElementOrNull(1_000) {
@@ -434,7 +439,9 @@ class MainBehaviorTest {
         )
 
         // Dismiss help message SHARE_SOURCE
-        onElement { viewIdResourceName == "geoShareHelpMessageDismiss_${HelpMessage.SHARE_SOURCE}" }.click()
+        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
+            .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
+            .click()
         quickWaitForStableInActiveWindow() // Wait for help message exit animation
         assertNull(
             onElementOrNull(1_000) {

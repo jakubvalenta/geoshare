@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_flavor_message_title" translatable="false">Thanks for testing %1$s</string>
+    <string name="main_flavor_message_text_1" translatable="false">This version of the app is not going to receive updates. You should uninstall it and install the new version from:</string>
+    <string name="main_flavor_message_text_2" translatable="false">If your Google account doesn’t seem to be invited to the new version, please write me at %1$s.</string>
+</resources>

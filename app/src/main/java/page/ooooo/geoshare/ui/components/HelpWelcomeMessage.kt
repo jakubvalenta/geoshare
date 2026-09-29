@@ -6,16 +6,21 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
+import page.ooooo.geoshare.data.local.preferences.isDismissed
 import page.ooooo.geoshare.lib.android.copy
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.WGS84Point
@@ -34,12 +39,14 @@ fun HelpWelcomeMessage(
     val exampleSource = UriFormatter.formatUriString(
         examplePoint, "https://maps.google.com/?q={lat}%2C{lon}"
     )
+    val helpMessage = HelpMessage.WELCOME
+    val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
+    val visible = remember(dismissedHelpMessages) { !helpMessage.isDismissed(dismissedHelpMessages) }
 
     HelpMessageCard(
-        helpMessage = HelpMessage.WELCOME,
-        dismissedHelpMessages = dismissedHelpMessages,
         title = { Text(stringResource(R.string.help_welcome_title)) },
-        modifier = modifier,
+        visible = visible,
+        modifier = modifier.testTag("geoShareHelpMessage_$helpMessage"),
         after = exampleSource?.let {
             {
                 SelectionContainer {
@@ -62,7 +69,7 @@ fun HelpWelcomeMessage(
                 }
             }
         },
-        onDismiss = onDismissHelpMessage,
+        onDismissRequest = { onDismissHelpMessage(helpMessage) },
     ) {
         ParagraphText(
             stringResource(
