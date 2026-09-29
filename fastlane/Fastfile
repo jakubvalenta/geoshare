@@ -36,13 +36,13 @@ platform :android do
 
   desc "Deploy a new version to Google Play"
   lane :deploy do
-    gradle(task: "clean assembleProRelease")
+    gradle(task: "clean assembleProActiveRelease")
     upload_to_play_store
   end
 
   desc "Take screenshots for store listing"
   lane :screenshots do
-    gradle(task: "assembleFreeDebug assembleFreeDebugAndroidTest")
+    gradle(task: "assembleFreeActiveDebug assembleFreeActiveDebugAndroidTest")
     screengrab(
       app_apk_path: 'app/build/outputs/apk/free/debug/app-free-debug.apk',
       tests_apk_path: 'app/build/outputs/apk/androidTest/free/debug/app-free-debug-androidTest.apk',

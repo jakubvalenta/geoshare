@@ -22,22 +22,22 @@ jobs:
           cache: 'gradle'
 
       - name: Run lint for the free debug variant
-        run: ./gradlew lintFreeDebug
+        run: ./gradlew lintFreeActiveDebug
 
       - name: Run lint for the pro debug variant
-        run: ./gradlew lintProDebug
+        run: ./gradlew lintProActiveDebug
 
       - name: Run unit tests for the free debug variant
-        run: ./gradlew testFreeDebugUnitTest
+        run: ./gradlew testFreeActiveDebugUnitTest
 
       - name: Run unit tests for the pro debug variant
-        run: ./gradlew testProDebugUnitTest
+        run: ./gradlew testProActiveDebugUnitTest
 
       - name: Build the free debug variant
-        run: ./gradlew assembleFreeDebug
+        run: ./gradlew assembleFreeActiveDebug
 
       - name: Build the pro debug variant
-        run: ./gradlew assembleProDebug
+        run: ./gradlew assembleProActiveDebug
 
       - name: Upload free debug APK
         uses: actions/upload-artifact@v4
