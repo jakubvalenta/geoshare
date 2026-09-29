@@ -5,9 +5,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,8 +27,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -40,33 +39,26 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.data.local.preferences.isDismissed
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun HelpMessageCard(
-    helpMessage: HelpMessage,
-    dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     title: @Composable () -> Unit,
+    visible: Boolean,
     modifier: Modifier = Modifier,
     after: (@Composable () -> Unit)? = null,
     actionText: (@Composable () -> String)? = null,
+    colors: CardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
     onAction: () -> Unit = {},
-    onDismiss: (helpMessage: HelpMessage) -> Unit,
+    onDismissRequest: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val spacing = LocalSpacing.current
-
-    val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
-    val visible = remember(dismissedHelpMessages) { !helpMessage.isDismissed(dismissedHelpMessages) }
 
     AnimatedVisibility(
         visible,
@@ -74,37 +66,36 @@ fun HelpMessageCard(
         exit = shrinkVertically(),
     ) {
         Card(
-            modifier = modifier
-                .widthIn(max = spacing.largeButtonMaxWidth + 2 * spacing.largeButtonHorizontalPadding)
-                .testTag("geoShareHelpMessage_$helpMessage"),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            ),
+            modifier = modifier.widthIn(max = spacing.largeButtonMaxWidth + 2 * spacing.largeButtonHorizontalPadding),
+            colors = colors,
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spacing.extraTiny),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-                    CompositionLocalProvider(LocalTextStyle provides LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)) {
-                        Column(
-                            Modifier
-                                .weight(1f)
-                                .padding(vertical = spacing.tiny)
-                                .padding(start = spacing.small)
-                        ) {
+            Box(Modifier.fillMaxWidth()) {
+                Column(
+                    Modifier.padding(
+                        start = spacing.small,
+                        top = spacing.small,
+                        end = if (onDismissRequest != null) 46.dp else 0.dp,
+                        bottom = spacing.tiny,
+                    ),
+                ) {
+                    CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
+                        CompositionLocalProvider(LocalTextStyle provides LocalTextStyle.current.copy(fontWeight = FontWeight.Bold)) {
                             title()
                         }
                     }
                 }
-                IconButton(
-                    { onDismiss(helpMessage) },
-                    Modifier.testTag("geoShareHelpMessageDismiss_$helpMessage"),
-                ) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = stringResource(R.string.intro_nav_close),
-                    )
+                if (onDismissRequest != null) {
+                    IconButton(
+                        onDismissRequest,
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .testTag("geoShareHelpMessageDismiss"),
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.intro_nav_close),
+                        )
+                    }
                 }
             }
             Column(
@@ -142,12 +133,11 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             HelpMessageCard(
-                helpMessage = HelpMessage.SHARE_SOURCE,
-                dismissedHelpMessages = MutableStateFlow(emptySet()),
                 title = { Text(stringResource(R.string.help_share_source_title)) },
+                visible = true,
                 actionText = { stringResource(R.string.help_share_source_action, "OsmAnd") },
                 onAction = {},
-                onDismiss = {},
+                onDismissRequest = {},
             ) {
                 val shareIconId = "shareIcon"
                 val shareIconSize = 14.sp
@@ -184,12 +174,53 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             HelpMessageCard(
-                helpMessage = HelpMessage.SHARE_SOURCE,
-                dismissedHelpMessages = MutableStateFlow(emptySet()),
                 title = { Text(stringResource(R.string.help_share_source_title)) },
+                visible = true,
                 actionText = { stringResource(R.string.help_share_source_action, "OsmAnd") },
                 onAction = {},
-                onDismiss = {},
+                onDismissRequest = {},
+            ) {
+                val shareIconId = "shareIcon"
+                val shareIconSize = 14.sp
+                ParagraphText(
+                    annotatedStringResource(
+                        R.string.help_share_source_text,
+                        FormatArg.InlineContent(shareIconId),
+                        FormatArg.Text(stringResource(R.string.app_name)),
+                    ),
+                    inlineContent = mapOf(
+                        shareIconId to InlineTextContent(
+                            Placeholder(
+                                width = shareIconSize,
+                                height = shareIconSize,
+                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center,
+                            )
+                        ) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = null,
+                                Modifier.requiredSize(with(LocalDensity.current) { shareIconSize.toDp() }),
+                            )
+                        }
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ErrorPreview() {
+    AppTheme {
+        Surface {
+            HelpMessageCard(
+                title = { Text(stringResource(R.string.help_share_source_title)) },
+                visible = true,
+                actionText = { stringResource(R.string.help_share_source_action, "OsmAnd") },
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                onAction = {},
+                onDismissRequest = null,
             ) {
                 val shareIconId = "shareIcon"
                 val shareIconSize = 14.sp
@@ -226,12 +257,11 @@ private fun TabletPreview() {
     AppTheme {
         Surface {
             HelpMessageCard(
-                helpMessage = HelpMessage.SHARE_SOURCE,
-                dismissedHelpMessages = MutableStateFlow(emptySet()),
                 title = { Text("Kotlin is a modern language that's concise, multiplatform, and interoperable with Java and other languages.") },
+                visible = true,
                 actionText = { stringResource(R.string.help_share_source_action, "OsmAnd") },
                 onAction = {},
-                onDismiss = {},
+                onDismissRequest = {},
             ) {
                 val shareIconId = "shareIcon"
                 val shareIconSize = 14.sp
