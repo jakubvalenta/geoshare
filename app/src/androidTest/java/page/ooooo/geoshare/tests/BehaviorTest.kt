@@ -524,7 +524,8 @@ fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferenceGroupI
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
     }
 
-    // If we're on the list screen, get the pane. Or if we're on the detail screen, go to the list screen and then get the pane
+    // If we're on the list screen, get the pane. Or if we're on the detail screen, go to the list screen and then get
+    // the pane
     goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }.run {
         quickWaitForStableInActiveWindow() // Wait for the lazy list to render
         scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }
