@@ -826,6 +826,19 @@ class ScreenshotsFreeBehaviorTest {
         saveScreenshot("main_strings/preferences_connection_permission")
         goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
 
+        // Preferences - Servers - Page 1
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}" }
+            .click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/preferences_servers_page_1")
+
+        // Preferences - Servers - Page 2
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scroll(Direction.DOWN, 10f)
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/preferences_servers_page_2")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+
         // Preferences - Automation
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}" }
             .click()
@@ -933,14 +946,6 @@ class ScreenshotsFreeBehaviorTest {
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_list_free_page_1")
-
-        // Servers - List - Page 2
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scroll(Direction.DOWN, 10f)
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerRestoreInitialButton" }
-        saveScreenshot("main_strings/servers_list_free_page_2")
 
         // Servers - Reset dialog
         onElement { viewIdResourceName == "geoShareServerRestoreInitialButton" }.click()

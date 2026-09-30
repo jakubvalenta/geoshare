@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.screenshots
 
-import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.onElement
-import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -10,8 +8,10 @@ import org.junit.BeforeClass
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
+import page.ooooo.geoshare.tests.configureServer
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.enableDarkMode
@@ -61,17 +61,11 @@ class ScreenshotsProBehaviorTest {
 
         // Test all screens in alphabetical order
         testConversion()
-        testServers()
+        testPreferences()
     }
 
     fun testConversion() = uiAutomator {
-        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_null" }
-            .click()
-        quickWaitForStableInActiveWindow() // Wait for the server to get saved
+        configureServer(TestServer.None)
 
         // Conversion - Error - Unsupported source place list
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
@@ -97,13 +91,11 @@ class ScreenshotsProBehaviorTest {
         goBackToMainForm()
     }
 
-    fun testServers() = uiAutomator {
-        // Servers - List - Page 1
+    fun testPreferences() = uiAutomator {
+        // Preferences - Servers - Page 1
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
         quickWaitForStableInActiveWindow()
-        saveScreenshot("pro_strings/servers_list_pro_page_1")
+        saveScreenshot("pro_strings/preferences_servers_page_1")
 
         goBackToMainForm()
     }
