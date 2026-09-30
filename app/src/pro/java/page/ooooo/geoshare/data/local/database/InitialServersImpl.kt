@@ -26,7 +26,7 @@ object InitialServersImpl : InitialServers {
         db.execSQL(
             "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
-                "Google Maps Geocode Address"
+                "Google Maps Geocode Address",
                 "via GeoShare Proxy",
                 "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
                 "ATTESTATION",
@@ -45,7 +45,7 @@ object InitialServersImpl : InitialServers {
         db.execSQL(
             "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
-                "Google Maps Geocode Place"
+                "Google Maps Geocode Place",
                 "via GeoShare Proxy",
                 "https://api.geoshare-app.net/v1/google-maps/geocode/places/{q}",
                 "ATTESTATION",
@@ -255,7 +255,7 @@ object InitialServersImpl : InitialServers {
                     )
                 }
             }
-        }
+        },
         object : Migration(10, 11) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
