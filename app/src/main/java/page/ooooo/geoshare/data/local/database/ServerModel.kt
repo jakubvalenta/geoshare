@@ -27,6 +27,7 @@ data class Server(
     val apiKey: String = "",
     val apiKeyHeader: String = "",
     val challengeUrl: String = "",
+    val description: String = "",
     val loginUrl: String = "",
     val registerUrl: String = "",
     val selectedGoogleMapsAddress: Boolean = false,
@@ -51,10 +52,10 @@ data class Server(
 
 @Dao
 interface ServerDao {
-    @Query("SELECT * FROM server ORDER BY createdAt ASC")
+    @Query("SELECT * FROM server ORDER BY name ASC, description ASC")
     suspend fun getAll(): List<Server>
 
-    @Query("SELECT * FROM server ORDER BY createdAt ASC")
+    @Query("SELECT * FROM server ORDER BY name ASC, description ASC")
     fun getAllFlow(): Flow<List<Server>>
 
     @Query("SELECT * FROM server WHERE uid = :uid")

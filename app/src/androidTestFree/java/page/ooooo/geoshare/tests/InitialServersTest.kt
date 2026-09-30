@@ -43,7 +43,8 @@ class InitialServersTest : InitialDataTest {
             if (BuildConfig.DEBUG) {
                 add(
                     Server(
-                        name = "Local GeoShare Proxy (GM Address)",
+                        name = "Google Maps Geocode Address",
+                        description = "via local GeoShare Proxy",
                         urlTemplate = "http://127.0.0.1:8080/v1/google-maps/geocode/address/{q}",
                         authType = ServerAuthType.ATTESTATION,
                         challengeUrl = "http://127.0.0.1:8080/v1/auth/challenge",
@@ -54,7 +55,8 @@ class InitialServersTest : InitialDataTest {
                 )
                 add(
                     Server(
-                        name = "Local GeoShare Proxy (GM Place)",
+                        name = "Google Maps Geocode Place",
+                        description = "via local GeoShare Proxy",
                         urlTemplate = "http://127.0.0.1:8080/v1/google-maps/geocode/places/{q}",
                         authType = ServerAuthType.ATTESTATION,
                         challengeUrl = "http://127.0.0.1:8080/v1/auth/challenge",

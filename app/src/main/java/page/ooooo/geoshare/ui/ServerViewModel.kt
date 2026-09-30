@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
@@ -21,6 +22,12 @@ import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.Message
 import javax.inject.Inject
+
+data class SelectedServers(
+    val googleMapsAddress: Server? = null,
+    val googleMapsPlace: Server? = null,
+    val search: Server? = null,
+)
 
 @OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
@@ -35,24 +42,23 @@ class ServerViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
-    val selectedServerGoogleMapsAddress: StateFlow<Server?> = serverRepository.selectedGoogleMapsAddress
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
-        )
-    val selectedServerGoogleMapsPlace: StateFlow<Server?> = serverRepository.selectedGoogleMapsPlace
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
-        )
-    val selectedServerSearch: StateFlow<Server?> = serverRepository.selectedSearch
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
-        )
+    val selectedServers: StateFlow<SelectedServers> =
+        combine(
+            serverRepository.selectedGoogleMapsAddress,
+            serverRepository.selectedGoogleMapsPlace,
+            serverRepository.selectedSearch,
+        ) { googleMapsAddressServer, googleMapsPlaceServer, searchServer ->
+            SelectedServers(
+                googleMapsAddress = googleMapsAddressServer,
+                googleMapsPlace = googleMapsPlaceServer,
+                search = searchServer,
+            )
+        }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                SelectedServers(),
+            )
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message.asStateFlow()

@@ -101,6 +101,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
     optionGroups: List<List<T>>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    itemEnabled: (value: T) -> Boolean = { true },
     itemTestTag: ((value: T) -> String)? = null,
     option: @Composable RowScope.(value: T, modifier: Modifier) -> Unit,
 ) {
@@ -121,6 +122,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
                             this
                         }
                     },
+                itemEnabled = itemEnabled,
                 itemTestTag = itemTestTag,
                 option = option,
             )

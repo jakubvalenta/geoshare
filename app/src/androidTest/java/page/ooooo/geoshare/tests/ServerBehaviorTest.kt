@@ -22,6 +22,8 @@ class ServerBehaviorTest {
 
         // Go to server list
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
 
         // Insert a new server
         val server = Server(
@@ -45,7 +47,7 @@ class ServerBehaviorTest {
         quickWaitForStableInActiveWindow() // Wait for the lazy list to render
         onElement { viewIdResourceName == "geoShareServerListPane" }
             .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${server.name}"
+                viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_${server.name}"
             }
     }
 
@@ -57,10 +59,11 @@ class ServerBehaviorTest {
 
         // Go to server list
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
 
         // Go to server detail
-        onElement { viewIdResourceName == "geoShareServerListItemMenu_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }.click()
-        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }.click()
 
         // Update the server
         val server = Server(
@@ -79,11 +82,10 @@ class ServerBehaviorTest {
 
         // Shows the updated server
         onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_Google Maps Geocode Address edited" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_Google Maps Geocode Address edited" }
 
         // Go to the server detail again
-        onElement { viewIdResourceName == "geoShareServerListItemMenu_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }.click()
-        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }.click()
 
         // Shows the updated values
         onElement { viewIdResourceName == "geoShareServerFormName" && textAsString() == "Google Maps Geocode Address edited" }
@@ -100,7 +102,7 @@ class ServerBehaviorTest {
         onElement { viewIdResourceName == "geoShareServerDeleteDialog" }.confirmDialog()
 
         // Does not show the server anymore
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareServerListItemMenu_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" })
 
         // Wait for the toast message to disappear, because it covers the restore button
         runBlocking {
@@ -123,6 +125,6 @@ class ServerBehaviorTest {
             .scroll(Direction.DOWN, 10f)
         onElement { viewIdResourceName == "geoShareServerListPane" }
             // Scroll again, because only now can the lazy column pane scroll all the way to the top
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItemMenu_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }
+            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }
     }
 }

@@ -929,6 +929,8 @@ class ScreenshotsFreeBehaviorTest {
     fun testServers() = uiAutomator {
         // Servers - List - Page 1
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_list_free_page_1")
 
@@ -985,8 +987,7 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Servers - Update
-        onElement { viewIdResourceName == "geoShareServerListItemMenu_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
-        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItem_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
         fillServerForm(
             Server(
                 name = "Google Maps Geocode Address",
@@ -1010,8 +1011,7 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Servers - Delete - Dialog
-        onElement { viewIdResourceName == "geoShareServerListItemMenu_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
-        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItem_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
         onElement { viewIdResourceName == "geoShareServerDetailDelete" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_delete_dialog")

@@ -311,7 +311,7 @@ private fun LinkListPane(
     onRestoreInitialData: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val (restoreInitialDataDialogOpen, setRestoreInitialDataDialogOpen) = retain { mutableStateOf(false) }
+    var restoreInitialDataDialogOpen by retain { mutableStateOf(false) }
 
     LargeTopAppBarPane(
         modifier = Modifier.testTag("geoShareLinkListPane"),
@@ -429,7 +429,7 @@ private fun LinkListPane(
             }
         item(key = "restore", contentType = "text_button") {
             TextButton(
-                onClick = { setRestoreInitialDataDialogOpen(true) },
+                onClick = { restoreInitialDataDialogOpen = true },
                 modifier = Modifier
                     .padding(horizontal = spacing.windowPadding)
                     .padding(top = spacing.small, bottom = spacing.tiny)
@@ -448,9 +448,9 @@ private fun LinkListPane(
             stringResource(R.string.conversion_permission_common_deny),
             onConfirmation = {
                 onRestoreInitialData()
-                setRestoreInitialDataDialogOpen(false)
+                restoreInitialDataDialogOpen = false
             },
-            onDismissRequest = { setRestoreInitialDataDialogOpen(false) },
+            onDismissRequest = { restoreInitialDataDialogOpen = false },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareLinkRestoreInitialDialog"),

@@ -66,8 +66,10 @@ class ScreenshotsProBehaviorTest {
 
     fun testConversion() = uiAutomator {
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
         onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_null" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_null" }
             .click()
         quickWaitForStableInActiveWindow() // Wait for the server to get saved
 
@@ -98,6 +100,8 @@ class ScreenshotsProBehaviorTest {
     fun testServers() = uiAutomator {
         // Servers - List - Page 1
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("pro_strings/servers_list_pro_page_1")
 
