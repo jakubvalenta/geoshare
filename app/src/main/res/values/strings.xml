@@ -115,6 +115,7 @@
     <string name="main_create_geo_uri">Show coordinates</string>
     <string name="main_random">Random link</string>
     <string name="no">No</string>
+    <string name="optional">Optional</string>
     <string name="output_gpx_location_permission">%1$s will create a route that starts at your current location.</string>
     <string name="output_gpx_point_save">Save GPX with one point</string>
     <string name="output_gpx_points_open">Open GPX points</string>
@@ -251,6 +252,7 @@
     <string name="conversion_failed_unsupported_source_google_search">Google Search links are not supported</string>
     <string name="conversion_failed_unsupported_source_place_list">Place lists are not supported</string>
     <string name="conversion_failed_cancelled">Cancelled</string>
+    <string name="description">Description</string>
     <string name="inputs_all">All map services</string>
     <string name="inputs_default_handler">Opens by default in %1$s</string>
     <string name="inputs_detail_text">You can share the following map links with %1$s or paste them in the app.</string>

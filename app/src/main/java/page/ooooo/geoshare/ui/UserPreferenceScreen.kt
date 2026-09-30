@@ -199,7 +199,6 @@ private fun UserPreferenceScreen(
                     }
                 },
                 onNavigateToLinkScreen = onNavigateToLinkScreen,
-                onNavigateToServerScreen = onNavigateToServerScreen,
             )
         },
         detailPane = { wide ->
@@ -252,7 +251,6 @@ private fun UserPreferenceListPane(
     onBack: () -> Unit,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
     onNavigateToLinkScreen: () -> Unit,
-    onNavigateToServerScreen: (uid: Int?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -292,7 +290,7 @@ private fun UserPreferenceListPane(
                     selected = currentGroupId == UserPreferenceGroupId.SERVERS,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"),
-                    onClick = { onNavigateToServerScreen(null) },
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.SERVERS) },
                 )
             }
         }

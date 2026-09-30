@@ -24,7 +24,7 @@ object InitialServersImpl : InitialServers {
     override fun restore(db: SupportSQLiteDatabase) {
         db.execSQL("DELETE FROM server")
         db.execSQL(
-            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "Google Maps Geocode Address"
                 "via GeoShare Proxy",
@@ -43,7 +43,7 @@ object InitialServersImpl : InitialServers {
             )
         )
         db.execSQL(
-            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "Google Maps Geocode Place"
                 "via GeoShare Proxy",
@@ -62,7 +62,7 @@ object InitialServersImpl : InitialServers {
             )
         )
         db.execSQL(
-            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "Google Maps Geocode Address",
                 "",
@@ -81,7 +81,7 @@ object InitialServersImpl : InitialServers {
             )
         )
         db.execSQL(
-            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "Google Maps Geocode Place",
                 "",
@@ -101,7 +101,7 @@ object InitialServersImpl : InitialServers {
         )
         if (BuildConfig.DEBUG) {
             db.execSQL(
-                "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Google Maps Geocode Address",
                     "via local GeoShare Proxy",
@@ -120,7 +120,7 @@ object InitialServersImpl : InitialServers {
                 )
             )
             db.execSQL(
-                "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO server (`name`,`description`,`urlTemplate`,`authType`,`apiKey`,`apiKeyHeader`,`challengeUrl`,`loginUrl`,`registerUrl`,`selectedGoogleMapsAddress`,`selectedGoogleMapsPlace`,`selectedSearch`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf<Any>(
                     "Google Maps Geocode Place",
                     "via local GeoShare Proxy",
@@ -256,10 +256,10 @@ object InitialServersImpl : InitialServers {
                 }
             }
         }
-        object : Migration(9, 10) {
+        object : Migration(10, 11) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ? LIMIT 1",
+                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ?",
                     arrayOf<Any>(
                         "Google Maps Geocode Address",
                         "via GeoShare Proxy",
@@ -268,7 +268,7 @@ object InitialServersImpl : InitialServers {
                     )
                 )
                 db.execSQL(
-                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ? LIMIT 1",
+                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ?",
                     arrayOf<Any>(
                         "Google Maps Geocode Place",
                         "via GeoShare Proxy",
@@ -277,7 +277,7 @@ object InitialServersImpl : InitialServers {
                     )
                 )
                 db.execSQL(
-                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ? LIMIT 1",
+                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ?",
                     arrayOf<Any>(
                         "Google Maps Geocode Address",
                         "via local GeoShare Proxy",
@@ -286,7 +286,7 @@ object InitialServersImpl : InitialServers {
                     )
                 )
                 db.execSQL(
-                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ? LIMIT 1",
+                    "UPDATE server SET `name` = ?, `description` = ? WHERE `uuid` = ? AND `name` = ?",
                     arrayOf<Any>(
                         "Google Maps Geocode Place",
                         "via local GeoShare Proxy",

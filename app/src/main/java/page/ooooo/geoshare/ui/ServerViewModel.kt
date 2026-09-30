@@ -117,10 +117,6 @@ class ServerViewModel @Inject constructor(
 
     // Form
 
-    private val _name = savedStateHandle.getMutableStateFlow("serverName", default.name)
-    val name: StateFlow<String> = _name.asStateFlow()
-    private val _urlTemplate = savedStateHandle.getMutableStateFlow("serverUrlTemplate", default.urlTemplate)
-    val urlTemplate: StateFlow<String> = _urlTemplate.asStateFlow()
     private val _authType = savedStateHandle.getMutableStateFlow("serverAuthType", default.authType)
     val authType: StateFlow<ServerAuthType> = _authType.asStateFlow()
     private val _apiKey = savedStateHandle.getMutableStateFlow("serverApiKey", default.apiKey)
@@ -129,10 +125,16 @@ class ServerViewModel @Inject constructor(
     val apiKeyHeader: StateFlow<String> = _apiKeyHeader.asStateFlow()
     private val _challengeUrl = savedStateHandle.getMutableStateFlow("serverChallengeUrl", default.challengeUrl)
     val challengeUrl: StateFlow<String> = _challengeUrl.asStateFlow()
+    private val _description = savedStateHandle.getMutableStateFlow("serverDescription", default.name)
+    val description: StateFlow<String> = _description.asStateFlow()
     private val _loginUrl = savedStateHandle.getMutableStateFlow("serverLoginUrl", default.loginUrl)
     val loginUrl: StateFlow<String> = _loginUrl.asStateFlow()
+    private val _name = savedStateHandle.getMutableStateFlow("serverName", default.name)
+    val name: StateFlow<String> = _name.asStateFlow()
     private val _registerUrl = savedStateHandle.getMutableStateFlow("serverRegisterUrl", default.registerUrl)
     val registerUrl: StateFlow<String> = _registerUrl.asStateFlow()
+    private val _urlTemplate = savedStateHandle.getMutableStateFlow("serverUrlTemplate", default.urlTemplate)
+    val urlTemplate: StateFlow<String> = _urlTemplate.asStateFlow()
 
     fun saveForm(resources: Resources) {
         _destination.value?.let { destination ->
@@ -146,6 +148,7 @@ class ServerViewModel @Inject constructor(
                             apiKey = _apiKey.value,
                             apiKeyHeader = _apiKeyHeader.value,
                             challengeUrl = _challengeUrl.value,
+                            description = _description.value,
                             loginUrl = _loginUrl.value,
                             registerUrl = _registerUrl.value,
                         )
@@ -166,6 +169,7 @@ class ServerViewModel @Inject constructor(
                                 apiKey = _apiKey.value,
                                 apiKeyHeader = _apiKeyHeader.value,
                                 challengeUrl = _challengeUrl.value,
+                                description = _description.value,
                                 loginUrl = _loginUrl.value,
                                 registerUrl = _registerUrl.value,
                             )
@@ -228,6 +232,10 @@ class ServerViewModel @Inject constructor(
 
     fun setChallengeUrl(newChallengeUrl: String) {
         _challengeUrl.value = newChallengeUrl
+    }
+
+    fun setDescription(newDescription: String) {
+        _description.value = newDescription
     }
 
     fun setLoginUrl(newLoginUrl: String) {

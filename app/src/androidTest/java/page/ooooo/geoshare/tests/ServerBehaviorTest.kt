@@ -28,6 +28,7 @@ class ServerBehaviorTest {
         // Insert a new server
         val server = Server(
             name = "Test Server",
+            description = "Test Server description",
             urlTemplate = "https://api.example.com/{q}",
             authType = ServerAuthType.ATTESTATION,
             challengeUrl = "https://api.example.com/auth/challenge",
@@ -46,9 +47,9 @@ class ServerBehaviorTest {
         // Shows the new server
         quickWaitForStableInActiveWindow() // Wait for the lazy list to render
         onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.DOWN, 3_000) {
-                viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_${server.name}"
-            }
+            .scrollToElement(Direction.DOWN, 3_000) { textAsString() == server.name }
+        onElement { viewIdResourceName == "geoShareServerListPane" }
+            .scrollToElement(Direction.DOWN, 3_000) { textAsString() == server.description }
     }
 
     @Test
@@ -68,6 +69,7 @@ class ServerBehaviorTest {
         // Update the server
         val server = Server(
             name = onElement { viewIdResourceName == "geoShareServerFormName" }.run { "$text edited" },
+            description = onElement { viewIdResourceName == "geoShareServerFormDescription" }.run { "$text edited" },
             urlTemplate = onElement { viewIdResourceName == "geoShareServerFormUrlTemplate" }.run { "$text/edited" },
             apiKey = "my_api_key",
             apiKeyHeader = "X-My-Header",
@@ -82,13 +84,16 @@ class ServerBehaviorTest {
 
         // Shows the updated server
         onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_Google Maps Geocode Address edited" }
+            .scrollToElement(Direction.DOWN) { textAsString() == "Google Maps Geocode Address edited" }
+        onElement { viewIdResourceName == "geoShareServerListPane" }
+            .scrollToElement(Direction.DOWN) { textAsString() == " edited" }
 
         // Go to the server detail again
         onElement { viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }.click()
 
         // Shows the updated values
         onElement { viewIdResourceName == "geoShareServerFormName" && textAsString() == "Google Maps Geocode Address edited" }
+        onElement { viewIdResourceName == "geoShareServerFormDescription" && textAsString() == " edited" }
         onElement { viewIdResourceName == "geoShareServerFormUrlTemplate" && textAsString() == "https://geocode.googleapis.com/v4/geocode/address/{q}/edited" }
         onElement { viewIdResourceName == "geoShareServerDetailPane" }.apply {
             scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormApiKeyHeader" && textAsString() == "X-My-Header" }

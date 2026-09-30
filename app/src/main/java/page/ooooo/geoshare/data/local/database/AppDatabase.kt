@@ -6,9 +6,10 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [Server::class, Link::class],
-    version = 10,
+    version = 11,
     autoMigrations = [
         AutoMigration(from = 6, to = 7),
+        AutoMigration(from = 9, to = 10),
     ]
 )
 abstract class AppDatabase : RoomDatabase() {

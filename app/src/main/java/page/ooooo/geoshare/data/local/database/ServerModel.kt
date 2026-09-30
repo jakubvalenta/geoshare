@@ -27,6 +27,7 @@ data class Server(
     val apiKey: String = "",
     val apiKeyHeader: String = "",
     val challengeUrl: String = "",
+    @ColumnInfo(defaultValue = "")
     val description: String = "",
     val loginUrl: String = "",
     val registerUrl: String = "",

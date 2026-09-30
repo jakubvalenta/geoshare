@@ -883,6 +883,9 @@ fun UiAutomatorTestScope.fillServerForm(server: Server) {
     server.name.takeIf { it.isNotEmpty() }?.let {
         onElement { viewIdResourceName == "geoShareServerFormName" }.setText(it)
     }
+    server.description.takeIf { it.isNotEmpty() }?.let {
+        onElement { viewIdResourceName == "geoShareServerFormDescription" }.setText(it)
+    }
     server.urlTemplate.takeIf { it.isNotEmpty() }?.let {
         onElement { viewIdResourceName == "geoShareServerFormUrlTemplate" }.setText(it)
     }
@@ -927,13 +930,13 @@ fun UiAutomatorTestScope.saveServerForm() {
 }
 
 fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
-    // Go to server list
-    goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
-    onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-        .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
-
     when (testServer) {
         is TestServer.Configured -> {
+            // Go to server list
+            goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+                .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
+
             // Insert a new server
             onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
             fillServerForm(testServer.server)
@@ -952,8 +955,11 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
         }
 
         is TestServer.None -> {
+            // Go to server preferences
+            goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+
             // Select no server
-            onElement { viewIdResourceName == "geoShareServerListPane" }.apply {
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_null" }.click()
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_null" }.click()
             }
