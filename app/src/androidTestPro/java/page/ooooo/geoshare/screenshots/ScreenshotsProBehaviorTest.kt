@@ -61,15 +61,25 @@ class ScreenshotsProBehaviorTest {
 
         // Test all screens in alphabetical order
         testConversion()
-        testServers()
+        testPreferences()
     }
 
     fun testConversion() = uiAutomator {
-        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_null" }
+        // Configure server (don't use helper method, because it fails on a managed device for some reason)
+        onElement(1_000) { viewIdResourceName == "geoShareMainMenuButton" }.let { mainMenu ->
+            mainMenu.click()
+            onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
+        }
+        quickWaitForStableInActiveWindow() // Wait for the lazy list to render
+        onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+            .scrollToElement(Direction.DOWN) {
+                viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"
+            }
             .click()
-        quickWaitForStableInActiveWindow() // Wait for the server to get saved
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_null" }.click()
+            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_null" }.click()
+        }
 
         // Conversion - Error - Unsupported source place list
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
@@ -95,11 +105,11 @@ class ScreenshotsProBehaviorTest {
         goBackToMainForm()
     }
 
-    fun testServers() = uiAutomator {
-        // Servers - List - Page 1
+    fun testPreferences() = uiAutomator {
+        // Preferences - Servers - Page 1
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
         quickWaitForStableInActiveWindow()
-        saveScreenshot("pro_strings/servers_list_pro_page_1")
+        saveScreenshot("pro_strings/preferences_servers_page_1")
 
         goBackToMainForm()
     }

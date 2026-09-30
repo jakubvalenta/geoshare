@@ -7,22 +7,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -44,11 +39,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,23 +51,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
-import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsPlaceServer
 import page.ooooo.geoshare.data.di.FakeGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.ui.components.ClickableLink
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.SegmentedList
-import page.ooooo.geoshare.ui.components.SegmentedListLabel
 import page.ooooo.geoshare.ui.components.ServerForm
 import page.ooooo.geoshare.ui.components.StyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
@@ -83,33 +71,31 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ServerScreen(
+    initialUid: Int?,
     onBack: () -> Unit,
     viewModel: ServerViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalResources.current
 
-    val all by viewModel.all.collectAsStateWithLifecycle()
-    val destination by viewModel.destination.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
-    val selectedServerGoogleMapsAddress by viewModel.selectedServerGoogleMapsAddress.collectAsStateWithLifecycle()
-    val selectedServerGoogleMapsPlace by viewModel.selectedServerGoogleMapsPlace.collectAsStateWithLifecycle()
-    val selectedServerSearch by viewModel.selectedServerSearch.collectAsStateWithLifecycle()
+    LaunchedEffect(initialUid) {
+        if (initialUid != null) {
+            viewModel.navigateTo(initialUid)
+        }
+    }
 
     ServerScreen(
-        destination = destination,
-        all = all,
-        message = message,
+        destination = viewModel.destination,
+        servers = viewModel.all,
+        message = viewModel.message,
         apiKey = viewModel.apiKey,
         apiKeyHeader = viewModel.apiKeyHeader,
         authType = viewModel.authType,
         challengeUrl = viewModel.challengeUrl,
         name = viewModel.name,
+        description = viewModel.description,
         loginUrl = viewModel.loginUrl,
         registerUrl = viewModel.registerUrl,
-        selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
-        selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
-        selectedServerSearch = selectedServerSearch,
         urlTemplate = viewModel.urlTemplate,
         onBack = onBack,
         onDelete = { viewModel.delete(resources) },
@@ -121,13 +107,11 @@ fun ServerScreen(
         },
         onRestoreInitialData = { viewModel.restoreInitialData(resources) },
         onSaveForm = { viewModel.saveForm(resources) },
-        onSelectServerGoogleMapsAddress = { viewModel.selectServerGoogleMapsAddress(it?.uid) },
-        onSelectServerGoogleMapsPlace = { viewModel.selectServerGoogleMapsPlace(it?.uid) },
-        onSelectServerSearch = { viewModel.selectServerSearch(it?.uid) },
         onSetApiKey = { viewModel.setApiKey(it) },
         onSetApiKeyHeader = { viewModel.setApiKeyHeader(it) },
         onSetAuthType = { viewModel.setAuthType(it) },
         onSetChallengeUrl = { viewModel.setChallengeUrl(it) },
+        onSetDescription = { viewModel.setDescription(it) },
         onSetLoginUrl = { viewModel.setLoginUrl(it) },
         onSetName = { viewModel.setName(it) },
         onSetRegisterUrl = { viewModel.setRegisterUrl(it) },
@@ -139,19 +123,17 @@ fun ServerScreen(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun ServerScreen(
-    destination: Int?,
-    all: List<Server>,
-    message: Message?,
+    destination: StateFlow<Int?>,
+    servers: StateFlow<List<Server>>,
+    message: StateFlow<Message?>,
     apiKey: StateFlow<String>,
     apiKeyHeader: StateFlow<String>,
     authType: StateFlow<ServerAuthType>,
     challengeUrl: StateFlow<String>,
+    description: StateFlow<String>,
     loginUrl: StateFlow<String>,
     name: StateFlow<String>,
     registerUrl: StateFlow<String>,
-    selectedServerGoogleMapsAddress: Server?,
-    selectedServerGoogleMapsPlace: Server?,
-    selectedServerSearch: Server?,
     urlTemplate: StateFlow<String>,
     onBack: () -> Unit,
     onDelete: () -> Unit,
@@ -159,19 +141,19 @@ private fun ServerScreen(
     onNavigateTo: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
     onSaveForm: () -> Unit,
-    onSelectServerGoogleMapsAddress: (Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (Server?) -> Unit,
-    onSelectServerSearch: (Server?) -> Unit,
     onSetApiKey: (String) -> Unit,
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
     onSetChallengeUrl: (String) -> Unit,
+    onSetDescription: (String) -> Unit,
     onSetLoginUrl: (String) -> Unit,
     onSetName: (String) -> Unit,
     onSetRegisterUrl: (String) -> Unit,
     onSetUrlTemplate: (String) -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val destination by destination.collectAsStateWithLifecycle()
+    val message by message.collectAsStateWithLifecycle()
 
     // Drive the scaffold navigator from view model, so that the UI state survives process death.
 
@@ -208,7 +190,7 @@ private fun ServerScreen(
     // Message
 
     LaunchedEffect(message) {
-        if (message != null) {
+        message?.let { message ->
             snackbarHostState.showSnackbar(MessageSnackbarVisuals(message))
             onDismissMessage()
         }
@@ -229,22 +211,16 @@ private fun ServerScreen(
                 // fields get briefly rendered with empty values when switching from detail to list.
                 ServerListPane(
                     destination = destination,
-                    all = all,
-                    selectedServerGoogleMapsAddress = selectedServerGoogleMapsAddress,
-                    selectedServerGoogleMapsPlace = selectedServerGoogleMapsPlace,
-                    selectedServerSearch = selectedServerSearch,
+                    servers = servers,
                     onBack = onBack,
                     onNavigateToContentKey = onNavigateTo,
                     onRestoreInitialData = onRestoreInitialData,
-                    onSelectServerGoogleMapsAddress = onSelectServerGoogleMapsAddress,
-                    onSelectServerGoogleMapsPlace = onSelectServerGoogleMapsPlace,
-                    onSelectServerSearch = onSelectServerSearch,
                 )
             },
             detailPane = { wide ->
                 // Use destination coming from view model, because if we use navigator.currentDestination?.contentKey,
                 // fields get briefly rendered with empty values when switching from detail to list.
-                if (destination != null) {
+                destination?.let { destination ->
                     ServerDetailPane(
                         destination = destination,
                         wide = wide,
@@ -252,12 +228,13 @@ private fun ServerScreen(
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
                         challengeUrl = challengeUrl,
+                        description = description,
                         loginUrl = loginUrl,
-                        onBack = { onNavigateTo(null) },
-                        onDelete = onDelete,
                         name = name,
                         registerUrl = registerUrl,
                         urlTemplate = urlTemplate,
+                        onBack = { onNavigateTo(null) },
+                        onDelete = onDelete,
                         onSaveForm = onSaveForm,
                         onSetApiKey = onSetApiKey,
                         onSetApiKeyHeader = onSetApiKeyHeader,
@@ -265,6 +242,7 @@ private fun ServerScreen(
                         onSetChallengeUrl = onSetChallengeUrl,
                         onSetLoginUrl = onSetLoginUrl,
                         onSetName = onSetName,
+                        onSetDescription = onSetDescription,
                         onSetRegisterUrl = onSetRegisterUrl,
                         onSetUrlTemplate = onSetUrlTemplate,
                     )
@@ -281,19 +259,15 @@ private fun ServerScreen(
 @Composable
 private fun ServerListPane(
     destination: Int?,
-    all: List<Server>,
-    selectedServerGoogleMapsAddress: Server?,
-    selectedServerGoogleMapsPlace: Server?,
-    selectedServerSearch: Server?,
+    servers: StateFlow<List<Server>>,
     onBack: () -> Unit,
     onNavigateToContentKey: (Int?) -> Unit,
     onRestoreInitialData: () -> Unit,
-    onSelectServerGoogleMapsAddress: (Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (Server?) -> Unit,
-    onSelectServerSearch: (Server?) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-    val (restoreInitialDataDialogOpen, setRestoreInitialDataDialogOpen) = retain { mutableStateOf(false) }
+
+    var restoreInitialDataDialogOpen by retain { mutableStateOf(false) }
+    val servers by servers.collectAsStateWithLifecycle()
 
     LargeTopAppBarPane(
         modifier = Modifier.testTag("geoShareServerListPane"),
@@ -325,44 +299,29 @@ private fun ServerListPane(
                 Text(stringResource(R.string.server_insert))
             }
         }
-        serverListSection(
-            destination = destination,
-            all = all,
-            itemTestTag = { "geoShareServerListItem_GoogleMapsAddress_${it?.name}" },
-            key = "google_maps_address",
-            title = { stringResource(R.string.server_list_google_maps_address_title) },
-            noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
-            selectedServer = selectedServerGoogleMapsAddress,
-            onNavigateToContentKey = onNavigateToContentKey,
-            onSelectServer = onSelectServerGoogleMapsAddress,
-        )
-        serverListSection(
-            destination = destination,
-            all = all,
-            itemTestTag = { "geoShareServerListItem_GoogleMapsPlace_${it?.name}" },
-            key = "google_maps_place",
-            title = { stringResource(R.string.server_list_google_maps_place_title) },
-            noneDescription = { stringResource(R.string.server_list_google_maps_none_description) },
-            selectedServer = selectedServerGoogleMapsPlace,
-            onNavigateToContentKey = onNavigateToContentKey,
-            onSelectServer = onSelectServerGoogleMapsPlace,
-        )
-        if (BuildConfig.DEBUG) {
-            serverListSection(
-                destination = destination,
-                all = all,
-                itemTestTag = { "geoShareServerSearchListItem_${it?.name}" },
-                key = "search",
-                title = { stringResource(R.string.server_list_search_title) },
-                noneDescription = { stringResource(R.string.server_list_search_none_description) },
-                selectedServer = selectedServerSearch,
-                onNavigateToContentKey = onNavigateToContentKey,
-                onSelectServer = onSelectServerSearch,
+        item("list", contentType = "segmented_list") {
+            SegmentedList(
+                values = servers,
+                modifier = Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.medium),
+                itemHeadline = { server -> server.name },
+                itemIsSelected = { server -> server.uid == destination },
+                itemOnClick = { server -> onNavigateToContentKey(server.uid) },
+                itemSupportingContent = { server ->
+                    server.description.takeIf { it.isNotEmpty() }?.let { description ->
+                        {
+                            Text(description, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                },
+                itemTestTag = { server -> "geoShareServerListItem_${server.uuid}" },
+                sort = true,
             )
         }
         item(key = "restore", contentType = "text_button") {
             TextButton(
-                onClick = { setRestoreInitialDataDialogOpen(true) },
+                onClick = { restoreInitialDataDialogOpen = true },
                 modifier = Modifier
                     .testTag("geoShareServerRestoreInitialButton")
                     .padding(horizontal = spacing.windowPadding)
@@ -381,9 +340,9 @@ private fun ServerListPane(
             stringResource(R.string.conversion_permission_common_deny),
             onConfirmation = {
                 onRestoreInitialData()
-                setRestoreInitialDataDialogOpen(false)
+                restoreInitialDataDialogOpen = false
             },
-            onDismissRequest = { setRestoreInitialDataDialogOpen(false) },
+            onDismissRequest = { restoreInitialDataDialogOpen = false },
             modifier = Modifier
                 .semantics { testTagsAsResourceId = true }
                 .testTag("geoShareServerRestoreInitialDialog"),
@@ -401,6 +360,7 @@ private fun ServerDetailPane(
     apiKeyHeader: StateFlow<String>,
     authType: StateFlow<ServerAuthType>,
     challengeUrl: StateFlow<String>,
+    description: StateFlow<String>,
     loginUrl: StateFlow<String>,
     name: StateFlow<String>,
     registerUrl: StateFlow<String>,
@@ -412,6 +372,7 @@ private fun ServerDetailPane(
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
     onSetChallengeUrl: (String) -> Unit,
+    onSetDescription: (String) -> Unit,
     onSetLoginUrl: (String) -> Unit,
     onSetName: (String) -> Unit,
     onSetRegisterUrl: (String) -> Unit,
@@ -453,6 +414,7 @@ private fun ServerDetailPane(
                         apiKeyHeader = apiKeyHeader,
                         authType = authType,
                         challengeUrl = challengeUrl,
+                        description = description,
                         loginUrl = loginUrl,
                         name = name,
                         registerUrl = registerUrl,
@@ -462,6 +424,7 @@ private fun ServerDetailPane(
                         onSetApiKeyHeader = onSetApiKeyHeader,
                         onSetAuthType = onSetAuthType,
                         onSetChallengeUrl = onSetChallengeUrl,
+                        onSetDescription = onSetDescription,
                         onSetLoginUrl = onSetLoginUrl,
                         onSetName = onSetName,
                         onSetRegisterUrl = onSetRegisterUrl,
@@ -495,106 +458,6 @@ private fun ServerDetailPane(
     }
 }
 
-fun LazyListScope.serverListSection(
-    destination: Int?,
-    all: List<Server>,
-    itemTestTag: (Server?) -> String,
-    key: String,
-    title: @Composable () -> String,
-    noneDescription: @Composable () -> String,
-    selectedServer: Server?,
-    onNavigateToContentKey: (Int?) -> Unit,
-    onSelectServer: (Server?) -> Unit,
-) {
-    item(key = "server_list_${key}_label", contentType = "segmented_list_label") {
-        SegmentedListLabel(
-            title(),
-            Modifier.padding(horizontal = LocalSpacing.current.windowPadding),
-        )
-    }
-    item(key = "server_list_${key}_list", contentType = "segmented_list") {
-        SegmentedList(
-            values = listOf(null) + all,
-            modifier = Modifier.padding(horizontal = LocalSpacing.current.windowPadding),
-            itemHeadline = { item -> item?.name ?: stringResource(R.string.server_list_none) },
-            itemIsSelected = { item -> item?.uid == destination },
-            itemOnClick = onSelectServer,
-            itemEnabled = { item -> item?.isValid() != false },
-            itemLeadingContent = { item ->
-                {
-                    RadioButton(
-                        selected = item == selectedServer,
-                        // Null recommended for accessibility with screen readers
-                        onClick = null,
-                        enabled = item?.isValid() != false,
-                    )
-                }
-            },
-            itemSupportingContent = { item ->
-                if (item == null) {
-                    {
-                        Text(
-                            noneDescription(),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                } else if (!item.isValid()) {
-                    {
-                        Text(
-                            buildAnnotatedString {
-                                ClickableLink(stringResource(R.string.server_invalid)) {
-                                    onNavigateToContentKey(item.uid)
-                                }
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
-                } else {
-                    null
-                }
-            },
-            itemTrailingContent = { item ->
-                if (item != null) {
-                    {
-                        var expanded by retain { mutableStateOf(false) }
-
-                        Box {
-                            IconButton(
-                                { expanded = true },
-                                Modifier.testTag("geoShareServerListItemMenu_${item.uuid}"),
-                            ) {
-                                Icon(
-                                    painterResource(R.drawable.more_vert_24px),
-                                    contentDescription = stringResource(R.string.nav_menu_content_description),
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                                modifier = Modifier.semantics { testTagsAsResourceId = true },
-                                shape = ShapeDefaults.Large,
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.server_update)) },
-                                    modifier = Modifier.testTag("geoShareServerListItemMenuDetail_${item.uuid}"),
-                                    onClick = {
-                                        expanded = false
-                                        onNavigateToContentKey(item.uid)
-                                    },
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    null
-                }
-            },
-            itemTestTag = itemTestTag,
-        )
-    }
-}
-
 // Previews
 
 @Preview(showBackground = true, device = "spec:width=1080px,height=4200px,dpi=440")
@@ -604,19 +467,17 @@ private fun DefaultPreview() {
         Surface {
             Column {
                 ServerScreen(
-                    destination = null,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(null),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(""),
                     apiKeyHeader = MutableStateFlow(""),
                     authType = MutableStateFlow(ServerAuthType.API_KEY),
                     challengeUrl = MutableStateFlow(""),
+                    description = MutableStateFlow(""),
                     loginUrl = MutableStateFlow(""),
                     name = MutableStateFlow(""),
                     registerUrl = MutableStateFlow(""),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(""),
                     onBack = {},
                     onDelete = {},
@@ -624,13 +485,11 @@ private fun DefaultPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -652,19 +511,17 @@ private fun DarkPreview() {
         Surface {
             Column {
                 ServerScreen(
-                    destination = null,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(null),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(""),
                     apiKeyHeader = MutableStateFlow(""),
                     authType = MutableStateFlow(ServerAuthType.API_KEY),
                     challengeUrl = MutableStateFlow(""),
+                    description = MutableStateFlow(""),
                     loginUrl = MutableStateFlow(""),
                     name = MutableStateFlow(""),
                     registerUrl = MutableStateFlow(""),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(""),
                     onBack = {},
                     onDelete = {},
@@ -672,13 +529,11 @@ private fun DarkPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -696,19 +551,17 @@ private fun TabletPreview() {
         Surface {
             Column {
                 ServerScreen(
-                    destination = null,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(null),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(""),
                     apiKeyHeader = MutableStateFlow(""),
                     authType = MutableStateFlow(ServerAuthType.API_KEY),
                     challengeUrl = MutableStateFlow(""),
+                    description = MutableStateFlow(""),
                     loginUrl = MutableStateFlow(""),
                     name = MutableStateFlow(""),
                     registerUrl = MutableStateFlow(""),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(""),
                     onBack = {},
                     onDelete = {},
@@ -716,13 +569,11 @@ private fun TabletPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -740,19 +591,17 @@ private fun InsertPreview() {
         Surface {
             Column {
                 ServerScreen(
-                    destination = -1,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(-1),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(""),
                     apiKeyHeader = MutableStateFlow(""),
                     authType = MutableStateFlow(ServerAuthType.API_KEY),
                     challengeUrl = MutableStateFlow(""),
+                    description = MutableStateFlow(""),
                     loginUrl = MutableStateFlow(""),
                     name = MutableStateFlow(""),
                     registerUrl = MutableStateFlow(""),
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(""),
                     onBack = {},
                     onDelete = {},
@@ -760,13 +609,11 @@ private fun InsertPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -784,19 +631,17 @@ private fun DarkInsertPreview() {
         Surface {
             Column {
                 ServerScreen(
-                    destination = -1,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(-1),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(""),
                     apiKeyHeader = MutableStateFlow(""),
                     authType = MutableStateFlow(ServerAuthType.ATTESTATION),
                     challengeUrl = MutableStateFlow(""),
+                    description = MutableStateFlow(""),
                     loginUrl = MutableStateFlow(""),
                     name = MutableStateFlow(""),
                     registerUrl = MutableStateFlow(""),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(""),
                     onBack = {},
                     onDelete = {},
@@ -804,13 +649,11 @@ private fun DarkInsertPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -829,19 +672,17 @@ private fun TabletInsertPreview() {
         Surface {
             Column {
                 ServerScreen(
-                    destination = -1,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(-1),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(""),
                     apiKeyHeader = MutableStateFlow(""),
                     authType = MutableStateFlow(ServerAuthType.ATTESTATION),
                     challengeUrl = MutableStateFlow(""),
+                    description = MutableStateFlow(""),
                     loginUrl = MutableStateFlow(""),
                     name = MutableStateFlow(""),
                     registerUrl = MutableStateFlow(""),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(""),
                     onBack = {},
                     onDelete = {},
@@ -849,13 +690,11 @@ private fun TabletInsertPreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -875,19 +714,17 @@ private fun UpdatePreview() {
             Column {
                 val item = FakeGoogleMapsAddressServer
                 ServerScreen(
-                    destination = item.uid,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(item.uid),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(item.apiKey),
                     apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
                     authType = MutableStateFlow(item.authType),
                     challengeUrl = MutableStateFlow(item.challengeUrl),
+                    description = MutableStateFlow(item.description),
                     loginUrl = MutableStateFlow(item.loginUrl),
                     name = MutableStateFlow(item.name),
                     registerUrl = MutableStateFlow(item.registerUrl),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(item.urlTemplate),
                     onBack = {},
                     onDelete = {},
@@ -895,13 +732,11 @@ private fun UpdatePreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -921,19 +756,17 @@ private fun DarkUpdatePreview() {
             Column {
                 val item = FakeGoogleMapsAddressServer
                 ServerScreen(
-                    destination = item.uid,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(item.uid),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(item.apiKey),
                     apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
                     authType = MutableStateFlow(item.authType),
                     challengeUrl = MutableStateFlow(item.challengeUrl),
+                    description = MutableStateFlow(item.description),
                     loginUrl = MutableStateFlow(item.loginUrl),
                     name = MutableStateFlow(item.name),
                     registerUrl = MutableStateFlow(item.registerUrl),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(item.urlTemplate),
                     onBack = {},
                     onDelete = {},
@@ -941,13 +774,11 @@ private fun DarkUpdatePreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},
@@ -967,19 +798,17 @@ private fun TabletUpdatePreview() {
             Column {
                 val item = FakeGoogleMapsAddressServer
                 ServerScreen(
-                    destination = item.uid,
-                    all = defaultFakeServers,
-                    message = null,
+                    destination = MutableStateFlow(item.uid),
+                    servers = MutableStateFlow(defaultFakeServers),
+                    message = MutableStateFlow(null),
                     apiKey = MutableStateFlow(item.apiKey),
                     apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
                     authType = MutableStateFlow(item.authType),
                     challengeUrl = MutableStateFlow(item.challengeUrl),
+                    description = MutableStateFlow(item.description),
                     loginUrl = MutableStateFlow(item.loginUrl),
                     name = MutableStateFlow(item.name),
                     registerUrl = MutableStateFlow(item.registerUrl),
-                    selectedServerGoogleMapsAddress = FakeGeoShareGoogleMapsAddressServer,
-                    selectedServerGoogleMapsPlace = FakeGeoShareGoogleMapsPlaceServer,
-                    selectedServerSearch = FakeGeoShareGoogleMapsAddressServer,
                     urlTemplate = MutableStateFlow(item.urlTemplate),
                     onBack = {},
                     onDelete = {},
@@ -987,13 +816,11 @@ private fun TabletUpdatePreview() {
                     onNavigateTo = {},
                     onRestoreInitialData = {},
                     onSaveForm = {},
-                    onSelectServerGoogleMapsAddress = {},
-                    onSelectServerGoogleMapsPlace = {},
-                    onSelectServerSearch = {},
                     onSetApiKey = {},
                     onSetApiKeyHeader = {},
                     onSetAuthType = {},
                     onSetChallengeUrl = {},
+                    onSetDescription = {},
                     onSetLoginUrl = {},
                     onSetName = {},
                     onSetRegisterUrl = {},

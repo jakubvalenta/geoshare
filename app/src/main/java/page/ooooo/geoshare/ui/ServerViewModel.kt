@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
@@ -21,6 +22,12 @@ import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.lib.Message
 import javax.inject.Inject
+
+data class SelectedServers(
+    val googleMapsAddress: Server? = null,
+    val googleMapsPlace: Server? = null,
+    val search: Server? = null,
+)
 
 @OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
@@ -35,24 +42,23 @@ class ServerViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5000),
             emptyList(),
         )
-    val selectedServerGoogleMapsAddress: StateFlow<Server?> = serverRepository.selectedGoogleMapsAddress
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
-        )
-    val selectedServerGoogleMapsPlace: StateFlow<Server?> = serverRepository.selectedGoogleMapsPlace
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
-        )
-    val selectedServerSearch: StateFlow<Server?> = serverRepository.selectedSearch
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null,
-        )
+    val selectedServers: StateFlow<SelectedServers> =
+        combine(
+            serverRepository.selectedGoogleMapsAddress,
+            serverRepository.selectedGoogleMapsPlace,
+            serverRepository.selectedSearch,
+        ) { googleMapsAddressServer, googleMapsPlaceServer, searchServer ->
+            SelectedServers(
+                googleMapsAddress = googleMapsAddressServer,
+                googleMapsPlace = googleMapsPlaceServer,
+                search = searchServer,
+            )
+        }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                SelectedServers(),
+            )
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message.asStateFlow()
@@ -111,10 +117,6 @@ class ServerViewModel @Inject constructor(
 
     // Form
 
-    private val _name = savedStateHandle.getMutableStateFlow("serverName", default.name)
-    val name: StateFlow<String> = _name.asStateFlow()
-    private val _urlTemplate = savedStateHandle.getMutableStateFlow("serverUrlTemplate", default.urlTemplate)
-    val urlTemplate: StateFlow<String> = _urlTemplate.asStateFlow()
     private val _authType = savedStateHandle.getMutableStateFlow("serverAuthType", default.authType)
     val authType: StateFlow<ServerAuthType> = _authType.asStateFlow()
     private val _apiKey = savedStateHandle.getMutableStateFlow("serverApiKey", default.apiKey)
@@ -123,10 +125,16 @@ class ServerViewModel @Inject constructor(
     val apiKeyHeader: StateFlow<String> = _apiKeyHeader.asStateFlow()
     private val _challengeUrl = savedStateHandle.getMutableStateFlow("serverChallengeUrl", default.challengeUrl)
     val challengeUrl: StateFlow<String> = _challengeUrl.asStateFlow()
+    private val _description = savedStateHandle.getMutableStateFlow("serverDescription", default.name)
+    val description: StateFlow<String> = _description.asStateFlow()
     private val _loginUrl = savedStateHandle.getMutableStateFlow("serverLoginUrl", default.loginUrl)
     val loginUrl: StateFlow<String> = _loginUrl.asStateFlow()
+    private val _name = savedStateHandle.getMutableStateFlow("serverName", default.name)
+    val name: StateFlow<String> = _name.asStateFlow()
     private val _registerUrl = savedStateHandle.getMutableStateFlow("serverRegisterUrl", default.registerUrl)
     val registerUrl: StateFlow<String> = _registerUrl.asStateFlow()
+    private val _urlTemplate = savedStateHandle.getMutableStateFlow("serverUrlTemplate", default.urlTemplate)
+    val urlTemplate: StateFlow<String> = _urlTemplate.asStateFlow()
 
     fun saveForm(resources: Resources) {
         _destination.value?.let { destination ->
@@ -140,6 +148,7 @@ class ServerViewModel @Inject constructor(
                             apiKey = _apiKey.value,
                             apiKeyHeader = _apiKeyHeader.value,
                             challengeUrl = _challengeUrl.value,
+                            description = _description.value,
                             loginUrl = _loginUrl.value,
                             registerUrl = _registerUrl.value,
                         )
@@ -160,6 +169,7 @@ class ServerViewModel @Inject constructor(
                                 apiKey = _apiKey.value,
                                 apiKeyHeader = _apiKeyHeader.value,
                                 challengeUrl = _challengeUrl.value,
+                                description = _description.value,
                                 loginUrl = _loginUrl.value,
                                 registerUrl = _registerUrl.value,
                             )
@@ -222,6 +232,10 @@ class ServerViewModel @Inject constructor(
 
     fun setChallengeUrl(newChallengeUrl: String) {
         _challengeUrl.value = newChallengeUrl
+    }
+
+    fun setDescription(newDescription: String) {
+        _description.value = newDescription
     }
 
     fun setLoginUrl(newLoginUrl: String) {

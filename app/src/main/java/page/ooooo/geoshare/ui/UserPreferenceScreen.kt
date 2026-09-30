@@ -38,6 +38,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.Permission
@@ -67,8 +68,9 @@ import page.ooooo.geoshare.ui.components.UserPreferenceFinishControls
 import page.ooooo.geoshare.ui.components.UserPreferenceFinishListItem
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsControls
 import page.ooooo.geoshare.ui.components.UserPreferenceHiddenAppsListItem
-import page.ooooo.geoshare.ui.components.UserPreferenceLinksListItem
-import page.ooooo.geoshare.ui.components.UserPreferenceServersListItem
+import page.ooooo.geoshare.ui.components.UserPreferenceLinkListItem
+import page.ooooo.geoshare.ui.components.UserPreferenceServerControls
+import page.ooooo.geoshare.ui.components.UserPreferenceServerListItem
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -92,9 +94,10 @@ fun UserPreferenceScreen(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
-    onNavigateToServerScreen: () -> Unit,
+    onNavigateToServerScreen: (uid: Int?) -> Unit,
     billingViewModel: BillingViewModel,
     linkViewModel: LinkViewModel = hiltViewModel(),
+    serverViewModel: ServerViewModel = hiltViewModel(),
     viewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
     val billingAppNameResId = billingViewModel.billingAppNameResId
@@ -112,11 +115,16 @@ fun UserPreferenceScreen(
         hiddenAppsDetails = viewModel.hiddenAppsDetails,
         hiddenAppsSize = viewModel.hiddenAppsSize,
         links = linkViewModel.all,
+        selectedServers = serverViewModel.selectedServers,
+        servers = serverViewModel.all,
         userPreferencesValues = userPreferencesValues,
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinkScreen = onNavigateToLinkScreen,
         onNavigateToServerScreen = onNavigateToServerScreen,
+        onSelectServerGoogleMapsAddress = { serverViewModel.selectServerGoogleMapsAddress(it?.uid) },
+        onSelectServerGoogleMapsPlace = { serverViewModel.selectServerGoogleMapsPlace(it?.uid) },
+        onSelectServerSearch = { serverViewModel.selectServerSearch(it?.uid) },
         onValueChange = { transform: (preferences: MutablePreferences) -> Unit ->
             viewModel.editUserPreferences(transform)
         },
@@ -135,11 +143,16 @@ private fun UserPreferenceScreen(
     hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
     hiddenAppsSize: StateFlow<HiddenAppsSize>,
     links: StateFlow<List<Link>>,
+    servers: StateFlow<List<Server>>,
+    selectedServers: StateFlow<SelectedServers>,
     userPreferencesValues: UserPreferencesValues,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
-    onNavigateToServerScreen: () -> Unit,
+    onNavigateToServerScreen: (uid: Int?) -> Unit,
+    onSelectServerGoogleMapsAddress: (server: Server?) -> Unit,
+    onSelectServerGoogleMapsPlace: (server: Server?) -> Unit,
+    onSelectServerSearch: (server: Server?) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -186,7 +199,6 @@ private fun UserPreferenceScreen(
                     }
                 },
                 onNavigateToLinkScreen = onNavigateToLinkScreen,
-                onNavigateToServerScreen = onNavigateToServerScreen,
             )
         },
         detailPane = { wide ->
@@ -198,6 +210,8 @@ private fun UserPreferenceScreen(
                     billingFeatures = billingFeatures,
                     billingStatus = billingStatus,
                     hiddenAppsDetails = hiddenAppsDetails,
+                    selectedServers = selectedServers,
+                    servers = servers,
                     values = userPreferencesValues,
                     wide = wide,
                     onBack = {
@@ -210,6 +224,10 @@ private fun UserPreferenceScreen(
                         }
                     },
                     onNavigateToBillingScreen = onNavigateToBillingScreen,
+                    onNavigateToServerScreen = onNavigateToServerScreen,
+                    onSelectServerGoogleMapsAddress = onSelectServerGoogleMapsAddress,
+                    onSelectServerGoogleMapsPlace = onSelectServerGoogleMapsPlace,
+                    onSelectServerSearch = onSelectServerSearch,
                     onValueChange = onValueChange,
                 )
             }
@@ -233,7 +251,6 @@ private fun UserPreferenceListPane(
     onBack: () -> Unit,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
     onNavigateToLinkScreen: () -> Unit,
-    onNavigateToServerScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -267,13 +284,13 @@ private fun UserPreferenceListPane(
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.CONNECTION_PERMISSION}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.CONNECTION_PERMISSION) },
                 )
-                UserPreferenceServersListItem(
+                UserPreferenceServerListItem(
                     index = 1,
                     count = 2,
                     selected = currentGroupId == UserPreferenceGroupId.SERVERS,
                     values = values,
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"),
-                    onClick = onNavigateToServerScreen,
+                    onClick = { onNavigateToGroup(UserPreferenceGroupId.SERVERS) },
                 )
             }
         }
@@ -334,7 +351,7 @@ private fun UserPreferenceListPane(
                     modifier = Modifier.testTag("geoShareUserPreferencesGroup_${UserPreferenceGroupId.HIDDEN_APPS}"),
                     onClick = { onNavigateToGroup(UserPreferenceGroupId.HIDDEN_APPS) },
                 )
-                UserPreferenceLinksListItem(
+                UserPreferenceLinkListItem(
                     index = 1,
                     count = 4,
                     links = links,
@@ -420,10 +437,16 @@ private fun UserPreferenceDetailPane(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
+    servers: StateFlow<List<Server>>,
+    selectedServers: StateFlow<SelectedServers>,
     values: UserPreferencesValues,
     wide: Boolean,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
+    onNavigateToServerScreen: (uid: Int?) -> Unit,
+    onSelectServerGoogleMapsAddress: (server: Server?) -> Unit,
+    onSelectServerGoogleMapsPlace: (server: Server?) -> Unit,
+    onSelectServerSearch: (server: Server?) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     when (currentGroupId) {
@@ -507,7 +530,18 @@ private fun UserPreferenceDetailPane(
 
         UserPreferenceGroupId.LINKS -> {}
 
-        UserPreferenceGroupId.SERVERS -> {}
+        UserPreferenceGroupId.SERVERS -> UserPreferenceServerControls(
+            billingAppNameResId = billingAppNameResId,
+            selectedServers = selectedServers,
+            servers = servers,
+            onBack = onBack,
+            onNavigateToBillingScreen = onNavigateToBillingScreen,
+            onNavigateToServerScreen = onNavigateToServerScreen,
+            onSelectServerGoogleMapsAddress = onSelectServerGoogleMapsAddress,
+            onSelectServerGoogleMapsPlace = onSelectServerGoogleMapsPlace,
+            onSelectServerSearch = onSelectServerSearch,
+            wide = wide,
+        )
     }
 }
 
@@ -529,6 +563,8 @@ private fun DefaultPreview() {
                     hiddenAppsDetails = MutableStateFlow(emptyList()),
                     hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
                     links = MutableStateFlow(defaultFakeLinks),
+                    selectedServers = MutableStateFlow(SelectedServers()),
+                    servers = MutableStateFlow(emptyList()),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
@@ -536,6 +572,9 @@ private fun DefaultPreview() {
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onValueChange = {},
                 )
             }
@@ -563,6 +602,8 @@ private fun DarkPreview() {
                     hiddenAppsDetails = MutableStateFlow(emptyList()),
                     hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
                     links = MutableStateFlow(defaultFakeLinks),
+                    selectedServers = MutableStateFlow(SelectedServers()),
+                    servers = MutableStateFlow(emptyList()),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
@@ -570,6 +611,9 @@ private fun DarkPreview() {
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onValueChange = {},
                 )
             }
@@ -593,6 +637,8 @@ private fun TabletPreview() {
                     hiddenAppsDetails = MutableStateFlow(emptyList()),
                     hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
                     links = MutableStateFlow(defaultFakeLinks),
+                    selectedServers = MutableStateFlow(SelectedServers()),
+                    servers = MutableStateFlow(emptyList()),
                     userPreferencesValues = defaultFakeUserPreferences.copy(
                         connectionPermission = Permission.NEVER,
                     ),
@@ -600,6 +646,9 @@ private fun TabletPreview() {
                     onNavigateToBillingScreen = {},
                     onNavigateToLinkScreen = {},
                     onNavigateToServerScreen = {},
+                    onSelectServerGoogleMapsAddress = {},
+                    onSelectServerGoogleMapsPlace = {},
+                    onSelectServerSearch = {},
                     onValueChange = {},
                 )
             }

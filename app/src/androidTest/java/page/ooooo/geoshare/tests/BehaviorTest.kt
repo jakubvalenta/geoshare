@@ -9,7 +9,6 @@ import android.location.provider.ProviderProperties
 import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.core.graphics.scale
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
@@ -524,7 +523,8 @@ fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferenceGroupI
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
     }
 
-    // If we're on the list screen, get the pane. Or if we're on the detail screen, go to the list screen and then get the pane
+    // If we're on the list screen, get the pane. Or if we're on the detail screen, go to the list screen and then get
+    // the pane
     goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }.run {
         quickWaitForStableInActiveWindow() // Wait for the lazy list to render
         scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferencesGroup_${groupId}" }
@@ -883,6 +883,9 @@ fun UiAutomatorTestScope.fillServerForm(server: Server) {
     server.name.takeIf { it.isNotEmpty() }?.let {
         onElement { viewIdResourceName == "geoShareServerFormName" }.setText(it)
     }
+    server.description.takeIf { it.isNotEmpty() }?.let {
+        onElement { viewIdResourceName == "geoShareServerFormDescription" }.setText(it)
+    }
     server.urlTemplate.takeIf { it.isNotEmpty() }?.let {
         onElement { viewIdResourceName == "geoShareServerFormUrlTemplate" }.setText(it)
     }
@@ -927,11 +930,13 @@ fun UiAutomatorTestScope.saveServerForm() {
 }
 
 fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
-    // Go to server list
-    goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
-
     when (testServer) {
         is TestServer.Configured -> {
+            // Go to server list
+            goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+                .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
+
             // Insert a new server
             onElement { viewIdResourceName == "geoShareServerListInsert" }.click()
             fillServerForm(testServer.server)
@@ -944,33 +949,21 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
 
             // Select the server
             onElement { viewIdResourceName == "geoShareServerListPane" }.apply {
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_${testServer.server.name}" }.click()
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsPlace_${testServer.server.name}" }.click()
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_${testServer.server.name}" }.click()
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_${testServer.server.name}" }.click()
             }
         }
 
         is TestServer.None -> {
+            // Go to server preferences
+            goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+
             // Select no server
-            onElement { viewIdResourceName == "geoShareServerListPane" }.apply {
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsAddress_null" }.click()
-                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerListItem_GoogleMapsPlace_null" }.click()
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_null" }.click()
+                scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_null" }.click()
             }
         }
-    }
-}
-
-private fun isKeyboardOpen(): Boolean {
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
-    val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
-    return inputMethodManager.isAcceptingText()
-}
-
-fun UiAutomatorTestScope.hideKeyboard() {
-    if (isKeyboardOpen()) {
-        device.executeShellCommand(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "input keyevent 111"
-        )
     }
 }
 

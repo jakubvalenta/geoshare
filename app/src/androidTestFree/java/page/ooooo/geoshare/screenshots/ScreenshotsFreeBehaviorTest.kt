@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.screenshots
 
+import android.view.inputmethod.InputMethodManager
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
@@ -50,7 +52,6 @@ import page.ooooo.geoshare.tests.goBackToMainForm
 import page.ooooo.geoshare.tests.goToInputList
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.grantSystemPermission
-import page.ooooo.geoshare.tests.hideKeyboard
 import page.ooooo.geoshare.tests.isAppInstalled
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.launchNavigationInApp
@@ -826,6 +827,19 @@ class ScreenshotsFreeBehaviorTest {
         saveScreenshot("main_strings/preferences_connection_permission")
         goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
 
+        // Preferences - Servers - Page 1
+        onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}" }
+            .click()
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/preferences_servers_page_1")
+
+        // Preferences - Servers - Page 2
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scroll(Direction.DOWN, 10f)
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/preferences_servers_page_2")
+        goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
+
         // Preferences - Automation
         onElement { viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.AUTOMATION}" }
             .click()
@@ -929,16 +943,10 @@ class ScreenshotsFreeBehaviorTest {
     fun testServers() = uiAutomator {
         // Servers - List - Page 1
         goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServerEdit" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_list_free_page_1")
-
-        // Servers - List - Page 2
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scroll(Direction.DOWN, 10f)
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerRestoreInitialButton" }
-        saveScreenshot("main_strings/servers_list_free_page_2")
 
         // Servers - Reset dialog
         onElement { viewIdResourceName == "geoShareServerRestoreInitialButton" }.click()
@@ -985,8 +993,7 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Servers - Update
-        onElement { viewIdResourceName == "geoShareServerListItemMenu_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
-        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItem_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
         fillServerForm(
             Server(
                 name = "Google Maps Geocode Address",
@@ -1010,8 +1017,7 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         // Servers - Delete - Dialog
-        onElement { viewIdResourceName == "geoShareServerListItemMenu_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
-        onElement { viewIdResourceName == "geoShareServerListItemMenuDetail_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
+        onElement { viewIdResourceName == "geoShareServerListItem_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
         onElement { viewIdResourceName == "geoShareServerDetailDelete" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_delete_dialog")
@@ -1027,6 +1033,21 @@ class ScreenshotsFreeBehaviorTest {
     private fun UiObject2.collapseSheet() {
         swipe(Direction.DOWN, 1f)
         swipe(Direction.DOWN, 1f)
+    }
+
+    private fun isKeyboardOpen(): Boolean {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
+        return inputMethodManager.isAcceptingText()
+    }
+
+    private fun UiAutomatorTestScope.hideKeyboard() {
+        if (isKeyboardOpen()) {
+            device.executeShellCommand(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "input keyevent 111"
+            )
+        }
     }
 
     private fun UiAutomatorTestScope.scrollToShareItem(): UiObject2 =

@@ -20,7 +20,7 @@ build: | check-env
 
 .PHONY: bundle
 bundle: | check-env
-	./gradlew "bundle$(variant)release" \
+	./gradlew "bundle$(variant)Release" \
 		-Pandroid.injected.signing.store.file="$(STORE_FILE)" \
 		-Pandroid.injected.signing.store.password="$(STORE_PASSWORD)" \
 		-Pandroid.injected.signing.key.alias="$(KEY_ALIAS)" \

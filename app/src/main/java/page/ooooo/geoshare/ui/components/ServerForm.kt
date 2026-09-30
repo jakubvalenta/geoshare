@@ -40,6 +40,7 @@ fun ServerForm(
     challengeUrl: StateFlow<String>,
     loginUrl: StateFlow<String>,
     name: StateFlow<String>,
+    description: StateFlow<String>,
     registerUrl: StateFlow<String>,
     urlTemplate: StateFlow<String>,
     onSaveForm: () -> Unit,
@@ -47,6 +48,7 @@ fun ServerForm(
     onSetApiKeyHeader: (String) -> Unit,
     onSetAuthType: (ServerAuthType) -> Unit,
     onSetChallengeUrl: (String) -> Unit,
+    onSetDescription: (String) -> Unit,
     onSetLoginUrl: (String) -> Unit,
     onSetName: (String) -> Unit,
     onSetRegisterUrl: (String) -> Unit,
@@ -55,26 +57,29 @@ fun ServerForm(
 ) {
     val spacing = LocalSpacing.current
 
-    val name by name.collectAsStateWithLifecycle()
-    val urlTemplate by urlTemplate.collectAsStateWithLifecycle()
-    val authType by authType.collectAsStateWithLifecycle()
     val apiKey by apiKey.collectAsStateWithLifecycle()
     val apiKeyHeader by apiKeyHeader.collectAsStateWithLifecycle()
+    val authType by authType.collectAsStateWithLifecycle()
     val challengeUrl by challengeUrl.collectAsStateWithLifecycle()
+    val description by description.collectAsStateWithLifecycle()
     val loginUrl by loginUrl.collectAsStateWithLifecycle()
+    val name by name.collectAsStateWithLifecycle()
     val registerUrl by registerUrl.collectAsStateWithLifecycle()
-    val item = remember(apiKey, apiKeyHeader, authType, challengeUrl, loginUrl, name, registerUrl, urlTemplate) {
-        Server(
-            name = name,
-            urlTemplate = urlTemplate,
-            authType = authType,
-            apiKey = apiKey,
-            apiKeyHeader = apiKeyHeader,
-            challengeUrl = challengeUrl,
-            loginUrl = loginUrl,
-            registerUrl = registerUrl,
-        )
-    }
+    val urlTemplate by urlTemplate.collectAsStateWithLifecycle()
+    val item =
+        remember(apiKey, apiKeyHeader, authType, challengeUrl, description, loginUrl, name, registerUrl, urlTemplate) {
+            Server(
+                name = name,
+                urlTemplate = urlTemplate,
+                authType = authType,
+                apiKey = apiKey,
+                apiKeyHeader = apiKeyHeader,
+                challengeUrl = challengeUrl,
+                description = description,
+                loginUrl = loginUrl,
+                registerUrl = registerUrl,
+            )
+        }
 
     Column(modifier) {
         TextField(
@@ -88,6 +93,20 @@ fun ServerForm(
                 Text(stringResource(R.string.server_name))
             },
             isError = name.isEmpty(),
+            singleLine = true,
+        )
+        TextField(
+            value = description,
+            onValueChange = onSetDescription,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.windowPadding)
+                .padding(top = spacing.medium)
+                .testTag("geoShareServerFormDescription"),
+            label = {
+                Text(stringResource(R.string.description))
+            },
+            supportingText = { Text(stringResource(R.string.optional)) },
             singleLine = true,
         )
         TextField(
@@ -234,6 +253,7 @@ private fun DefaultPreview() {
                 apiKeyHeader = MutableStateFlow(""),
                 authType = MutableStateFlow(ServerAuthType.ATTESTATION),
                 challengeUrl = MutableStateFlow(""),
+                description = MutableStateFlow(""),
                 loginUrl = MutableStateFlow(""),
                 name = MutableStateFlow(""),
                 registerUrl = MutableStateFlow(""),
@@ -243,6 +263,7 @@ private fun DefaultPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
+                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -262,6 +283,7 @@ private fun DarkPreview() {
                 apiKeyHeader = MutableStateFlow(""),
                 authType = MutableStateFlow(ServerAuthType.ATTESTATION),
                 challengeUrl = MutableStateFlow(""),
+                description = MutableStateFlow(""),
                 loginUrl = MutableStateFlow(""),
                 name = MutableStateFlow(""),
                 registerUrl = MutableStateFlow(""),
@@ -271,6 +293,7 @@ private fun DarkPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
+                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -291,6 +314,7 @@ private fun UpdateApiKeyPreview() {
                 apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
                 authType = MutableStateFlow(item.authType),
                 challengeUrl = MutableStateFlow(item.challengeUrl),
+                description = MutableStateFlow(item.description),
                 loginUrl = MutableStateFlow(item.loginUrl),
                 name = MutableStateFlow(item.name),
                 registerUrl = MutableStateFlow(item.registerUrl),
@@ -300,6 +324,7 @@ private fun UpdateApiKeyPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
+                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -320,6 +345,7 @@ private fun DarkUpdateApiKeyPreview() {
                 apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
                 authType = MutableStateFlow(item.authType),
                 challengeUrl = MutableStateFlow(item.challengeUrl),
+                description = MutableStateFlow(item.description),
                 loginUrl = MutableStateFlow(item.loginUrl),
                 name = MutableStateFlow(item.name),
                 registerUrl = MutableStateFlow(item.registerUrl),
@@ -329,6 +355,7 @@ private fun DarkUpdateApiKeyPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
+                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -349,6 +376,7 @@ private fun UpdateAttestationPreview() {
                 apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
                 authType = MutableStateFlow(item.authType),
                 challengeUrl = MutableStateFlow(item.challengeUrl),
+                description = MutableStateFlow(item.description),
                 loginUrl = MutableStateFlow(item.loginUrl),
                 name = MutableStateFlow(item.name),
                 registerUrl = MutableStateFlow(item.registerUrl),
@@ -358,6 +386,7 @@ private fun UpdateAttestationPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
+                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},
@@ -378,6 +407,7 @@ private fun DarkUpdateExpandedPreview() {
                 apiKeyHeader = MutableStateFlow(item.apiKeyHeader),
                 authType = MutableStateFlow(item.authType),
                 challengeUrl = MutableStateFlow(item.challengeUrl),
+                description = MutableStateFlow(item.description),
                 loginUrl = MutableStateFlow(item.loginUrl),
                 name = MutableStateFlow(item.name),
                 registerUrl = MutableStateFlow(item.registerUrl),
@@ -387,6 +417,7 @@ private fun DarkUpdateExpandedPreview() {
                 onSetApiKeyHeader = {},
                 onSetAuthType = {},
                 onSetChallengeUrl = {},
+                onSetDescription = {},
                 onSetLoginUrl = {},
                 onSetName = {},
                 onSetRegisterUrl = {},

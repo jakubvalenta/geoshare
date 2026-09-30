@@ -25,7 +25,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun UserPreferenceLinksListItem(
+fun UserPreferenceLinkListItem(
     index: Int,
     count: Int,
     links: StateFlow<List<Link>>,
@@ -64,7 +64,7 @@ private fun ListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceLinksListItem(
+                UserPreferenceLinkListItem(
                     index = 0,
                     count = 1,
                     links = MutableStateFlow(defaultFakeLinks),
@@ -82,7 +82,7 @@ private fun DarkListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceLinksListItem(
+                UserPreferenceLinkListItem(
                     index = 0,
                     count = 1,
                     links = MutableStateFlow(defaultFakeLinks),
@@ -100,7 +100,7 @@ private fun EmptyListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceLinksListItem(
+                UserPreferenceLinkListItem(
                     index = 0,
                     count = 1,
                     links = MutableStateFlow(emptyList()),
@@ -118,7 +118,7 @@ private fun DarkEmptyListItemPreview() {
     AppTheme {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
-                UserPreferenceLinksListItem(
+                UserPreferenceLinkListItem(
                     index = 0,
                     count = 1,
                     links = MutableStateFlow(emptyList()),

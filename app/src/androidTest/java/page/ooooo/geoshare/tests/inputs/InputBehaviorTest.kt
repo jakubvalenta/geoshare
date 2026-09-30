@@ -8,5 +8,5 @@ interface InputBehaviorTest {
      * both build variants and all the tested links in one function.
      */
     @Suppress("KotlinConstantConditions", "SimplifyBooleanWithConstants")
-    val htmlParsingSupported get() = BuildConfig.FLAVOR == "free"
+    val htmlParsingSupported get() = BuildConfig.FLAVOR_tier == "free"
 }

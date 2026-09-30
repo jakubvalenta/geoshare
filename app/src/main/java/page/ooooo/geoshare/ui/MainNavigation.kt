@@ -34,7 +34,7 @@ object LinkRoute
 object MainRoute
 
 @Serializable
-object ServerRoute
+data class ServerRoute(val uid: Int? = null)
 
 @Serializable
 data class UserPreferencesRoute(val groupId: UserPreferenceGroupId? = null)
@@ -116,8 +116,10 @@ fun MainNavigation(
                 billingViewModel = billingViewModel,
             )
         }
-        composable<ServerRoute> {
+        composable<ServerRoute> { backStackEntry ->
+            val route: ServerRoute = backStackEntry.toRoute()
             ServerScreen(
+                initialUid = route.uid,
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
             )
         }
@@ -128,7 +130,7 @@ fun MainNavigation(
                 onBack = { if (!navController.popBackStack()) navController.navigate(MainRoute) },
                 onNavigateToBillingScreen = { navController.navigate(BillingRoute) },
                 onNavigateToLinkScreen = { navController.navigate(LinkRoute) },
-                onNavigateToServerScreen = { navController.navigate(ServerRoute) },
+                onNavigateToServerScreen = { uid -> navController.navigate(ServerRoute(uid)) },
                 billingViewModel = billingViewModel,
             )
         }
