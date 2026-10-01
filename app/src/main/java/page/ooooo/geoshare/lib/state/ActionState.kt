@@ -41,7 +41,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 interface ActionState : State<ActionStateContext> {
-    interface HasPermission : State.HasPermission<ActionStateContext>
+    interface HasPermission : State.HasPermission<ActionStateContext> {
+        override suspend fun grant(stateContext: ActionStateContext, doNotAsk: Boolean): ActionState
+        override suspend fun deny(stateContext: ActionStateContext, doNotAsk: Boolean): ActionState
+    }
 
     object Initial : ActionState {
         override fun toString() = "Initial"

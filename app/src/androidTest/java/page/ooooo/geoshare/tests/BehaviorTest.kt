@@ -9,6 +9,7 @@ import android.location.provider.ProviderProperties
 import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.core.graphics.scale
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
@@ -363,9 +364,19 @@ fun UiAutomatorTestScope.waitAndAssertTomTomContainsElement(block: Accessibility
         grantSystemPermission()
     }
 
+    // If there is a "Disable camera warnings" dialog, dismiss it
+    if (
+        onElementOrNull(5_000) {
+            packageName == PackageNames.TOMTOM && textAsString() == "Disable camera warnings"
+        } != null
+    ) {
+        onElement { packageName == PackageNames.TOMTOM && textAsString() == "No" }
+    }
+
     // If there is an "Importing GPX tracks" dialog, confirm it
-    onElementOrNull(5_000) {
-        textAsString() in setOf(
+    onElementOrNull(1_000) {
+        packageName == PackageNames.TOMTOM &&
+            textAsString() in setOf(
             "Got it",
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "J'ai compris",
         )
@@ -925,8 +936,8 @@ fun UiAutomatorTestScope.fillServerForm(server: Server) {
 
 fun UiAutomatorTestScope.saveServerForm() {
     onElement { viewIdResourceName == "geoShareServerDetailPane" }
-        .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerFormSave" }
-        .click()
+        .scroll(Direction.DOWN, 5f) // Scroll by percents, because it's more reliable on Redmi 8
+    onElement { viewIdResourceName == "geoShareServerFormSave" }.click()
 }
 
 fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
@@ -964,6 +975,21 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_null" }.click()
             }
         }
+    }
+}
+
+fun isKeyboardOpen(): Boolean {
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
+    return inputMethodManager.isAcceptingText()
+}
+
+fun UiAutomatorTestScope.hideKeyboard() {
+    if (isKeyboardOpen()) {
+        device.executeShellCommand(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            "input keyevent 111"
+        )
     }
 }
 
