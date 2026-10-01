@@ -177,22 +177,20 @@ class MainBehaviorTest {
     fun whenLinkIsShared_allowsOpeningUriSourceAndDoesNotCancelPendingConversion() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
-        val output = withNetworkOff {
-            // Share a Google Maps place link with the app
-            shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
+        // Share a Google Maps place link with the app
+        shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
-            // Grant connection permission
-            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        // Grant connection permission
+        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
 
-            // Open the source sheet
-            onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
-            val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
-            onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-                .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
-        }
-
-        // Tap an app after enabling network, so that Google Maps work
-        output.click()
+        // Open the source sheet
+        onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
+        val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
+        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+            // Tap an app while the conversion is still running. This is an imperfect test scenario, because there's a
+            // small chance that the conversion finishes before we tap the app.
+            .click()
 
         // Google Maps shows precise location
         waitAndAssertGoogleMapsContainsElement {

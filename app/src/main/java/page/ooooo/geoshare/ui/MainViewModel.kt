@@ -292,6 +292,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun grantAction(doNotAsk: Boolean) {
+        (_actionState.value as? ActionState.HasPermission)?.apply {
+            transitionAction { grant(actionStateContext, doNotAsk) }
+        }
+    }
+
+    fun denyAction(doNotAsk: Boolean) {
+        (_actionState.value as? ActionState.HasPermission)?.apply {
+            transitionAction { deny(actionStateContext, doNotAsk) }
+        }
+    }
+
     fun cancelAction() {
         actionJob?.cancel()
     }
