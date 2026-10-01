@@ -66,7 +66,7 @@ class InitialServersTest : InitialDataTest {
                     ),
                 )
             }
-        }.sortedBy { it.name }
+        }.sortedWith(compareBy<Server>{ it.name }.thenBy { it.description })
         val actualItems = serverDao.getAll()
         Assert.assertEquals(expectedItems.size, actualItems.size)
         for ((expectedItem, actualItem) in expectedItems.zip(actualItems)) {
