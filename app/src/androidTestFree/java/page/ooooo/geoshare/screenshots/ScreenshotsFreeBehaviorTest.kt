@@ -668,7 +668,7 @@ class ScreenshotsFreeBehaviorTest {
         // Supported maps - Recent
         goToUserPreferencesDetail(UserPreferenceGroupId.DEVELOPER_OPTIONS)
         onElement { viewIdResourceName == "geoShareUserPreferenceChangelogShownForVersionCode" }
-            .setText("44")
+            .setText("50")
         goBackToMainForm()
         goToInputList()
         quickWaitForStableInActiveWindow()
@@ -676,12 +676,12 @@ class ScreenshotsFreeBehaviorTest {
 
         // Supported maps - All - Page 1
         onElement { viewIdResourceName == "geoShareInputListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputListAll_${InputGroupId.OSM_AND}" }
+            .scroll(Direction.DOWN, 0.5f)
         saveScreenshot("main_strings/supported_maps_all_page_1")
 
         // Supported maps - All - Page 2
         onElement { viewIdResourceName == "geoShareInputListPane" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareInputListAll_${InputGroupId.GEO_URI}" }
+            .scroll(Direction.DOWN, 5f)
         saveScreenshot("main_strings/supported_maps_all_page_2")
 
         // Supported maps - Detail - Coordinates
