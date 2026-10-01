@@ -31,6 +31,7 @@ import page.ooooo.geoshare.lib.inputs.GoogleNavigationUriInput
 import page.ooooo.geoshare.lib.inputs.GoogleSearchUriInput
 import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
 import page.ooooo.geoshare.lib.inputs.InputGroup
+import page.ooooo.geoshare.lib.inputs.KagiMapsUriInput
 import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
 import page.ooooo.geoshare.lib.inputs.MapsMeUriInput
 import page.ooooo.geoshare.lib.inputs.MapyComShortLinkInput
@@ -69,6 +70,7 @@ object InputRepositoryModule {
         googleMapsUriInput: GoogleMapsUriInput,
         googleNavigationUriInput: GoogleNavigationUriInput,
         googleSearchUriInput: GoogleSearchUriInput,
+        kagiMapsUriInput: KagiMapsUriInput,
         hereWeGoUriInput: HereWeGoUriInput,
         magicEarthUriInput: MagicEarthUriInput,
         mapsMeUriInput: MapsMeUriInput,
@@ -96,6 +98,7 @@ object InputRepositoryModule {
             googleMapsUriInput,
             googleNavigationUriInput,
             googleSearchUriInput,
+            kagiMapsUriInput,
             hereWeGoUriInput,
             magicEarthUriInput,
             mapsMeUriInput,
@@ -207,6 +210,9 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     override val hereWeGoUriInput = HereWeGoUriInput(
+        uriQuote = uriQuote,
+    )
+    override val kagiMapsUriInput = KagiMapsUriInput(
         uriQuote = uriQuote,
     )
     override val magicEarthUriInput = MagicEarthUriInput(

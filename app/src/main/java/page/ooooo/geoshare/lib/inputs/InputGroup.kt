@@ -15,6 +15,7 @@ enum class InputGroupId {
     GEO_URI,
     GOOGLE_MAPS,
     GOOGLE_NAVIGATION_URI,
+    KAGI_MAPS,
     HERE_WEGO,
     MAGIC_EARTH,
     MAPS_ME,
@@ -76,6 +77,12 @@ interface InputGroup {
                 override val id = InputGroupId.GOOGLE_NAVIGATION_URI
                 override fun getName(resources: Resources) =
                     resources.getString(R.string.converter_google_navigation_uri_name)
+            }
+        val KAGI_MAPS =
+            object : InputGroup {
+                override val id = InputGroupId.KAGI_MAPS
+                override fun getName(resources: Resources) =
+                    resources.getString(R.string.input_kagi_maps_name)
             }
         val HERE_WEGO = object : InputGroup {
             override val id = InputGroupId.HERE_WEGO
