@@ -1,2 +1,3 @@
+- Added Kagi Maps support.
 - Fixed the Open original link button by not cancelling current link processing.
 - Improved API servers preferences screen by separating server list.

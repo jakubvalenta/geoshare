@@ -90,7 +90,7 @@ class OpenStreetMapUriInput @Inject constructor(
                     pathParts.getOrNull(2)?.let { id ->
                         next = MatchedInput(
                             openStreetMapApiInput.get(),
-                            "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json",
+                            OpenStreetMapApiInput.formatApiUrlString(type = type, id = id),
                         )
                     }
                 }

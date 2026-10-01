@@ -6422,6 +6422,18 @@
 
                 <data android:scheme="google.navigation" />
             </intent-filter>
+            <!-- Kagi Maps -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="kagi.com"
+                    android:pathPrefix="/maps/"
+                    android:scheme="https" />
+            </intent-filter>
             <!-- Here WeGo -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />

@@ -76,6 +76,7 @@
     <string name="input_google_maps_short_link_name" translatable="false">Google Maps (short link)</string>
     <string name="input_google_maps_web_view_name" translatable="false">Google Maps (WebView)</string>
     <string name="input_google_search_name" translatable="false">Google Search</string>
+    <string name="input_kagi_maps_name">Kagi Maps</string>
     <string name="input_mapy_com_short_link_name" translatable="false">Mapy.com (short link)</string>
     <string name="input_open_street_map_api_name" translatable="false">OpenStreetMap (API)</string>
     <string name="input_urbi_html_name" translatable="false">2GIS / Urbi (HTML)</string>

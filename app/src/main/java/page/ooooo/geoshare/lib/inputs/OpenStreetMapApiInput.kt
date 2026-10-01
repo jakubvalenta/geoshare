@@ -32,4 +32,9 @@ class OpenStreetMapApiInput @Inject constructor(
     }
 
     override fun toString() = "OpenStreetMapApiInput"
+
+    companion object {
+        fun formatApiUrlString(type: String, id: String): String =
+            "https://www.openstreetmap.org/api/0.6/$type/$id${if (type != "node") "/full" else ""}.json"
+    }
 }
