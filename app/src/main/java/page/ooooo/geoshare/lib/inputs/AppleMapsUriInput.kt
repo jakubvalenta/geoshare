@@ -35,7 +35,7 @@ class AppleMapsUriInput @Inject constructor(
 
             // Search or place with name
             // https://maps.apple.com/?q={name}
-            // https://maps.apple.com/place?place-id={id}...&q={name}
+            // https://maps.apple.com/place?place-id={id}&q={name}
             val name = listOf(
                 "name",
                 "address",
@@ -73,10 +73,10 @@ class AppleMapsUriInput @Inject constructor(
             // https://maps.apple/p/{hash}
             if (host == "maps.apple" && pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "p" ||
                 // Place
-                // https://maps.apple.com/place?auid={id}...
+                // https://maps.apple.com/place?auid={id}
                 !queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "auid"].isNullOrEmpty() ||
                 // Place
-                // https://maps.apple.com/place?place-id={id}...
+                // https://maps.apple.com/place?place-id={id}
                 !queryParams["place-id"].isNullOrEmpty()
             ) {
                 next = MatchedInput(appleMapsHtmlInput.get(), match)

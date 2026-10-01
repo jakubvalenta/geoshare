@@ -212,9 +212,6 @@ object FakeInputRepository : InputRepository {
     override val hereWeGoUriInput = HereWeGoUriInput(
         uriQuote = uriQuote,
     )
-    override val kagiMapsUriInput = KagiMapsUriInput(
-        uriQuote = uriQuote,
-    )
     override val magicEarthUriInput = MagicEarthUriInput(
         uriQuote = uriQuote,
     )
@@ -237,6 +234,10 @@ object FakeInputRepository : InputRepository {
     val openStreetMapApiInput = OpenStreetMapApiInput(
         engine = engine,
         log = log,
+        uriQuote = uriQuote,
+    )
+    override val kagiMapsUriInput = KagiMapsUriInput(
+        openStreetMapApiInput = openStreetMapApiInput,
         uriQuote = uriQuote,
     )
     override val osmAndUriInput = OsmAndUriInput(
