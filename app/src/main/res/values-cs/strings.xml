@@ -337,4 +337,8 @@
     <string name="conversion_succeeded_copy_name">Zkopírovat název</string>
     <string name="conversion_automation_copy_name_succeeded">Název byl automaticky zkopírován</string>
     <string name="main_source_open">Otevřít původní odkaz</string>
+    <string name="input_kagi_maps_name">Kagi Maps</string>
+    <string name="optional">Volitelné</string>
+    <string name="description">Popis</string>
+    <string name="user_preferences_server_edit">Upravit servery</string>
 </resources>
