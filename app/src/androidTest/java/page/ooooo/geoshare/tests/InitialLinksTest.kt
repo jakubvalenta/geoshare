@@ -181,6 +181,32 @@ class InitialLinksTest : InitialDataTest {
                 coordsUriTemplate = "https://cartes.gouv.fr/explorer-les-cartes?c={lon},{lat}&z={z}",
                 uuid = UUID.fromString("b0f1715a-6645-4ae6-a4ec-36d6e5f08c34"),
             ),
+            Link(
+                group = "Kagi Maps",
+                name = "Kagi Maps",
+                appEnabled = false,
+                coordsUriTemplate = "https://kagi.com/maps/info?ll={lat},{lon}&z={z}",
+                nameUriTemplate = "https://kagi.com/maps/info?q={q}",
+                uuid = UUID.fromString("7633131d-8485-46ce-8be8-8b05f0928fd8"),
+            ),
+            Link(
+                group = "Kagi Maps",
+                name = "Kagi Maps navigation",
+                type = LinkType.NAVIGATION,
+                appEnabled = false,
+                coordsUriTemplate = "https://kagi.com/maps/directions?q=|{lat},{lon}",
+                nameUriTemplate = "https://kagi.com/maps/directions?q=|{q}",
+                uuid = UUID.fromString("0f327575-c2c9-41e1-9bba-fb4af5e195a7"),
+            ),
+            Link(
+                group = "Kagi Maps",
+                name = "Kagi Maps search",
+                type = LinkType.SEARCH,
+                appEnabled = false,
+                coordsUriTemplate = "https://kagi.com/maps/search?q={q}",
+                nameUriTemplate = "https://kagi.com/maps/search?q={q}",
+                uuid = UUID.fromString("782ec7d5-8962-4a24-9ecb-1fc61418d60e"),
+            ),
         ).sortedBy { it.name }
         val actualItems = linkDao.getAll()
         assertEquals(expectedItems.size, actualItems.size)
