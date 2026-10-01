@@ -317,4 +317,7 @@
     <string name="conversion_succeeded_copy_name">复制名称</string>
     <string name="conversion_automation_copy_name_succeeded">自动复制了名称</string>
     <string name="main_source_open">打开原始链接</string>
+    <string name="optional">可选</string>
+    <string name="description">描述</string>
+    <string name="user_preferences_server_edit">编辑服务器</string>
 </resources>
