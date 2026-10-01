@@ -226,7 +226,7 @@ object InitialLinks : InitialData {
             "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "",
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "KartaView",
+                "KartaView",
                 "WGS84",
                 "STREET_VIEW",
                 0,
@@ -242,7 +242,7 @@ object InitialLinks : InitialData {
             "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "",
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Mapilio",
+                "Mapilio",
                 "WGS84",
                 "STREET_VIEW",
                 0,
@@ -258,7 +258,7 @@ object InitialLinks : InitialData {
             "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             arrayOf<Any>(
                 "",
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Panoramax",
+                "Panoramax",
                 "WGS84",
                 "STREET_VIEW",
                 0,
@@ -398,6 +398,54 @@ object InitialLinks : InitialData {
                 Uuid.parse("782ec7d5-8962-4a24-9ecb-1fc61418d60e").toByteArray(),
             )
         )
+        db.execSQL(
+            "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Cartes.app",
+                "Cartes.app",
+                "WGS84",
+                "DISPLAY",
+                0,
+                0,
+                0,
+                "https://cartes.app/?perspective=non&clic={lat}%7C{lon}#{z}/{lat}/{lon}",
+                "https://cartes.app/?q={q}",
+                1790865562966,
+                Uuid.parse("4d7b8012-7f0e-478a-9858-634dc4009a58").toByteArray(),
+            )
+        )
+        db.execSQL(
+            "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Cartes.app",
+                "Cartes.app navigation",
+                "WGS84",
+                "NAVIGATION",
+                0,
+                0,
+                0,
+                "https://cartes.app/?perspective=non&clic={lat}%7C{lon}&allez=-%3EPoint+sur+la+carte%7C%7C{lon}%7C{lat}#{z}/{lat}/{lon}",
+                "",
+                1790865562966,
+                Uuid.parse("06c9c666-0f65-4a42-b571-de5c1b6b0f13").toByteArray(),
+            )
+        )
+        db.execSQL(
+            "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Cartes.app",
+                "Cartes.app search",
+                "WGS84",
+                "SEARCH",
+                0,
+                0,
+                0,
+                "https://cartes.app/?q={lat},{lon}",
+                "https://cartes.app/?q={q}",
+                1790865562966,
+                Uuid.parse("54ac6017-4988-40a5-86fe-63aac862fb20").toByteArray(),
+            )
+        )
     }
 
     override val migrations = arrayOf(
@@ -423,7 +471,7 @@ object InitialLinks : InitialData {
                     "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "KartaView",
+                        "KartaView",
                         "WGS84",
                         "STREET_VIEW",
                         0,
@@ -439,7 +487,7 @@ object InitialLinks : InitialData {
                     "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Mapilio",
+                        "Mapilio",
                         "WGS84",
                         "STREET_VIEW",
                         0,
@@ -455,7 +503,7 @@ object InitialLinks : InitialData {
                     "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     arrayOf<Any>(
                         "",
-                        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Panoramax",
+                        "Panoramax",
                         "WGS84",
                         "STREET_VIEW",
                         0,
@@ -681,6 +729,54 @@ object InitialLinks : InitialData {
                         "https://kagi.com/maps/search?q={q}",
                         1790865562966,
                         Uuid.parse("782ec7d5-8962-4a24-9ecb-1fc61418d60e").toByteArray(),
+                    )
+                )
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Cartes.app",
+                        "Cartes.app",
+                        "WGS84",
+                        "DISPLAY",
+                        0,
+                        0,
+                        0,
+                        "https://cartes.app/?perspective=non&clic={lat}%7C{lon}#{z}/{lat}/{lon}",
+                        "https://cartes.app/?q={q}",
+                        1790865562966,
+                        Uuid.parse("4d7b8012-7f0e-478a-9858-634dc4009a58").toByteArray(),
+                    )
+                )
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Cartes.app",
+                        "Cartes.app navigation",
+                        "WGS84",
+                        "NAVIGATION",
+                        0,
+                        0,
+                        0,
+                        "https://cartes.app/?perspective=non&clic={lat}%7C{lon}&allez=-%3EPoint+sur+la+carte%7C%7C{lon}%7C{lat}#{z}/{lat}/{lon}",
+                        "",
+                        1790865562966,
+                        Uuid.parse("06c9c666-0f65-4a42-b571-de5c1b6b0f13").toByteArray(),
+                    )
+                )
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Cartes.app",
+                        "Cartes.app search",
+                        "WGS84",
+                        "SEARCH",
+                        0,
+                        0,
+                        0,
+                        "https://cartes.app/?q={lat},{lon}",
+                        "https://cartes.app/?q={q}",
+                        1790865562966,
+                        Uuid.parse("54ac6017-4988-40a5-86fe-63aac862fb20").toByteArray(),
                     )
                 )
             }
