@@ -34,8 +34,9 @@ class KagiMapsUriInput @Inject constructor(
         data.run {
             // Query
             // https://kagi.com/maps/info?q={q}
-            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()?.trim()
-                ?.takeIf { it.isNotEmpty() }
+            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()?.let { q ->
+                q.trim().takeIf { it.isNotEmpty() }
+            }
 
             // Map center from fragment (contains zoom)
             // https://kagi.com/maps/info#{z}/{lat}/{lon}
@@ -66,7 +67,7 @@ class KagiMapsUriInput @Inject constructor(
                 // https://kagi.com/maps/info?id=n{osmId}
                 // https://kagi.com/maps/info?id=r{osmId}
                 // https://kagi.com/maps/info?id=w{osmId}
-                Regex("""([nrw])(\d+)""").matchEntire(id)?.let { m ->
+                Regex("""([a-z])(\d+)""").matchEntire(id)?.let { m ->
                     val prefix = m.groupOrNull(1)
                     val osmId = m.groupOrNull(2)
                     val type = when(prefix) {
@@ -92,23 +93,25 @@ class KagiMapsUriInput @Inject constructor(
             // Directions
             // https://kagi.com/maps/directions?q={point1Name}~{point1Lat}%2C{point1Lon}|{point2Lat}%2C{point2Lon}|...
             if (pathParts.getOrNull(2) == "directions") {
-                queryParams["q"]
-                    ?.split('|')
-                    ?.filter { it.isNotBlank() }
-                    ?.map { pointStr ->
-                        val nameAndCoordinates = pointStr.split('~', limit = 2)
-                        val name = nameAndCoordinates.firstOrNull()
-                        val coordinates = nameAndCoordinates.lastOrNull()
-                        // Notice that name and coordinates can be the same list element
-                        LAT_LON_PATTERN.matchEntire(coordinates)?.toLatLonPoint(Source.URI)?.let {
-                            WGS84Point(it, z = z, name = name.takeIf { name -> name != coordinates })
-                        } ?: WGS84Point(name = name, source = Source.URI)
-                    }
-                    ?.toImmutableList()
-                    ?.let {
-                        points = it
-                        return@parseResult
-                    }
+                queryParams["q"]?.let { q ->
+                    q
+                        .split('|')
+                        .filter { it.isNotBlank() }
+                        .map { pointStr ->
+                            val nameAndCoordinates = pointStr.split('~', limit = 2)
+                            val name = nameAndCoordinates.firstOrNull()
+                            val coordinates = nameAndCoordinates.lastOrNull()
+                            // Notice that name and coordinates can be the same list element
+                            LAT_LON_PATTERN.matchEntire(coordinates)?.toLatLonPoint(Source.URI)?.let {
+                                WGS84Point(it, z = z, name = name.takeIf { name -> name != coordinates })
+                            } ?: WGS84Point(name = name, source = Source.URI)
+                        }
+                        .toImmutableList()
+                        .let {
+                            points = it
+                            return@parseResult
+                        }
+                }
             }
 
             if (center != null) {

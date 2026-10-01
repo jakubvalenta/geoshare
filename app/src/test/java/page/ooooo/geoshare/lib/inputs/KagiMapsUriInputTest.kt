@@ -90,6 +90,18 @@ class KagiMapsUriInputTest : InputTest {
     }
 
     @Test
+    fun parse_coordinatesInvalid() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(53.205291,5.783568, z = 17.5, name = "Shared Point", source = Source.MAP_CENTER)
+                )
+            ),
+            input.parse("https://kagi.com/maps/info?q=Shared%20Point&ll=53.205291,5.783568&id=point_spam_spam#17.5/53.205291/5.783568"),
+        )
+    }
+
+    @Test
     fun parse_placeOpenStreetMapName() = runTest {
         assertEquals(
             ParseResult.Success(
@@ -140,6 +152,33 @@ class KagiMapsUriInputTest : InputTest {
                 next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/way/448058512"),
             ),
             input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
+        )
+    }
+
+    @Test
+    fun parse_placeOpenStreetMapInvalid() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        22.275900068060622, 114.14579272270203,
+                        z = 19.0,
+                        name = "Victoria Peak Station HK Telecom Radio Station",
+                        source = Source.MAP_CENTER,
+                    ),
+                )
+            ),
+            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=x448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
+        )
+    }
+
+    @Test
+    fun parse_placeOpenStreetMapNoCenter() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/way/448058512"),
+            ),
+            input.parse(uriString = "https://kagi.com/maps/info?z=19&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station"),
         )
     }
 
@@ -295,6 +334,18 @@ class KagiMapsUriInputTest : InputTest {
     }
 
     @Test
+    fun parseDirectionsInvalidCoordinates() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(name = "Forbidden City, China", source = Source.URI)
+                )
+            ),
+            input.parse("https://kagi.com/maps/directions?provider=all&mode=traffic&q=Forbidden%20City,%20China~spam#15.92/39.909553/116.387608")
+        )
+    }
+
+    @Test
     fun parseDirectionsNamesOnly() = runTest {
         assertEquals(
             ParseResult.Success(
@@ -328,6 +379,16 @@ class KagiMapsUriInputTest : InputTest {
                 )
             ),
             input.parse("https://kagi.com/maps/directions?q=%20|foo")
+        )
+    }
+
+    @Test
+    fun parseZoomInvalid() = runTest {
+        assertEquals(
+            ParseResult.Success(persistentListOf(
+                WGS84Point(53.205291,5.783568, source = Source.MAP_CENTER)
+            )),
+            input.parse("https://kagi.com/maps/directions?z=spam&ll=53.205291,5.783568")
         )
     }
 }
