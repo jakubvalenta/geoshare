@@ -5,6 +5,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
@@ -33,20 +34,30 @@ class KagiMapsUriInput @Inject constructor(
         data.run {
             // Query
             // https://kagi.com/maps/info?q={q}
-            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
+            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()?.trim()
+                ?.takeIf { it.isNotEmpty() }
 
-            // Map center
-            // https://kagi.com/maps/info?ll={lat}%2C{lon}
+            // Map center from fragment (contains zoom)
             // https://kagi.com/maps/info#{z}/{lat}/{lon}
-            val center = Regex("""$Z/$LAT/$LON""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)
-                ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])?.toLatLonPoint(Source.MAP_CENTER)
-            val z = center?.z
+            val centerFromFragment = Regex("""$Z/$LAT/$LON""").matchEntire(fragment)
+                ?.toZLatLonPoint(Source.MAP_CENTER)
+
+            // Zoom (takes precedence over map center zoom)
+            // https://kagi.com/maps/info?z={z}
+            val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull() ?: centerFromFragment?.z
+
+            // Map center from query parameter (takes precedence over center from fragment)
+            // https://kagi.com/maps/info?ll={lat}%2C{lon}
+            val centerFromQueryParam = LAT_LON_PATTERN.matchEntire(queryParams["ll"])
+                ?.toLatLonPoint(Source.MAP_CENTER)
+            val center = centerFromQueryParam ?: centerFromFragment
 
             queryParams["id"]?.let { id ->
                 // Coordinates
                 // https://kagi.com/maps/info?id=point_{lat}_{lon}
                 Regex("""point_${LAT}_${LON}""").matchEntire(id)
-                    ?.toLatLonPoint(source = Source.URI)?.let {
+                    ?.toLatLonPoint(source = Source.URI)
+                    ?.let {
                         points = persistentListOf(WGS84Point(it, z = z, name = name))
                         return@parseResult
                     }
@@ -67,7 +78,7 @@ class KagiMapsUriInput @Inject constructor(
                     if (type != null) {
                         if (center != null) {
                             // Use center as fallback if the user later denies OpenStreetMap API permission
-                            points = persistentListOf(WGS84Point(center, name = name))
+                            points = persistentListOf(WGS84Point(center, z = z, name = name))
                         }
                         next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/$type/$osmId")
                         return@parseResult
@@ -80,12 +91,12 @@ class KagiMapsUriInput @Inject constructor(
 
             // Directions
             // https://kagi.com/maps/directions?q={point1Name}~{point1Lat}%2C{point1Lon}|{point2Lat}%2C{point2Lon}|...
-            if (pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "directions") {
+            if (pathParts.getOrNull(2) == "directions") {
                 queryParams["q"]
-                    ?.takeIf { it.isNotBlank() }
                     ?.split('|')
+                    ?.filter { it.isNotBlank() }
                     ?.map { pointStr ->
-                        val nameAndCoordinates = pointStr.split('~', limit = 1)
+                        val nameAndCoordinates = pointStr.split('~', limit = 2)
                         val name = nameAndCoordinates.firstOrNull()
                         val coordinates = nameAndCoordinates.lastOrNull()
                         // Notice that name and coordinates can be the same list element
@@ -101,7 +112,7 @@ class KagiMapsUriInput @Inject constructor(
             }
 
             if (center != null) {
-                points = persistentListOf(WGS84Point(center, name = name))
+                points = persistentListOf(WGS84Point(center, z = z, name = name))
             } else if (name != null) {
                 points = persistentListOf(WGS84Point(name = name, source = Source.URI))
             }
