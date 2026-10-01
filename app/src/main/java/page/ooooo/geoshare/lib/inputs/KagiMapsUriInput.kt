@@ -68,21 +68,23 @@ class KagiMapsUriInput @Inject constructor(
                 // https://kagi.com/maps/info?id=r{osmId}
                 // https://kagi.com/maps/info?id=w{osmId}
                 Regex("""([a-z])(\d+)""").matchEntire(id)?.let { m ->
-                    val prefix = m.groupOrNull(1)
-                    val osmId = m.groupOrNull(2)
-                    val type = when(prefix) {
-                        "n" -> "node"
-                        "r" -> "relation"
-                        "w" -> "way"
-                        else -> null
-                    }
-                    if (type != null) {
-                        if (center != null) {
-                            // Use center as fallback if the user later denies OpenStreetMap API permission
-                            points = persistentListOf(WGS84Point(center, z = z, name = name))
+                    m.groupOrNull(2)?.let { id ->
+                        m.groupOrNull(1).let { prefix ->
+                            when (prefix) {
+                                "n" -> "node"
+                                "r" -> "relation"
+                                "w" -> "way"
+                                else -> null
+                            }?.let { type ->
+                                // TODO Fallback to map center
+                                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
+                                next = MatchedInput(
+                                    openStreetMapApiInput,
+                                    OpenStreetMapApiInput.formatApiUrlString(type = type, id = id),
+                                )
+                                return@parseResult
+                            }
                         }
-                        next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/$type/$osmId")
-                        return@parseResult
                     }
                 }
 
