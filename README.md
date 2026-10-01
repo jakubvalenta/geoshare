@@ -32,6 +32,7 @@ map app.
 - Cartes IGN
 - CoMaps
 - HERE WeGo
+- Kagi Maps
 - Magic Earth
 - Maps.me
 - Mapy.com
