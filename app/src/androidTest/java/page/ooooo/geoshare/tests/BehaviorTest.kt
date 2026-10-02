@@ -529,8 +529,9 @@ fun UiAutomatorTestScope.goToInputList() {
 
 fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferenceGroupId) {
     // If we're on the main screen, use the main menu
-    onElementOrNull(1_000) { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
+    onElementOrNull { viewIdResourceName == "geoShareMainMenuButton" }?.let { mainMenu ->
         mainMenu.click()
+        quickWaitForStableInActiveWindow() // Wait for the menu to open on managed device
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
     }
 
@@ -544,7 +545,7 @@ fun UiAutomatorTestScope.goToUserPreferencesDetail(groupId: UserPreferenceGroupI
 }
 
 fun UiAutomatorTestScope.goBackToElement(
-    timeoutMs: Long = 1_000,
+    timeoutMs: Long = 3_000,
     block: AccessibilityNodeInfo.() -> Boolean,
 ): UiObject2 {
     repeat(4) {

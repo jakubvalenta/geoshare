@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.screenshots
 
-import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.onElement
-import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -10,8 +8,10 @@ import org.junit.BeforeClass
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
+import page.ooooo.geoshare.tests.configureServer
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.enableDarkMode
@@ -65,21 +65,7 @@ class ScreenshotsProBehaviorTest {
     }
 
     fun testConversion() = uiAutomator {
-        // Configure server (don't use helper method, because it fails on a managed device for some reason)
-        onElement(1_000) { viewIdResourceName == "geoShareMainMenuButton" }.let { mainMenu ->
-            mainMenu.click()
-            onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
-        }
-        quickWaitForStableInActiveWindow() // Wait for the lazy list to render
-        onElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareUserPreferencesGroup_${UserPreferenceGroupId.SERVERS}"
-            }
-            .click()
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
-            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_null" }.click()
-            scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_null" }.click()
-        }
+        configureServer(TestServer.None)
 
         // Conversion - Error - Unsupported source place list
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
