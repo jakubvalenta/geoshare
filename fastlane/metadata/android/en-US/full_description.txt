@@ -13,6 +13,7 @@ Share a map link with GeoShare and the app will open it in another installed map
 - Yahoo! Maps
 - Kagi Maps
 - Magic Earth
+- MapQuest
 - Maps.me
 - Mapy.com
 - OpenStreetMap

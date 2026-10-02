@@ -34,6 +34,7 @@ map app.
 - HERE WeGo
 - Kagi Maps
 - Magic Earth
+- MapQuest
 - Maps.me
 - Mapy.com
 - OpenStreetMap

@@ -19,9 +19,9 @@ class AppleMapsHtmlInputTest : InputTest {
     fun parse_success() = runTest {
         assertEquals(
             ParseResult.Success(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML))),
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             input.parse(
-                """<html>
+                // language=html
+                """<html lang="en">
 <head>
   <title>Tempelhofer Feld</title>
   <meta property="place:location:latitude" content="52.4735927" />

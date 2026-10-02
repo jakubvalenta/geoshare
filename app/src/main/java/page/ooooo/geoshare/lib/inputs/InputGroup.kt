@@ -20,6 +20,7 @@ enum class InputGroupId {
     MAGIC_EARTH,
     MAPS_ME,
     MAPY_COM,
+    MAP_QUEST,
     OPEN_STREET_MAP,
     OSM_AND,
     PLUS_CODE,
@@ -104,6 +105,11 @@ interface InputGroup {
             override val id = InputGroupId.MAPY_COM
             override fun getName(resources: Resources) =
                 resources.getString(R.string.converter_mapy_com_name)
+        }
+        val MAP_QUEST = object : InputGroup {
+            override val id = InputGroupId.MAP_QUEST
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.input_map_quest_name)
         }
         val OPEN_STREET_MAP = object : InputGroup {
             override val id = InputGroupId.OPEN_STREET_MAP

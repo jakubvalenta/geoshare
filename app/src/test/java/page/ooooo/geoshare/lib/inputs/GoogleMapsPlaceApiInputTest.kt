@@ -37,7 +37,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
             server.getUrl(placeId, uriQuote) -> respond(
-                // language=Json
+                // language=json
                 """
                     {
                         "place": "//places.googleapis.com/places/foo",
@@ -48,13 +48,13 @@ class GoogleMapsPlaceApiInputTest : InputTest {
             )
 
             server.getUrl("empty-object", uriQuote) -> respond(
-                // language=Json
+                // language=json
                 """{}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
             server.getUrl("invalid", uriQuote) -> respond(
-                // language=Json
+                // language=json
                 """{"location": "invalid"}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
