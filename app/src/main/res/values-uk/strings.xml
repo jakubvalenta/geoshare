@@ -338,4 +338,8 @@
     <string name="main_source_open">Відкрити оригінальне посилання</string>
     <string name="conversion_automation_copy_name_succeeded">Автоматично скопійована назва</string>
     <string name="faq_open_by_default_headline">Як завжди відкривати посилання в %1$s</string>
+    <string name="input_kagi_maps_name">Kagi Maps</string>
+    <string name="optional">Необов’язково</string>
+    <string name="description">Опис</string>
+    <string name="user_preferences_server_edit">Редагувати сервери</string>
 </resources>
