@@ -5,16 +5,12 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.Test
-import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.assumeNotEmulator
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.testUriFails
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
     @Test
@@ -22,11 +18,6 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
-
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
 
         if (htmlParsingSupported) {
             // Fails on physical Nexus 5 for some reason
@@ -41,6 +32,7 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
                 ),
                 "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
                 fallbackNames = setOf("السيرك القومى بالجيزة\u202D"),
+                grantConnectionPermission = true,
             )
         } else {
             testUriFails(
@@ -49,6 +41,7 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Ce lien n’est pas pris en charge",
                 ),
                 "https://maps.google.com/maps?client=firefox-b-m&um=1&ie=UTF-8&fb=1&gl=eg&sa=X&ftid=0x1458411f8f55adbb:0xbc693e01227e010d",
+                grantConnectionPermission = true,
             )
         }
     }
@@ -61,15 +54,11 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
             false,
         )
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         // Google Search
         testUri(
             WGS84Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
             "https://g.co/kgs/91UYXud",
+            grantConnectionPermission = true,
         )
     }
 }

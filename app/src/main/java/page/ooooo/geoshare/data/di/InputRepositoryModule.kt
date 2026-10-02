@@ -44,6 +44,7 @@ import page.ooooo.geoshare.lib.inputs.UrbiHtmlInput
 import page.ooooo.geoshare.lib.inputs.UrbiUriInput
 import page.ooooo.geoshare.lib.inputs.WazeHtmlInput
 import page.ooooo.geoshare.lib.inputs.WazeUriInput
+import page.ooooo.geoshare.lib.inputs.YahooMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.YahooMapsUriInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsShortLinkInput
@@ -82,6 +83,7 @@ object InputRepositoryModule {
         plusCodeInput: PlusCodeInput,
         urbiUriInput: UrbiUriInput,
         wazeUriInput: WazeUriInput,
+        yahooMapsShortLinkInput: YahooMapsShortLinkInput,
         yahooMapsUriInput: YahooMapsUriInput,
         yandexMapsShortLinkInput: YandexMapsShortLinkInput,
         yandexMapsUriInput: YandexMapsUriInput,
@@ -111,6 +113,7 @@ object InputRepositoryModule {
             plusCodeInput,
             urbiUriInput,
             wazeUriInput,
+            yahooMapsShortLinkInput,
             yahooMapsUriInput,
             yandexMapsShortLinkInput,
             yandexMapsUriInput,
@@ -262,6 +265,12 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote
     )
     val wazeHtmlInput = WazeHtmlInput(
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val yahooMapsShortLinkInput = YahooMapsShortLinkInput(
+        yahooMapsUriInput = { yahooMapsUriInput },
         engine = engine,
         log = log,
         uriQuote = uriQuote,

@@ -82,6 +82,7 @@
     <string name="input_urbi_html_name" translatable="false">2GIS / Urbi (HTML)</string>
     <string name="input_waze_html_name" translatable="false">Waze (HTML)</string>
     <string name="input_yahoo_maps_name">Yahoo! Maps</string>
+    <string name="input_yahoo_maps_short_link_name" translatable="false">Yahoo! Maps (short link)</string>
     <string name="input_yandex_html_name" translatable="false">Yandex (HTML)</string>
     <string name="input_yandex_short_link_name" translatable="false">Yandex (short link)</string>
     <string name="main_source_open">Open original link</string>

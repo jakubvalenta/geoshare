@@ -2,9 +2,11 @@ package page.ooooo.geoshare.tests.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.testUri
 
 class YahooMapsInputBehaviorTest : InputBehaviorTest {
@@ -47,6 +49,22 @@ class YahooMapsInputBehaviorTest : InputBehaviorTest {
                 ),
             ),
             "https://map.yahoo.co.jp/route/walk?from=%E4%BA%AC%E9%83%BD%E5%BA%9C%E4%BA%AC%E9%83%BD%E5%B8%82%E5%8C%97%E5%8C%BA%E5%B0%8F%E5%B1%B1%E4%B8%8A%E7%B7%8F%E7%94%BA&to=%E4%BA%AC%E9%83%BD%E5%BA%9C%E4%BA%AC%E9%83%BD%E5%B8%82%E4%B8%AD%E4%BA%AC%E5%8C%BA%E8%99%8E%E5%B1%8B%E7%94%BA&fromLat=35.04361&fromLon=135.75926&toLat=35.01084&toLon=135.75962&waypoints=name%3A%E4%BA%AC%E9%83%BD%E5%BA%9C%E4%BA%AC%E9%83%BD%E5%B8%82%E4%B8%8A%E4%BA%AC%E5%8C%BA%E9%9D%A9%E5%A0%82%E5%86%85%E7%94%BA%2Clat%3A35.02924%2Clon%3A135.76683%3Bname%3A%E4%BA%AC%E9%83%BD%E5%BA%9C%E4%BA%AC%E9%83%BD%E5%B8%82%E4%B8%AD%E4%BA%AC%E5%8C%BA%E4%B8%8B%E5%BE%A1%E9%9C%8A%E5%89%8D%E7%94%BA%2Clat%3A35.01749%2Clon%3A135.76726%3B&sort=1&lat=35.02766&lon=135.76411&zoom=14&maptype=basic",
+        )
+    }
+
+    @Test
+    fun yahooMaps_online() = uiAutomator {
+        runBlocking {
+            assumeDomainResolvable("yahoo.jp")
+        }
+
+        // Short link
+        testUri(
+            persistentListOf(
+                WGS84Point(35.69548, 139.77065, z = 17.0, source = Source.MAP_CENTER)
+            ),
+            "https://yahoo.jp/qDc2x2", // Resolves to https://map.yahoo.co.jp/place?gid=MBd0PFPhR-Y&lat=35.69548&lon=139.77065&zoom=17&maptype=basic
+            grantConnectionPermission = true,
         )
     }
 }

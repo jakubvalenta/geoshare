@@ -3,12 +3,10 @@ package page.ooooo.geoshare.tests.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.assumeDomainResolvable
+import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
@@ -56,15 +54,11 @@ class WazeInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("waze.com")
         }
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         // Place id
         testUri(
             WGS84Point(52.000425474, 4.372739102, source = Source.JAVASCRIPT),
             "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020",
+            grantConnectionPermission = true,
         )
     }
 }

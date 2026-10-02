@@ -3,14 +3,10 @@ package page.ooooo.geoshare.tests.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.testUri
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class UrbiInputBehaviorTest : InputBehaviorTest {
     @Test
@@ -28,11 +24,6 @@ class UrbiInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("go.2gis.com")
         }
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         // Short link
         testUri(
             WGS84Point(
@@ -42,6 +33,7 @@ class UrbiInputBehaviorTest : InputBehaviorTest {
                 source = Source.MAP_CENTER,
             ),
             "https://go.2gis.com/WSTdK",
+            grantConnectionPermission = true,
         )
     }
 }

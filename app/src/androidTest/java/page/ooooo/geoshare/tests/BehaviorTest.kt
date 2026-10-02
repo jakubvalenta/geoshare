@@ -39,7 +39,6 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.local.database.Server
 import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
@@ -397,9 +396,22 @@ fun UiAutomatorTestScope.shareUri(point: WGS84Point) {
     shareUri(GeoUriFormatter.formatGeoUriString(point, flavor = GeoUriFlavor.Best))
 }
 
-fun UiAutomatorTestScope.configureConnectionPermissionPreference(permission: Permission) {
-    goToUserPreferencesDetail(UserPreferenceGroupId.CONNECTION_PERMISSION)
-    onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_$permission" }.click()
+fun UiAutomatorTestScope.grantConnectionPermission(timeoutMs: Long = 20_000, doNotAsk: Boolean = false) {
+    onElement(timeoutMs) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
+        if (doNotAsk) {
+            toggleDoNotAsk()
+        }
+        confirmDialog()
+    }
+}
+
+fun UiAutomatorTestScope.denyConnectionPermission(timeoutMs: Long = 20_000, doNotAsk: Boolean = false) {
+    onElement(timeoutMs) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
+        if (doNotAsk) {
+            toggleDoNotAsk()
+        }
+        dismissDialog()
+    }
 }
 
 fun UiAutomatorTestScope.testUri(
@@ -407,9 +419,13 @@ fun UiAutomatorTestScope.testUri(
     unsafeUriString: String,
     fallbackNames: Set<String> = emptySet(),
     accurate: Boolean? = null,
+    grantConnectionPermission: Boolean = false,
     timeoutMs: Long = NETWORK_TIMEOUT,
 ) {
     shareUri(unsafeUriString)
+    if (grantConnectionPermission) {
+        grantConnectionPermission()
+    }
     quickWaitForStableInActiveWindow() // Wait for the result to render, because there might be the old result
     assertConversionSucceeds(expectedPoints, fallbackNames, accurate, timeoutMs)
 }
@@ -419,15 +435,27 @@ fun UiAutomatorTestScope.testUri(
     unsafeUriString: String,
     fallbackNames: Set<String> = emptySet(),
     accurate: Boolean? = null,
+    grantConnectionPermission: Boolean = false,
     timeoutMs: Long = NETWORK_TIMEOUT,
-) = testUri(persistentListOf(expectedPoint), unsafeUriString, fallbackNames, accurate, timeoutMs)
+) = testUri(
+    expectedPoints = persistentListOf(expectedPoint),
+    unsafeUriString = unsafeUriString,
+    fallbackNames = fallbackNames,
+    accurate = accurate,
+    grantConnectionPermission = grantConnectionPermission,
+    timeoutMs = timeoutMs,
+)
 
 fun UiAutomatorTestScope.testUriFails(
     expectedMessage: Set<String>,
     unsafeUriString: String,
+    grantConnectionPermission: Boolean = false,
     timeoutMs: Long = NETWORK_TIMEOUT,
 ) {
     shareUri(unsafeUriString)
+    if (grantConnectionPermission) {
+        grantConnectionPermission()
+    }
     quickWaitForStableInActiveWindow() // Wait for the result to render, because there might be the old result
     assertConversionFails(expectedMessage, timeoutMs)
 }

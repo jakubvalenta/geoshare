@@ -3,12 +3,10 @@ package page.ooooo.geoshare.tests.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.assumeDomainResolvable
+import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
@@ -61,25 +59,23 @@ class AppleMapsInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("maps.apple.com")
         }
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         // Place id
         testUri(
             WGS84Point(52.4735927, 13.4050798, source = Source.HTML),
             "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902",
+            grantConnectionPermission = true,
         )
         testUri(
             WGS84Point(52.4618234, 13.4010092, source = Source.HTML),
             "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618",
+            grantConnectionPermission = true,
         )
 
         // Short link
         testUri(
             WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
             "https://maps.apple/p/7E-Brjrk_THN14",
+            grantConnectionPermission = true,
         )
     }
 }

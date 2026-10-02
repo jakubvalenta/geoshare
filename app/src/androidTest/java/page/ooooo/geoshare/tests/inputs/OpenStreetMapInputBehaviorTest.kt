@@ -4,14 +4,10 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.testUri
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
     @Test
@@ -47,15 +43,11 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("www.openstreetmap.org")
         }
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         // Node
         testUri(
             WGS84Point(45.4771659, 9.2297918, source = Source.API),
             "https://www.openstreetmap.org/node/6284640534",
+            grantConnectionPermission = true,
         )
 
         // Relation
@@ -92,6 +84,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
                 WGS84Point(45.4775140, 9.2297036, source = Source.API),
             ),
             "https://www.openstreetmap.org/relation/910699",
+            grantConnectionPermission = true,
         )
 
         // Way
@@ -103,6 +96,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
                 WGS84Point(45.4772950, 9.2296354, source = Source.API),
             ),
             "https://www.openstreetmap.org/way/596674456",
+            grantConnectionPermission = true,
         )
     }
 }

@@ -13,13 +13,14 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.TestServerParams
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.tests.configureServer
 import page.ooooo.geoshare.tests.getAndAssumeTestServer
+import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.testUriFails
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
+import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 @RunWith(Parameterized::class)
 class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestServerParams) : InputBehaviorTest {
@@ -68,7 +69,12 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
         // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
+
+        // Configure connection permission to speed up subsequent tests by skipping the connection permission dialog
+        goToUserPreferencesDetail(UserPreferenceGroupId.CONNECTION_PERMISSION)
+        onElement { viewIdResourceName == "geoShareUserPreferenceConnectionPermission_${Permission.ALWAYS}" }.click()
+
+        // Configure server
         configureServer(testServer)
 
         // Search
