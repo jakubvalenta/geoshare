@@ -258,7 +258,7 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     override val kagiMapsUriInput = KagiMapsUriInput(
-        openStreetMapApiInput = openStreetMapApiInput,
+        openStreetMapApiInput = { openStreetMapApiInput },
         uriQuote = uriQuote,
     )
     override val osmAndUriInput = OsmAndUriInput(

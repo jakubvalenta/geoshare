@@ -19,7 +19,7 @@ import javax.inject.Singleton
 
 @Singleton
 class KagiMapsUriInput @Inject constructor(
-    val openStreetMapApiInput: OpenStreetMapApiInput,
+    val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
@@ -79,7 +79,7 @@ class KagiMapsUriInput @Inject constructor(
                                 // TODO Fallback to map center
                                 points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
                                 next = MatchedInput(
-                                    openStreetMapApiInput,
+                                    openStreetMapApiInput.get(),
                                     OpenStreetMapApiInput.formatApiUrlString(type = type, id = id),
                                 )
                                 return@parseResult
