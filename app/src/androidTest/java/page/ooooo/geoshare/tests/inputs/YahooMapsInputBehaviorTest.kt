@@ -10,10 +10,10 @@ import page.ooooo.geoshare.tests.testUri
 class YahooMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     fun yahooMaps_offline() = uiAutomator {
-        // Place
+        // Place with id
         testUri(
             persistentListOf(
-                WGS84Point(35.04000, 135.72805, z = 17.0, source = Source.URI)
+                WGS84Point(35.04000, 135.72805, z = 17.0, source = Source.MAP_CENTER)
             ),
             "https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic",
         )

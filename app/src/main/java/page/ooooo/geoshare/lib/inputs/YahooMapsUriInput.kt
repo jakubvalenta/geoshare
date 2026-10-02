@@ -39,23 +39,36 @@ class YahooMapsUriInput @Inject constructor(
                 q.trim().takeIf { it.isNotEmpty() }
             }
 
-            // Coordinates
+            // Map center
             // https://map.yahoo.co.jp/?lat={lat}&lon={lot}
-            val lat = LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()
-            val lon = LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()
+            val center = LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
+                    WGS84Point(lat, lon, z, name, source = Source.MAP_CENTER)
+                }
+            }
 
             when (pathParts.getOrNull(1)) {
                 // Place
-                // https://map.yahoo.co.jp/place
-                "place" -> {
-                    if (lat != null && lon != null) {
-                        points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
+                // https://map.yahoo.co.jp/place?lat={lat}&lon={lot}
+                // https://map.yahoo.co.jp/place?gid={id}&lat={lat}&lon={lot}
+                "place" ->
+                    if (center != null) {
+                        points = persistentListOf(
+                            if (queryParams["gid"].isNullOrEmpty()) {
+                                // If the 'gid' query parameter is not set, then the coordinates in the 'lat' and 'lon'
+                                // query parameters are not a map center, but they are the correct place location. So we
+                                // can use mark the point as coming from a URI.
+                                center.copy(source = Source.URI)
+                            } else {
+                                center
+                            }
+                        )
                         return@parseResult
                     }
-                }
+
                 // Directions
                 // https://map.yahoo.co.jp/route/{type}?from={point1Name}&to={lastPointName}&fromLat={point1Lat}&fromLon={point1Lon}&toLat={lastPointLat}&toLon={lastPointLon}&waypoints=name:{point2Name},lat:{point2Lat},lon:{point2Lon};...
-                "route" -> {
+                "route" ->
                     buildList {
                         val fromLat = LAT_PATTERN.matchEntire(queryParams["fromLat"])?.doubleGroupOrNull()
                         val fromLon = LON_PATTERN.matchEntire(queryParams["fromLon"])?.doubleGroupOrNull()
@@ -114,15 +127,10 @@ class YahooMapsUriInput @Inject constructor(
                             points = it.toImmutableList()
                             return@parseResult
                         }
-                    if (lat != null && lon != null) {
-                        points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
-                        return@parseResult
-                    }
-                }
             }
 
-            if (lat != null && lon != null) {
-                points = persistentListOf(WGS84Point(lat, lon, z = z, name = name, source = Source.MAP_CENTER))
+            if (center != null) {
+                points = persistentListOf(center)
             } else if (name != null) {
                 points = persistentListOf(WGS84Point(name = name, source = Source.URI))
             }

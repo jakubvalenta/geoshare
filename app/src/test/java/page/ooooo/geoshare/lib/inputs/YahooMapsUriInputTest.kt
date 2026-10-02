@@ -84,14 +84,26 @@ class YahooMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_place() = runTest {
+    fun parse_placeWithId() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    WGS84Point(35.04000, 135.72805, z = 17.0, source = Source.URI)
+                    WGS84Point(35.04000, 135.72805, z = 17.0, source = Source.MAP_CENTER)
                 )
             ),
             input.parse("https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic"),
+        )
+    }
+
+    @Test
+    fun parse_placeWithoutId() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(35.05083, 135.76469, z = 17.0, source = Source.URI)
+                )
+            ),
+            input.parse("https://map.yahoo.co.jp/place?lat=35.05083&lon=135.76469&zoom=17&maptype=basic"),
         )
     }
 
@@ -148,34 +160,6 @@ class YahooMapsUriInputTest : InputTest {
                 )
             ),
             input.parse("https://map.yahoo.co.jp/search?q=Kinkaku-ji&zoom=17"),
-        )
-    }
-
-    @Test
-    fun parse_directionsCoordinatesOnly() = runTest {
-        assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    WGS84Point(
-                        35.03935, 135.72926,
-                        z = 17.0,
-                        source = Source.URI,
-                    )
-                )
-            ),
-            input.parse("https://map.yahoo.co.jp/route/train?lat=35.03935&lon=135.72926&zoom=17&maptype=basic")
-        )
-        assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    WGS84Point(
-                        35.02766, 135.76411,
-                        z = 14.0,
-                        source = Source.URI,
-                    )
-                )
-            ),
-            input.parse("https://map.yahoo.co.jp/route/car?lat=35.02766&lon=135.76411&zoom=14&maptype=basic")
         )
     }
 
@@ -301,6 +285,34 @@ class YahooMapsUriInputTest : InputTest {
                 )
             ),
             input.parse("https://map.yahoo.co.jp/route/walk?fromLat=35.04361&fromLon=135.75926&toLat=35.01084&toLon=135.75962&waypoints=name%3Amissing%20value%20of%20'lat'%2Clat%3Bname%3Aunknown%20key%20'spam'%2Cspam%3A%3B")
+        )
+    }
+
+    @Test
+    fun parse_directionsMapCenterOnly() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        35.03935, 135.72926,
+                        z = 17.0,
+                        source = Source.MAP_CENTER,
+                    )
+                )
+            ),
+            input.parse("https://map.yahoo.co.jp/route/train?lat=35.03935&lon=135.72926&zoom=17&maptype=basic")
+        )
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    WGS84Point(
+                        35.02766, 135.76411,
+                        z = 14.0,
+                        source = Source.MAP_CENTER,
+                    )
+                )
+            ),
+            input.parse("https://map.yahoo.co.jp/route/car?lat=35.02766&lon=135.76411&zoom=14&maptype=basic")
         )
     }
 }
