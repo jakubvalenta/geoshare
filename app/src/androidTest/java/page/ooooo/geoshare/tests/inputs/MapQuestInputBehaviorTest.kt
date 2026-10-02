@@ -11,6 +11,15 @@ import page.ooooo.geoshare.tests.testUri
 
 class MapQuestInputBehaviorTest {
     @Test
+    fun mapQuest_offline() = uiAutomator {
+        // Search
+        testUri(
+            WGS84Point(name = "Provincial Park", source = Source.URI),
+            "https://www.mapquest.com/search/Provincial%20Park",
+        )
+    }
+
+    @Test
     fun mapQuest_online() = uiAutomator {
         runBlocking {
             assumeDomainResolvable("mapq.st")

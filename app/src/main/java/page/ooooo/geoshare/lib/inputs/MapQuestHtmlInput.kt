@@ -5,9 +5,9 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
@@ -21,16 +21,8 @@ class MapQuestHtmlInput @Inject constructor(
     override val log: Log,
     override val uriQuote: UriQuote,
 ) : BodyAsChannelInput {
-    override fun getName(resources: Resources) = group.getName(resources)
+    override fun getName(resources: Resources) = resources.getString(R.string.input_map_quest_html_name)
     override val group = InputGroup.MAP_QUEST
-    override val changelog = persistentListOf(
-        InputChangelogItem.Url(51, "https://mapq.st"),
-        InputChangelogItem.Url(51, "https://www.mapquest.com"),
-    )
-
-    val pattern = Regex("""((?:https?://)?(?:(?:www\.)?mapquest\.com|mapq\.st)[/?#]$URI_REST)""")
-
-    override fun match(source: String) = pattern.find(source)?.groupOrNull()
 
     // Use a browser user agent, so that MapQuest doesn't return empty 202 Accepted response
     override val userAgent = DESKTOP_USER_AGENT

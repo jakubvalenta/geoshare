@@ -16,37 +16,6 @@ class MapQuestHtmlInputTest : InputTest {
     private val input = FakeInputRepository.mapQuestHtmlInput
 
     @Test
-    fun match_fullUrl() {
-        assertEquals(
-            "https://www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097",
-            input.match("https://www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097"),
-        )
-        assertEquals(
-            "https://www.mapquest.com/tw/taipei-101-777297285",
-            input.match("https://www.mapquest.com/tw/taipei-101-777297285"),
-        )
-        assertEquals(
-            "www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097",
-            input.match("www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097")
-        )
-        assertEquals(
-            "mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097",
-            input.match("mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097")
-        )
-    }
-
-    @Test
-    fun match_shortLink() {
-        assertEquals("https://mapq.st/4hFIEFF", input.match("https://mapq.st/4hFIEFF"))
-        assertEquals("mapq.st/4hFIEFF", input.match("mapq.st/4hFIEFF"))
-    }
-
-    @Test
-    fun match_unknownHost() {
-        assertNull(input.match("https://www.example.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097"))
-    }
-
-    @Test
     fun parse_containsCoordinates_returnsPoint() = runTest {
         assertEquals(
             ParseResult.Success(
