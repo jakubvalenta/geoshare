@@ -18,7 +18,7 @@ class MainPermissionFreeBehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
             // Grant connection permission
-            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+            grantConnectionPermission()
 
             // Shows precise location
             assertConversionSucceeds(
@@ -57,10 +57,7 @@ class MainPermissionFreeBehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
 
             // Grant connection permission and check "Don't ask me again"
-            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
-                toggleDoNotAsk()
-                confirmDialog()
-            }
+            grantConnectionPermission(doNotAsk = true)
 
             // Shows precise location
             assertConversionSucceeds(
@@ -114,7 +111,7 @@ class MainPermissionFreeBehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+30,+Berlin/")
 
             // Deny connection permission
-            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
+            denyConnectionPermission()
 
             // Shows location search
             assertConversionSucceeds(
@@ -142,10 +139,7 @@ class MainPermissionFreeBehaviorTest {
             shareUri("https://www.google.com/maps/place/Hermannstr.+40,+Berlin/")
 
             // Deny connection permission
-            onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.run {
-                toggleDoNotAsk()
-                dismissDialog()
-            }
+            denyConnectionPermission(doNotAsk = true)
 
             // Shows location search
             assertConversionSucceeds(

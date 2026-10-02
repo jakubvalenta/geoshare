@@ -181,7 +181,7 @@ class MainBehaviorTest {
         shareUri("https://www.google.com/maps/place/Hermannstr.+10,+Berlin/")
 
         // Grant connection permission
-        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        grantConnectionPermission()
 
         // Open the source sheet
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()

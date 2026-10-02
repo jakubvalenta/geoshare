@@ -38,8 +38,8 @@ import page.ooooo.geoshare.tests.NETWORK_TIMEOUT
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.chooseFile
 import page.ooooo.geoshare.tests.confirmDialog
+import page.ooooo.geoshare.tests.denyConnectionPermission
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
-import page.ooooo.geoshare.tests.dismissDialog
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.expandSheet
@@ -49,6 +49,7 @@ import page.ooooo.geoshare.tests.goBackToElement
 import page.ooooo.geoshare.tests.goBackToMainForm
 import page.ooooo.geoshare.tests.goToInputList
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
+import page.ooooo.geoshare.tests.grantConnectionPermission
 import page.ooooo.geoshare.tests.grantSystemPermission
 import page.ooooo.geoshare.tests.hideKeyboard
 import page.ooooo.geoshare.tests.isAppInstalled
@@ -343,7 +344,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Error - Unshorten error
         shareUri("https://maps.app.goo.gl/spam")
-        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        grantConnectionPermission()
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_error_unshorten_error")
@@ -389,7 +390,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Conversion - Error - Permission denied
         shareUri(uriString)
-        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
+        denyConnectionPermission()
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_error_permission_denied")
@@ -468,7 +469,7 @@ class ScreenshotsFreeBehaviorTest {
     fun testConversionResultChecks() = uiAutomator {
         // Conversion - Check - Experimental
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
-        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        grantConnectionPermission()
         onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareResultLastPointName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_experimental")
@@ -545,7 +546,7 @@ class ScreenshotsFreeBehaviorTest {
         }
 
         shareUri("https://www.openstreetmap.org/relation/910699")
-        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        grantConnectionPermission()
 
         // Conversion - Result
         onElement { viewIdResourceName == "geoShareResultLastPointName" }

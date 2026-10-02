@@ -13,13 +13,9 @@ class AmapShortLinkInputTest : InputTest {
     private val input = FakeInputRepository.amapShortLinkInput
 
     @Test
-    fun match() {
-        assertEquals("https://surl.amap.com/4mkKGuyJ2bz", input.match("https://surl.amap.com/4mkKGuyJ2bz"))
-    }
-
-    @Test
     fun match_correct() {
         assertEquals("https://surl.amap.com/4mkKGuyJ2bz", input.match("https://surl.amap.com/4mkKGuyJ2bz"))
+        assertEquals("surl.amap.com/4mkKGuyJ2bz", input.match("surl.amap.com/4mkKGuyJ2bz"))
     }
 
     @Test

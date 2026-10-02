@@ -64,6 +64,7 @@ class YahooMapsInputBehaviorTest : InputBehaviorTest {
                 WGS84Point(35.69548, 139.77065, z = 17.0, source = Source.MAP_CENTER)
             ),
             "https://yahoo.jp/qDc2x2", // Resolves to https://map.yahoo.co.jp/place?gid=MBd0PFPhR-Y&lat=35.69548&lon=139.77065&zoom=17&maptype=basic
+            grantConnectionPermission = true,
         )
     }
 }

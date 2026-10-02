@@ -6,12 +6,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.TestServerParams
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
 import page.ooooo.geoshare.tests.configureServer
 import page.ooooo.geoshare.tests.getAndAssumeTestServer
 import page.ooooo.geoshare.tests.launchApplication
@@ -65,7 +63,8 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
         // Launch app
         launchApplication()
         waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
+
+        // Configure server
         configureServer(testServer)
 
         testUri(
@@ -88,6 +87,7 @@ class GoogleMapsPlaceApiInputBehaviorTest(private val testServerParams: TestServ
             } else {
                 emptySet()
             },
+            grantConnectionPermission = true,
         )
     }
 }

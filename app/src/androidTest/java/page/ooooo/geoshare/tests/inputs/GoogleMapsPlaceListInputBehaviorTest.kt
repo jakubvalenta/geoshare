@@ -3,23 +3,14 @@ package page.ooooo.geoshare.tests.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
-import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testUri
 import page.ooooo.geoshare.tests.testUriFails
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class GoogleMapsPlaceListInputBehaviorTest : InputBehaviorTest {
     @Test
     fun googleMapsPlaceListInput_online() = uiAutomator {
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         if (htmlParsingSupported) {
             testUri(
                 persistentListOf(
@@ -33,6 +24,7 @@ class GoogleMapsPlaceListInputBehaviorTest : InputBehaviorTest {
                     WGS84Point(59.147731699999994, 11.550661199999999, source = Source.JAVASCRIPT),
                 ),
                 "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
+                grantConnectionPermission = true,
             )
         } else {
             testUriFails(
@@ -42,6 +34,7 @@ class GoogleMapsPlaceListInputBehaviorTest : InputBehaviorTest {
                     "Les listes de lieux ne sont pas prises en charge",
                 ),
                 "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
+                grantConnectionPermission = true,
             )
         }
     }

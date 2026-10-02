@@ -12,12 +12,12 @@ import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.configureServer
-import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
 import page.ooooo.geoshare.tests.goBackToMainForm
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
+import page.ooooo.geoshare.tests.grantConnectionPermission
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.saveScreenshot
@@ -75,7 +75,7 @@ class ScreenshotsProBehaviorTest {
 
         // Conversion - Check - Name only
         shareUri("https://www.google.com/maps/place/Hermannstr.+20,+Berlin/")
-        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        grantConnectionPermission()
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
@@ -84,7 +84,7 @@ class ScreenshotsProBehaviorTest {
 
         // Conversion - Check - Points name only
         shareUri("https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France")
-        onElement { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
+        grantConnectionPermission()
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
         saveScreenshot("main_strings/conversion_result_check_points_name_only")
 

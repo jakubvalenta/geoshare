@@ -8,12 +8,9 @@ import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.assertConversionSucceeds
 import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.confirmDialog
-import page.ooooo.geoshare.tests.dismissDialog
-import page.ooooo.geoshare.tests.launchApplication
+import page.ooooo.geoshare.tests.denyConnectionPermission
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.testUri
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class KagiMapsInputBehaviorTest : InputBehaviorTest {
     @Test
@@ -70,14 +67,8 @@ class KagiMapsInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("www.openstreetmap.org") // Kagi Maps input uses OpenStreetMap API
         }
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-
         // Way
-        shareUri("https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503")
-        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.confirmDialog()
-        assertConversionSucceeds(
+        testUri(
             persistentListOf(
                 WGS84Point(22.2759891, 114.1457360, z = 19.0, source = Source.API),
                 WGS84Point(22.2759569, 114.1458881, z = 19.0, source = Source.API),
@@ -92,12 +83,14 @@ class KagiMapsInputBehaviorTest : InputBehaviorTest {
                     name = "Victoria Peak Station HK Telecom Radio Station",
                     source = Source.API,
                 ),
-            )
+            ),
+            "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503",
+            grantConnectionPermission = true,
         )
 
         // Way when permission is denied
         shareUri("https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503")
-        onElement(20_000) { viewIdResourceName == "geoShareConnectionPermissionDialog" }.dismissDialog()
+        denyConnectionPermission()
         assertConversionSucceeds(
             persistentListOf(
                 WGS84Point(

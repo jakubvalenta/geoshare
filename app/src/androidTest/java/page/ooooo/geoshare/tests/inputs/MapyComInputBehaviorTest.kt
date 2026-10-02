@@ -4,14 +4,10 @@ import androidx.test.uiautomator.uiAutomator
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.testUri
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class MapyComInputBehaviorTest : InputBehaviorTest {
     @Test
@@ -35,15 +31,11 @@ class MapyComInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("mapy.com")
         }
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         // Short link
         testUri(
             WGS84Point(50.0831498, 14.4549515, z = 17.0, source = Source.MAP_CENTER),
             "https://mapy.com/s/jakuhelasu",
+            grantConnectionPermission = true,
         )
 
         // Navigation
@@ -53,7 +45,8 @@ class MapyComInputBehaviorTest : InputBehaviorTest {
                 WGS84Point(44.645654037594795, -63.60516831278801, z = 19.0, source = Source.HASH),
                 WGS84Point(44.658605083823204, -63.61712023615837, z = 19.0, source = Source.HASH),
             ),
-            "https://mapy.com/s/dufokujobu"
+            "https://mapy.com/s/dufokujobu",
+            grantConnectionPermission = true,
         )
     }
 }

@@ -3,15 +3,11 @@ package page.ooooo.geoshare.tests.inputs
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.tests.assumeDomainResolvable
-import page.ooooo.geoshare.tests.configureConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.testUri
-import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class AmapInputBehaviorTest : InputBehaviorTest {
     @Test
@@ -74,11 +70,6 @@ class AmapInputBehaviorTest : InputBehaviorTest {
             assumeDomainResolvable("surl.amap.com")
         }
 
-        // Launch app
-        launchApplication()
-        waitForAppToBeVisible()
-        configureConnectionPermissionPreference(Permission.ALWAYS)
-
         // Short link
         testUri(
             GCJ02Point(
@@ -87,6 +78,7 @@ class AmapInputBehaviorTest : InputBehaviorTest {
                 source = Source.URI,
             ),
             "https://surl.amap.com/4mkKGuyJ2bz",
+            grantConnectionPermission = true,
         )
     }
 }
