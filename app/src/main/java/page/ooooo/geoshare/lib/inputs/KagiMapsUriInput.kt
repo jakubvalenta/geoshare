@@ -90,6 +90,7 @@ class KagiMapsUriInput @Inject constructor(
 
                 // Opaque id (not supported)
                 // https://kagi.com/maps/info?id={id}
+                // TODO Show warning that this is definitely a map center and not the point
             }
 
             // Directions
