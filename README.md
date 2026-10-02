@@ -42,6 +42,7 @@ map app.
 - Plus Codes (global only)
 - Urbi
 - Waze
+- Yahoo! Maps
 - Yandex Maps
 - coordinates
 

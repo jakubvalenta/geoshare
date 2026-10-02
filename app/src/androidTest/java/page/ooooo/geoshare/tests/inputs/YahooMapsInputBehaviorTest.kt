@@ -10,17 +10,12 @@ import page.ooooo.geoshare.tests.testUri
 class YahooMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     fun yahooMaps_offline() = uiAutomator {
-        // Search
+        // Place
         testUri(
             persistentListOf(
-                WGS84Point(
-                    35.03935, 135.72926,
-                    z = 17.0,
-                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Kinkaku-ji",
-                    source = Source.URI,
-                )
+                WGS84Point(35.04000, 135.72805, z = 17.0, source = Source.URI)
             ),
-            "https://map.yahoo.co.jp/search?q=Kinkaku-ji&lat=35.03935&lon=135.72926&zoom=17&maptype=basic",
+            "https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic",
         )
 
         // Directions
