@@ -446,6 +446,38 @@ object InitialLinks : InitialData {
                 Uuid.parse("54ac6017-4988-40a5-86fe-63aac862fb20").toByteArray(),
             )
         )
+        db.execSQL(
+            "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Yahoo! Maps Japan",
+                "Yahoo! Maps Japan",
+                "WGS84",
+                "DISPLAY",
+                0,
+                0,
+                0,
+                "https://map.yahoo.co.jp/place?lat={lat}&lon={lon}&zoom={z}",
+                "https://map.yahoo.co.jp/search?q={q}",
+                1790947732269,
+                Uuid.parse("5274e6d4-c675-4d44-a36c-b5d36e717624").toByteArray(),
+            )
+        )
+        db.execSQL(
+            "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Yahoo! Maps Japan",
+                "Yahoo! Maps Japan search",
+                "WGS84",
+                "SEARCH",
+                0,
+                0,
+                0,
+                "",
+                "https://map.yahoo.co.jp/search?q={q}",
+                1790947732269,
+                Uuid.parse("7db7be61-657c-47e7-9b10-68b40cd914b4").toByteArray(),
+            )
+        )
     }
 
     override val migrations = arrayOf(
@@ -781,6 +813,42 @@ object InitialLinks : InitialData {
                 )
             }
         },
+        object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Yahoo! Maps Japan",
+                        "Yahoo! Maps Japan",
+                        "WGS84",
+                        "DISPLAY",
+                        0,
+                        0,
+                        0,
+                        "https://map.yahoo.co.jp/place?lat={lat}&lon={lon}&zoom={z}",
+                        "https://map.yahoo.co.jp/search?q={q}",
+                        1790947732269,
+                        Uuid.parse("5274e6d4-c675-4d44-a36c-b5d36e717624").toByteArray(),
+                    )
+                )
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Yahoo! Maps Japan",
+                        "Yahoo! Maps Japan search",
+                        "WGS84",
+                        "SEARCH",
+                        0,
+                        0,
+                        0,
+                        "",
+                        "https://map.yahoo.co.jp/search?q={q}",
+                        1790947732269,
+                        Uuid.parse("7db7be61-657c-47e7-9b10-68b40cd914b4").toByteArray(),
+                    )
+                )
+            }
+        }
     )
 
     const val GOOGLE_MAPS_DISPLAY_UUID = "7bd96da4-beba-4a30-9dbd-b437a49a1dc0"

@@ -240,6 +240,23 @@ class InitialLinksTest : InitialDataTest {
                 coordsUriTemplate = "https://umap.openstreetmap.fr/en/map/test-mapy_626288#{z}/{lat}/{lon}",
                 uuid = UUID.fromString("94e1350a-3599-43b3-858b-59750a6f8680"),
             ),
+            // Yahoo! Maps Japan
+            Link(
+                group = "Yahoo! Maps Japan",
+                name = "Yahoo! Maps Japan",
+                appEnabled = false,
+                coordsUriTemplate = "https://map.yahoo.co.jp/place?lat={lat}&lon={lon}&zoom={z}",
+                nameUriTemplate = "https://map.yahoo.co.jp/search?q={q}",
+                uuid = UUID.fromString("5274e6d4-c675-4d44-a36c-b5d36e717624"),
+            ),
+            Link(
+                group = "Yahoo! Maps Japan",
+                name = "Yahoo! Maps Japan search",
+                type = LinkType.SEARCH,
+                appEnabled = false,
+                nameUriTemplate = "https://map.yahoo.co.jp/search?q={q}",
+                uuid = UUID.fromString("7db7be61-657c-47e7-9b10-68b40cd914b4"),
+            ),
             // Zoom Earth
             Link(
                 name = "Zoom Earth",

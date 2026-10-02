@@ -60,6 +60,7 @@ class YahooMapsUriInput @Inject constructor(
                                 // can use mark the point as coming from a URI.
                                 center.copy(source = Source.URI)
                             } else {
+                                // TODO Show warning that this is definitely a map center and not the point
                                 center
                             }
                         )
