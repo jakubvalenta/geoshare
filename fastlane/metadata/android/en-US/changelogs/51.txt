@@ -1,6 +1,7 @@
-- Added Kagi Maps input support.
-- Added Yahoo! Maps input support.
+- Added Kagi Maps input.
+- Added Yahoo! Maps input.
 - Added Kagi Maps web map.
 - Added Cartes.app web map.
+- Added Yahoo! Maps Japan web map.
 - Fixed the Open original link button by not cancelling current link processing.
 - Improved API servers preferences screen by separating server list.
