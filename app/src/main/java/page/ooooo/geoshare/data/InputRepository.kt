@@ -26,6 +26,7 @@ import page.ooooo.geoshare.lib.inputs.OsmAndUriInput
 import page.ooooo.geoshare.lib.inputs.PlusCodeInput
 import page.ooooo.geoshare.lib.inputs.UrbiUriInput
 import page.ooooo.geoshare.lib.inputs.WazeUriInput
+import page.ooooo.geoshare.lib.inputs.YahooMapsUriInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
 import javax.inject.Inject
@@ -56,6 +57,7 @@ interface InputRepository {
     val plusCodeInput: PlusCodeInput
     val urbiUriInput: UrbiUriInput
     val wazeUriInput: WazeUriInput
+    val yahooMapsUriInput: YahooMapsUriInput
     val yandexMapsShortLinkInput: YandexMapsShortLinkInput
     val yandexMapsUriInput: YandexMapsUriInput
 
@@ -89,6 +91,7 @@ interface InputRepository {
             osmAndUriInput,
             urbiUriInput,
             wazeUriInput,
+            yahooMapsUriInput,
             yandexMapsShortLinkInput,
             yandexMapsUriInput,
             coordinateInput,
@@ -128,6 +131,7 @@ class DefaultInputRepository @Inject constructor(
     override val plusCodeInput: PlusCodeInput,
     override val urbiUriInput: UrbiUriInput,
     override val wazeUriInput: WazeUriInput,
+    override val yahooMapsUriInput: YahooMapsUriInput,
     override val yandexMapsShortLinkInput: YandexMapsShortLinkInput,
     override val yandexMapsUriInput: YandexMapsUriInput,
 ) : InputRepository

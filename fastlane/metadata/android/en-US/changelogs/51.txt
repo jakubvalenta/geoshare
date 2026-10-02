@@ -1,4 +1,5 @@
 - Added Kagi Maps input support.
+- Added Yahoo! Maps input support.
 - Added Kagi Maps web map.
 - Added Cartes.app web map.
 - Fixed the Open original link button by not cancelling current link processing.

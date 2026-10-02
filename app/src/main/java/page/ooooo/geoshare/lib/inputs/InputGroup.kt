@@ -25,6 +25,7 @@ enum class InputGroupId {
     PLUS_CODE,
     URBI,
     WAZE,
+    YAHOO_MAPS,
     YANDEX_MAPS,
 }
 
@@ -78,17 +79,17 @@ interface InputGroup {
                 override fun getName(resources: Resources) =
                     resources.getString(R.string.converter_google_navigation_uri_name)
             }
+        val HERE_WEGO = object : InputGroup {
+            override val id = InputGroupId.HERE_WEGO
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.converter_here_wego_name)
+        }
         val KAGI_MAPS =
             object : InputGroup {
                 override val id = InputGroupId.KAGI_MAPS
                 override fun getName(resources: Resources) =
                     resources.getString(R.string.input_kagi_maps_name)
             }
-        val HERE_WEGO = object : InputGroup {
-            override val id = InputGroupId.HERE_WEGO
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_here_wego_name)
-        }
         val MAGIC_EARTH = object : InputGroup {
             override val id = InputGroupId.MAGIC_EARTH
             override fun getName(resources: Resources) =
@@ -128,6 +129,11 @@ interface InputGroup {
             override val id = InputGroupId.WAZE
             override fun getName(resources: Resources) =
                 resources.getString(R.string.converter_waze_name)
+        }
+        val YAHOO_MAPS = object : InputGroup {
+            override val id = InputGroupId.YAHOO_MAPS
+            override fun getName(resources: Resources) =
+                resources.getString(R.string.input_yahoo_maps_name)
         }
         val YANDEX_MAPS = object : InputGroup {
             override val id = InputGroupId.YANDEX_MAPS
