@@ -18,6 +18,8 @@ import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.KagiMapsUriInput
 import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
+import page.ooooo.geoshare.lib.inputs.MapQuestHtmlInput
+import page.ooooo.geoshare.lib.inputs.MapQuestUriInput
 import page.ooooo.geoshare.lib.inputs.MapsMeUriInput
 import page.ooooo.geoshare.lib.inputs.MapyComShortLinkInput
 import page.ooooo.geoshare.lib.inputs.MapyComUriInput
@@ -50,6 +52,8 @@ interface InputRepository {
     val kagiMapsUriInput: KagiMapsUriInput
     val hereWeGoUriInput: HereWeGoUriInput
     val magicEarthUriInput: MagicEarthUriInput
+    val mapQuestHtmlInput: MapQuestHtmlInput
+    val mapQuestUriInput: MapQuestUriInput
     val mapsMeUriInput: MapsMeUriInput
     val mapyComShortLinkInput: MapyComShortLinkInput
     val mapyComUriInput: MapyComUriInput
@@ -86,6 +90,8 @@ interface InputRepository {
             hereWeGoUriInput,
             kagiMapsUriInput,
             magicEarthUriInput,
+            mapQuestHtmlInput,
+            mapQuestUriInput,
             mapsMeUriInput,
             mapyComShortLinkInput,
             mapyComUriInput,
@@ -126,6 +132,8 @@ class DefaultInputRepository @Inject constructor(
     override val kagiMapsUriInput: KagiMapsUriInput,
     override val hereWeGoUriInput: HereWeGoUriInput,
     override val magicEarthUriInput: MagicEarthUriInput,
+    override val mapQuestHtmlInput: MapQuestHtmlInput,
+    override val mapQuestUriInput: MapQuestUriInput,
     override val mapsMeUriInput: MapsMeUriInput,
     override val mapyComShortLinkInput: MapyComShortLinkInput,
     override val mapyComUriInput: MapyComUriInput,

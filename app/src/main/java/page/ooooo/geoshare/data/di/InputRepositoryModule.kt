@@ -33,6 +33,8 @@ import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
 import page.ooooo.geoshare.lib.inputs.InputGroup
 import page.ooooo.geoshare.lib.inputs.KagiMapsUriInput
 import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
+import page.ooooo.geoshare.lib.inputs.MapQuestHtmlInput
+import page.ooooo.geoshare.lib.inputs.MapQuestUriInput
 import page.ooooo.geoshare.lib.inputs.MapsMeUriInput
 import page.ooooo.geoshare.lib.inputs.MapyComShortLinkInput
 import page.ooooo.geoshare.lib.inputs.MapyComUriInput
@@ -75,6 +77,8 @@ object InputRepositoryModule {
         kagiMapsUriInput: KagiMapsUriInput,
         hereWeGoUriInput: HereWeGoUriInput,
         magicEarthUriInput: MagicEarthUriInput,
+        mapQuestHtmlInput: MapQuestHtmlInput,
+        mapQuestUriInput: MapQuestUriInput,
         mapsMeUriInput: MapsMeUriInput,
         mapyComShortLinkInput: MapyComShortLinkInput,
         mapyComUriInput: MapyComUriInput,
@@ -105,6 +109,8 @@ object InputRepositoryModule {
             kagiMapsUriInput,
             hereWeGoUriInput,
             magicEarthUriInput,
+            mapQuestHtmlInput,
+            mapQuestUriInput,
             mapsMeUriInput,
             mapyComShortLinkInput,
             mapyComUriInput,
@@ -221,6 +227,15 @@ object FakeInputRepository : InputRepository {
     override val magicEarthUriInput = MagicEarthUriInput(
         uriQuote = uriQuote,
     )
+    override val mapQuestHtmlInput = MapQuestHtmlInput(
+        engine = engine,
+        log = log,
+        uriQuote = uriQuote,
+    )
+    override val mapQuestUriInput = MapQuestUriInput(
+        mapQuestHtmlInput = { mapQuestHtmlInput },
+        uriQuote = uriQuote,
+    )
     override val mapsMeUriInput = MapsMeUriInput(
         uriQuote = uriQuote,
     )
@@ -243,7 +258,7 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     override val kagiMapsUriInput = KagiMapsUriInput(
-        openStreetMapApiInput = openStreetMapApiInput,
+        openStreetMapApiInput = { openStreetMapApiInput },
         uriQuote = uriQuote,
     )
     override val osmAndUriInput = OsmAndUriInput(

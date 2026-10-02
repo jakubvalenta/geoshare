@@ -139,10 +139,7 @@ class YahooMapsUriInput @Inject constructor(
     }
 
     override fun genRandomUri(point: Point) =
-        UriFormatter.formatUriString(
-            point,
-            "https://kagi.com/maps/info?q={name}&id=point_{lat}_{lon}&ll={lat}%2C{lon}#{z}/{lat}/{lon}"
-        )
+        UriFormatter.formatUriString(point, "https://map.yahoo.co.jp/place?lat={lat}&lon={lon}&zoom={z}")
 
     override fun toString() = "KagiMapsUriInput"
 }

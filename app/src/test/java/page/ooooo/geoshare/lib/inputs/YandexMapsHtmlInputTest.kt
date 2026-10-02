@@ -36,6 +36,12 @@ class YandexMapsHtmlInputTest : InputTest {
 
     @Test
     fun parse_doesNotContainCoordinates_returnsNoPoints() = runTest {
-        assertEquals(ParseResult.Success(), input.parse("""<html></html>"""))
+        assertEquals(
+            ParseResult.Success(),
+            input.parse(
+                // language=html
+                """<html lang="en"></html>"""
+            )
+        )
     }
 }

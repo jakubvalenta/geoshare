@@ -6491,6 +6491,27 @@
                     android:path="/"
                     android:scheme="https" />
             </intent-filter>
+            <!-- MapQuest -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="mapq.st"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.mapquest.com"
+                    android:scheme="https" />
+            </intent-filter>
             <!-- Maps.me, Organic Maps, CoMaps -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />

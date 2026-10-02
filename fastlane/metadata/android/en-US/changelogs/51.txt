@@ -1,4 +1,5 @@
 - Added Kagi Maps input.
+- Added MapQuest input.
 - Added Yahoo! Maps input.
 - Added Kagi Maps web map.
 - Added Cartes.app web map.

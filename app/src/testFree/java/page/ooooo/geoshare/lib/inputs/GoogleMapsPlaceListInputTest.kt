@@ -27,7 +27,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=Json
+                // language=json
                 """
                     [
                         {"lat": 59.1293656, "lon": 11.4585672},
@@ -45,7 +45,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=Json
+                // language=json
                 """
                     [
                         {"lat": 59.1293656}
@@ -61,7 +61,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=Json
+                // language=json
                 "[{}]",
                 "https://maps.google.com/original",
             ),
@@ -69,7 +69,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=Json
+                // language=json
                 "[]",
                 "https://maps.google.com/original",
             ),
@@ -79,15 +79,15 @@ class GoogleMapsPlaceListInputTest : InputTest {
     @Test
     fun parse_whenDataIsValidJsonButHasUnexpectedPropertyType_returnsNoPoints() = runTest {
         for (data in listOf(
-            // language=Json
+            // language=json
             """["spam"]""",
-            // language=Json
+            // language=json
             "{}",
-            // language=Json
+            // language=json
             """"spam"""",
-            // language=Json
+            // language=json
             "0",
-            // language=Json
+            // language=json
             "null",
         )) {
             assertEquals(
@@ -98,7 +98,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=Json
+                // language=json
                 """{"lat":  "spam"}""",
                 "https://maps.google.com/original",
             ),
@@ -106,7 +106,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=Json
+                // language=json
                 "[]",
                 "https://maps.google.com/original",
             ),

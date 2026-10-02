@@ -28,7 +28,7 @@ class BaiduMapWebViewInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=Json
+                // language=json
                 """
                     {
                         "lat": 3315902.2199999997,
@@ -50,7 +50,7 @@ class BaiduMapWebViewInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=Json
+                // language=json
                 """
                     {
                         "lat": 3315902.2199999997,
@@ -70,7 +70,7 @@ class BaiduMapWebViewInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=Json
+                // language=json
                 """
                     {
                         "lat": 3315902.2199999997
@@ -86,7 +86,7 @@ class BaiduMapWebViewInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=Json
+                // language=json
                 "{}",
                 "https://map.baidu.com/original",
             ),
@@ -96,15 +96,15 @@ class BaiduMapWebViewInputTest : InputTest {
     @Test
     fun parse_whenDataIsValidJsonButHasUnexpectedPropertyType_returnsNoPoints() = runTest {
         for (data in listOf(
-            // language=Json
+            // language=json
             """{"lat":  "spam"}""",
-            // language=Json
+            // language=json
             """[]""",
-            // language=Json
+            // language=json
             """"spam"""",
-            // language=Json
+            // language=json
             "0",
-            // language=Json
+            // language=json
             "null",
         )) {
             assertEquals(
@@ -115,7 +115,7 @@ class BaiduMapWebViewInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=Json
+                // language=json
                 """{"lat":  "spam"}""",
                 "https://map.baidu.com/original",
             ),
@@ -123,7 +123,7 @@ class BaiduMapWebViewInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=Json
+                // language=json
                 "[]",
                 "https://map.baidu.com/original",
             ),

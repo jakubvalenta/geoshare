@@ -37,7 +37,7 @@ class GoogleMapsAddressApiInputTest : InputTest {
     private val engine = MockEngine { request ->
         when (request.url.toString()) {
             server.getUrl("Cherbourg, France", uriQuote) -> respond(
-                // language=Json
+                // language=json
                 """
                     {
                         "results": [
@@ -50,19 +50,19 @@ class GoogleMapsAddressApiInputTest : InputTest {
             )
 
             server.getUrl("empty-results", uriQuote) -> respond(
-                // language=Json
+                // language=json
                 """{"results": []}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
             server.getUrl("empty-object", uriQuote) -> respond(
-                // language=Json
+                // language=json
                 """{}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
 
             server.getUrl("invalid", uriQuote) -> respond(
-                // language=Json
+                // language=json
                 """{"results": "invalid"}""",
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
             )
@@ -221,7 +221,7 @@ class GoogleMapsAddressApiInputTest : InputTest {
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 server.getUrl(cleanQuery, uriQuote) -> respond(
-                    // language=Json
+                    // language=json
                     """
                         {
                             "results": [
