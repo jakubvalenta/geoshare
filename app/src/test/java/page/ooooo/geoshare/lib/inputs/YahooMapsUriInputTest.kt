@@ -32,6 +32,12 @@ class YahooMapsUriInputTest : InputTest {
     }
 
     @Test
+    fun match_shortLink() {
+        assertNull(input.match("https://yahoo.jp/qDc2x2"))
+        assertNull(input.match("yahoo.jp/qDc2x2"))
+    }
+
+    @Test
     fun match_unknownHost() {
         assertNull(input.match("https://www.example.com/place?lat=35.04038&lon=135.72895&zoom=17&maptype=basic"))
     }
