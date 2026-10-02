@@ -47,7 +47,7 @@ class MapQuestHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_success() = runTest {
+    fun parse_containsCoordinates_returnsPoint() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
@@ -57,19 +57,22 @@ class MapQuestHtmlInputTest : InputTest {
             input.parse(
                 // language=html
                 """<html lang="en">
-  <body>
-    <script>
-      {"url":"https://www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097","geo":{"@type":"GeoCoordinates","latitude":39.91843414,"longitude":116.40497589},"address":{"@type":"PostalAddress","addressCountry":"CN","addressLocality":"Beijing","postalCode":"110101"}}
-    </script>
-  </body>
-</html>
-"""
+<script>
+{"url":"https://www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097","geo":{"@type":"GeoCoordinates","latitude":39.91843414,"longitude":116.40497589},"address":{"@type":"PostalAddress","addressCountry":"CN","addressLocality":"Beijing","postalCode":"110101"}}
+</script>
+</html>"""
             ),
         )
     }
 
     @Test
-    fun parse_failure() = runTest {
-        assertEquals(ParseResult.Success(), input.parse("spam"))
+    fun parse_doesNotContainCoordinates_returnsNoPoints() = runTest {
+        assertEquals(
+            ParseResult.Success(),
+            input.parse(
+                // language=html
+                """<html lang="en"></html>"""
+            )
+        )
     }
 }

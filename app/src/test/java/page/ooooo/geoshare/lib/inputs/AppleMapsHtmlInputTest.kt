@@ -16,26 +16,29 @@ class AppleMapsHtmlInputTest : InputTest {
     private val input = FakeInputRepository.appleMapsHtmlInput
 
     @Test
-    fun parse_success() = runTest {
+    fun parse_containsCoordinates_returnsPoint() = runTest {
         assertEquals(
             ParseResult.Success(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML))),
             input.parse(
                 // language=html
                 """<html lang="en">
 <head>
-  <title>Tempelhofer Feld</title>
   <meta property="place:location:latitude" content="52.4735927" />
   <meta property="place:location:longitude" content="13.4050798" />
 </head>
-<body></body>
-</html>
-"""
+</html>"""
             ),
         )
     }
 
     @Test
-    fun parse_failure() = runTest {
-        assertEquals(ParseResult.Success(), input.parse("spam"))
+    fun parse_doesNotContainCoordinates_returnsNoPoints() = runTest {
+        assertEquals(
+            ParseResult.Success(),
+            input.parse(
+                // language=html
+                """<html lang="en"></html>"""
+            )
+        )
     }
 }
