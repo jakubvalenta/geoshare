@@ -50,5 +50,5 @@ class YahooMapsWebViewInput @Inject constructor(
             // Tracking
             || requestUrlString.contains("events.mapbox.com/")
 
-    override fun toString() = "KagiMapsWebViewInput"
+    override fun toString() = "YahooMapsWebViewInput"
 }
