@@ -27,7 +27,7 @@ class KagiMapsInputBehaviorTest : InputBehaviorTest {
         // Opaque id (not supported)
         testUriFails(
             setOf(
-                "Links with place ids are not supported, because they are accessible only after logging in to Kagi.",
+                "Links with place ids are not supported, because they require a Kagi account.",
                 // TODO Add French
             ),
             "https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=U8zPGlHJwIDz2VwrxsSEGaA06EqXhN0w2nWmr48ffeM-a51Q_TtSVLKK_JCs6s0P&ll=50.735981,15.739860#16.13/50.735739/15.7395",

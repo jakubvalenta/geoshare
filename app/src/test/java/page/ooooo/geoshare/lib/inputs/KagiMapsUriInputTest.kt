@@ -15,8 +15,8 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class KagiMapsUriInputTest : InputTest {
     override val resources: Resources = mock {
-        on { getString(R.string.input_kagi_maps_warning_opaque_id) } doReturn
-            "Links with place ids are not supported, because they are accessible only after logging in to Kagi."
+        on { getString(R.string.input_kagi_maps_warning_account) } doReturn
+            "Links with place ids are not supported, because they require a Kagi account."
     }
     private val input = FakeInputRepository.kagiMapsUriInput
     private val openStreetMapApiInput = FakeInputRepository.openStreetMapApiInput
@@ -194,7 +194,7 @@ class KagiMapsUriInputTest : InputTest {
     @Test
     fun parse_idOpaque() = runTest {
         assertEquals(
-            ParseResult.Warning(resources.getString(R.string.input_kagi_maps_warning_opaque_id)),
+            ParseResult.Warning(resources.getString(R.string.input_kagi_maps_warning_account)),
             input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=U8zPGlHJwIDz2VwrxsSEGaA06EqXhN0w2nWmr48ffeM-a51Q_TtSVLKK_JCs6s0P&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
         )
     }
@@ -202,7 +202,7 @@ class KagiMapsUriInputTest : InputTest {
     @Test
     fun parse_idUnknown() = runTest {
         assertEquals(
-            ParseResult.Warning(resources.getString(R.string.input_kagi_maps_warning_opaque_id)),
+            ParseResult.Warning(resources.getString(R.string.input_kagi_maps_warning_account)),
             input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=SPAM&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
         )
     }

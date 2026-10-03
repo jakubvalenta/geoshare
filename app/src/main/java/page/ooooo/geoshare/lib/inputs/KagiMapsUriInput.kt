@@ -101,7 +101,7 @@ class KagiMapsUriInput @Inject constructor(
                     else -> {
                         // Opaque id (not supported and don't use map center, because user expects the point location)
                         // https://kagi.com/maps/info?id={id}
-                        warningMessage = resources.getString(R.string.input_kagi_maps_warning_opaque_id)
+                        warningMessage = resources.getString(R.string.input_kagi_maps_warning_account)
                     }
                 }
                 return@parseResult
