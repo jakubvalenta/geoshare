@@ -341,4 +341,6 @@
     <string name="optional">Volitelné</string>
     <string name="description">Popis</string>
     <string name="user_preferences_server_edit">Upravit servery</string>
+    <string name="input_yahoo_maps_name">Yahoo! Maps</string>
+    <string name="input_map_quest_name">MapQuest</string>
 </resources>

@@ -10,8 +10,10 @@ Sdílejte odkaz na mapy s GeoShare a tato aplikace jej otevře v jiné mapové a
 - Cartes IGN
 - CoMaps
 - HERE WeGo
+- Yahoo! Maps
 - Kagi Maps
 - Magic Earth
+- MapQuest
 - Maps.me
 - Mapy.com (Mapy.cz)
 - OpenStreetMap
