@@ -324,4 +324,9 @@
     <string name="conversion_succeeded_copy_name">Копиране на име</string>
     <string name="main_source_open">Отваряне на оригиналната връзка</string>
     <string name="conversion_automation_copy_name_succeeded">Автоматично копирано име</string>
+    <string name="optional">По избор</string>
+    <string name="description">Описание</string>
+    <string name="user_preferences_server_edit">Редактиране на сървъри</string>
+    <string name="input_kagi_maps_name">Kagi Карти</string>
+    <string name="input_yahoo_maps_name">Yahoo! Карти</string>
 </resources>
