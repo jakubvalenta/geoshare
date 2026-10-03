@@ -44,7 +44,7 @@ class OpenStreetMapUriInput @Inject constructor(
                     ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
                     ?.let {
                         points = persistentListOf(WGS84Point(it))
-                        return@run
+                        return@parseResult
                     }
             }
 
@@ -52,7 +52,7 @@ class OpenStreetMapUriInput @Inject constructor(
             // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
             Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
                 points = persistentListOf(WGS84Point(it))
-                return@run
+                return@parseResult
             }
 
             // Coordinates
@@ -70,7 +70,7 @@ class OpenStreetMapUriInput @Inject constructor(
                                     Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull()
                                 }
                             points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
-                            return@run
+                            return@parseResult
                         }
                 }
 
@@ -78,22 +78,48 @@ class OpenStreetMapUriInput @Inject constructor(
             // https://www.openstreetmap.org/directions?to={lat},{lon}
             LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint(Source.URI)?.let {
                 points = persistentListOf(WGS84Point(it))
-                return@run
+                return@parseResult
             }
 
-            // Element
-            // https://www.openstreetmap.org/node/{id}
-            // https://www.openstreetmap.org/relation/{id}
-            // https://www.openstreetmap.org/way/{id}
-            if (pathParts.firstOrNull() == "") {
-                pathParts.getOrNull(1).takeIf { it in setOf("node", "relation", "way") }?.let { type ->
-                    pathParts.getOrNull(2)?.let { id ->
+            when (pathParts.getOrNull(1)) {
+                "node" ->
+                    // Node
+                    // https://www.openstreetmap.org/node/{id}
+                    pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
                         next = MatchedInput(
                             openStreetMapApiInput.get(),
-                            OpenStreetMapApiInput.formatApiUrlString(type = type, id = id),
+                            OpenStreetMapApiInput.formatUrlString(
+                                OpenStreetMapApiInput.Companion.ElementType.NODE, osmId
+                            ),
                         )
+                        return@parseResult
                     }
-                }
+
+                "relation" ->
+                    // Relation
+                    // https://www.openstreetmap.org/relation/{id}
+                    pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
+                        next = MatchedInput(
+                            openStreetMapApiInput.get(),
+                            OpenStreetMapApiInput.formatUrlString(
+                                OpenStreetMapApiInput.Companion.ElementType.RELATION, osmId
+                            ),
+                        )
+                        return@parseResult
+                    }
+
+                "way" ->
+                    // Way
+                    // https://www.openstreetmap.org/way/{id}
+                    pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
+                        next = MatchedInput(
+                            openStreetMapApiInput.get(),
+                            OpenStreetMapApiInput.formatUrlString(
+                                OpenStreetMapApiInput.Companion.ElementType.WAY, osmId
+                            ),
+                        )
+                        return@parseResult
+                    }
             }
         }
     }

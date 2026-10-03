@@ -6,46 +6,51 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 
 class KagiMapsUriInputTest : InputTest {
-    override val resources: Resources = mock()
+    override val resources: Resources = mock {
+        on { getString(R.string.input_kagi_maps_warning_opaque_id) } doReturn
+            "Links with place ids are not supported, because they are accessible only after logging in to Kagi."
+    }
     private val input = FakeInputRepository.kagiMapsUriInput
     private val openStreetMapApiInput = FakeInputRepository.openStreetMapApiInput
 
     @Test
     fun match_fullUrl() {
         assertEquals(
-            "https://kagi.com/maps/info#16.13/50.735739/15.7395",
-            input.match("https://kagi.com/maps/info#16.13/50.735739/15.7395")
+            "https://kagi.com/maps/#16.13/50.735739/15.7395",
+            input.match("https://kagi.com/maps/#16.13/50.735739/15.7395")
         )
         assertEquals(
             "https://kagi.com/maps/directions?q=%7CLugard%20Road,%2033%20Lugard%20Rd%20The%20Peak%20Hong%20Kong%20SAR,%20China~22.277521,114.144010",
             input.match("https://kagi.com/maps/directions?q=%7CLugard%20Road,%2033%20Lugard%20Rd%20The%20Peak%20Hong%20Kong%20SAR,%20China~22.277521,114.144010")
         )
         assertEquals(
-            "www.kagi.com/maps/info#16.13/50.735739/15.7395",
-            input.match("www.kagi.com/maps/info#16.13/50.735739/15.7395")
+            "www.kagi.com/maps/#16.13/50.735739/15.7395",
+            input.match("www.kagi.com/maps/#16.13/50.735739/15.7395")
         )
         assertEquals(
-            "kagi.com/maps/info#16.13/50.735739/15.7395",
-            input.match("kagi.com/maps/info#16.13/50.735739/15.7395")
+            "kagi.com/maps/#16.13/50.735739/15.7395",
+            input.match("kagi.com/maps/#16.13/50.735739/15.7395")
         )
     }
 
     @Test
     fun match_unknownHost() {
-        assertNull(input.match("https://www.example.com/maps/info#16.13/50.735739/15.7395"))
+        assertNull(input.match("https://www.example.com/maps/#16.13/50.735739/15.7395"))
     }
 
     @Test
     fun match_unknownScheme() {
         assertEquals(
-            "kagi.com/maps/info#16.13/50.735739/15.7395",
-            input.match("ftp://kagi.com/maps/info#16.13/50.735739/15.7395"),
+            "kagi.com/maps/#16.13/50.735739/15.7395",
+            input.match("ftp://kagi.com/maps/#16.13/50.735739/15.7395"),
         )
     }
 
@@ -78,7 +83,7 @@ class KagiMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_coordinates() = runTest {
+    fun parse_idPoint() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
@@ -90,19 +95,15 @@ class KagiMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_coordinatesInvalid() = runTest {
+    fun parse_idPointInvalid() = runTest {
         assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    WGS84Point(53.205291, 5.783568, z = 17.5, name = "Shared Point", source = Source.MAP_CENTER)
-                )
-            ),
-            input.parse("https://kagi.com/maps/info?q=Shared%20Point&ll=53.205291,5.783568&id=point_spam_spam#17.5/53.205291/5.783568"),
+            ParseResult.Success(),
+            input.parse("https://kagi.com/maps/info?q=Shared%20Point&ll=53.205291,5.783568&id=point_SPAM#17.5/53.205291/5.783568"),
         )
     }
 
     @Test
-    fun parse_placeOpenStreetMapNode() = runTest {
+    fun parse_idOpenStreetMapNode() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
@@ -115,7 +116,15 @@ class KagiMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_placeOpenStreetMapRelation() = runTest {
+    fun parse_idOpenStreetMapNodeInvalid() = runTest {
+        assertEquals(
+            ParseResult.Success(),
+            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.27603906188044,114.14545744657516&id=nSPAM&q=Victoria%20Peak#17.5/22.276039/114.145457"),
+        )
+    }
+
+    @Test
+    fun parse_idOpenStreetMapRelation() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
@@ -125,64 +134,93 @@ class KagiMapsUriInputTest : InputTest {
                         source = Source.URI,
                     )
                 ),
-                next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/api/0.6/relation/440105/full.json"),
+                next = MatchedInput(
+                    openStreetMapApiInput,
+                    "https://www.openstreetmap.org/api/0.6/relation/440105/full.json"
+                ),
             ),
             input.parse(uriString = "https://kagi.com/maps/info?q=%C5%A0pindler%C5%AFv%20Ml%C3%BDn&id=r440105#12.34/50.72525/15.59019"),
         )
     }
 
     @Test
-    fun parse_placeOpenStreetMapWay() = runTest {
+    fun parse_idOpenStreetMapRelationInvalid() = runTest {
+        assertEquals(
+            ParseResult.Success(),
+            input.parse(uriString = "https://kagi.com/maps/info?q=%C5%A0pindler%C5%AFv%20Ml%C3%BDn&id=rSPAM#12.34/50.72525/15.59019"),
+        )
+    }
+
+    @Test
+    fun parse_idOpenStreetMapWay() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
                     WGS84Point(z = 19.0, name = "Victoria Peak Station HK Telecom Radio Station", source = Source.URI)
                 ),
-                next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/api/0.6/way/448058512/full.json"),
+                next = MatchedInput(
+                    openStreetMapApiInput,
+                    "https://www.openstreetmap.org/api/0.6/way/448058512/full.json"
+                ),
             ),
             input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
         )
     }
 
     @Test
-    fun parse_placeOpenStreetMapInvalid() = runTest {
+    fun parse_idOpenStreetMapWayInvalid() = runTest {
         assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    WGS84Point(
-                        22.275900068060622, 114.14579272270203,
-                        z = 19.0,
-                        name = "Victoria Peak Station HK Telecom Radio Station",
-                        source = Source.MAP_CENTER,
-                    ),
-                )
-            ),
-            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=x448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
+            ParseResult.Success(),
+            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=wSPAM&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
         )
     }
 
     @Test
-    fun parse_placeOpenStreetMapNoCenter() = runTest {
+    fun parse_idOpenStreetMapNoCenter() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
                     WGS84Point(z = 19.0, name = "Victoria Peak Station HK Telecom Radio Station", source = Source.URI)
                 ),
-                next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/api/0.6/way/448058512/full.json"),
+                next = MatchedInput(
+                    openStreetMapApiInput,
+                    "https://www.openstreetmap.org/api/0.6/way/448058512/full.json"
+                ),
             ),
             input.parse(uriString = "https://kagi.com/maps/info?z=19&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station"),
         )
     }
 
     @Test
-    fun parse_placeEmptyId() = runTest {
+    fun parse_idOpaque() = runTest {
+        assertEquals(
+            ParseResult.Warning(resources.getString(R.string.input_kagi_maps_warning_opaque_id)),
+            input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=U8zPGlHJwIDz2VwrxsSEGaA06EqXhN0w2nWmr48ffeM-a51Q_TtSVLKK_JCs6s0P&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
+        )
+    }
+
+    @Test
+    fun parse_idUnknown() = runTest {
+        assertEquals(
+            ParseResult.Warning(resources.getString(R.string.input_kagi_maps_warning_opaque_id)),
+            input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=SPAM&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
+        )
+    }
+
+    @Test
+    fun parse_idEmpty() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    WGS84Point(22.276039, 114.144692, z = 17.5, name = "Victoria Peak", source = Source.MAP_CENTER)
+                    WGS84Point(
+                        50.735981, 15.739860,
+                        z = 16.13,
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Sněžka",
+                        source = Source.MAP_CENTER,
+                    )
                 )
             ),
-            input.parse("https://kagi.com/maps/info?q=Victoria%20Peak&ll=22.276039,114.144692&id#17.5/22.276039/114.144692"),
+            input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
         )
     }
 
@@ -199,7 +237,7 @@ class KagiMapsUriInputTest : InputTest {
                     )
                 )
             ),
-            input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=U8zPGlHJwIDz2VwrxsSEGaA06EqXhN0w2nWmr48ffeM-a51Q_TtSVLKK_JCs6s0P&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
+            input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
         )
     }
 
@@ -211,7 +249,7 @@ class KagiMapsUriInputTest : InputTest {
                     WGS84Point(50.735739, 15.7395, z = 16.13, source = Source.MAP_CENTER)
                 )
             ),
-            input.parse("https://kagi.com/maps/info#16.13/50.735739/15.7395"),
+            input.parse("https://kagi.com/maps/#16.13/50.735739/15.7395"),
         )
     }
 
@@ -228,7 +266,7 @@ class KagiMapsUriInputTest : InputTest {
                     )
                 )
             ),
-            input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka%20&id=U8zPGlHJwIDz2VwrxsSEGaA06EqXhN0w2nWmr48ffeM-a51Q_TtSVLKK_JCs6s0P&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
+            input.parse("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka%20&ll=50.735981,15.739860#16.13/50.735739/15.7395"),
         )
     }
 

@@ -3,6 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
@@ -39,7 +40,7 @@ class KagiMapsUriInput @Inject constructor(
             }
 
             // Map center from fragment (contains zoom)
-            // https://kagi.com/maps/info#{z}/{lat}/{lon}
+            // https://kagi.com/maps/#{z}/{lat}/{lon}
             val centerFromFragment = Regex("""$Z/$LAT/$LON""").matchEntire(fragment)
                 ?.toZLatLonPoint(Source.MAP_CENTER)
 
@@ -47,50 +48,63 @@ class KagiMapsUriInput @Inject constructor(
             // https://kagi.com/maps/info?z={z}
             val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull() ?: centerFromFragment?.z
 
-            // Map center from query parameter (takes precedence over center from fragment)
-            // https://kagi.com/maps/info?ll={lat}%2C{lon}
-            val centerFromQueryParam = LAT_LON_PATTERN.matchEntire(queryParams["ll"])
-                ?.toLatLonPoint(Source.MAP_CENTER)
-            val center = centerFromQueryParam ?: centerFromFragment
-
-            queryParams["id"]?.let { id ->
-                // Coordinates
-                // https://kagi.com/maps/info?id=point_{lat}_{lon}
-                Regex("""point_${LAT}_${LON}""").matchEntire(id)
-                    ?.toLatLonPoint(source = Source.URI)
-                    ?.let {
-                        points = persistentListOf(WGS84Point(it, z = z, name = name))
-                        return@parseResult
-                    }
-
-                // OSM id
-                // https://kagi.com/maps/info?id=n{osmId}
-                // https://kagi.com/maps/info?id=r{osmId}
-                // https://kagi.com/maps/info?id=w{osmId}
-                Regex("""([a-z])(\d+)""").matchEntire(id)?.let { m ->
-                    m.groupOrNull(2)?.let { id ->
-                        m.groupOrNull(1).let { prefix ->
-                            when (prefix) {
-                                "n" -> "node"
-                                "r" -> "relation"
-                                "w" -> "way"
-                                else -> null
-                            }?.let { type ->
-                                // TODO Fallback to map center
-                                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
-                                next = MatchedInput(
-                                    openStreetMapApiInput.get(),
-                                    OpenStreetMapApiInput.formatApiUrlString(type = type, id = id),
-                                )
-                                return@parseResult
+            queryParams["id"]?.takeIf { it.isNotEmpty() }?.let { id ->
+                when (id.firstOrNull()) {
+                    'p' ->
+                        // Point
+                        // https://kagi.com/maps/info?id=point_{lat}_{lon}
+                        Regex("""point_${LAT}_${LON}""").matchEntire(id)
+                            ?.toLatLonPoint(source = Source.URI)
+                            ?.let {
+                                points = persistentListOf(WGS84Point(it, z = z, name = name))
                             }
+
+                    'n' ->
+                        // OSM node
+                        // https://kagi.com/maps/info?id=n{osmId}
+                        id.substring(1).toLongOrNull()?.let { osmId ->
+                            points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
+                            next = MatchedInput(
+                                openStreetMapApiInput.get(),
+                                OpenStreetMapApiInput.formatUrlString(
+                                    OpenStreetMapApiInput.Companion.ElementType.NODE, osmId
+                                ),
+                            )
                         }
+
+                    'r' ->
+                        // OSM relation
+                        // https://kagi.com/maps/info?id=r{osmId}
+                        id.substring(1).toLongOrNull()?.let { osmId ->
+                            points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
+                            next = MatchedInput(
+                                openStreetMapApiInput.get(),
+                                OpenStreetMapApiInput.formatUrlString(
+                                    OpenStreetMapApiInput.Companion.ElementType.RELATION, osmId
+                                ),
+                            )
+                        }
+
+                    'w' ->
+                        // OSM way
+                        // https://kagi.com/maps/info?id=w{osmId}
+                        id.substring(1).toLongOrNull()?.let { osmId ->
+                            points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
+                            next = MatchedInput(
+                                openStreetMapApiInput.get(),
+                                OpenStreetMapApiInput.formatUrlString(
+                                    OpenStreetMapApiInput.Companion.ElementType.WAY, osmId
+                                ),
+                            )
+                        }
+
+                    else -> {
+                        // Opaque id (not supported and don't use map center, because user expects the point location)
+                        // https://kagi.com/maps/info?id={id}
+                        warningMessage = resources.getString(R.string.input_kagi_maps_warning_opaque_id)
                     }
                 }
-
-                // Opaque id (not supported)
-                // https://kagi.com/maps/info?id={id}
-                // TODO Show warning that this is definitely a map center and not the point
+                return@parseResult
             }
 
             // Directions
@@ -117,6 +131,12 @@ class KagiMapsUriInput @Inject constructor(
                 }
             }
 
+            // Map center from query parameter (takes precedence over center from fragment)
+            // https://kagi.com/maps/info?ll={lat}%2C{lon}
+            val centerFromQueryParam = LAT_LON_PATTERN.matchEntire(queryParams["ll"])
+                ?.toLatLonPoint(Source.MAP_CENTER)
+            val center = centerFromQueryParam ?: centerFromFragment
+
             if (center != null) {
                 points = persistentListOf(WGS84Point(center, z = z, name = name))
             } else if (name != null) {
@@ -126,7 +146,10 @@ class KagiMapsUriInput @Inject constructor(
     }
 
     override fun genRandomUri(point: Point) =
-        UriFormatter.formatUriString(point, "https://kagi.com/maps/info?q={name}&id=point_{lat}_{lon}&ll={lat}%2C{lon}#{z}/{lat}/{lon}")
+        UriFormatter.formatUriString(
+            point,
+            "https://kagi.com/maps/info?q={name}&id=point_{lat}_{lon}&ll={lat}%2C{lon}#{z}/{lat}/{lon}"
+        )
 
     override fun toString() = "KagiMapsUriInput"
 }
