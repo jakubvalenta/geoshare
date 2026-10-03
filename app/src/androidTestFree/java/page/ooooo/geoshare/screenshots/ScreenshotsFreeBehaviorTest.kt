@@ -361,6 +361,12 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_error_unsupported_source_google_search")
 
+        // Conversion - Error - Kagi Maps - Warning - Account
+        shareUri("https://kagi.com/maps/info?q=Sn%C4%9B%C5%BEka&id=U8zPGlHJwIDz2VwrxsSEGaA06EqXhN0w2nWmr48ffeM-a51Q_TtSVLKK_JCs6s0P&ll=50.735981,15.739860#16.13/50.735739/15.7395")
+        onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_error_kagi_maps_warning_account")
+
         goBackToMainForm()
     }
 

@@ -77,6 +77,7 @@
     <string name="input_google_maps_web_view_name" translatable="false">Google Maps (WebView)</string>
     <string name="input_google_search_name" translatable="false">Google Search</string>
     <string name="input_kagi_maps_name">Kagi Maps</string>
+    <string name="input_kagi_maps_warning_account">Links with place ids are not supported, because they require a Kagi account.</string>
     <string name="input_mapy_com_short_link_name" translatable="false">Mapy.com (short link)</string>
     <string name="input_map_quest_html_name" translatable="false">MapQuest (HTML)</string>
     <string name="input_map_quest_name">MapQuest</string>
@@ -368,6 +369,6 @@
     <string name="user_preferences_section_appearance">Appearance</string>
     <string name="user_preferences_section_input">Input</string>
     <string name="user_preferences_section_output">Output</string>
-    <string name="yes">Yes</string>
     <string name="user_preferences_server_edit">Edit servers</string>
+    <string name="yes">Yes</string>
 </resources>
