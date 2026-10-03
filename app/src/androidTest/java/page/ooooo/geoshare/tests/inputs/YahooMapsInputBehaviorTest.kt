@@ -1,23 +1,23 @@
 package page.ooooo.geoshare.tests.inputs
 
 import androidx.test.uiautomator.uiAutomator
+import io.ktor.http.HttpStatusCode
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.tests.assumeDomainResolvable
+import page.ooooo.geoshare.tests.assumeHttpGetReturnsStatus
 import page.ooooo.geoshare.tests.testUri
 
 class YahooMapsInputBehaviorTest : InputBehaviorTest {
     @Test
     fun yahooMaps_offline() = uiAutomator {
-        // Place with id
+        // Map center
         testUri(
-            persistentListOf(
-                WGS84Point(35.04000, 135.72805, z = 17.0, source = Source.MAP_CENTER)
-            ),
-            "https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic",
+            WGS84Point(35.04067, 135.73777, z = 16.0, source = Source.MAP_CENTER),
+            "https://map.yahoo.co.jp/?lat=35.04067&lon=135.73777&zoom=16&maptype=basic",
         )
 
         // Directions
@@ -60,10 +60,22 @@ class YahooMapsInputBehaviorTest : InputBehaviorTest {
 
         // Short link
         testUri(
-            persistentListOf(
-                WGS84Point(35.69548, 139.77065, z = 17.0, source = Source.MAP_CENTER)
-            ),
-            "https://yahoo.jp/qDc2x2", // Resolves to https://map.yahoo.co.jp/place?gid=MBd0PFPhR-Y&lat=35.69548&lon=139.77065&zoom=17&maptype=basic
+            WGS84Point(35.03923, 135.72843, z = 17.0, source = Source.URI),
+            "https://yahoo.jp/wMAoiQ", // Resolves to https://map.yahoo.co.jp/place?lat=35.03923&lon=135.72843&zoom=17&maptype=basic
+            grantConnectionPermission = true,
+        )
+    }
+
+    @Test
+    fun yahooMaps_onlineAndMapAccessible() = uiAutomator {
+        runBlocking {
+            assumeHttpGetReturnsStatus("https://map.yahoo.co.jp", HttpStatusCode.OK)
+        }
+
+        // Place
+        testUri(
+            WGS84Point(35.03935, 135.72926, z = 17.0, source = Source.MAP_CENTER),
+            "https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic",
             grantConnectionPermission = true,
         )
     }

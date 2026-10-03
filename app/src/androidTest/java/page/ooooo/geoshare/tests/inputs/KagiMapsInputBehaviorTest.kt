@@ -18,9 +18,7 @@ class KagiMapsInputBehaviorTest : InputBehaviorTest {
     fun kagiMaps_offline() = uiAutomator {
         // Point
         testUri(
-            persistentListOf(
-                WGS84Point(53.205480, 5.784024, z = 17.5, name = "Shared Point", source = Source.URI)
-            ),
+            WGS84Point(53.205480, 5.784024, z = 17.5, name = "Shared Point", source = Source.URI),
             "https://kagi.com/maps/info?q=Shared%20Point&ll=53.205291,5.783568&id=point_53.205480_5.784024#17.5/53.205291/5.783568",
         )
 
@@ -97,12 +95,10 @@ class KagiMapsInputBehaviorTest : InputBehaviorTest {
         shareUri("https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503")
         denyConnectionPermission()
         assertConversionSucceeds(
-            persistentListOf(
-                WGS84Point(
-                    z = 19.0,
-                    name = "Victoria Peak Station HK Telecom Radio Station",
-                    source = Source.URI,
-                )
+            WGS84Point(
+                z = 19.0,
+                name = "Victoria Peak Station HK Telecom Radio Station",
+                source = Source.URI,
             )
         )
     }
