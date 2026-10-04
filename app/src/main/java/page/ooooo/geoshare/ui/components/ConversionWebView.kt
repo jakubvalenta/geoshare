@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.lib.network.WebViewNetworkException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -136,8 +137,8 @@ fun ConversionWebView(
                 settings.allowContentAccess = false
                 settings.allowFileAccess = false
                 settings.javaScriptEnabled = true
-                // Notice that we don't set custom user agent, because it makes Google Maps serve an error page. An
-                // Input can set a user agent in extendWebSettings, if needed.
+                // Don't set a custom user agent by default, because it makes Google Maps return an error page. If a
+                // particular Input requires a custom user agent, it can override extendWebSettings.
                 extendWebSettings(settings)
 
                 webChromeClient = object : WebChromeClient() {
@@ -216,7 +217,9 @@ fun ConversionWebView(
                             if (shouldInterceptRequest(requestUrlString)) {
                                 return WebResourceResponse("text/plain", "utf-8", null)
                             }
-                            // In development, you can log requests with Log.d(TAG, "Allowed request $requestUrlString")
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "Allowed request to $requestUrlString")
+                            }
                         }
                         return super.shouldInterceptRequest(view, request)
                     }

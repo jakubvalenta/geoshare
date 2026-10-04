@@ -153,7 +153,7 @@ class MainViewModel @Inject constructor(
             _conversionStateLog.append(newState, clear = clearLog)
             newState.transitionRecursively(conversionStateContext) { newState ->
                 _conversionState.value = newState as ConversionState
-                log.d(TAG, "Transitioned action state to $newState")
+                log.d(TAG, "Transitioned conversion state to $newState")
                 _conversionStateLog.append(newState)
             }
         }

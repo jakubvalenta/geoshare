@@ -24,7 +24,9 @@ class BaiduMapWebViewInput @Inject constructor(
     override val group = InputGroup.BAIDU_MAP
 
     /**
-     * Notice that we don't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
+     * Extracts point from the page JavaScript state.
+     *
+     * It doesn't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
      */
     // language=JavaScript
     override fun getUnsafeExtractionJavaScript(match: String) = """

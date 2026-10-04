@@ -24,7 +24,7 @@ class AppleMapsHtmlInput @Inject constructor(
     override fun getName(resources: Resources) = resources.getString(R.string.input_apple_maps_html_name)
     override val group = InputGroup.APPLE_MAPS
 
-    // Use custom user agent instead of BrowserUserAgent, so that Apple Maps doesn't show "Unsupported browser"
+    // Set a custom user agent, so that Apple Maps doesn't show "Unsupported browser"
     override val userAgent = DESKTOP_USER_AGENT
 
     override suspend fun parse(data: ByteReadChannel, match: String, resources: Resources) = parseResult {
