@@ -10,7 +10,10 @@ Compartilhe um link de mapa com o GeoShare e o app abrirá ele em outro app de m
 - Cartes IGN
 - CoMaps
 - HERE WeGo
+- Yahoo! Maps
+- Kagi Maps
 - Magic Earth
+- MapQuest
 - Mapy.com
 - Maps.me
 - OpenStreetMap
