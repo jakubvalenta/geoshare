@@ -343,4 +343,5 @@
     <string name="user_preferences_server_edit">Upravit servery</string>
     <string name="input_yahoo_maps_name">Yahoo! Maps</string>
     <string name="input_map_quest_name">MapQuest</string>
+    <string name="input_kagi_maps_warning_account">Odkazy s id míst nejsou podporovány, protože vyžadují účet na Kagi.</string>
 </resources>
