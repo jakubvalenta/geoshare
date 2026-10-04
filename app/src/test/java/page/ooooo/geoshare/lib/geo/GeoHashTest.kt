@@ -74,7 +74,7 @@ class GeoHashTest {
         )
         assertEquals(
             NaivePoint(51.510998010635376, 0.05499601364135742, 16.0, source = Source.HASH),
-            decodeOpenStreetMapQuadTileHash(@Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "0EEQjEEb"),
+            decodeOpenStreetMapQuadTileHash(@Suppress("GrazieInspectionRunner") "0EEQjEEb"),
         )
     }
 
@@ -82,27 +82,27 @@ class GeoHashTest {
     fun decodeOpenStreetMapQuadTileHash_osmZoom() {
         assertEquals(
             NaivePoint(-16.23152732849121, -49.08348083496094, 13.0, source = Source.HASH),
-            decodeOpenStreetMapQuadTileHash(@Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "NuJWxJh"),
+            decodeOpenStreetMapQuadTileHash(@Suppress("GrazieInspectionRunner") "NuJWxJh"),
         )
         assertEquals(
             NaivePoint(-16.23152732849121, -49.08348083496094, 11.0, source = Source.HASH),
-            decodeOpenStreetMapQuadTileHash(@Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "NuJWxJh-"),
+            decodeOpenStreetMapQuadTileHash(@Suppress("GrazieInspectionRunner") "NuJWxJh-"),
         )
         assertEquals(
             NaivePoint(-16.23152732849121, -49.08348083496094, 12.0, source = Source.HASH),
-            decodeOpenStreetMapQuadTileHash(@Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "NuJWxJh--"),
+            decodeOpenStreetMapQuadTileHash(@Suppress("GrazieInspectionRunner") "NuJWxJh--"),
         )
         assertEquals(
             NaivePoint(-16.23152732849121, -49.08348083496094, 13.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash(
-                @Suppress("SpellCheckingInspection", "GrazieInspectionRunner")
+                @Suppress("GrazieInspectionRunner")
                 "NuJWxJh---"
             ),
         )
         assertEquals(
             NaivePoint(-16.23152732849121, -49.08348083496094, 11.0, source = Source.HASH),
             decodeOpenStreetMapQuadTileHash(
-                @Suppress("SpellCheckingInspection", "GrazieInspectionRunner")
+                @Suppress("GrazieInspectionRunner")
                 "NuJWxJh----"
             ),
         )

@@ -92,9 +92,8 @@ fun Context.openFileWithChooser(file: File, log: Log = DefaultLog): Boolean {
 fun Context.openSettingsOpenByDefaultForPackage(launcher: ActivityResultLauncher<Intent>, packageName: String) {
     try {
         val action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            // Samsung supposedly doesn't allow going to the "Open by default" settings page.
-            Build.MANUFACTURER.lowercase(Locale.ROOT) !=
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "samsung"
+            // According to users, Samsung doesn't allow going to the "Open by default" settings page.
+            Build.MANUFACTURER.lowercase(Locale.ROOT) != "samsung"
         ) {
             Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
         } else {
