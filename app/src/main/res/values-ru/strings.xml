@@ -342,4 +342,7 @@
     <string name="optional">Необязательно</string>
     <string name="description">Описание</string>
     <string name="user_preferences_server_edit">Редактировать серверы</string>
+    <string name="input_kagi_maps_warning_account">Ссылки с идентификаторами мест не поддерживаются, так как для этого требуется аккаунт Kagi.</string>
+    <string name="input_map_quest_name">MapQuest</string>
+    <string name="input_yahoo_maps_name">Yahoo! Maps</string>
 </resources>
