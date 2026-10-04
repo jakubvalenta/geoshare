@@ -74,7 +74,7 @@ class YahooMapsInputBehaviorTest : InputBehaviorTest {
 
         // Place
         testUri(
-            WGS84Point(35.03935, 135.72926, z = 17.0, source = Source.MAP_CENTER),
+            WGS84Point(35.03935, 135.72926, z = 17.0, source = Source.URI),
             "https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic",
             grantConnectionPermission = true,
         )

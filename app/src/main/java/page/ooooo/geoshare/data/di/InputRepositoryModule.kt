@@ -298,7 +298,7 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     override val yahooMapsWebViewInput = YahooMapsWebViewInput(
-        uriQuote = uriQuote
+        log = log,
     )
     override val yandexMapsShortLinkInput = YandexMapsShortLinkInput(
         yandexMapsUriInput = { yandexMapsUriInput },
