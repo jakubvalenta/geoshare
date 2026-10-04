@@ -28,11 +28,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.lib.network.WebViewNetworkException
 import kotlin.math.roundToInt
@@ -42,8 +37,6 @@ import kotlin.time.Duration.Companion.seconds
 private const val JAVA_SCRIPT_INTERFACE_NAME = "Android"
 private const val TAG = "ConversionWebView"
 
-@OptIn(FlowPreview::class)
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ConversionWebView(
     unsafeUrl: String,
@@ -54,7 +47,6 @@ fun ConversionWebView(
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
     sizePx: Size = Size(1080 - 2f, 1920f - 277f),
     extractionInterval: Duration = 1.seconds,
-    settleTimeout: Duration = 3.seconds,
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -74,31 +66,13 @@ fun ConversionWebView(
         """https://www\.example\.com[/?#]\S+""",
     )
     val safeUrl = remember(unsafeUrl) {
-        if (allowedUrlPatterns.any { pattern -> Regex(pattern).matches(unsafeUrl) }) {
-            unsafeUrl
-        } else {
-            pendingExtractionResult.completeExceptionally(IllegalStateException("Page blocked"))
-            null
-        }
+        unsafeUrl.takeIf { allowedUrlPatterns.any { pattern -> Regex(pattern).matches(unsafeUrl) } }
     }
-    val extractionResultFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
 
-    /**
-     * Stores the extraction result by completing the [pendingExtractionResult] deferred variable.
-     *
-     * It stores the result only after it hasn't changed in a while, because the first extraction often doesn't lead to
-     * the final result. For example when extracting the page URL, the first URL is not the final one. It can take the
-     * page JavaScript a few seconds to set the final page URL.
-     */
-    LaunchedEffect(extractionResultFlow) {
-        extractionResultFlow
-            .filterNotNull()
-            .distinctUntilChanged()
-            .debounce(settleTimeout)
-            .collect { extractionResult ->
-                Log.i(TAG, "Extraction settled at $extractionResult")
-                pendingExtractionResult.complete(extractionResult)
-            }
+    LaunchedEffect(safeUrl) {
+        if (safeUrl == null) {
+            pendingExtractionResult.completeExceptionally(IllegalStateException("Page blocked"))
+        }
     }
 
     // Render a placeholder in Preview, because WebView is not supported there
@@ -136,7 +110,9 @@ fun ConversionWebView(
                 // Allow JavaScript and configure its security
                 settings.allowContentAccess = false
                 settings.allowFileAccess = false
+                @SuppressLint("SetJavaScriptEnabled")
                 settings.javaScriptEnabled = true
+
                 // Don't set a custom user agent by default, because it makes Google Maps return an error page. If a
                 // particular Input requires a custom user agent, it can override extendWebSettings.
                 extendWebSettings(settings)
@@ -157,7 +133,7 @@ fun ConversionWebView(
                         @JavascriptInterface
                         fun onExtractSuccess(extractionResult: String) {
                             Log.d(TAG, "Extracted $extractionResult")
-                            extractionResultFlow.value = extractionResult
+                            pendingExtractionResult.complete(extractionResult)
                         }
 
                         @Suppress("unused")
@@ -202,7 +178,7 @@ fun ConversionWebView(
                                         }
                                     }
                                     extractAndCallback();
-                                    window.setInterval(extractAndCallback, ${extractionInterval.inWholeMilliseconds});
+                                    setInterval(extractAndCallback, ${extractionInterval.inWholeMilliseconds});
                                 })();
                             """.trimIndent(),
                             null,

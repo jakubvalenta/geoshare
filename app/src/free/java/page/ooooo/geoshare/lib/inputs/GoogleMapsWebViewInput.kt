@@ -15,23 +15,35 @@ class GoogleMapsWebViewInput @Inject constructor(
     override val group = InputGroup.GOOGLE_MAPS
 
     /**
-     * Extracts the URL of the page.
+     * Extracts the URL of the page after the page JavaScript has changed the URL.
      *
-     * Returns undefined if the URL doesn't contain coordinates, so that the extraction is retried until the page
-     * JavaScript changes the URL into one with coordinates.
+     * It waits for a while after a URL change and returns the URL only if no further URL change happens. The reaason is
+     * that the first URL change often doesn't lead to the final coordinates.
      *
-     * The check whether the URL contains coordinates is very simple, because we don't want to reimplement the whole URI
-     * parsing here, and because we know that:
+     * It does only a quick check that the URL contains coordinates, so that it doesn't duplicate the Google Maps URI
+     * parsing code, and because we know that:
      *
      * - The URL will most probably be in format `/@{lat},{lon},{z}z`
-     * - The URL could plausibly be in format `/data=...!3d{lat}!4d{lon}`
+     * - The URL could possibly be in format `/data=...!3d{lat}!4d{lon}`
      * - The URL is unlikely to be in another format such as `/?ll={lat},{lon}`
      */
     // language=JavaScript
     override fun getUnsafeExtractionJavaScript(match: String) = """
-        () => location.href.includes("/@") || location.href.includes("!2d") || location.href.includes("!4d")
-            ? location.href
-            : undefined;
+        () => {
+            if (window.__hrefWithCoordinates !== location.href) {
+                if (location.href.includes("/@") || location.href.includes("!2d") || location.href.includes("!4d")) {
+                    window.__hrefWithCoordinates = location.href;
+                    clearTimeout(window.__hrefWithCoordinatesTimeout);
+                    window.__hrefWithCoordinatesTimeout = setTimeout(
+                        () => window.__hrefWithCoordinatesFinished = true,
+                        3000
+                    );
+                }
+            } else if (window.__hrefWithCoordinatesFinished) {
+                return window.__hrefWithCoordinates;
+            }
+            return undefined;
+        }
     """.trimIndent()
 
     override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {

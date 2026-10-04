@@ -21,7 +21,9 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
     override val group = InputGroup.GOOGLE_MAPS
 
     /**
-     * Parse APP_INITIALIZATION_STATE, which has this structure:
+     * Extracts point from the page JavaScript state.
+     *
+     * It takes coordinates from the `APP_INITIALIZATION_STATE` global variable, which has this structure:
      *
      * ```
      * [
