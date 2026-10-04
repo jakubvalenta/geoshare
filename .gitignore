@@ -1,4 +1,5 @@
 *.iml
+*.log
 .DS_Store
 .attach_pid*
 .cxx

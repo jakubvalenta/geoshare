@@ -303,7 +303,7 @@ private fun ActionCompletedFeatureNotAvailablePreview() {
                 ResultTitle(
                     actionDetail = MutableStateFlow(null),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+                    billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                     animationsEnabled = false,
                     onCancel = {},
                     onNavigateToUserPreferencesScreen = {},
@@ -323,7 +323,7 @@ private fun DarkActionCompletedFeatureNotAvailablePreview() {
                 ResultTitle(
                     actionDetail = MutableStateFlow(null),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+                    billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                     animationsEnabled = false,
                     onCancel = {},
                     onNavigateToUserPreferencesScreen = {},

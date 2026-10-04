@@ -11,7 +11,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -165,7 +164,6 @@ fun MainMenu(
 // Previews
 
 @Preview(showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DefaultPreview() {
     AppTheme {
@@ -177,7 +175,7 @@ private fun DefaultPreview() {
                         MainMenu(
                             currentState = ConversionState.Initial,
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+                            billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                             changelogShown = MutableStateFlow(false),
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -195,7 +193,6 @@ private fun DefaultPreview() {
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DarkPreview() {
     AppTheme {
@@ -207,7 +204,7 @@ private fun DarkPreview() {
                         MainMenu(
                             currentState = ConversionState.Initial,
                             billingAppNameResId = R.string.app_name_pro,
-                            billingStatus = MutableStateFlow(BillingStatus.NotPurchased()),
+                            billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                             changelogShown = MutableStateFlow(false),
                             onNavigateToAboutScreen = {},
                             onNavigateToBillingScreen = {},
@@ -225,7 +222,6 @@ private fun DarkPreview() {
 }
 
 @Preview(showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DonationPreview() {
     AppTheme {
@@ -262,7 +258,6 @@ private fun DonationPreview() {
 }
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DarkDonationPreview() {
     AppTheme {

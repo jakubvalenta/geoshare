@@ -14,10 +14,8 @@ import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.UriQuote
 import java.util.UUID
-import kotlin.uuid.ExperimentalUuidApi
 
 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-@OptIn(ExperimentalUuidApi::class)
 @Entity
 @Serializable
 data class Server(

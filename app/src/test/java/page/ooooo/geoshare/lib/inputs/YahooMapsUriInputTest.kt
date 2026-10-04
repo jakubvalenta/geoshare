@@ -90,19 +90,7 @@ class YahooMapsUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_placeWithId() = runTest {
-        assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    WGS84Point(35.04000, 135.72805, z = 17.0, source = Source.MAP_CENTER)
-                )
-            ),
-            input.parse("https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic"),
-        )
-    }
-
-    @Test
-    fun parse_placeWithoutId() = runTest {
+    fun parse_point() = runTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
@@ -110,6 +98,19 @@ class YahooMapsUriInputTest : InputTest {
                 )
             ),
             input.parse("https://map.yahoo.co.jp/place?lat=35.05083&lon=135.76469&zoom=17&maptype=basic"),
+        )
+    }
+
+    @Test
+    fun parse_place() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                next = MatchedInput(
+                    FakeInputRepository.yahooMapsWebViewInput,
+                    "https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic"
+                )
+            ),
+            input.parse("https://map.yahoo.co.jp/place?gid=xnjNltgGwY6&lat=35.04000&lon=135.72805&zoom=17&maptype=basic"),
         )
     }
 

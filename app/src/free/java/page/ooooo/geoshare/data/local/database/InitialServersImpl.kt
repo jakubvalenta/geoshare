@@ -3,10 +3,8 @@ package page.ooooo.geoshare.data.local.database
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import page.ooooo.geoshare.BuildConfig
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 object InitialServersImpl : InitialServers {
     /**
      * Delete all servers and populate the table with initial ones.

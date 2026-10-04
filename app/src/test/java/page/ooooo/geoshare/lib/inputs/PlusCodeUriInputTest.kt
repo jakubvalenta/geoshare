@@ -18,8 +18,8 @@ class PlusCodeUriInputTest : InputTest {
     @Test
     fun match_globalCode() {
         assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "6GCRPR6C+24",
-            input.match(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "6GCRPR6C+24")
+            @Suppress("GrazieInspectionRunner") "6GCRPR6C+24",
+            input.match(@Suppress("GrazieInspectionRunner") "6GCRPR6C+24")
         )
         assertEquals(
             "796RWF8Q+WF",
@@ -154,7 +154,7 @@ class PlusCodeUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(-1.289938, 36.820313, source = Source.HASH)
                 )
             ),
-            input.parse(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "6GCRPR6C+24"),
+            input.parse(@Suppress("GrazieInspectionRunner") "6GCRPR6C+24"),
         )
         assertEquals(
             ParseResult.Success(
@@ -190,7 +190,7 @@ class PlusCodeUriInputTest : InputTest {
                     GCJ02MainlandChinaPoint(39.917312, 116.397078, source = Source.HASH)
                 )
             ),
-            input.parse(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "8PFRW98W+WRG"),
+            input.parse(@Suppress("GrazieInspectionRunner") "8PFRW98W+WRG"),
         )
     }
 

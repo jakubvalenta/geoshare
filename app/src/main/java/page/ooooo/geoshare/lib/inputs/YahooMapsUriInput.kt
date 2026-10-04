@@ -17,6 +17,7 @@ import javax.inject.Singleton
 
 @Singleton
 class YahooMapsUriInput @Inject constructor(
+    val yahooMapsWebViewInput: dagger.Lazy<YahooMapsWebViewInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
@@ -39,31 +40,21 @@ class YahooMapsUriInput @Inject constructor(
                 q.trim().takeIf { it.isNotEmpty() }
             }
 
-            // Map center
-            // https://map.yahoo.co.jp/?lat={lat}&lon={lot}
-            val center = LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
-                LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
-                    WGS84Point(lat, lon, z, name, source = Source.MAP_CENTER)
-                }
-            }
-
             when (pathParts.getOrNull(1)) {
-                // Place
-                // https://map.yahoo.co.jp/place?lat={lat}&lon={lot}
-                // https://map.yahoo.co.jp/place?gid={id}&lat={lat}&lon={lot}
                 "place" ->
-                    if (center != null) {
-                        points = persistentListOf(
-                            if (queryParams["gid"].isNullOrEmpty()) {
-                                // If the 'gid' query parameter is not set, then the coordinates in the 'lat' and 'lon'
-                                // query parameters are not a map center, but they are the correct place location. So we
-                                // can use mark the point as coming from a URI.
-                                center.copy(source = Source.URI)
-                            } else {
-                                // TODO Show warning that this is definitely a map center and not the point
-                                center
+                    if (queryParams["gid"].isNullOrEmpty()) {
+                        // Point
+                        // https://map.yahoo.co.jp/place?lat={lat}&lon={lot}
+                        LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
+                            LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
+                                points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
+                                return@parseResult
                             }
-                        )
+                        }
+                    } else {
+                        // Place (don't use 'lat' and 'lon', because that's map center and user expects the point location)
+                        // https://map.yahoo.co.jp/place?gid={id}
+                        next = MatchedInput(yahooMapsWebViewInput.get(), match)
                         return@parseResult
                     }
 
@@ -130,9 +121,16 @@ class YahooMapsUriInput @Inject constructor(
                         }
             }
 
-            if (center != null) {
-                points = persistentListOf(center)
-            } else if (name != null) {
+            // Map center
+            // https://map.yahoo.co.jp/?lat={lat}&lon={lot}
+            LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
+                    points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.MAP_CENTER))
+                    return@parseResult
+                }
+            }
+
+            if (name != null) {
                 points = persistentListOf(WGS84Point(name = name, source = Source.URI))
             }
         }
@@ -141,5 +139,5 @@ class YahooMapsUriInput @Inject constructor(
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://map.yahoo.co.jp/place?lat={lat}&lon={lon}&zoom={z}")
 
-    override fun toString() = "KagiMapsUriInput"
+    override fun toString() = "YahooMapsUriInput"
 }

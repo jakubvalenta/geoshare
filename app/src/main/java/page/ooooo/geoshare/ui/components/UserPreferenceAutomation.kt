@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -53,7 +52,6 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.toAutomationDetail
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun UserPreferenceAutomationListItem(
     index: Int,
@@ -185,7 +183,6 @@ private fun AutomationPreferenceValue(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun ListItemPreview() {
@@ -541,7 +538,7 @@ private fun NotPurchasedControlsPreview() {
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
-                billingStatus = BillingStatus.NotPurchased(),
+                billingStatus = BillingStatus.NotPurchased,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
@@ -585,7 +582,7 @@ private fun DarkNotPurchasedControlsPreview() {
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
-                billingStatus = BillingStatus.NotPurchased(),
+                billingStatus = BillingStatus.NotPurchased,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
@@ -629,7 +626,7 @@ private fun TabletNotPurchasedControlsPreview() {
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
-                billingStatus = BillingStatus.NotPurchased(),
+                billingStatus = BillingStatus.NotPurchased,
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},

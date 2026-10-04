@@ -46,8 +46,8 @@ class PermissionRequestedTest {
             state.grant(stateContext, false),
         )
         assertEquals(
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
             Permission.ASK,
+            userPreferencesRepository.getValue(ConnectionPermissionPreference),
         )
     }
 
@@ -65,8 +65,8 @@ class PermissionRequestedTest {
             state.grant(stateContext, true),
         )
         assertEquals(
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
             Permission.ALWAYS,
+            userPreferencesRepository.getValue(ConnectionPermissionPreference),
         )
     }
 
@@ -84,8 +84,8 @@ class PermissionRequestedTest {
             state.deny(stateContext, false),
         )
         assertEquals(
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
             Permission.ASK,
+            userPreferencesRepository.getValue(ConnectionPermissionPreference),
         )
     }
 
@@ -103,8 +103,8 @@ class PermissionRequestedTest {
             state.deny(stateContext, true),
         )
         assertEquals(
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
             Permission.NEVER,
+            userPreferencesRepository.getValue(ConnectionPermissionPreference),
         )
     }
 }

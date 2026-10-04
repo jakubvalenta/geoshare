@@ -3,6 +3,7 @@ package com.github.wandergis.coordtransform
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@Suppress("KotlinMisorderedAssertEqualsArguments")
 class CoordTransformTest {
     @Test
     fun bd09toGCJ02_example() {

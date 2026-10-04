@@ -133,13 +133,13 @@ class KagiMapsUriInput @Inject constructor(
 
             // Map center from query parameter (takes precedence over center from fragment)
             // https://kagi.com/maps/info?ll={lat}%2C{lon}
-            val centerFromQueryParam = LAT_LON_PATTERN.matchEntire(queryParams["ll"])
-                ?.toLatLonPoint(Source.MAP_CENTER)
-            val center = centerFromQueryParam ?: centerFromFragment
+            (LAT_LON_PATTERN.matchEntire(queryParams["ll"])?.toLatLonPoint(Source.MAP_CENTER)
+                ?: centerFromFragment)?.let {
+                points = persistentListOf(WGS84Point(it, z = z, name = name))
+                return@parseResult
+            }
 
-            if (center != null) {
-                points = persistentListOf(WGS84Point(center, z = z, name = name))
-            } else if (name != null) {
+            if (name != null) {
                 points = persistentListOf(WGS84Point(name = name, source = Source.URI))
             }
         }

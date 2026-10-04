@@ -184,7 +184,7 @@ suspend fun assumeDomainResolvable(
     assumeTrue("This test only works when DNS resolves the domain $domain", success)
 }
 
-suspend fun assumeHttpGetReturnsStatus(@Suppress("SameParameterValue") url: String, status: HttpStatusCode) {
+suspend fun assumeHttpGetReturnsStatus(url: String, status: HttpStatusCode) {
     val resStatus = try {
         withContext(Dispatchers.IO) {
             HttpClient(CIO).use { client ->
@@ -195,7 +195,7 @@ suspend fun assumeHttpGetReturnsStatus(@Suppress("SameParameterValue") url: Stri
         null
     }
     assumeTrue(
-        "This test only works when HTTP GET request returns 404 but it ${if (resStatus != null) "was ${resStatus.value}" else "timed out"} for $url",
+        "This test only works when HTTP GET $url returns ${status.value} but it ${if (resStatus != null) "was ${resStatus.value}" else "timed out"}",
         resStatus == status,
     )
 }

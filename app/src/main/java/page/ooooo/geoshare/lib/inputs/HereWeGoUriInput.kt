@@ -16,7 +16,6 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Singleton
 class HereWeGoUriInput @Inject constructor(
@@ -33,7 +32,6 @@ class HereWeGoUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?(?:share|wego)\.here\.com/$URI_REST)""")
 
-    @OptIn(ExperimentalEncodingApi::class)
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             val parts = data.pathParts.drop(1)

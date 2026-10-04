@@ -24,7 +24,7 @@ class MapQuestHtmlInput @Inject constructor(
     override fun getName(resources: Resources) = resources.getString(R.string.input_map_quest_html_name)
     override val group = InputGroup.MAP_QUEST
 
-    // Use a browser user agent, so that MapQuest doesn't return empty 202 Accepted response
+    // Set a custom user agent, so that MapQuest doesn't return empty 202 Accepted response
     override val userAgent = DESKTOP_USER_AGENT
 
     override suspend fun parse(data: ByteReadChannel, match: String, resources: Resources) = parseResult {

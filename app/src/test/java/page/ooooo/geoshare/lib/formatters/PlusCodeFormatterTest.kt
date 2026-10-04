@@ -20,7 +20,7 @@ class PlusCodeFormatterTest {
     @Test
     fun formatPlusCode_pointIsWithinMainlandChina() {
         assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "8PFRW98W+WRG",
+            @Suppress("GrazieInspectionRunner") "8PFRW98W+WRG",
             PlusCodeFormatter.formatPlusCode(
                 GCJ02MainlandChinaPoint(39.917313, 116.397063, source = Source.GENERATED)
             ),

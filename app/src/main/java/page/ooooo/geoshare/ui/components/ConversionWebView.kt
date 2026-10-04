@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.lib.network.WebViewNetworkException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -60,17 +61,25 @@ fun ConversionWebView(
     val size = with(density) { sizePx.toDpSize() }
 
     // As an extra layer of security, allow only specific URLs to be loaded in the WebView. These URLs should be more
-    // strict than the patterns in Input (for example only HTTPS should be allowed) and they should not change often.
+    // strict than the patterns in Input (for example only HTTPS should be allowed) and any change to these patterns
+    // should be reviewed thoroughly.
     val allowedUrlPatterns = listOf(
         // language=regexp
-        """^https://(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+$""",
+        """https://(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+""",
         // language=regexp
-        """^https://map\.baidu\.com[/?#]\S+$""",
+        """https://map\.baidu\.com[/?#]\S+""",
         // language=regexp
-        """^https://www\.example\.com[/?#]\S+$""",
+        """https://map\.yahoo\.co\.jp[/?#]\S+""",
+        // language=regexp
+        """https://www\.example\.com[/?#]\S+""",
     )
     val safeUrl = remember(unsafeUrl) {
-        allowedUrlPatterns.firstNotNullOfOrNull { pattern -> Regex(pattern).matchEntire(unsafeUrl)?.value }
+        if (allowedUrlPatterns.any { pattern -> Regex(pattern).matches(unsafeUrl) }) {
+            unsafeUrl
+        } else {
+            pendingExtractionResult.completeExceptionally(IllegalStateException("Page blocked"))
+            null
+        }
     }
     val extractionResultFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
 
@@ -128,8 +137,8 @@ fun ConversionWebView(
                 settings.allowContentAccess = false
                 settings.allowFileAccess = false
                 settings.javaScriptEnabled = true
-                // Notice that we don't set custom user agent, because it makes Google Maps serve an error page. An
-                // Input can set a user agent in extendWebSettings, if needed.
+                // Don't set a custom user agent by default, because it makes Google Maps return an error page. If a
+                // particular Input requires a custom user agent, it can override extendWebSettings.
                 extendWebSettings(settings)
 
                 webChromeClient = object : WebChromeClient() {
@@ -208,7 +217,9 @@ fun ConversionWebView(
                             if (shouldInterceptRequest(requestUrlString)) {
                                 return WebResourceResponse("text/plain", "utf-8", null)
                             }
-                            // In development, you can log requests with Log.d(TAG, "Allowed request $requestUrlString")
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "Allowed request to $requestUrlString")
+                            }
                         }
                         return super.shouldInterceptRequest(view, request)
                     }

@@ -110,7 +110,7 @@ data class AutomationRequested(
                 }
                 ?: run {
                     stateContext.log.w(TAG, "Didn't find cached billing status")
-                    BillingStatus.Loading()
+                    BillingStatus.Loading
                 }
         }
 

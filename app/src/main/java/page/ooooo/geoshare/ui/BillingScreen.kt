@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
@@ -124,7 +123,7 @@ fun BillingScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun BillingScreen(
@@ -440,7 +439,6 @@ private fun BillingLegalText(onConsumePurchases: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun BillingSupportingPane(
     billingOffers: BillingOffers,
@@ -597,7 +595,7 @@ private fun DefaultPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -618,7 +616,7 @@ private fun DarkPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -639,7 +637,7 @@ private fun TabletPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -660,7 +658,7 @@ private fun SmallPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -681,7 +679,7 @@ private fun PendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Pending(),
+            billingStatus = BillingStatus.Pending,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -702,7 +700,7 @@ private fun DarkPendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Pending(),
+            billingStatus = BillingStatus.Pending,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -723,7 +721,7 @@ private fun TabletPendingPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf(FakeSubscriptionOffer, FakeOneTimeOffer)),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Pending(),
+            billingStatus = BillingStatus.Pending,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1134,7 +1132,7 @@ private fun EmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1155,7 +1153,7 @@ private fun DarkEmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1176,7 +1174,7 @@ private fun TabletEmptyPreview() {
             billingMessage = null,
             billingOffers = BillingOffers.Done(persistentListOf()),
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1195,9 +1193,9 @@ private fun LoadingPreview() {
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
-            billingOffers = BillingOffers.Loading(),
+            billingOffers = BillingOffers.Loading,
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Loading(),
+            billingStatus = BillingStatus.Loading,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1216,9 +1214,9 @@ private fun DarkLoadingPreview() {
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
-            billingOffers = BillingOffers.Loading(),
+            billingOffers = BillingOffers.Loading,
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Loading(),
+            billingStatus = BillingStatus.Loading,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1237,9 +1235,9 @@ private fun TabletLoadingPreview() {
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
-            billingOffers = BillingOffers.Loading(),
+            billingOffers = BillingOffers.Loading,
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.Loading(),
+            billingStatus = BillingStatus.Loading,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1258,9 +1256,9 @@ private fun LoadingOffersPreview() {
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
-            billingOffers = BillingOffers.Loading(),
+            billingOffers = BillingOffers.Loading,
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1279,9 +1277,9 @@ private fun DarkLoadingOffersPreview() {
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
-            billingOffers = BillingOffers.Loading(),
+            billingOffers = BillingOffers.Loading,
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},
@@ -1300,9 +1298,9 @@ private fun TabletLoadingOffersPreview() {
             billingAppNameResId = R.string.app_name_pro,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingMessage = null,
-            billingOffers = BillingOffers.Loading(),
+            billingOffers = BillingOffers.Loading,
             billingRefundableDuration = 48.hours,
-            billingStatus = BillingStatus.NotPurchased(),
+            billingStatus = BillingStatus.NotPurchased,
             animationsEnabled = false,
             onBack = {},
             onConsumePurchases = {},

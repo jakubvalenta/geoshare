@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -55,7 +54,6 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * A text field whose placeholder cycles through [placeholders] every [placeholderCycleInterval].
  */
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedPlaceholderTextField(
     @Suppress("SameParameterValue") value: String,

@@ -2,10 +2,8 @@ package page.ooooo.geoshare.data.local.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 object InitialLinks : InitialData {
     /**
      * Delete all links and populate the table with initial ones.

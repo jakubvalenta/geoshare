@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui
 
 import android.util.Log
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -41,7 +40,6 @@ data class UserPreferencesRoute(val groupId: UserPreferenceGroupId? = null)
 
 private const val TAG = "MainNavigation"
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun MainNavigation(
     billingViewModel: BillingViewModel,

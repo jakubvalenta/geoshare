@@ -20,10 +20,8 @@ import page.ooooo.geoshare.ui.components.IconDescriptor
 import page.ooooo.geoshare.ui.components.ImageVectorIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import java.util.UUID
-import kotlin.uuid.ExperimentalUuidApi
 
 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-@OptIn(ExperimentalUuidApi::class)
 @Entity
 @Serializable
 data class Link(

@@ -21,7 +21,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
 import io.ktor.util.AttributeKey
 import io.ktor.util.network.UnresolvedAddressException
-import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.EOFException
 import org.junit.Assert.assertEquals
@@ -251,7 +250,6 @@ class HttpClientExtensionsTest {
             }
         }
 
-    @OptIn(InternalAPI::class)
     @Test
     fun getLastHopUrlString_whenResponseIs2xx_returnsRequestUrl() = runTest {
         for (status in listOf(
