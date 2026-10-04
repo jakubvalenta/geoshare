@@ -32,7 +32,7 @@ import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.lib.network.WebViewNetworkException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val JAVA_SCRIPT_INTERFACE_NAME = "Android"
 private const val TAG = "ConversionWebView"
@@ -46,7 +46,7 @@ fun ConversionWebView(
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
     sizePx: Size = Size(1080 - 2f, 1920f - 277f),
-    extractionInterval: Duration = 1.seconds,
+    extractionInterval: Duration = 500.milliseconds,
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
