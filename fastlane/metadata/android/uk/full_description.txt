@@ -10,7 +10,10 @@
 - Cartes IGN
 - CoMaps
 - HERE WeGo
+- Yahoo! Maps
+- Kagi Maps
 - Magic Earth
+- MapQuest
 - Maps.me
 - Mapy.com
 - OpenStreetMap
