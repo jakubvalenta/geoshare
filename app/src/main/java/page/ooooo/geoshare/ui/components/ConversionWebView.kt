@@ -60,17 +60,25 @@ fun ConversionWebView(
     val size = with(density) { sizePx.toDpSize() }
 
     // As an extra layer of security, allow only specific URLs to be loaded in the WebView. These URLs should be more
-    // strict than the patterns in Input (for example only HTTPS should be allowed) and they should not change often.
+    // strict than the patterns in Input (for example only HTTPS should be allowed) and any change to these patterns
+    // should be reviewed thoroughly.
     val allowedUrlPatterns = listOf(
         // language=regexp
-        """^https://(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+$""",
+        """https://(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+""",
         // language=regexp
-        """^https://map\.baidu\.com[/?#]\S+$""",
+        """https://map\.baidu\.com[/?#]\S+""",
         // language=regexp
-        """^https://www\.example\.com[/?#]\S+$""",
+        """https://map\.yahoo\.co\.jp[/?#]\S+""",
+        // language=regexp
+        """https://www\.example\.com[/?#]\S+""",
     )
     val safeUrl = remember(unsafeUrl) {
-        allowedUrlPatterns.firstNotNullOfOrNull { pattern -> Regex(pattern).matchEntire(unsafeUrl)?.value }
+        if (allowedUrlPatterns.any { pattern -> Regex(pattern).matches(unsafeUrl) }) {
+            unsafeUrl
+        } else {
+            pendingExtractionResult.completeExceptionally(IllegalStateException("Page blocked"))
+            null
+        }
     }
     val extractionResultFlow = remember(safeUrl) { MutableStateFlow<String?>(null) }
 
