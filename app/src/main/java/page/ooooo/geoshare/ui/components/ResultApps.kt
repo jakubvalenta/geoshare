@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -68,7 +67,6 @@ import page.ooooo.geoshare.ui.toOutputDetailsForAppsByCategory
 import page.ooooo.geoshare.ui.toOutputDetailsForLinks
 import page.ooooo.geoshare.ui.toOutputDetailsForSharing
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ResultApps(
     outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory>,

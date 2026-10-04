@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -131,7 +129,7 @@ fun UserPreferenceScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
@@ -238,7 +236,6 @@ private fun UserPreferenceScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
@@ -559,7 +556,7 @@ private fun DefaultPreview() {
                     automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.Loading(),
+                    billingStatus = BillingStatus.Loading,
                     hiddenAppsDetails = MutableStateFlow(emptyList()),
                     hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
                     links = MutableStateFlow(defaultFakeLinks),
@@ -598,7 +595,7 @@ private fun DarkPreview() {
                     automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.Loading(),
+                    billingStatus = BillingStatus.Loading,
                     hiddenAppsDetails = MutableStateFlow(emptyList()),
                     hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
                     links = MutableStateFlow(defaultFakeLinks),
@@ -633,7 +630,7 @@ private fun TabletPreview() {
                     automationDetails = MutableStateFlow(emptyList()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.Loading(),
+                    billingStatus = BillingStatus.Loading,
                     hiddenAppsDetails = MutableStateFlow(emptyList()),
                     hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 0, visible = 0)),
                     links = MutableStateFlow(defaultFakeLinks),

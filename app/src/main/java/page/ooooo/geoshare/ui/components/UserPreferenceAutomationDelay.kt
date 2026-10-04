@@ -3,7 +3,6 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
@@ -40,7 +39,6 @@ import page.ooooo.geoshare.ui.toAutomationDetail
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun UserPreferenceAutomationDelayListItem(
     index: Int,
@@ -288,7 +286,7 @@ private fun NotPurchasedControlsPreview() {
                 values = UserPreferencesValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
-                billingStatus = BillingStatus.NotPurchased(),
+                billingStatus = BillingStatus.NotPurchased,
             )
         }
     }
@@ -310,7 +308,7 @@ private fun DarkNotPurchasedControlsPreview() {
                 ),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
-                billingStatus = BillingStatus.NotPurchased(),
+                billingStatus = BillingStatus.NotPurchased,
             )
         }
     }
@@ -332,7 +330,7 @@ private fun TabletNotPurchasedControlsPreview() {
                 ),
                 wide = false,
                 billingFeatures = listOf(AutomationFeature),
-                billingStatus = BillingStatus.NotPurchased(),
+                billingStatus = BillingStatus.NotPurchased,
             )
         }
     }

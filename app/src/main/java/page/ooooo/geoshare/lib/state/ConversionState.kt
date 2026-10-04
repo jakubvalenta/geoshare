@@ -4,7 +4,6 @@ import android.content.res.Resources
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -438,7 +437,6 @@ data class ConversionSucceeded(
     override val source: String,
     override val points: Points,
 ) : ConversionState, ConversionState.HasResult {
-    @OptIn(FlowPreview::class)
     override fun toString() = "ConversionSucceeded(source=$source, points=$points)"
 }
 

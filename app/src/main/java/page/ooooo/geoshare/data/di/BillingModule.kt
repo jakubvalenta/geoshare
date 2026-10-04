@@ -39,7 +39,7 @@ object BillingModule {
 class FakeBilling(
     override val context: Context,
     override val features: ImmutableList<Feature> = persistentListOf(AutomationFeature, CustomLinkFeature),
-    initialStatus: BillingStatus = BillingStatus.Loading(),
+    initialStatus: BillingStatus = BillingStatus.Loading,
 ) : Billing {
     override val appNameResId: Int = R.string.app_name_pro
     override val products: ImmutableList<BillingProduct> = persistentListOf(

@@ -6,7 +6,6 @@ import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +22,6 @@ import page.ooooo.geoshare.lib.Message
 import page.ooooo.geoshare.lib.geo.Srs
 import javax.inject.Inject
 
-@OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class LinkViewModel @Inject constructor(
     private val linkRepository: LinkRepository,

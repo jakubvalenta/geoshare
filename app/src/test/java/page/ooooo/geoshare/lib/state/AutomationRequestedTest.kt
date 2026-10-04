@@ -265,7 +265,7 @@ class AutomationRequestedTest {
         val automation = CopyCoordsDecAutomation
         val billing = FakeBilling(
             context,
-            initialStatus = BillingStatus.NotPurchased(),
+            initialStatus = BillingStatus.NotPurchased,
         )
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)

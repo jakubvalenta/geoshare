@@ -32,7 +32,7 @@ class BillingImpl(override val context: Context) : Billing {
         .stateIn(
             CoroutineScope(Dispatchers.Default),
             SharingStarted.WhileSubscribed(5000),
-            BillingStatus.Loading(),
+            BillingStatus.Loading,
         )
 
     override val message = flowOf(null)

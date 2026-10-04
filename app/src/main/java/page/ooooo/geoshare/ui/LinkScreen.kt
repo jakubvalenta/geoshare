@@ -857,7 +857,6 @@ private fun DarkInsertPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletInsertPreview() {
@@ -929,7 +928,7 @@ private fun InsertNotPurchasedPreview() {
                     appEnabled = MutableStateFlow(false),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(),
+                    billingStatus = BillingStatus.NotPurchased,
                     chipEnabled = MutableStateFlow(false),
                     coordsUriTemplate = MutableStateFlow(""),
                     group = MutableStateFlow(""),
@@ -979,7 +978,7 @@ private fun DarkInsertNotPurchasedPreview() {
                     appEnabled = MutableStateFlow(false),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(),
+                    billingStatus = BillingStatus.NotPurchased,
                     chipEnabled = MutableStateFlow(false),
                     coordinateConverter = coordinateConverter,
                     coordsUriTemplate = MutableStateFlow(""),
@@ -1013,7 +1012,6 @@ private fun DarkInsertNotPurchasedPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletInsertNotPurchasedPreview() {
@@ -1030,7 +1028,7 @@ private fun TabletInsertNotPurchasedPreview() {
                     appEnabled = MutableStateFlow(false),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
-                    billingStatus = BillingStatus.NotPurchased(),
+                    billingStatus = BillingStatus.NotPurchased,
                     chipEnabled = MutableStateFlow(false),
                     coordinateConverter = coordinateConverter,
                     coordsUriTemplate = MutableStateFlow(""),
@@ -1064,7 +1062,6 @@ private fun TabletInsertNotPurchasedPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun UpdatePreview() {
@@ -1121,7 +1118,6 @@ private fun UpdatePreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkUpdatePreview() {
@@ -1178,7 +1174,6 @@ private fun DarkUpdatePreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletUpdatePreview() {

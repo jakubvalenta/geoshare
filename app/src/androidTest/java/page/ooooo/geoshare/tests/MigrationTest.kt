@@ -9,10 +9,8 @@ import page.ooooo.geoshare.data.local.database.AppDatabase
 import page.ooooo.geoshare.data.local.database.InitialLinks
 import page.ooooo.geoshare.data.local.database.InitialServersImpl
 import java.io.IOException
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 class MigrationTest {
     private val testDb = "migration-test"
 

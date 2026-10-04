@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -255,7 +254,6 @@ private fun ServerScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ServerListPane(
     destination: Int?,
@@ -664,7 +662,6 @@ private fun DarkInsertPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletInsertPreview() {
@@ -705,7 +702,6 @@ private fun TabletInsertPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun UpdatePreview() {
@@ -747,7 +743,6 @@ private fun UpdatePreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkUpdatePreview() {
@@ -789,7 +784,6 @@ private fun DarkUpdatePreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Preview(showBackground = true, device = Devices.TABLET)
 @Composable
 private fun TabletUpdatePreview() {

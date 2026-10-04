@@ -3,6 +3,7 @@ package com.github._46319943.bd09convertor
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@Suppress("KotlinMisorderedAssertEqualsArguments")
 class BD09ConvertorTest {
     @Test
     fun convertMC2LL_example() {

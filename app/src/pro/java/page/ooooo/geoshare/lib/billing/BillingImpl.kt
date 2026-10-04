@@ -77,7 +77,7 @@ class BillingImpl(
         .enableAutoServiceReconnection()
         .build()
 
-    private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading())
+    private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading)
     override val status: StateFlow<BillingStatus> = _status.asStateFlow()
 
     private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
@@ -360,7 +360,7 @@ class BillingImpl(
             }
 
     private fun queryPurchases() {
-        _status.value = BillingStatus.Loading()
+        _status.value = BillingStatus.Loading
         for (productType in listOf(ProductType.INAPP, ProductType.SUBS)) {
             val queryPurchasesParams = QueryPurchasesParams.newBuilder().setProductType(productType).build()
             billingClient.queryPurchasesAsync(queryPurchasesParams, this)

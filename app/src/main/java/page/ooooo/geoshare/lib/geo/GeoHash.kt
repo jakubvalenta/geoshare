@@ -157,10 +157,10 @@ private val MAPY_COM_CHAR_MAP = "0ABCD2EFGH4IJKLMN6OPQRST8UVWXYZ-1abcd3efgh5ijkl
  *
  * Is composed of:
  *
- * - `9gz-H` = 1st point x (`9` determines that coordinate is 5 characters long)
- * - `xYH7n` = 1st point y (`x` determines that coordinate is 5 characters long)
- * - `gon` = 2nd point x as an offset from the 1st point x (`g` determines that the coordinate is 3 characters long)
- * - `A6` = 2nd point y as an offset from the 1st point y (`A` determines that the coordinate is 2 characters long)
+ * - `9gz-H` = 1st point x; `9` determines that coordinate is 5 characters long
+ * - `xYH7n` = 1st point y; `x` determines that coordinate is 5 characters long
+ * - `gon` = 2nd point x as an offset from the 1st point x; `g` determines that the coordinate is 3 characters long
+ * - `A6` = 2nd point y as an offset from the 1st point y; `A` determines that the coordinate is 2 characters long
  */
 fun decodeMapyComGeoHash(
     hash: String,

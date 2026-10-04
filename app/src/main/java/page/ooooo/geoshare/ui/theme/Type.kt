@@ -3,7 +3,6 @@ package page.ooooo.geoshare.ui.theme
 import android.os.Build
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -16,7 +15,6 @@ val defaultTypography = Typography().run {
         copy(
             headlineLarge = headlineLarge.copy(
                 fontFamily = FontFamily(
-                    @OptIn(ExperimentalTextApi::class)
                     Font(
                         R.font.robotoflex_variable,
                         variationSettings = FontVariation.Settings(

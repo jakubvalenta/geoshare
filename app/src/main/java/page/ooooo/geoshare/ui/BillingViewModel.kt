@@ -40,7 +40,7 @@ class BillingViewModel @Inject constructor(
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                BillingOffers.Loading(),
+                BillingOffers.Loading,
             )
     val billingRefundableDuration: Duration = billing.refundableDuration
     val billingStatus: StateFlow<BillingStatus> = billing.status

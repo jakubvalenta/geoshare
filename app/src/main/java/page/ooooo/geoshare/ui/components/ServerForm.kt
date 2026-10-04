@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,12 +25,11 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.FakeGoogleMapsAddressServer
-import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.data.local.database.Server
+import page.ooooo.geoshare.data.local.database.ServerAuthType
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServerForm(
     apiKey: StateFlow<String>,

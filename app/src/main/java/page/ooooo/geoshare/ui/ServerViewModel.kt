@@ -6,7 +6,6 @@ import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +28,6 @@ data class SelectedServers(
     val search: Server? = null,
 )
 
-@OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class ServerViewModel @Inject constructor(
     private val serverRepository: ServerRepository,

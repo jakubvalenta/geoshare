@@ -26,9 +26,9 @@ fun List<Purchase>.getBillingStatus(products: List<BillingProduct>, refundableDu
             }
 
             PurchaseState.PENDING -> {
-                return BillingStatus.Pending()
+                return BillingStatus.Pending
             }
         }
     }
-    return BillingStatus.NotPurchased()
+    return BillingStatus.NotPurchased
 }
