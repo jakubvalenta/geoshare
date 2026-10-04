@@ -323,4 +323,5 @@
     <string name="input_kagi_maps_name">Kagi Maps</string>
     <string name="input_map_quest_name">MapQuest</string>
     <string name="input_yahoo_maps_name">Yahoo! Maps</string>
+    <string name="input_kagi_maps_warning_account">不支持包含地点 ID 的链接，因为它们需要 Kagi 账号。</string>
 </resources>
