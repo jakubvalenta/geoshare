@@ -277,7 +277,7 @@ class MainBehaviorTest {
             shareUri()
 
             // Launch navigation in TomTom
-            scrollToAppIcon(PackageNames.TOMTOM).longClick() // FIXME
+            scrollToAppIcon(PackageNames.TOMTOM).longClick()
             launchNavigationInApp()
 
             // Dismiss the location rationale dialog
