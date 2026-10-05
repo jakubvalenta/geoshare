@@ -123,6 +123,10 @@ class GoogleMapsAddressApiInputTest : InputTest {
                 ParseResult.Success(
                     persistentListOf(
                         GCJ02MainlandChinaPoint(name = "Paris,France", source = Source.URI),
+                        GCJ02MainlandChinaPoint(name = "Versailles,France", source = Source.URI),
+                        GCJ02MainlandChinaPoint(name = "Chartres,France", source = Source.URI),
+                        GCJ02MainlandChinaPoint(name = "Le+Mans,France", source = Source.URI),
+                        GCJ02MainlandChinaPoint(name = "Caen,France", source = Source.URI),
                         GCJ02MainlandChinaPoint(50.123456, -120.123456, name = query, source = Source.API),
                     )
                 ),

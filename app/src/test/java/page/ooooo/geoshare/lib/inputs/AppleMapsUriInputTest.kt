@@ -216,18 +216,9 @@ class AppleMapsUriInputTest : InputTest {
                         "Hugo de Vrieslaan, Hugo de Vrieslaan Amsterdam Netherlands",
                         source = Source.URI,
                     ),
-                    WGS84Point(
-                        52.352443, 4.921501,
-                        source = Source.URI,
-                    ),
-                    WGS84Point(
-                        52.355175, 4.928403,
-                        source = Source.URI,
-                    ),
-                    WGS84Point(
-                        52.351108, 4.935267,
-                        source = Source.URI,
-                    ),
+                    WGS84Point(52.352443, 4.921501, source = Source.URI),
+                    WGS84Point(52.355175, 4.928403, source = Source.URI),
+                    WGS84Point(52.351108, 4.935267, source = Source.URI),
                 )
             ),
             input.parse("https://maps.apple.com/directions?source=Hugo%20de%20Vrieslaan%2C%20Hugo%20de%20Vrieslaan%20Amsterdam%20Netherlands&waypoint=52.352443%2C4.921501&waypoint=52.355175%2C4.928403&destination=52.351108%2C4.935267&mode=driving"),
@@ -239,19 +230,13 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    WGS84Point(
-                        52.350284, 4.944259,
-                        source = Source.URI,
-                    ),
+                    WGS84Point(52.350284, 4.944259, source = Source.URI),
                     WGS84Point(
                         name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                         "Middenweg 331, Middenweg 331, 1098 AT Amsterdam, Netherlands",
                         source = Source.URI,
                     ),
-                    WGS84Point(
-                        52.346449, 4.950065,
-                        source = Source.URI,
-                    ),
+                    WGS84Point(52.346449, 4.950065, source = Source.URI),
                 )
             ),
             input.parse("https://maps.apple.com/directions?source=52.350284%2C4.944259&waypoint=Middenweg%20331%2C%20Middenweg%20331%2C%201098%20AT%20Amsterdam%2C%20Netherlands&destination=52.346449%2C4.950065&mode=driving"),
@@ -263,10 +248,7 @@ class AppleMapsUriInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    WGS84Point(
-                        52.49115540927951, 13.42595574770533,
-                        source = Source.MAP_CENTER,
-                    )
+                    WGS84Point(52.49115540927951, 13.42595574770533, source = Source.MAP_CENTER)
                 )
             ),
             input.parse("https://maps.apple.com/search?span=0.0076562252877820924,0.009183883666992188&center=52.49115540927951,13.42595574770533"),

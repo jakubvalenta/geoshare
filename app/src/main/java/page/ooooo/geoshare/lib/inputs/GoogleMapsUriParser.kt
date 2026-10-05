@@ -48,17 +48,41 @@ object GoogleMapsUriParser {
 
             val z = Z_PATTERN.matchEntire(queryParams["zoom"]?.firstOrNull())?.doubleGroupOrNull()
 
-            // API directions
-            // https://www.google.com/maps/dir/?origin={lat},{lon}&destination={lat},{lon}
-            // https://www.google.com/maps/dir/?origin={name}&destination={name}
-            listOf(
-                "origin",
-                "destination",
-            )
-                .mapNotNull { key ->
-                    LAT_LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLatLonPoint(Source.URI)
-                        ?: Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toNamePoint(Source.URI)
+            // API Directions
+            // https://www.google.com/maps/dir/?origin={point1Lat},{point1Lon}&waypoints={point2Lat},{point2Lon}|{point3Lat},{point3Lon}...&destination={lastPointLat},{lastPointLon}
+            // https://www.google.com/maps/dir/?origin={point1Name}&waypoints={point2Name}|{point3Name}...&destination={lastPointName}
+            // https://www.google.com/maps/dir/?sdaddr={point1Lat},{point1Lon}&daddr={lastPointLat},{lastPointLon}
+            // https://www.google.com/maps/dir/?sdaddr={point1Name}&daddr={lastPointName}
+            buildList {
+                listOf(
+                    "origin",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "saddr",
+                )
+                    .firstNotNullOfOrNull { key ->
+                        LAT_LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLatLonPoint(Source.URI)
+                            ?: Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toNamePoint(Source.URI)
+                    }
+                    ?.let { add(it) }
+                queryParams["waypoints"]?.firstOrNull()?.let { waypoints ->
+                    addAll(
+                        waypoints.split('|')
+                            .filter { it.isNotBlank() }
+                            .mapNotNull { waypointStr ->
+                                LAT_LON_PATTERN.matchEntire(waypointStr)?.toLatLonPoint(Source.URI)
+                                    ?: Q_PARAM_PATTERN.matchEntire(waypointStr)?.toNamePoint(Source.URI)
+                            }
+                    )
                 }
+                listOf(
+                    "destination",
+                    @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr",
+                )
+                    .firstNotNullOfOrNull { key ->
+                        LAT_LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLatLonPoint(Source.URI)
+                            ?: Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toNamePoint(Source.URI)
+                    }
+                    ?.let { add(it) }
+            }
                 .takeIf { it.isNotEmpty() }
                 ?.let { naivePoints ->
                     points = naivePoints.map { GCJ02MainlandChinaPoint(it, z) }.toImmutableList()
@@ -69,7 +93,6 @@ object GoogleMapsUriParser {
             // https://maps.google.com/?ll={lat},{lon}
             // https://maps.google.com/?q={lat},{lon}
             listOf(
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr",
                 "q",
                 "query",
                 "ll",
@@ -98,19 +121,24 @@ object GoogleMapsUriParser {
             // https://maps.google.com/?q={name}
             // https://maps.google.com/?q={name}&query_place_id={name}
             // https://maps.google.com/?query_place_id={name}
-            val query = listOf(
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr",
+            listOf(
                 "q",
                 "query",
             )
-                .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.groupOrNull() }
-            val placeId = Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"]?.firstOrNull())?.groupOrNull()
-            if (query != null || placeId != null) {
-                points = persistentListOf(
-                    GCJ02MainlandChinaPoint(z = z, name = query, placeId = placeId, source = Source.URI)
-                )
-                return@googleMapsParseResult
-            }
+                .firstNotNullOfOrNull { key ->
+                    Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.groupOrNull()
+                }
+                .let { query ->
+                    Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"]?.firstOrNull())?.groupOrNull()
+                        .let { placeId ->
+                            if (query != null || placeId != null) {
+                                points = persistentListOf(
+                                    GCJ02MainlandChinaPoint(z = z, name = query, placeId = placeId, source = Source.URI)
+                                )
+                                return@googleMapsParseResult
+                            }
+                        }
+                }
 
             val parts = pathParts.dropWhile { it.isEmpty() || it == "maps" }
             val firstPart = parts.firstOrNull()
