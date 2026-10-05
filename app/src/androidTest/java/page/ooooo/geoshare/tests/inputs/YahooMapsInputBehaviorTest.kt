@@ -67,7 +67,7 @@ class YahooMapsInputBehaviorTest : InputBehaviorTest {
     }
 
     @Test
-    fun yahooMaps_onlineAndMapAccessible() = uiAutomator {
+    fun yahooMaps_onlineAndServiceAccessible() = uiAutomator {
         runBlocking {
             assumeHttpGetReturnsStatus("https://map.yahoo.co.jp", HttpStatusCode.OK)
         }

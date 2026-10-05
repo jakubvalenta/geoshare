@@ -66,6 +66,7 @@ import page.ooooo.geoshare.tests.saveServerForm
 import page.ooooo.geoshare.tests.scrollToAppIcon
 import page.ooooo.geoshare.tests.scrollToAppIcons
 import page.ooooo.geoshare.tests.scrollToAutomationItem
+import page.ooooo.geoshare.tests.scrollToBottom
 import page.ooooo.geoshare.tests.scrollToLinkIcon
 import page.ooooo.geoshare.tests.scrollToTop
 import page.ooooo.geoshare.tests.setAppLocales
@@ -725,11 +726,8 @@ class ScreenshotsFreeBehaviorTest {
         saveScreenshot("main_strings/web_maps_list")
 
         // Web maps - Reset - Button
-        onElement { viewIdResourceName == "geoShareLinkListPane" }
-            .scroll(Direction.DOWN, 10f)
-        onElement { viewIdResourceName == "geoShareLinkListPane" }
-            // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkRestoreInitialButton" }
+        onElement { viewIdResourceName == "geoShareLinkListPane" }.scrollToBottom()
+        quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/web_maps_reset_button")
 
         // Web maps - Reset - Dialog
@@ -840,8 +838,7 @@ class ScreenshotsFreeBehaviorTest {
         saveScreenshot("main_strings/preferences_servers_page_1")
 
         // Preferences - Servers - Page 2
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-            .scroll(Direction.DOWN, 10f)
+        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.scrollToBottom()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_servers_page_2")
         goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }

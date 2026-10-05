@@ -50,7 +50,7 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
     fun googleMapsHtmlInput_online_googleSearch() = uiAutomator {
         assumeNotEmulator()
         assumeTrue(
-            "This test currently fails, because Google returns a captcha, even though we only run the test on a real device",
+            "This test currently fails, because Google returns a captcha, even though we only run the test on a physical device",
             false,
         )
 

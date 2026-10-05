@@ -115,21 +115,15 @@ class ServerBehaviorTest {
         }
 
         // Restore initial servers
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scroll(Direction.DOWN, 10f)
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareServerRestoreInitialButton" }
-            .click()
+        onElement { viewIdResourceName == "geoShareServerListPane" }.scrollToBottom()
+        onElement { viewIdResourceName == "geoShareServerRestoreInitialButton" }.click()
         onElement { viewIdResourceName == "geoShareServerRestoreInitialDialog" }.dismissDialog()
         onElement { viewIdResourceName == "geoShareServerRestoreInitialButton" }.click()
         onElement { viewIdResourceName == "geoShareServerRestoreInitialDialog" }.confirmDialog()
 
         // Shows the restored server
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            .scroll(Direction.DOWN, 10f)
-        onElement { viewIdResourceName == "geoShareServerListPane" }
-            // Scroll again, because only now can the lazy column pane scroll all the way to the top
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" }
+        onElement { viewIdResourceName == "geoShareServerListPane" }.scrollToElement(Direction.UP) {
+            viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID"
+        }
     }
 }
