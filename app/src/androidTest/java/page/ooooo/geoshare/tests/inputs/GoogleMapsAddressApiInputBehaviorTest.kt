@@ -257,6 +257,10 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             if (testServer is TestServer.Configured) {
                 persistentListOf(
                     GCJ02MainlandChinaPoint(name = "Paris,France", source = Source.API),
+                    GCJ02MainlandChinaPoint(name = "Versailles,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Chartres,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Le+Mans,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Caen,France", source = Source.URI),
                     GCJ02MainlandChinaPoint(
                         49.6338979, -1.622224,
                         name = "Cherbourg,France",
@@ -301,6 +305,10 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             } else {
                 persistentListOf(
                     GCJ02MainlandChinaPoint(name = "Paris,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Versailles,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Chartres,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Le+Mans,France", source = Source.URI),
+                    GCJ02MainlandChinaPoint(name = "Caen,France", source = Source.URI),
                     GCJ02MainlandChinaPoint(name = "Cherbourg,France", source = Source.URI),
                 )
             },

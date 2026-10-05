@@ -101,7 +101,7 @@ class GoogleMapsUriInputBehaviorTest : InputBehaviorTest {
             "https://www.google.co.uk/maps/place/Berlin,+Germany/@52.5067296,13.2599309,11z/",
         )
 
-        // API
+        // API map center
         testUri(
             WGS84Point(52.5067296, 13.2599309, source = Source.MAP_CENTER),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
