@@ -5,7 +5,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
@@ -183,6 +182,7 @@ class BaiduMapUriInputTest : InputTest {
             ParseResult.Success(
                 persistentListOf(
                     BD09MCPoint(
+                        z = 16.0,
                         name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
                         source = Source.URI,
                     )
@@ -201,11 +201,13 @@ class BaiduMapUriInputTest : InputTest {
                 persistentListOf(
                     BD09MCPoint(
                         2629182.88, 12613508.26,
+                        z = 16.0,
                         name = "广东省广州市越秀区白云街道烟雨路",
                         source = Source.URI,
                     ),
                     BD09MCPoint(
                         2631139.59, 12611885.88,
+                        z = 16.0,
                         name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
                         source = Source.URI,
                     ),
@@ -222,8 +224,8 @@ class BaiduMapUriInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
-                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
                 ),
             ),
             input.parse(
@@ -239,16 +241,19 @@ class BaiduMapUriInputTest : InputTest {
                 persistentListOf(
                     BD09MCPoint(
                         2629184.09, 12613508.26,
+                        z = 16.0,
                         name = "广东省广州市越秀区白云街道烟雨路",
                         source = Source.URI,
                     ),
                     BD09MCPoint(
                         2631131.0213408465, 12614727.164999995,
+                        z = 16.0,
                         name = "广东省广州市越秀区梅花村街道泰兴直街35号",
                         source = Source.URI,
                     ),
                     BD09MCPoint(
                         2631139.59, 12611885.88,
+                        z = 16.0,
                         name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
                         source = Source.URI,
                     ),
@@ -265,9 +270,9 @@ class BaiduMapUriInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
-                    BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
-                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
                 )
             ),
             input.parse(
@@ -283,21 +288,25 @@ class BaiduMapUriInputTest : InputTest {
                 persistentListOf(
                     BD09MCPoint(
                         2629182.88, 12613508.26,
+                        z = 16.0,
                         name = "广东省广州市越秀区白云街道烟雨路",
                         source = Source.URI,
                     ),
                     BD09MCPoint(
                         2631131.0213408465, 12614727.164999995,
+                        z = 16.0,
                         name = "广东省广州市越秀区梅花村街道泰兴直街35号",
                         source = Source.URI,
                     ),
                     BD09MCPoint(
                         2633524.681382545, 12613424.449999997,
+                        z = 16.0,
                         name = "广东省广州市越秀区黄花岗街道永福路36号DE座",
                         source = Source.URI,
                     ),
                     BD09MCPoint(
                         2631139.59, 12611885.88,
+                        z = 16.0,
                         name = "广东省广州市越秀区大塘街道中山三路东昌大街2号",
                         source = Source.URI,
                     ),
@@ -314,10 +323,10 @@ class BaiduMapUriInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    BD09MCPoint(name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
-                    BD09MCPoint(name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
-                    BD09MCPoint(name = "广东省广州市越秀区黄花岗街道永福路36号DE座", source = Source.URI),
-                    BD09MCPoint(name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区白云街道烟雨路", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区梅花村街道泰兴直街35号", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区黄花岗街道永福路36号DE座", source = Source.URI),
+                    BD09MCPoint(z = 16.0, name = "广东省广州市越秀区大塘街道中山三路东昌大街2号", source = Source.URI),
                 )
             ),
             input.parse(
@@ -328,21 +337,28 @@ class BaiduMapUriInputTest : InputTest {
 
     @Test
     fun parse_search() = runTest {
-        // TODO Add support for Baidu Map search URLs
-        assumeTrue(false)
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    BD09MCPoint(
-                        4047017.0, 14571495.0,
-                        z = 16.0,
-                        name = "%E5%8C%BB%E9%99%A2",
-                        source = Source.MAP_CENTER,
-                    ),
+                    BD09MCPoint(4047017.0, 14571495.0, z = 16.0, name = "医院", source = Source.MAP_CENTER)
                 )
             ),
             input.parse(
                 "https://map.baidu.com/search/%E5%8C%BB%E9%99%A2/@14571400,4047000,16z?querytype=nb&ar=(14570495%2C4046017%3B14572495%2C4048017)&wd=%E5%8C%BB%E9%99%A2&c=26046&bdtp=0&nb_x=14571495&nb_y=4047017&userSign=0&b=(14566383%2C4044357%3B14576607%2C4049677)&l=16&pn=0&gr_radius=1000&r=1000&from=webmap&device_ratio=1&da_src=shareurl"
+            ),
+        )
+    }
+
+    @Test
+    fun parse_searchQueryOnly() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    BD09MCPoint(name = "医院", source = Source.URI)
+                )
+            ),
+            input.parse(
+                "https://map.baidu.com/search/%E5%8C%BB%E9%99%A2"
             ),
         )
     }
