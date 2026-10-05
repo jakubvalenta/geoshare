@@ -987,8 +987,13 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
                 delay(TOAST_TIMEOUT)
             }
 
+            // Go back to server preferences
+            onElement { viewIdResourceName == "geoShareBack" }.click()
+
             // Select the server
-            onElement { viewIdResourceName == "geoShareServerListPane" }.apply {
+            onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
+                scrollToTop()
+                quickWaitForStableInActiveWindow()
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_${testServer.server.name}" }.click()
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_${testServer.server.name}" }.click()
             }
