@@ -2,6 +2,8 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
+import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
+import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
@@ -27,21 +29,34 @@ class AmapUriInput @Inject constructor(
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
-            // Query param p
+            // Coordinates and name in param 'p' (mobile)
             // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>
-            Regex("""\w+,$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["p"]?.firstOrNull())?.toLatLonNamePoint(Source.URI)
+            Regex("""\w+,$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["p"]?.firstOrNull())
+                ?.toLatLonNamePoint(Source.URI)
                 ?.let {
                     points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
-                    return@run
+                    return@parseResult
                 }
 
-            // Query param q
+            // Coordinates and name in param 'q' (mobile)
             // https://wb.amap.com/?q=<lat>,<lon>,<name>
-            Regex("""$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["q"]?.firstOrNull())?.toLatLonNamePoint(Source.URI)
+            Regex("""$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["q"]?.firstOrNull())
+                ?.toLatLonNamePoint(Source.URI)
                 ?.let {
                     points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
-                    return@run
+                    return@parseResult
                 }
+
+            // Coordinates and name in params 'lat', 'lng' and 'name' (desktop)
+            LAT_PATTERN.matchEntire(queryParams["lat"]?.firstOrNull())?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["lng"]?.firstOrNull())?.doubleGroupOrNull()?.let { lon ->
+                    val name = Q_PARAM_PATTERN.matchEntire(queryParams["name"]?.firstOrNull())?.groupOrNull()
+                    points = persistentListOf(
+                        GCJ02GreaterChinaAndTaiwanPoint(lat, lon, name = name, source = Source.URI)
+                    )
+                    return@parseResult
+                }
+            }
         }
     }
 
