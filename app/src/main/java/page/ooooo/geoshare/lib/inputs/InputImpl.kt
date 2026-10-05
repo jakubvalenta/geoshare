@@ -7,8 +7,6 @@ import io.ktor.client.plugins.cookies.CookiesStorage
 import io.ktor.client.request.prepareRequest
 import io.ktor.utils.io.ByteReadChannel
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.network.getLastHopUrlString
 import page.ooooo.geoshare.lib.network.headLocationHeader
@@ -16,6 +14,8 @@ import page.ooooo.geoshare.lib.network.rethrowExceptionsAsNetworkException
 import page.ooooo.geoshare.lib.network.setCookies
 import page.ooooo.geoshare.lib.network.setDefaultTimeouts
 import page.ooooo.geoshare.lib.network.setUserAgent
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import java.net.MalformedURLException
 
 interface TextInput : BasicInput<String> {

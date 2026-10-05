@@ -16,8 +16,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.network.NetworkException
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
 import java.net.MalformedURLException
 
 class BodyAsChannelInputTest {

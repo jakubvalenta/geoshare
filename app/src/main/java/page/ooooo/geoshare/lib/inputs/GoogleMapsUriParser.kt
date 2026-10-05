@@ -2,17 +2,18 @@ package page.ooooo.geoshare.lib.inputs
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
 import page.ooooo.geoshare.lib.extensions.toLatLonZPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
+import page.ooooo.geoshare.lib.extensions.toNamePoint
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.uri.Uri
 
 data class GoogleMapsParseResult(
     val points: Points = persistentListOf(),
@@ -45,7 +46,7 @@ object GoogleMapsUriParser {
                 return@run
             }
 
-            val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
+            val z = Z_PATTERN.matchEntire(queryParams["zoom"]?.firstOrNull())?.doubleGroupOrNull()
 
             // API directions
             // https://www.google.com/maps/dir/?origin={lat},{lon}&destination={lat},{lon}
@@ -55,9 +56,8 @@ object GoogleMapsUriParser {
                 "destination",
             )
                 .mapNotNull { key ->
-                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.URI)
-                        ?: Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull()
-                            ?.let { NaivePoint(name = it, source = Source.URI) }
+                    LAT_LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLatLonPoint(Source.URI)
+                        ?: Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toNamePoint(Source.URI)
                 }
                 .takeIf { it.isNotEmpty() }
                 ?.let { naivePoints ->
@@ -75,7 +75,7 @@ object GoogleMapsUriParser {
                 "ll",
             )
                 .firstNotNullOfOrNull { key ->
-                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.URI)
+                    LAT_LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLatLonPoint(Source.URI)
                 }?.let {
                     points = persistentListOf(GCJ02MainlandChinaPoint(it, z))
                     return@googleMapsParseResult
@@ -88,7 +88,7 @@ object GoogleMapsUriParser {
                 "center",
             )
                 .firstNotNullOfOrNull { key ->
-                    LAT_LON_PATTERN.matchEntire(queryParams[key])?.toLatLonPoint(Source.MAP_CENTER)
+                    LAT_LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLatLonPoint(Source.MAP_CENTER)
                 }?.let {
                     points = persistentListOf(GCJ02MainlandChinaPoint(it, z))
                     return@googleMapsParseResult
@@ -103,8 +103,8 @@ object GoogleMapsUriParser {
                 "q",
                 "query",
             )
-                .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
-            val placeId = Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"])?.groupOrNull()
+                .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.groupOrNull() }
+            val placeId = Q_PARAM_PATTERN.matchEntire(queryParams["query_place_id"]?.firstOrNull())?.groupOrNull()
             if (query != null || placeId != null) {
                 points = persistentListOf(
                     GCJ02MainlandChinaPoint(z = z, name = query, placeId = placeId, source = Source.URI)

@@ -20,13 +20,13 @@ import page.ooooo.geoshare.data.di.FakeKeyStoreTools
 import page.ooooo.geoshare.data.di.FakeServerRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
 import page.ooooo.geoshare.lib.network.UnknownNetworkException
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
 import java.net.SocketTimeoutException
 
 class GoogleMapsPlaceApiInputTest : InputTest {

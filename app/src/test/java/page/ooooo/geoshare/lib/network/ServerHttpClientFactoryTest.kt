@@ -23,12 +23,12 @@ import page.ooooo.geoshare.data.local.preferences.CachedServerToken
 import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.SigningPurpose
 import page.ooooo.geoshare.lib.buildSigningPayloadV1
 import page.ooooo.geoshare.lib.extensions.base64Decode
 import page.ooooo.geoshare.lib.extensions.base64Encode
 import page.ooooo.geoshare.lib.fingerprint
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
 import page.ooooo.geoshare.lib.verifySignature
 import kotlin.random.Random
 

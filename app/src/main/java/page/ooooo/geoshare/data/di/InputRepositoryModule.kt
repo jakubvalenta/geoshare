@@ -8,7 +8,6 @@ import io.ktor.client.engine.mock.MockEngine
 import page.ooooo.geoshare.data.DefaultInputRepository
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.inputs.AmapShortLinkInput
 import page.ooooo.geoshare.lib.inputs.AmapUriInput
 import page.ooooo.geoshare.lib.inputs.AppleMapsHtmlInput
@@ -53,6 +52,7 @@ import page.ooooo.geoshare.lib.inputs.YandexMapsHtmlInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsShortLinkInput
 import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
 import javax.inject.Singleton
 
 @Module

@@ -7,11 +7,11 @@ import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 

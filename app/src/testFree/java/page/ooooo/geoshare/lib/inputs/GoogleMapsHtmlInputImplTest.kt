@@ -1,18 +1,17 @@
 package page.ooooo.geoshare.lib.inputs
 
+import android.content.res.Resources
 import io.ktor.client.engine.mock.MockEngine
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-
-import android.content.res.Resources
-import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
 
 class GoogleMapsHtmlInputImplTest : InputTest {
     override val resources: Resources = mock()

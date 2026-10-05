@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.uri
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

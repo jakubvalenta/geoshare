@@ -2,8 +2,8 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -32,13 +32,13 @@ class MagicEarthUriInput @Inject constructor(
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             val z = listOf("z", "zoom")
-                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
 
             val name = listOf("name", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr", "q")
-                .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key])?.groupOrNull() }
+                .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.groupOrNull() }
 
-            LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
-                LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
+            LAT_PATTERN.matchEntire(queryParams["lat"]?.firstOrNull())?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["lon"]?.firstOrNull())?.doubleGroupOrNull()?.let { lon ->
                     points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
                     return@run
                 }

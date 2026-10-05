@@ -3,8 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -12,6 +10,8 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,21 +32,21 @@ class YahooMapsUriInput @Inject constructor(
         data.run {
             // Zoom
             // https://map.yahoo.co.jp/?zoom={z}
-            val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
+            val z = Z_PATTERN.matchEntire(queryParams["zoom"]?.firstOrNull())?.doubleGroupOrNull()
 
             // Query
             // https://map.yahoo.co.jp/search?q={q}
-            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()?.let { q ->
+            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"]?.firstOrNull())?.groupOrNull()?.let { q ->
                 q.trim().takeIf { it.isNotEmpty() }
             }
 
             when (pathParts.getOrNull(1)) {
                 "place" ->
-                    if (queryParams["gid"].isNullOrEmpty()) {
+                    if (queryParams["gid"]?.firstOrNull().isNullOrEmpty()) {
                         // Point
                         // https://map.yahoo.co.jp/place?lat={lat}&lon={lot}
-                        LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
-                            LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
+                        LAT_PATTERN.matchEntire(queryParams["lat"]?.firstOrNull())?.doubleGroupOrNull()?.let { lat ->
+                            LON_PATTERN.matchEntire(queryParams["lon"]?.firstOrNull())?.doubleGroupOrNull()?.let { lon ->
                                 points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
                                 return@parseResult
                             }
@@ -62,15 +62,15 @@ class YahooMapsUriInput @Inject constructor(
                 // https://map.yahoo.co.jp/route/{type}?from={point1Name}&to={lastPointName}&fromLat={point1Lat}&fromLon={point1Lon}&toLat={lastPointLat}&toLon={lastPointLon}&waypoints=name:{point2Name},lat:{point2Lat},lon:{point2Lon};...
                 "route" ->
                     buildList {
-                        val fromLat = LAT_PATTERN.matchEntire(queryParams["fromLat"])?.doubleGroupOrNull()
-                        val fromLon = LON_PATTERN.matchEntire(queryParams["fromLon"])?.doubleGroupOrNull()
-                        val fromName = Q_PARAM_PATTERN.matchEntire(queryParams["from"])?.groupOrNull()
+                        val fromLat = LAT_PATTERN.matchEntire(queryParams["fromLat"]?.firstOrNull())?.doubleGroupOrNull()
+                        val fromLon = LON_PATTERN.matchEntire(queryParams["fromLon"]?.firstOrNull())?.doubleGroupOrNull()
+                        val fromName = Q_PARAM_PATTERN.matchEntire(queryParams["from"]?.firstOrNull())?.groupOrNull()
                         if (fromLat != null && fromLon != null) {
                             add(WGS84Point(fromLat, fromLon, z, name = fromName, source = Source.URI))
                         } else if (fromName != null) {
                             add(WGS84Point(z = z, name = fromName, source = Source.URI))
                         }
-                        queryParams["waypoints"]?.let { pointsStr ->
+                        queryParams["waypoints"]?.firstOrNull()?.let { pointsStr ->
                             pointsStr
                                 .split(';')
                                 .filter { it.isNotBlank() }
@@ -105,9 +105,9 @@ class YahooMapsUriInput @Inject constructor(
                                     }
                                 }
                         }
-                        val toLat = LAT_PATTERN.matchEntire(queryParams["toLat"])?.doubleGroupOrNull()
-                        val toLon = LON_PATTERN.matchEntire(queryParams["toLon"])?.doubleGroupOrNull()
-                        val toName = Q_PARAM_PATTERN.matchEntire(queryParams["to"])?.groupOrNull()
+                        val toLat = LAT_PATTERN.matchEntire(queryParams["toLat"]?.firstOrNull())?.doubleGroupOrNull()
+                        val toLon = LON_PATTERN.matchEntire(queryParams["toLon"]?.firstOrNull())?.doubleGroupOrNull()
+                        val toName = Q_PARAM_PATTERN.matchEntire(queryParams["to"]?.firstOrNull())?.groupOrNull()
                         if (toLat != null && toLon != null) {
                             add(WGS84Point(toLat, toLon, z, name = toName, source = Source.URI))
                         } else if (toName != null) {
@@ -123,8 +123,8 @@ class YahooMapsUriInput @Inject constructor(
 
             // Map center
             // https://map.yahoo.co.jp/?lat={lat}&lon={lot}
-            LAT_PATTERN.matchEntire(queryParams["lat"])?.doubleGroupOrNull()?.let { lat ->
-                LON_PATTERN.matchEntire(queryParams["lon"])?.doubleGroupOrNull()?.let { lon ->
+            LAT_PATTERN.matchEntire(queryParams["lat"]?.firstOrNull())?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["lon"]?.firstOrNull())?.doubleGroupOrNull()?.let { lon ->
                     points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.MAP_CENTER))
                     return@parseResult
                 }

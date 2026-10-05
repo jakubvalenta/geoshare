@@ -4,8 +4,6 @@ import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -15,6 +13,8 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,7 +35,7 @@ class KagiMapsUriInput @Inject constructor(
         data.run {
             // Query
             // https://kagi.com/maps/info?q={q}
-            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()?.let { q ->
+            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"]?.firstOrNull())?.groupOrNull()?.let { q ->
                 q.trim().takeIf { it.isNotEmpty() }
             }
 
@@ -46,9 +46,9 @@ class KagiMapsUriInput @Inject constructor(
 
             // Zoom (takes precedence over map center zoom)
             // https://kagi.com/maps/info?z={z}
-            val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull() ?: centerFromFragment?.z
+            val z = Z_PATTERN.matchEntire(queryParams["z"]?.firstOrNull())?.doubleGroupOrNull() ?: centerFromFragment?.z
 
-            queryParams["id"]?.takeIf { it.isNotEmpty() }?.let { id ->
+            queryParams["id"]?.firstOrNull()?.takeIf { it.isNotEmpty() }?.let { id ->
                 when (id.firstOrNull()) {
                     'p' ->
                         // Point
@@ -110,7 +110,7 @@ class KagiMapsUriInput @Inject constructor(
             // Directions
             // https://kagi.com/maps/directions?q={point1Name}~{point1Lat}%2C{point1Lon}|{point2Lat}%2C{point2Lon}|...
             if (pathParts.getOrNull(2) == "directions") {
-                queryParams["q"]?.let { q ->
+                queryParams["q"]?.firstOrNull()?.let { q ->
                     q
                         .split('|')
                         .filter { it.isNotBlank() }
@@ -133,7 +133,7 @@ class KagiMapsUriInput @Inject constructor(
 
             // Map center from query parameter (takes precedence over center from fragment)
             // https://kagi.com/maps/info?ll={lat}%2C{lon}
-            (LAT_LON_PATTERN.matchEntire(queryParams["ll"])?.toLatLonPoint(Source.MAP_CENTER)
+            (LAT_LON_PATTERN.matchEntire(queryParams["ll"]?.firstOrNull())?.toLatLonPoint(Source.MAP_CENTER)
                 ?: centerFromFragment)?.let {
                 points = persistentListOf(WGS84Point(it, z = z, name = name))
                 return@parseResult

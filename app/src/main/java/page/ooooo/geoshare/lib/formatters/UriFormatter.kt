@@ -1,9 +1,9 @@
 package page.ooooo.geoshare.lib.formatters
 
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.UriQuote
-import page.ooooo.geoshare.lib.encodeURI
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.uri.DefaultUriQuote
+import page.ooooo.geoshare.lib.uri.UriQuote
+import page.ooooo.geoshare.lib.uri.encodeURI
 
 object UriFormatter {
     fun formatUriString(

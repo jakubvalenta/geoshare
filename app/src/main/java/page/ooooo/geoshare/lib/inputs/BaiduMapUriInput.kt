@@ -3,8 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.find
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -13,6 +11,8 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,9 +36,9 @@ class BaiduMapUriInput @Inject constructor(
 
             if (firstPart == "") {
                 if (
-                    !queryParams["poiShareId"].isNullOrEmpty() ||
-                    !queryParams["poiShareUid"].isNullOrEmpty() ||
-                    queryParams["s"]?.contains("uid=") == true
+                    !queryParams["poiShareId"]?.firstOrNull().isNullOrEmpty() ||
+                    !queryParams["poiShareUid"]?.firstOrNull().isNullOrEmpty() ||
+                    queryParams["s"]?.firstOrNull()?.contains("uid=") == true
                 ) {
                     // Shared coordinates or shared POI
                     // https://map.baidu.com/?poiShareId={id}
@@ -66,8 +66,8 @@ class BaiduMapUriInput @Inject constructor(
                 // https://map.baidu.com/dir/...?sn={startPoint}&en={waypointPoint}$$1$$%20to:{destPoint}
                 val pattern = Regex(WAYPOINT)
                 points = listOfNotNull(
-                    pattern.find(queryParams["sn"])?.toLonLatNamePoint(Source.URI)?.let { BD09MCPoint(it) },
-                    *pattern.findAll(queryParams["en"])
+                    pattern.find(queryParams["sn"]?.firstOrNull())?.toLonLatNamePoint(Source.URI)?.let { BD09MCPoint(it) },
+                    *pattern.findAll(queryParams["en"]?.firstOrNull())
                         .mapNotNull { m -> m.toLonLatNamePoint(Source.URI)?.let { BD09MCPoint(it) } }
                         .toList().toTypedArray(),
                 ).takeIf { it.isNotEmpty() }?.toImmutableList() ?:

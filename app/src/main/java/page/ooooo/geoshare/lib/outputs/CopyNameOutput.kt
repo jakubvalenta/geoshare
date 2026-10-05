@@ -3,9 +3,9 @@ package page.ooooo.geoshare.lib.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.uri.UriQuote
 
 /**
  * Copies the name of the point to the clipboard.

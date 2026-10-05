@@ -1,9 +1,9 @@
 package page.ooooo.geoshare.lib.formatters
 
-import kotlinx.collections.immutable.toImmutableMap
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
+import page.ooooo.geoshare.lib.uri.toQueryParams
 
 /**
  * See https://web.archive.org/web/20250609044205/https://www.magicearth.com/developers/, although it's outdated:
@@ -16,50 +16,50 @@ object MagicEarthUriFormatter {
     fun formatDisplayUriString(point: WGS84Point, uriQuote: UriQuote) = Uri(
         scheme = "magicearth",
         path = "//",
-        queryParams = buildMap {
+        queryParams = buildList {
             point.run {
                 latStr?.let { latStr ->
                     lonStr?.let { lonStr ->
-                        set("show_on_map", "")
-                        set("lat", latStr)
-                        set("lon", lonStr)
+                        add("show_on_map" to "")
+                        add("lat" to latStr)
+                        add("lon" to lonStr)
                         name?.let { name ->
-                            set("name", name)
+                            add("name" to name)
                         }
                         Unit
                     }
                 } ?: name?.let { name ->
-                    set("open_search", "")
-                    set("q", name)
+                    add("open_search" to "")
+                    add("q" to name)
                 } ?: run {
-                    set("show_on_map", "")
-                    set("lat", "0")
-                    set("lon", "0")
+                    add("show_on_map" to "")
+                    add("lat" to "0")
+                    add("lon" to "0")
                 }
             }
-        }.toImmutableMap(),
+        }.toQueryParams(),
         uriQuote = uriQuote,
     ).toString()
 
     fun formatNavigationUriString(point: WGS84Point, uriQuote: UriQuote) = Uri(
         scheme = "magicearth",
         path = "//",
-        queryParams = buildMap {
-            set("get_directions", "")
+        queryParams = buildList {
+            add("get_directions" to "")
             point.run {
                 latStr?.let { latStr ->
                     lonStr?.let { lonStr ->
-                        set("lat", latStr)
-                        set("lon", lonStr)
+                        add("lat" to latStr)
+                        add("lon" to lonStr)
                     }
                 } ?: name?.let { name ->
-                    set("q", name)
+                    add("q" to name)
                 } ?: run {
-                    set("lat", "0")
-                    set("lon", "0")
+                    add("lat" to "0")
+                    add("lon" to "0")
                 }
             }
-        }.toImmutableMap(),
+        }.toQueryParams(),
         uriQuote = uriQuote,
     ).toString()
 }

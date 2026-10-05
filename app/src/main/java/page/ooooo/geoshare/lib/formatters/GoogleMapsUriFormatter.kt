@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.lib.formatters
 
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 
 object GoogleMapsUriFormatter {
     fun formatNavigationUriString(point: Point, uriQuote: UriQuote) = point.run {

@@ -2,8 +2,8 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
-import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
+import page.ooooo.geoshare.lib.uri.Uri
 
 interface InputTest {
     val resources: Resources

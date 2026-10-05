@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.uri.DefaultUriQuote
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Singleton
 
 @Module

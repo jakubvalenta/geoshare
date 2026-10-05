@@ -24,7 +24,6 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.InputGroup
@@ -35,6 +34,7 @@ import page.ooooo.geoshare.lib.network.ConnectionClosedNetworkException
 import page.ooooo.geoshare.lib.network.RecoverableNetworkException
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.WebViewNetworkException
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
 import java.io.EOFException
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime

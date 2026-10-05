@@ -2,9 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -15,6 +12,9 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeWazeGeoHash
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
+import page.ooooo.geoshare.lib.uri.toQueryParams
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,7 +48,7 @@ class WazeUriInput @Inject constructor(
                 null
             }
             // https://www.waze.com/live-map?h={hash}
-                ?: Regex("($HASH)").matchEntire(queryParams["h"])
+                ?: Regex("($HASH)").matchEntire(queryParams["h"]?.firstOrNull())
                 )?.groupOrNull()
                 ?.let { hash -> decodeWazeGeoHash(hash) }
                 ?.let {
@@ -64,17 +64,16 @@ class WazeUriInput @Inject constructor(
                     return@run
                 }
 
-            val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
+            val z = Z_PATTERN.matchEntire(queryParams["z"]?.firstOrNull())?.doubleGroupOrNull()
 
-            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
+            val name = Q_PARAM_PATTERN.matchEntire(queryParams["q"]?.firstOrNull())?.groupOrNull()
 
             // Coordinates
             // https://waze.com/ul?ll={lat},{lon}
-            (Regex("""ll\.$LAT,$LON""").matchEntire(queryParams["to"])
-                ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"])
+            (Regex("""ll\.$LAT,$LON""").matchEntire(queryParams["to"]?.firstOrNull())
+                ?: LAT_LON_PATTERN.matchEntire(queryParams["ll"]?.firstOrNull())
                 ?: LAT_LON_PATTERN.matchEntire(
-                    queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                    "latlng"]
+                    queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "latlng"]?.firstOrNull()
                 )
                 )?.toLatLonPoint(Source.URI)?.let {
                     points = persistentListOf(WGS84Point(it, z, name))
@@ -89,7 +88,7 @@ class WazeUriInput @Inject constructor(
 
             // Place
             // https://ul.waze.com/ul?venue_id={id}
-            queryParams["venue_id"]?.takeIf { it.isNotEmpty() }?.let { venueId ->
+            queryParams["venue_id"]?.firstOrNull()?.takeIf { it.isNotEmpty() }?.let { venueId ->
                 // To skip some redirects when downloading HTML, replace this URL:
                 // https://ul.waze.com/ul?venue_id=2884104.28644432.6709020
                 // or this URL:
@@ -102,11 +101,11 @@ class WazeUriInput @Inject constructor(
                         scheme = "https",
                         host = "www.waze.com",
                         path = "/live-map/directions",
-                        queryParams = persistentMapOf("to" to "place.w.$venueId"),
+                        queryParams = listOf("to" to "place.w.$venueId").toQueryParams(),
                         uriQuote = uriQuote,
                     ).toString(),
                 )
-            } ?: queryParams["place"]?.takeIf { it.isNotEmpty() }?.let { placeId ->
+            } ?: queryParams["place"]?.firstOrNull()?.takeIf { it.isNotEmpty() }?.let { placeId ->
                 // To skip some redirects when downloading HTML, replace this URL:
                 // https://www.waze.com/live-map/directions?place=w.2884104.28644432.6709020
                 // with this one:
@@ -117,11 +116,11 @@ class WazeUriInput @Inject constructor(
                         scheme = "https",
                         host = "www.waze.com",
                         path = "/live-map/directions",
-                        queryParams = persistentMapOf("to" to "place.$placeId"),
+                        queryParams = listOf("to" to "place.$placeId").toQueryParams(),
                         uriQuote = uriQuote,
                     ).toString(),
                 )
-            } ?: queryParams["to"]?.takeIf { it.startsWith("place.") }?.let {
+            } ?: queryParams["to"]?.firstOrNull()?.takeIf { it.startsWith("place.") }?.let {
                 next = MatchedInput(wazeHtmlInput.get(), match)
             }
         }

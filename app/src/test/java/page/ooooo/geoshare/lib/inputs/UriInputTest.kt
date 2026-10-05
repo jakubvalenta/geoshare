@@ -6,8 +6,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Uri
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
+import page.ooooo.geoshare.lib.uri.Uri
 
 class UriInputTest {
     val input = object : UriInput {

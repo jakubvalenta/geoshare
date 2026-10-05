@@ -2,14 +2,14 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonNamePoint
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,7 +29,7 @@ class AmapUriInput @Inject constructor(
         data.run {
             // Query param p
             // https://wb.amap.com/?p=<id>,<lat>,<lon>,<name>
-            Regex("""\w+,$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["p"])?.toLatLonNamePoint(Source.URI)
+            Regex("""\w+,$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["p"]?.firstOrNull())?.toLatLonNamePoint(Source.URI)
                 ?.let {
                     points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
                     return@run
@@ -37,7 +37,7 @@ class AmapUriInput @Inject constructor(
 
             // Query param q
             // https://wb.amap.com/?q=<lat>,<lon>,<name>
-            Regex("""$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["q"])?.toLatLonNamePoint(Source.URI)
+            Regex("""$LAT,$LON,?(?:$NAME_PARAM)?.*""").matchEntire(queryParams["q"]?.firstOrNull())?.toLatLonNamePoint(Source.URI)
                 ?.let {
                     points = persistentListOf(GCJ02GreaterChinaAndTaiwanPoint(it))
                     return@run

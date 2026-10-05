@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.outputs
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeUriQuote
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.android.UriActivity
 import page.ooooo.geoshare.lib.android.UriScheme
@@ -11,6 +10,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.mockGeometries
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
 
 class OpenNavigationGoogleUriOutputTest {
     private val coordinateConverter = CoordinateConverter(mockGeometries)

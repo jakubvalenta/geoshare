@@ -3,10 +3,7 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableMap
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
@@ -15,6 +12,9 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
+import page.ooooo.geoshare.lib.uri.toQueryParams
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -67,7 +67,7 @@ class GoogleNavigationUriInput @Inject constructor(
                     Uri(
                         scheme = "https",
                         host = "maps.google.com",
-                        queryParams = mapOf("q" to it).toImmutableMap(),
+                        queryParams = listOf("q" to it).toQueryParams(),
                         uriQuote = uriQuote,
                     ).toString()
                 )

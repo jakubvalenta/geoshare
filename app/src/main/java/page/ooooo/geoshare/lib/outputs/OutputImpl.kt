@@ -7,9 +7,7 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.DefaultUriQuote
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.FileActivity
 import page.ooooo.geoshare.lib.android.UriActivity
@@ -20,6 +18,8 @@ import page.ooooo.geoshare.lib.android.writeToContentProvider
 import page.ooooo.geoshare.lib.deleteAllAndWriteFile
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.uri.DefaultUriQuote
+import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.ui.components.DrawableIconDescriptor
 import page.ooooo.geoshare.ui.components.ResourceIconDescriptor
 import java.io.File

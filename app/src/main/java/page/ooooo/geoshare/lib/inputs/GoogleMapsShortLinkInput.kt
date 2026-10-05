@@ -7,9 +7,9 @@ import io.ktor.http.Cookie
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,7 +38,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
         data.run {
             // Google Maps Go
             // https://maps.app.goo.gl/?link={url}
-            queryParams["link"]?.takeIf { it.isNotEmpty() }?.let {
+            queryParams["link"]?.firstOrNull()?.takeIf { it.isNotEmpty() }?.let {
                 next = MatchedInput(googleMapsUriInput.get(), it)
                 return@parseResult
             }

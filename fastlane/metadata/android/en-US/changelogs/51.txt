@@ -1,8 +1,7 @@
-- Added Kagi Maps input.
-- Added MapQuest input.
-- Added Yahoo! Maps input.
-- Added Kagi Maps web map.
+- Added Kagi Maps support.
+- Added MapQuest support.
+- Added Yahoo! Maps support.
+- Added Apple Maps direction links support.
 - Added Cartes.app web map.
-- Added Yahoo! Maps Japan web map.
 - Fixed the Open original link button by not cancelling current link processing.
 - Improved API servers preferences screen by separating server list.
