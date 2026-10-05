@@ -111,24 +111,21 @@ class LinkBehaviorTest {
         }
 
         // Restore initial links
-        onElement { viewIdResourceName == "geoShareLinkListPane" }
-            .scroll(Direction.DOWN, 10f)
-        onElement { viewIdResourceName == "geoShareLinkListPane" }
-            // Scroll again, because only now can the lazy column pane scroll all the way to the bottom
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareLinkRestoreInitialButton" }
-            .click()
+        onElement { viewIdResourceName == "geoShareLinkListPane" }.scrollToBottom()
+        onElement { viewIdResourceName == "geoShareLinkRestoreInitialButton" }.click()
         onElement { viewIdResourceName == "geoShareLinkRestoreInitialDialog" }.dismissDialog()
         onElement { viewIdResourceName == "geoShareLinkRestoreInitialButton" }.click()
         onElement { viewIdResourceName == "geoShareLinkRestoreInitialDialog" }.confirmDialog()
 
         // Shows link
-        onElement { viewIdResourceName == "geoShareLinkListPane" }
-            .scroll(Direction.UP, 10f)
-        onElement { viewIdResourceName == "geoShareLinkListPane" }
-            // Scroll again, because only now can the lazy column pane scroll all the way to the top
-            .scrollToElement(Direction.UP) {
+        onElement { viewIdResourceName == "geoShareLinkListPane" }.run {
+            scrollToTop()
+            quickWaitForStableInActiveWindow()
+            scrollToTop() // Scroll once more, because the list is long
+            scrollToElement(Direction.DOWN) {
                 viewIdResourceName == "geoShareLinkListItem_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}"
             }
+        }
     }
 
     @Test
