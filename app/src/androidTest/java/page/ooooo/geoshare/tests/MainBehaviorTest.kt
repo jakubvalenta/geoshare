@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.lib.android.MimeType
@@ -267,12 +268,16 @@ class MainBehaviorTest {
         runBlocking {
             assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
+            assumeTrue(
+                "This test currently fails, because the current version of the TomTom app doesn't seem to support GPX anymore",
+                false,
+            )
 
             // Share a URI with the app
             shareUri()
 
             // Launch navigation in TomTom
-            scrollToAppIcon(PackageNames.TOMTOM).longClick()
+            scrollToAppIcon(PackageNames.TOMTOM).longClick() // FIXME
             launchNavigationInApp()
 
             // Dismiss the location rationale dialog

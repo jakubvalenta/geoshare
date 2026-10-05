@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertNull
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import page.ooooo.geoshare.data.local.preferences.Automation
 import page.ooooo.geoshare.data.local.preferences.CopyCoordsDecAutomation
@@ -113,6 +114,10 @@ class AutomationBehaviorTest {
         runBlocking {
             assumeAppInstalled(PackageNames.TOMTOM)
             assumeDomainResolvable("tomtom.com")
+            assumeTrue(
+                "This test currently fails, because the current version of the TomTom app doesn't seem to support GPX anymore",
+                false,
+            )
 
             // Launch app
             launchApplication()
