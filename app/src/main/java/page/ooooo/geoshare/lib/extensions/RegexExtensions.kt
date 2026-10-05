@@ -2,8 +2,6 @@ package page.ooooo.geoshare.lib.extensions
 
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
-import kotlin.text.MatchResult
-import kotlin.text.Regex
 
 fun Regex.find(input: CharSequence?): MatchResult? = input?.let { this.find(it) }
 
@@ -62,4 +60,9 @@ fun MatchResult.toLonLatNamePoint(source: Source): NaivePoint? =
         this.doubleGroupOrNull(2)?.let { lat ->
             NaivePoint(lat, lon, name = this.groupOrNull(3), source = source)
         }
+    }
+
+fun MatchResult.toNamePoint(source: Source): NaivePoint? =
+    this.groupOrNull()?.let { name ->
+        NaivePoint(name = name, source = source)
     }

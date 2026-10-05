@@ -3,8 +3,6 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.findAll
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -14,6 +12,8 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,11 +53,13 @@ class YandexMapsUriInput @Inject constructor(
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             val z = listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[zoom]", "z")
-                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
 
             // Directions
             // https://yandex.com/maps?rtext={lat}%2C{lon}~{lat}%2C{lon}~{lat}%2C{lon}
-            LAT_LON_PATTERN.findAll(queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "rtext"])
+            LAT_LON_PATTERN.findAll(
+                queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "rtext"]?.firstOrNull()
+            )
                 .mapNotNull { m -> m.toLatLonPoint(Source.URI)?.copy(z = z)?.let { WGS84Point(it) } }
                 .toImmutableList()
                 .takeIf { it.isNotEmpty() }
@@ -71,7 +73,7 @@ class YandexMapsUriInput @Inject constructor(
             // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
             listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[point]", "ll")
                 .firstNotNullOfOrNull { key ->
-                    LON_LAT_PATTERN.matchEntire(queryParams[key])?.toLonLatPoint(Source.URI)
+                    LON_LAT_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLonLatPoint(Source.URI)
                 }?.let {
                     points = persistentListOf(WGS84Point(it, z))
                     return@parseResult

@@ -3,8 +3,8 @@ package page.ooooo.geoshare.lib.inputs
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
@@ -33,18 +33,18 @@ class MapyComUriInput @Inject constructor(
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
-            val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
+            val z = Z_PATTERN.matchEntire(queryParams["z"]?.firstOrNull())?.doubleGroupOrNull()
 
             // Navigation
             // https://mapy.com/...?rc={hash}
-            queryParams["rc"].takeIf { !it.isNullOrEmpty() }?.let { hash ->
+            queryParams["rc"]?.firstOrNull().takeIf { !it.isNullOrEmpty() }?.let { hash ->
                 points = decodeMapyComGeoHash(hash).map { WGS84Point(it, z) }.toImmutableList()
                 return@run
             }
 
             // Point with id
             // https://mapy.com/...?id={lon}%2C{lat}
-            LON_LAT_PATTERN.matchEntire(queryParams["id"])?.toLonLatPoint(Source.URI)?.let {
+            LON_LAT_PATTERN.matchEntire(queryParams["id"]?.firstOrNull())?.toLonLatPoint(Source.URI)?.let {
                 points = persistentListOf(WGS84Point(it, z))
                 return@run
             }
@@ -66,8 +66,8 @@ class MapyComUriInput @Inject constructor(
 
             // Coordinates in URL
             // https://mapy.com/...?x={lon}&y={lat}&z={z}
-            LAT_PATTERN.matchEntire(queryParams["y"])?.doubleGroupOrNull()?.let { lat ->
-                LON_PATTERN.matchEntire(queryParams["x"])?.doubleGroupOrNull()?.let { lon ->
+            LAT_PATTERN.matchEntire(queryParams["y"]?.firstOrNull())?.doubleGroupOrNull()?.let { lat ->
+                LON_PATTERN.matchEntire(queryParams["x"]?.firstOrNull())?.doubleGroupOrNull()?.let { lon ->
                     points = persistentListOf(WGS84Point(lat, lon, z, source = Source.MAP_CENTER))
                     return@run
                 }

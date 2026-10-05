@@ -4,8 +4,6 @@ import android.content.res.Resources
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -17,6 +15,8 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,19 +39,19 @@ class GeoUriInput @Inject constructor(
 
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
-            val z = Z_PATTERN.matchEntire(queryParams["z"])?.doubleGroupOrNull()
+            val z = Z_PATTERN.matchEntire(queryParams["z"]?.firstOrNull())?.doubleGroupOrNull()
 
             // Name in separate query param
             // ?q=...&({name})
             val name = queryParams
-                .filter { (key, value) -> key != "q" && key != "z" && value.isEmpty() }
+                .filter { (key, value) -> key != "q" && key != "z" && value.firstOrNull().isNullOrEmpty() }
                 .firstNotNullOfOrNull { (key) -> Regex(NAME_REGEX).matchEntire(key)?.groupOrNull() }
 
             // Pin without name
             // ?q={lat},{lon}
             // Pin with name
             // ?q={lat},{lon}({name})
-            Regex("""$LAT$COORD_SEP$LON\s?(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"])
+            Regex("""$LAT$COORD_SEP$LON\s?(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"]?.firstOrNull())
                 ?.toLatLonNamePoint(Source.URI)?.let {
                     points = persistentListOf(WGS84Point(it, z, name))
                     return@run
@@ -59,7 +59,7 @@ class GeoUriInput @Inject constructor(
 
             // Query unless it contained coordinates
             // ?q={name}
-            val query = Q_PARAM_PATTERN.matchEntire(queryParams["q"])?.groupOrNull()
+            val query = Q_PARAM_PATTERN.matchEntire(queryParams["q"]?.firstOrNull())?.groupOrNull()
 
             // Coordinates
             // geo:{lat},{lon}

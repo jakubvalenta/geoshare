@@ -3,13 +3,13 @@ package page.ooooo.geoshare.lib.outputs
 import android.content.res.Resources
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.android.AppActivity
 import page.ooooo.geoshare.lib.android.AppDetail
 import page.ooooo.geoshare.lib.android.AppDetails
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.uri.DefaultUriQuote
+import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.ui.components.IconDescriptor
 
 sealed interface Output {

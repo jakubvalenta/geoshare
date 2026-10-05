@@ -1,4 +1,4 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.uri
 
 import android.net.Uri
 import java.net.URLDecoder

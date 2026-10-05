@@ -2,10 +2,10 @@ package page.ooooo.geoshare.lib.formatters
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
+import page.ooooo.geoshare.lib.uri.UriQuote
 
 class GoogleMapsUriFormatterTest {
     private val uriQuote: UriQuote = FakeUriQuote

@@ -1,7 +1,10 @@
-package page.ooooo.geoshare.lib
+package page.ooooo.geoshare.lib.uri
 
 import androidx.compose.runtime.Immutable
-import kotlinx.collections.immutable.*
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -13,7 +16,7 @@ data class Uri(
     val scheme: String = "",
     val host: String = "",
     val pathParts: ImmutableList<String> = persistentListOf(),
-    val queryParams: ImmutableMap<String, String> = persistentMapOf(),
+    val queryParams: QueryParams = persistentMapOf(),
     val fragment: String = "",
     val uriQuote: UriQuote = DefaultUriQuote,
 ) {
@@ -77,46 +80,10 @@ data class Uri(
                 } else {
                     persistentListOf()
                 },
-                queryParams = parseQueryParams(query, uriQuote),
+                queryParams = query.toQueryParams(uriQuote),
                 fragment = uriQuote.decode(fragment),
                 uriQuote = uriQuote,
             )
-        }
-
-        private fun parseQueryParams(query: String?, uriQuote: UriQuote): ImmutableMap<String, String> =
-            if (query.isNullOrEmpty()) {
-                persistentMapOf()
-            } else {
-                query.split('&').associate { rawParam ->
-                    val paramParts = rawParam.split('=')
-                    val rawParamName = paramParts.firstOrNull().orEmpty()
-                    val rawParamValue = paramParts.drop(1).firstOrNull().orEmpty()
-                    val paramName = uriQuote.decode(rawParamName)
-                    val paramValue = uriQuote.decode(rawParamValue)
-                    paramName to paramValue
-                }.toImmutableMap()
-            }
-
-        fun formatQueryParams(
-            queryParams: ImmutableMap<String, String>,
-            allow: String = ",",
-            uriQuote: UriQuote,
-        ): String {
-            val plusAllowed = '+' in allow
-            return queryParams.map {
-                buildString {
-                    append(uriQuote.encode(it.key, allow = allow))
-                    if (it.value.isNotEmpty()) {
-                        append("=")
-                        val cleanValue = if (plusAllowed) {
-                            it.value.replace(' ', '+')
-                        } else {
-                            it.value.replace('+', ' ')
-                        }
-                        append(uriQuote.encode(cleanValue, allow = allow))
-                    }
-                }
-            }.joinToString("&")
         }
 
         fun formatPathPart(pathPart: String, allow: String = "!&+,=@", uriQuote: UriQuote): String =
@@ -127,7 +94,7 @@ data class Uri(
         scheme: String = "",
         host: String = "",
         path: String,
-        queryParams: ImmutableMap<String, String> = persistentMapOf(),
+        queryParams: QueryParams = persistentMapOf(),
         fragment: String = "",
         uriQuote: UriQuote = DefaultUriQuote,
     ) : this(
@@ -202,7 +169,7 @@ data class Uri(
         }
         append(pathParts.joinToString("/") { formatPathPart(it, uriQuote = uriQuote) })
         if (queryParams.isNotEmpty()) {
-            append("?${formatQueryParams(queryParams, uriQuote = uriQuote)}")
+            append("?${queryParams.format(uriQuote = uriQuote)}")
         }
         if (fragment.isNotEmpty()) {
             append("#$fragment")

@@ -2,8 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -13,6 +11,8 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -61,12 +61,12 @@ class UrbiUriInput @Inject constructor(
         data.run {
             // Marker
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon},{lat}/{z}
-            Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"])?.toLonLatZPoint(Source.URI)?.let {
+            Regex("""$LON,$LAT/$Z""").matchEntire(queryParams["m"]?.firstOrNull())?.toLonLatZPoint(Source.URI)?.let {
                 points = persistentListOf(WGS84Point(it))
                 return@run
             }
 
-            val z = Z_PATTERN.matchEntire(queryParams["zoom"])?.doubleGroupOrNull()
+            val z = Z_PATTERN.matchEntire(queryParams["zoom"]?.firstOrNull())?.doubleGroupOrNull()
 
             // Point
             // https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}
@@ -77,12 +77,12 @@ class UrbiUriInput @Inject constructor(
 
             // API map center
             // https://share.api.2gis.ru/getimage?...&zoom={z}&center={lon},{lat}&title={name}...
-            LON_LAT_PATTERN.matchEntire(queryParams["center"])?.toLonLatPoint(Source.MAP_CENTER)?.let {
+            LON_LAT_PATTERN.matchEntire(queryParams["center"]?.firstOrNull())?.toLonLatPoint(Source.MAP_CENTER)?.let {
                 points = persistentListOf(
                     WGS84Point(
                         it,
                         z = z,
-                        name = Q_PARAM_PATTERN.matchEntire(queryParams["title"])?.groupOrNull(),
+                        name = Q_PARAM_PATTERN.matchEntire(queryParams["title"]?.firstOrNull())?.groupOrNull(),
                     )
                 )
                 return@run

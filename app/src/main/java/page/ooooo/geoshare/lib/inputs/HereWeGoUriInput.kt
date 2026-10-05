@@ -2,8 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
@@ -13,6 +11,8 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.io.encoding.Base64
@@ -37,13 +37,13 @@ class HereWeGoUriInput @Inject constructor(
             val parts = data.pathParts.drop(1)
             val firstPart = parts.firstOrNull() ?: return@run
             if (firstPart == "") {
-                Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"])?.toLatLonZPoint(Source.MAP_CENTER)?.let {
+                Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"]?.firstOrNull())?.toLatLonZPoint(Source.MAP_CENTER)?.let {
                     points = persistentListOf(WGS84Point(it))
                 }
             } else {
                 val secondPart = parts.getOrNull(1)
                 if (secondPart != null) {
-                    val z = Regex(""".*,$Z""").matchEntire(queryParams["map"])?.doubleGroupOrNull()
+                    val z = Regex(""".*,$Z""").matchEntire(queryParams["map"]?.firstOrNull())?.doubleGroupOrNull()
                     if (firstPart == "l") {
                         LAT_LON_PATTERN.matchEntire(secondPart)?.toLatLonPoint(Source.URI)?.let {
                             points = persistentListOf(WGS84Point(it, z))

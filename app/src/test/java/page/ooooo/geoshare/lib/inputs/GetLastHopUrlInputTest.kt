@@ -15,9 +15,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.FakeLog
-import page.ooooo.geoshare.lib.FakeUriQuote
-import page.ooooo.geoshare.lib.Uri
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
+import page.ooooo.geoshare.lib.uri.FakeUriQuote
+import page.ooooo.geoshare.lib.uri.Uri
 import java.net.MalformedURLException
 
 class GetLastHopUrlInputTest {

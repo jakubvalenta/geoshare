@@ -1,17 +1,18 @@
 package page.ooooo.geoshare.lib.formatters
 
-import kotlinx.collections.immutable.toImmutableMap
-import page.ooooo.geoshare.lib.DefaultUriQuote
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.uri.DefaultUriQuote
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
+import page.ooooo.geoshare.lib.uri.format
+import page.ooooo.geoshare.lib.uri.toQueryParams
 
 object GeoUriFormatter {
     fun formatGeoUriString(
         point: Point,
         flavor: GeoUriFlavor = GeoUriFlavor.Safe,
         uriQuote: UriQuote = DefaultUriQuote,
-    ) =
+    ): String =
         point.run {
             // Use custom string builder instead of Uri.toString(), because we want to allow custom chars in query params
             buildString {
@@ -26,7 +27,7 @@ object GeoUriFormatter {
                         uriQuote = uriQuote,
                     )
                 )
-                buildMap {
+                buildList {
                     val z = zStr
                     val q = latStr?.let { latStr ->
                         lonStr?.let { lonStr ->
@@ -49,17 +50,18 @@ object GeoUriFormatter {
                     // can be part of 'q') to be at the very end of the URI.
                     if (z != null) {
                         when (flavor.zoom) {
-                            GeoUriFlavor.ZoomFlavor.ALONE_ONLY -> if (q == null) set("z", z)
-                            GeoUriFlavor.ZoomFlavor.ANY -> set("z", z)
+                            GeoUriFlavor.ZoomFlavor.ALONE_ONLY -> if (q == null) add("z" to z)
+                            GeoUriFlavor.ZoomFlavor.ANY -> add("z" to z)
                             GeoUriFlavor.ZoomFlavor.NOT_AVAILABLE -> {}
                         }
                     }
                     if (q != null) {
-                        set("q", q)
+                        add("q" to q)
                     }
                 }
                     .takeIf { it.isNotEmpty() }
-                    ?.let { Uri.formatQueryParams(it.toImmutableMap(), allow = ",()", uriQuote = uriQuote) }
+                    ?.toQueryParams()
+                    ?.format(allow = ",()", uriQuote = uriQuote)
                     ?.let { append("?$it") }
             }
         }

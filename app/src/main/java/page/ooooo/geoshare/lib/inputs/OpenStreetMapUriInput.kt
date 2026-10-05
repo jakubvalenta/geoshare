@@ -2,8 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.Uri
-import page.ooooo.geoshare.lib.UriQuote
 import page.ooooo.geoshare.lib.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.lib.extensions.matchEntire
 import page.ooooo.geoshare.lib.extensions.toLatLonPoint
@@ -13,6 +11,8 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -60,14 +60,14 @@ class OpenStreetMapUriInput @Inject constructor(
             // Pin
             // https://www.openstreetmap.org/?mlat={lat}&mlon={lon}&zoom={z}
             listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlat", "lat")
-                .firstNotNullOfOrNull { key -> LAT_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+                .firstNotNullOfOrNull { key -> LAT_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
                 ?.let { lat ->
                     listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlon", "lon")
-                        .firstNotNullOfOrNull { key -> LON_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull() }
+                        .firstNotNullOfOrNull { key -> LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
                         ?.let { lon ->
                             val z = listOf("z", "zoom")
                                 .firstNotNullOfOrNull { key ->
-                                    Z_PATTERN.matchEntire(queryParams[key])?.doubleGroupOrNull()
+                                    Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull()
                                 }
                             points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
                             return@parseResult
@@ -76,7 +76,7 @@ class OpenStreetMapUriInput @Inject constructor(
 
             // Directions
             // https://www.openstreetmap.org/directions?to={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(queryParams["to"])?.toLatLonPoint(Source.URI)?.let {
+            LAT_LON_PATTERN.matchEntire(queryParams["to"]?.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
                 points = persistentListOf(WGS84Point(it))
                 return@parseResult
             }
