@@ -22,6 +22,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.ContentConvertNetworkException
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
@@ -174,12 +175,12 @@ class GoogleMapsPlaceApiInputTest : InputTest {
         )
     }
 
-    @Test(expected = UnknownNetworkException::class)
+    @Test(expected = ContentConvertNetworkException::class)
     fun parse_whenApiReturnsEmptyObject_throwsException() = runTest {
         input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=empty-object")
     }
 
-    @Test(expected = UnknownNetworkException::class)
+    @Test(expected = ContentConvertNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
         input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=invalid")
     }

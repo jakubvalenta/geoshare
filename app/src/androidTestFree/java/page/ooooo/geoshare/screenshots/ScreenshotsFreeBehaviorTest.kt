@@ -368,6 +368,13 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_error_kagi_maps_warning_account")
 
+        // Conversion - Error - Waze - Warning - Route expired
+        shareUri("https://www.waze.com/ul?a=share_drive&locale=fr&sd=73U16hXD2OJwGD1-Rw-sd&env=row&utm_source=waze_app&utm_campaign=share_drive")
+        grantConnectionPermission()
+        onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("main_strings/conversion_error_waze_warning_route_expired")
+
         goBackToMainForm()
     }
 

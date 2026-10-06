@@ -58,6 +58,11 @@ class ResponseNetworkException(val response: HttpResponse, cause: Throwable) : U
     override fun getDetails() = "Request URL: ${response.request.url}"
 }
 
+class ContentConvertNetworkException(cause: Throwable) : UnrecoverableNetworkException(cause) {
+    override fun getMessage(resources: Resources) =
+        resources.getString(R.string.network_exception_content_convert)
+}
+
 class TooManyRequestsNetworkException(val response: HttpResponse, cause: Throwable) :
     UnrecoverableNetworkException(cause) {
     override fun getMessage(resources: Resources) =

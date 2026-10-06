@@ -9,6 +9,7 @@ import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
+import page.ooooo.geoshare.tests.testUriFails
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 
 class WazeInputBehaviorTest : InputBehaviorTest {
@@ -53,6 +54,16 @@ class WazeInputBehaviorTest : InputBehaviorTest {
         runBlocking {
             assumeDomainResolvable("waze.com")
         }
+
+        // Route
+        testUriFails(
+            setOf(
+                "Route has expired.",
+                // TODO Add French
+            ),
+            "https://www.waze.com/ul?a=share_drive&locale=fr&sd=73U16hXD2OJwGD1-Rw-sd&env=row&utm_source=waze_app&utm_campaign=share_drive",
+            grantConnectionPermission = true,
+        )
 
         // Place id
         testUri(

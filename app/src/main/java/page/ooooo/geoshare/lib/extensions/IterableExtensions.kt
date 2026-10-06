@@ -1,5 +1,19 @@
 package page.ooooo.geoshare.lib.extensions
 
+fun <T> Iterable<T>.chunkedPairs(): List<Pair<T, T>> =
+    chunked(2)
+        .mapNotNull { chunk ->
+            if (chunk.size == 2) {
+                chunk.first() to chunk.last()
+            } else {
+                null
+            }
+        }
+
+fun <T> Iterable<T>.removeRepeated(equals: (a: T?, b: T) -> Boolean = { a, b -> a == b }): List<T> =
+    zipWithNextFirstNull { prev, curr -> prev to curr }
+        .mapNotNull { (prev, curr) -> curr.takeIf { !equals(prev, curr) } }
+
 /**
  * A version of [zipWithNext] that prepends one more pair to the result: null, first element.
  *

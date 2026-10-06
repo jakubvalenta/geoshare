@@ -68,7 +68,11 @@ class ServerHttpClientFactory @Inject constructor(
     data class GoogleMapsResult(val location: GoogleMapsLocation)
 
     @Serializable
-    data class GoogleMapsResults(val results: List<GoogleMapsResult>)
+    data class GoogleMapsResults(
+        // Results are optional, because Google returns a JSON without the 'results' property when no coordinates are
+        // found.
+        val results: List<GoogleMapsResult>? = null
+    )
 
     fun createHttpClient(server: Server): HttpClient =
         HttpClient(engine) {

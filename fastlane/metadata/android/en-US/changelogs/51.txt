@@ -6,5 +6,6 @@
 - Improved Apple Maps direction links support by extracting waypoints.
 - Improved Baidu Map search links support.
 - Improved Google Maps direction links support by extraction waypoints from API links.
+- Improved Waze support by extracting route links
 - Improved preferences screen by putting API server list on a separate screen.
 - Fixed Open original link button cancelling link processing.

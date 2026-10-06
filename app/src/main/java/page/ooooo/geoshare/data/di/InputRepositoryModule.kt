@@ -43,6 +43,7 @@ import page.ooooo.geoshare.lib.inputs.OsmAndUriInput
 import page.ooooo.geoshare.lib.inputs.PlusCodeInput
 import page.ooooo.geoshare.lib.inputs.UrbiHtmlInput
 import page.ooooo.geoshare.lib.inputs.UrbiUriInput
+import page.ooooo.geoshare.lib.inputs.WazeApiInput
 import page.ooooo.geoshare.lib.inputs.WazeHtmlInput
 import page.ooooo.geoshare.lib.inputs.WazeUriInput
 import page.ooooo.geoshare.lib.inputs.YahooMapsShortLinkInput
@@ -54,6 +55,7 @@ import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.uri.FakeUriQuote
 import javax.inject.Singleton
+import kotlin.time.Clock
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -90,7 +92,6 @@ object InputRepositoryModule {
         wazeUriInput: WazeUriInput,
         yahooMapsShortLinkInput: YahooMapsShortLinkInput,
         yahooMapsUriInput: YahooMapsUriInput,
-        yahooMapsWebViewInput: YahooMapsWebViewInput,
         yandexMapsShortLinkInput: YandexMapsShortLinkInput,
         yandexMapsUriInput: YandexMapsUriInput,
     ): InputRepository =
@@ -123,7 +124,6 @@ object InputRepositoryModule {
             wazeUriInput,
             yahooMapsShortLinkInput,
             yahooMapsUriInput,
-            yahooMapsWebViewInput,
             yandexMapsShortLinkInput,
             yandexMapsUriInput,
         )
@@ -201,7 +201,6 @@ object FakeInputRepository : InputRepository {
     val googleMapsAddressApiInput = GoogleMapsAddressApiInput(
         serverHttpClientFactory = serverHttpClientFactory,
         googleMapsHtmlInput = { googleMapsHtmlInput },
-        log = log,
         serverRepository = serverRepository,
         uriQuote = uriQuote,
     )
@@ -278,7 +277,13 @@ object FakeInputRepository : InputRepository {
         log = log,
         uriQuote = uriQuote,
     )
+    val wazeApiInput = WazeApiInput(
+        clock = Clock.System,
+        engine = engine,
+        log = log,
+    )
     override val wazeUriInput = WazeUriInput(
+        wazeApiInput = { wazeApiInput },
         wazeHtmlInput = { wazeHtmlInput },
         uriQuote = uriQuote
     )
@@ -297,7 +302,7 @@ object FakeInputRepository : InputRepository {
         yahooMapsWebViewInput = { yahooMapsWebViewInput },
         uriQuote = uriQuote,
     )
-    override val yahooMapsWebViewInput = YahooMapsWebViewInput(
+    val yahooMapsWebViewInput = YahooMapsWebViewInput(
         log = log,
     )
     override val yandexMapsShortLinkInput = YandexMapsShortLinkInput(

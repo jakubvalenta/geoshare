@@ -8,16 +8,13 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
-import io.ktor.serialization.JsonConvertException
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
-import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
-import page.ooooo.geoshare.lib.network.UnknownNetworkException
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -26,7 +23,6 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsAddressApiInput @Inject constructor(
     private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
-    private val log: Log,
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
@@ -77,18 +73,10 @@ class GoogleMapsAddressApiInput @Inject constructor(
                 return@parseResult
             }
             throw tr
-        } catch (tr: UnknownNetworkException) {
-            if (tr.cause is JsonConvertException) {
-                // Google returns a JSON without the 'results' property when no coordinates are found, so let's silently
-                // return no points in this case
-                log.i(TAG, "API returned no results")
-                return@parseResult
-            }
-            throw tr
         }
 
         // Update points
-        val highestRankedResult = res.results.firstOrNull() ?: return@parseResult
+        val highestRankedResult = res.results?.firstOrNull() ?: return@parseResult
         val point = GCJ02MainlandChinaPoint(
             lat = highestRankedResult.location.latitude,
             lon = highestRankedResult.location.longitude,
