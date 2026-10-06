@@ -23,6 +23,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class WazeUriInput @Inject constructor(
+    private val wazeApiInput: dagger.Lazy<WazeApiInput>,
     private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
     override val uriQuote: UriQuote,
 ) : UriInput, Input.HasRandomUri {
@@ -41,15 +42,16 @@ class WazeUriInput @Inject constructor(
     override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
         data.run {
             // Short link
-            // https://waze.com/ul/h{hash}
-            (if (pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "ul") {
-                Regex("""h($HASH)""").matchEntire(pathParts.getOrNull(2))
+            val hash = if (pathParts.getOrNull(1) == "ul") {
+                // Hash in path
+                // https://waze.com/ul/h{hash}
+                Regex("""h($HASH)""").matchEntire(pathParts.getOrNull(2))?.groupOrNull()
             } else {
-                null
+                // Hash in query parameter
+                // https://www.waze.com/live-map?h={hash}
+                Regex("($HASH)").matchEntire(queryParams["h"]?.firstOrNull())?.groupOrNull()
             }
-            // https://www.waze.com/live-map?h={hash}
-                ?: Regex("($HASH)").matchEntire(queryParams["h"]?.firstOrNull())
-                )?.groupOrNull()
+            hash
                 ?.let { hash -> decodeWazeGeoHash(hash) }
                 ?.let {
                     points = persistentListOf(
@@ -63,6 +65,22 @@ class WazeUriInput @Inject constructor(
                     )
                     return@run
                 }
+
+            if (queryParams["a"]?.firstOrNull() == "share_drive") {
+                // Route with token in the param 'sd'
+                // https://www.waze.com/ul?a=share_drive&sd={token}
+                queryParams["sd"]?.firstOrNull()?.let { token ->
+                    next = MatchedInput(wazeApiInput.get(), token)
+                    return@parseResult
+                }
+            } else if (pathParts.getOrNull(2) == "meeting") {
+                // Route with token in the param 'token'
+                // https://www.waze.com/live-map/meeting?token={token}
+                queryParams["token"]?.firstOrNull()?.let { token ->
+                    next = MatchedInput(wazeApiInput.get(), token)
+                    return@parseResult
+                }
+            }
 
             val z = Z_PATTERN.matchEntire(queryParams["z"]?.firstOrNull())?.doubleGroupOrNull()
 

@@ -2,6 +2,7 @@ package page.ooooo.geoshare.lib.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
+import io.ktor.client.call.body
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
@@ -14,15 +15,22 @@ import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
+import io.ktor.http.headersOf
+import io.ktor.serialization.JsonConvertException
+import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.AttributeKey
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.test.runTest
 import kotlinx.io.EOFException
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -642,6 +650,42 @@ class HttpClientExtensionsTest {
         assertTrue(threw is ConnectionClosedNetworkException)
         assertTrue(threw?.cause is EOFException)
     }
+
+    @Test
+    fun rethrowExceptionsAsNetworkException_whenRequestThrowsContentConvertException_throwsUnrecoverableException() =
+        runTest {
+            @Serializable
+            data class MyData(val foo: Int)
+
+            val engine = MockEngine {
+                respond(
+                    // language=Json
+                    """{"spam": "spam"}""",
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                )
+            }
+            val threw = HttpClient(engine) {
+                expectSuccess = true
+                rethrowExceptionsAsNetworkException(log)
+                install(ContentNegotiation) {
+                    json(Json {
+                        ignoreUnknownKeys = true
+                    })
+                }
+            }.use { client ->
+                try {
+                    client
+                        .get(url)
+                        .body<MyData>()
+                    null
+                } catch (tr: Exception) {
+                    tr
+                }
+            }
+            assertTrue(threw is UnrecoverableNetworkException)
+            assertTrue(threw is ContentConvertNetworkException)
+            assertTrue(threw?.cause is JsonConvertException)
+        }
 
     @Test
     fun rethrowExceptionsAsNetworkException_whenRequestThrowsUnknownException_throwsUnrecoverableException() = runTest {

@@ -22,6 +22,7 @@ import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.ContentConvertNetworkException
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.network.SocketTimeoutNetworkException
@@ -91,7 +92,6 @@ class GoogleMapsAddressApiInputTest : InputTest {
         serverRepository = serverRepository,
         serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
         googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-        log = log,
         uriQuote = uriQuote,
     )
 
@@ -104,7 +104,6 @@ class GoogleMapsAddressApiInputTest : InputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            log = log,
             uriQuote = uriQuote,
         )
         assertEquals(
@@ -246,7 +245,6 @@ class GoogleMapsAddressApiInputTest : InputTest {
             serverRepository = serverRepository,
             serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
-            log = log,
             uriQuote = uriQuote,
         )
         assertEquals(
@@ -283,8 +281,8 @@ class GoogleMapsAddressApiInputTest : InputTest {
         )
     }
 
-    @Test
-    fun parse_whenApiReturnsInvalidResponse_returnsPointsWithoutCoordinates() = runTest {
+    @Test(expected = ContentConvertNetworkException::class)
+    fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
         assertEquals(
             ParseResult.Success(persistentListOf(GCJ02MainlandChinaPoint(name = "invalid", source = Source.URI))),
             input.fetchAndParse("https://maps.google.com/?q=invalid"),

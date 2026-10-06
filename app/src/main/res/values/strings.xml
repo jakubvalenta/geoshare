@@ -83,7 +83,9 @@
     <string name="input_map_quest_name">MapQuest</string>
     <string name="input_open_street_map_api_name" translatable="false">OpenStreetMap (API)</string>
     <string name="input_urbi_html_name" translatable="false">2GIS / Urbi (HTML)</string>
+    <string name="input_waze_api_name" translatable="false">Waze (API)</string>
     <string name="input_waze_html_name" translatable="false">Waze (HTML)</string>
+    <string name="input_waze_warning_expired">Route link is expired.</string>
     <string name="input_yahoo_maps_name">Yahoo! Maps</string>
     <string name="input_yahoo_maps_short_link_name" translatable="false">Yahoo! Maps (short link)</string>
     <string name="input_yahoo_maps_web_view_name" translatable="false">Yahoo! Maps (WebView)</string>
@@ -372,4 +374,5 @@
     <string name="user_preferences_section_output">Output</string>
     <string name="user_preferences_server_edit">Edit servers</string>
     <string name="yes">Yes</string>
+    <string name="network_exception_content_convert">Invalid response content</string>
 </resources>

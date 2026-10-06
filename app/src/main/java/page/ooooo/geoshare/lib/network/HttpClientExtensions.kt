@@ -22,6 +22,7 @@ import io.ktor.client.statement.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.network.sockets.SocketTimeoutException
+import io.ktor.serialization.ContentConvertException
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.io.EOFException
 import page.ooooo.geoshare.lib.DefaultLog
@@ -172,6 +173,11 @@ fun HttpClientConfig<*>.rethrowExceptionsAsNetworkException(log: Log = DefaultLo
                         HttpStatusCode.Unauthorized -> UnauthorizedNetworkException(cause.response, cause)
                         else -> ResponseNetworkException(cause.response, cause)
                     }
+                }
+
+                is ContentConvertException -> {
+                    log.w(TAG, "Content convert exception for ${request.url}", cause)
+                    throw ContentConvertNetworkException(cause)
                 }
 
                 else -> {

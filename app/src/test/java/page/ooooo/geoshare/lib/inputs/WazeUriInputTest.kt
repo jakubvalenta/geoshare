@@ -79,6 +79,15 @@ class WazeUriInputTest : InputTest {
     }
 
     @Test
+    fun match_routeInText() {
+        assertEquals(
+            "https://www.waze.com/ul?a=share_drive&locale=fr&sd=xxx&env=row&utm_source=waze_app&utm_campaign=share_drive",
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            input.match("J'utilise Waze pour aller à Emser Straße (Neukölln), Berlin, j'arriverai à 17:01. Suivez mon trajet en temps réel sur la carte Waze ! https://www.waze.com/ul?a=share_drive&locale=fr&sd=xxx&env=row&utm_source=waze_app&utm_campaign=share_drive"),
+        )
+    }
+
+    @Test
     fun match_unknownHost() {
         assertNull(input.match("https://www.example.com/ul?ll=45.6906304,-120.810983&z=10"))
     }
@@ -204,6 +213,22 @@ class WazeUriInputTest : InputTest {
                 )
             ),
             input.parse("https://www.waze.com/ul?venue_id=2884104.28644432.6709020"),
+        )
+    }
+
+    @Test
+    fun parse_route() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                next = MatchedInput(FakeInputRepository.wazeApiInput, "test-token")
+            ),
+            input.parse("https://www.waze.com/ul?a=share_drive&locale=fr&sd=test-token&env=row&utm_source=waze_app&utm_campaign=share_drive"),
+        )
+        assertEquals(
+            ParseResult.Success(
+                next = MatchedInput(FakeInputRepository.wazeApiInput, "test-token")
+            ),
+            input.parse("https://www.waze.com/live-map/meeting?token=test-token&locale=fr&env=row&utm_campaign=share_drive&utm_source=waze_app"),
         )
     }
 
