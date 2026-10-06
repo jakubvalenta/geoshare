@@ -25,7 +25,9 @@ import kotlin.time.Instant
 
 class WazeApiInputTest : InputTest {
     override val resources: Resources = mock {
-        on { getString(R.string.input_waze_warning_expired) } doReturn "Route link is expired."
+        on { getString(R.string.input_waze_warning_route_empty) } doReturn
+            "Route is empty. Try to return to Waze, wait for GPS, and share the route again."
+        on { getString(R.string.input_waze_warning_route_expired) } doReturn "Route has expired."
     }
     private val epochMilliseconds = 1791298809703L
     private val clock: Clock = object : Clock {
@@ -177,7 +179,7 @@ class WazeApiInputTest : InputTest {
         }
         val input = WazeApiInput(clock = clock, engine = engine, log = log)
         assertEquals(
-            ParseResult.Warning(resources.getString(R.string.input_waze_warning_expired)),
+            ParseResult.Warning(resources.getString(R.string.input_waze_warning_route_expired)),
             input.fetchAndParse("test-token")
         )
     }
@@ -194,19 +196,40 @@ class WazeApiInputTest : InputTest {
         }
         val input = WazeApiInput(clock = clock, engine = engine, log = log)
         assertEquals(
-            ParseResult.Warning(resources.getString(R.string.input_waze_warning_expired)),
+            ParseResult.Warning(resources.getString(R.string.input_waze_warning_route_expired)),
             input.fetchAndParse("test-token")
         )
     }
 
     @Test
-    fun parse_whenResponseIsEmpty_returnsNoPoints() = runTest {
+    fun parse_whenResponseIsEmpty_returnsWarning() = runTest {
         val engine = MockEngine { request ->
             when (request.url.toString()) {
                 "https://www.waze.com/row-rtserver/web/PickUpGetDriverInfo?token=test-token&getUserInfo=true&_=$epochMilliseconds" ->
                     respond(
                         // language=json
                         """{"status": "ok"}""",
+                        headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                    )
+
+                else -> throw NotImplementedError()
+            }
+        }
+        val input = WazeApiInput(clock = clock, engine = engine, log = log)
+        assertEquals(
+            ParseResult.Warning(resources.getString(R.string.input_waze_warning_route_empty)),
+            input.fetchAndParse("test-token"),
+        )
+    }
+
+    @Test
+    fun parse_whenResponseIsUnknownError_returnsNoPoints() = runTest {
+        val engine = MockEngine { request ->
+            when (request.url.toString()) {
+                "https://www.waze.com/row-rtserver/web/PickUpGetDriverInfo?token=test-token&getUserInfo=true&_=$epochMilliseconds" ->
+                    respond(
+                        // language=json
+                        """{"status": "error"}""",
                         headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
                     )
 

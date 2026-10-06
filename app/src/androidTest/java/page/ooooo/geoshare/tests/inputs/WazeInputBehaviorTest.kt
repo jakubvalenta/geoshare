@@ -58,7 +58,7 @@ class WazeInputBehaviorTest : InputBehaviorTest {
         // Route
         testUriFails(
             setOf(
-                "Route link is expired.",
+                "Route has expired.",
                 // TODO Add French
             ),
             "https://www.waze.com/ul?a=share_drive&locale=fr&sd=73U16hXD2OJwGD1-Rw-sd&env=row&utm_source=waze_app&utm_campaign=share_drive",

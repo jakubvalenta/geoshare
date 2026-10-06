@@ -85,7 +85,8 @@
     <string name="input_urbi_html_name" translatable="false">2GIS / Urbi (HTML)</string>
     <string name="input_waze_api_name" translatable="false">Waze (API)</string>
     <string name="input_waze_html_name" translatable="false">Waze (HTML)</string>
-    <string name="input_waze_warning_expired">Route link is expired.</string>
+    <string name="input_waze_warning_route_empty">Route is empty. Try to return to Waze, wait for GPS, and share the route again.</string>
+    <string name="input_waze_warning_route_expired">Route has expired.</string>
     <string name="input_yahoo_maps_name">Yahoo! Maps</string>
     <string name="input_yahoo_maps_short_link_name" translatable="false">Yahoo! Maps (short link)</string>
     <string name="input_yahoo_maps_web_view_name" translatable="false">Yahoo! Maps (WebView)</string>
