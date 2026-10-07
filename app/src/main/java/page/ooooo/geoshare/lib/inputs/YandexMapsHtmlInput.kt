@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
@@ -28,20 +29,26 @@ class YandexMapsHtmlInput @Inject constructor(
     override val group = InputGroup.YANDEX_MAPS
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
-        fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->
+        fetchTools.getBodyAsChannel(
+            match,
+            engine,
+            log,
+            uriQuote,
+            // Set a custom user agent, so that Yandex Maps returns an HTML with the '...ll%3D...' value.
+            userAgent = DESKTOP_USER_AGENT,
+        ) { data ->
             parseResult {
                 val uri = Uri.parse(match, uriQuote)
                 val ptPattern = Regex("""pt=$LON%2C$LAT""")
                 val llPattern = if (!uri.queryParams.contains("ll")) {
-                    // If the match (place URL) doesn't contain map center, then the '%2F%3Fll%3D...' pattern returns
-                    // correct place location. Example match:
-                    // https://yandex.com/maps/org/zapretny_gorod/5867973238
+                    // Use the '...ll%3D...' pattern only if the place URL doesn't already contain a map center (e.g.
+                    // https://yandex.com/maps/org/zapretny_gorod/5867973238). Because if the place URL contains a map
+                    // center (e.g.
+                    // https://yandex.com/maps/org/zapretny_gorod/5867973238/?ll=116.096354%2C40.045755&z=13), then the
+                    // HTML '...ll%3D...' value contains the same coordinates as the page URL, instead of the correct
+                    // coordinates of the place.
                     Regex("${Regex.escape(uriQuote.encode(match))}%2F%3Fll%3D$LON%252C$LAT%26z%3D$Z")
                 } else {
-                    // If the match (place URL) contains map center, then the '%2F%3Fll%3D...' pattern returns the same
-                    // map center. This is not the point the user expects when processing a place URL, so the pattern
-                    // must not be used. Example match:
-                    // https://yandex.com/maps/org/zapretny_gorod/5867973238/?ll=116.096354%2C40.045755&z=13
                     null
                 }
                 val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
