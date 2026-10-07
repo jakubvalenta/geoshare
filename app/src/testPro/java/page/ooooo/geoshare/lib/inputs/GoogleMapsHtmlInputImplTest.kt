@@ -24,7 +24,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     fun parse_whenUriHasPoints_returnsPoints() = runTest {
         assertEquals(
             ParseResult.Success(persistentListOf(GCJ02MainlandChinaPoint(name = query, source = Source.URI))),
-            input.fetchAndParse("https://maps.google.com/?q=$query"),
+            input.parse("https://maps.google.com/?q=$query"),
         )
     }
 
@@ -32,7 +32,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
     fun parse_whenUriDoesNotHavePoints_returnsWarning() = runTest {
         assertEquals(
             ParseResult.Warning(resources.getString(R.string.conversion_failed_unsupported_source)),
-            input.fetchAndParse("https://maps.google.com/spam"),
+            input.parse("https://maps.google.com/spam"),
         )
     }
 }

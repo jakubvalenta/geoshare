@@ -111,7 +111,7 @@ class KagiMapsUriInputTest : InputTest {
                 ),
                 next = MatchedInput(openStreetMapApiInput, "https://www.openstreetmap.org/api/0.6/node/26412171.json"),
             ),
-            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.27603906188044,114.14545744657516&id=n26412171&q=Victoria%20Peak#17.5/22.276039/114.145457"),
+            input.parse("https://kagi.com/maps/info?z=19&ll=22.27603906188044,114.14545744657516&id=n26412171&q=Victoria%20Peak#17.5/22.276039/114.145457"),
         )
     }
 
@@ -119,7 +119,7 @@ class KagiMapsUriInputTest : InputTest {
     fun parse_idOpenStreetMapNodeInvalid() = runTest {
         assertEquals(
             ParseResult.Success(),
-            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.27603906188044,114.14545744657516&id=nSPAM&q=Victoria%20Peak#17.5/22.276039/114.145457"),
+            input.parse("https://kagi.com/maps/info?z=19&ll=22.27603906188044,114.14545744657516&id=nSPAM&q=Victoria%20Peak#17.5/22.276039/114.145457"),
         )
     }
 
@@ -139,7 +139,7 @@ class KagiMapsUriInputTest : InputTest {
                     "https://www.openstreetmap.org/api/0.6/relation/440105/full.json"
                 ),
             ),
-            input.parse(uriString = "https://kagi.com/maps/info?q=%C5%A0pindler%C5%AFv%20Ml%C3%BDn&id=r440105#12.34/50.72525/15.59019"),
+            input.parse("https://kagi.com/maps/info?q=%C5%A0pindler%C5%AFv%20Ml%C3%BDn&id=r440105#12.34/50.72525/15.59019"),
         )
     }
 
@@ -147,7 +147,7 @@ class KagiMapsUriInputTest : InputTest {
     fun parse_idOpenStreetMapRelationInvalid() = runTest {
         assertEquals(
             ParseResult.Success(),
-            input.parse(uriString = "https://kagi.com/maps/info?q=%C5%A0pindler%C5%AFv%20Ml%C3%BDn&id=rSPAM#12.34/50.72525/15.59019"),
+            input.parse("https://kagi.com/maps/info?q=%C5%A0pindler%C5%AFv%20Ml%C3%BDn&id=rSPAM#12.34/50.72525/15.59019"),
         )
     }
 
@@ -163,7 +163,7 @@ class KagiMapsUriInputTest : InputTest {
                     "https://www.openstreetmap.org/api/0.6/way/448058512/full.json"
                 ),
             ),
-            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
+            input.parse("https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
         )
     }
 
@@ -171,7 +171,7 @@ class KagiMapsUriInputTest : InputTest {
     fun parse_idOpenStreetMapWayInvalid() = runTest {
         assertEquals(
             ParseResult.Success(),
-            input.parse(uriString = "https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=wSPAM&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
+            input.parse("https://kagi.com/maps/info?z=19&ll=22.275900068060622,114.14579272270203&id=wSPAM&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station#17.5/22.275905/114.14503"),
         )
     }
 
@@ -187,7 +187,7 @@ class KagiMapsUriInputTest : InputTest {
                     "https://www.openstreetmap.org/api/0.6/way/448058512/full.json"
                 ),
             ),
-            input.parse(uriString = "https://kagi.com/maps/info?z=19&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station"),
+            input.parse("https://kagi.com/maps/info?z=19&id=w448058512&q=Victoria%20Peak%20Station%20HK%20Telecom%20Radio%20Station"),
         )
     }
 

@@ -14,5 +14,5 @@ object GoogleMapsPlaceListInputModule {
 
     @Provides
     @Singleton
-    fun provideGoogleMapsPlaceListInput(): GoogleMapsPlaceListInput = GoogleMapsPlaceListInputImpl()
+    fun provideGoogleMapsPlaceListInput(): GoogleMapsPlaceListInput = GoogleMapsPlaceListInputImpl
 }

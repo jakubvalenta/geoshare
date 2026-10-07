@@ -93,7 +93,7 @@ data class SourceReceived(
             )
         }
         for (input in stateContext.inputs) {
-            val match = input.match(source)
+            val match = (input as? Input.HasPattern)?.match(source)
             if (match != null) {
                 return InputMatched(source, MatchedInput(input, match))
             }
@@ -159,7 +159,7 @@ data class PermissionGranted(
 ) : ConversionState, ConversionState.HasSource {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState =
         when (matchedInput.input) {
-            is BasicInput<*> ->
+            is BasicInput ->
                 PermissionGrantedBasicInput(
                     source, MatchedInput(matchedInput.input, matchedInput.match), permission, results
                 )
@@ -187,9 +187,9 @@ data class PermissionGranted(
  * custom retrying changes the current conversion state, which allows the UI to react to it and show the user a message
  * about the progress of the retrying.
  */
-data class PermissionGrantedBasicInput<T>(
+data class PermissionGrantedBasicInput(
     override val source: String,
-    val matchedInput: MatchedInput<BasicInput<T>>,
+    val matchedInput: MatchedInput<BasicInput>,
     val permission: Permission?,
     val results: Results,
     override val lastAttempt: Attempt<RecoverableNetworkException>? = null,
@@ -215,9 +215,7 @@ data class PermissionGrantedBasicInput<T>(
                         delay(delayMillis.milliseconds)
                     }
                     when (
-                        val result = matchedInput.input.fetch(matchedInput.match) { data ->
-                            matchedInput.input.parse(data, matchedInput.match, stateContext.resources)
-                        }
+                        val result = matchedInput.input.parse(matchedInput.match, stateContext.resources)
                     ) {
                         is ParseResult.Success -> DataParsed(
                             source, matchedInput, permission, results + (matchedInput to result)

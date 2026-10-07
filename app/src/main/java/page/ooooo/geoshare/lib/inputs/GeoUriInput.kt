@@ -15,6 +15,7 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -22,8 +23,8 @@ import javax.inject.Singleton
 
 @Singleton
 class GeoUriInput @Inject constructor(
-    override val uriQuote: UriQuote,
-) : UriInput, Input.HasRandomUri {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.GEO_URI
     override val changelog = persistentListOf(
@@ -37,42 +38,43 @@ class GeoUriInput @Inject constructor(
 
     override val pattern = Regex("""(geo:$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        data.run {
-            val z = Z_PATTERN.matchEntire(queryParams["z"]?.firstOrNull())?.doubleGroupOrNull()
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        Uri.parse(match, uriQuote).run {
+            parseResult {
+                val z = Z_PATTERN.matchEntire(queryParams["z"]?.firstOrNull())?.doubleGroupOrNull()
 
-            // Name in separate query param
-            // ?q=...&({name})
-            val name = queryParams
-                .filter { (key, value) -> key != "q" && key != "z" && value.firstOrNull().isNullOrEmpty() }
-                .firstNotNullOfOrNull { (key) -> Regex(NAME_REGEX).matchEntire(key)?.groupOrNull() }
+                // Name in separate query param
+                // ?q=...&({name})
+                val name = queryParams
+                    .filter { (key, value) -> key != "q" && key != "z" && value.firstOrNull().isNullOrEmpty() }
+                    .firstNotNullOfOrNull { (key) -> Regex(NAME_REGEX).matchEntire(key)?.groupOrNull() }
 
-            // Pin without name
-            // ?q={lat},{lon}
-            // Pin with name
-            // ?q={lat},{lon}({name})
-            Regex("""$LAT$COORD_SEP$LON\s?(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"]?.firstOrNull())
-                ?.toLatLonNamePoint(Source.URI)?.let {
-                    points = persistentListOf(WGS84Point(it, z, name))
-                    return@run
+                // Pin without name
+                // ?q={lat},{lon}
+                // Pin with name
+                // ?q={lat},{lon}({name})
+                Regex("""$LAT$COORD_SEP$LON\s?(?:$NAME_REGEX)?.*""").matchEntire(queryParams["q"]?.firstOrNull())
+                    ?.toLatLonNamePoint(Source.URI)?.let {
+                        points = persistentListOf(WGS84Point(it, z, name))
+                        return@parseResult
+                    }
+
+                // Query unless it contained coordinates
+                // ?q={name}
+                val query = Q_PARAM_PATTERN.matchEntire(queryParams["q"]?.firstOrNull())?.groupOrNull()
+
+                // Coordinates
+                // geo:{lat},{lon}
+                Regex("""$LAT_LON_PATTERN.*""").matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
+                    points = persistentListOf(WGS84Point(it, z, name ?: query))
+                    return@parseResult
                 }
 
-            // Query unless it contained coordinates
-            // ?q={name}
-            val query = Q_PARAM_PATTERN.matchEntire(queryParams["q"]?.firstOrNull())?.groupOrNull()
-
-            // Coordinates
-            // geo:{lat},{lon}
-            Regex("""$LAT_LON_PATTERN.*""").matchEntire(pathParts.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it, z, name ?: query))
-                return@run
-            }
-
-            if (name != null || query != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name ?: query, source = Source.URI))
+                if (name != null || query != null) {
+                    points = persistentListOf(WGS84Point(z = z, name = name ?: query, source = Source.URI))
+                }
             }
         }
-    }
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")

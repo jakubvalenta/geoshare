@@ -380,6 +380,14 @@ class UriTest {
     }
 
     @Test
+    fun parse_whenUriStringIsInvalidUrl_returnsUri() {
+        assertEquals(
+            Uri(scheme = "https", host = "[invalid:ipv6]", path = "/", uriQuote = uriQuote),
+            Uri.parse("https://[invalid:ipv6]/", uriQuote)
+        )
+    }
+
+    @Test
     fun toAbsoluteUri_inputUrlHasSchemeAndHost() {
         val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
         assertEquals(

@@ -8,7 +8,7 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.network.DESKTOP_USER_AGENT
-import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,10 +16,10 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsShortLinkInput @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
-    override val engine: HttpClientEngine,
-    override val log: Log,
-    override val uriQuote: UriQuote,
-) : HeadLocationHeaderInput {
+    val engine: HttpClientEngine,
+    val log: Log,
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern, Input.HasPermission {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_short_link_name)
     override val group = InputGroup.GOOGLE_MAPS
     override val changelog = persistentListOf(
@@ -31,21 +31,26 @@ class GoogleMapsShortLinkInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?(?:(?:maps\.)?(?:app\.)?goo\.gl|g\.co)/[/A-Za-z0-9_-]+)""")
 
-    override val cookies = COOKIES
-    override val userAgent = USER_AGENT
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        fetchTools.headLocationHeader(
+            match,
+            engine,
+            log,
+            uriQuote,
+            cookies = COOKIES,
+            userAgent = USER_AGENT,
+        ).run {
+            parseResult {
+                // Google Maps Go
+                // https://maps.app.goo.gl/?link={url}
+                queryParams["link"]?.firstOrNull()?.takeIf { it.isNotEmpty() }?.let {
+                    next = MatchedInput(googleMapsUriInput.get(), it)
+                    return@parseResult
+                }
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        data.run {
-            // Google Maps Go
-            // https://maps.app.goo.gl/?link={url}
-            queryParams["link"]?.firstOrNull()?.takeIf { it.isNotEmpty() }?.let {
-                next = MatchedInput(googleMapsUriInput.get(), it)
-                return@parseResult
+                next = MatchedInput(googleMapsUriInput.get(), this@run.toString())
             }
-
-            next = MatchedInput(googleMapsUriInput.get(), data.toString())
         }
-    }
 
     override fun toString() = "GoogleMapsShortLinkInput"
 

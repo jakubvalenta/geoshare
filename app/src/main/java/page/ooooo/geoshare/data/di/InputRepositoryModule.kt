@@ -70,7 +70,6 @@ object InputRepositoryModule {
         baiduMapShortLinkInput: BaiduMapShortLinkInput,
         baiduMapUriInput: BaiduMapUriInput,
         cartesIGNUriInput: CartesIGNUriInput,
-        coordinateInput: CoordinateInput,
         debugUriInput: DebugUriInput,
         geoUriInput: GeoUriInput,
         googleMapsShortLinkInput: GoogleMapsShortLinkInput,
@@ -87,7 +86,6 @@ object InputRepositoryModule {
         mapyComUriInput: MapyComUriInput,
         openStreetMapUriInput: OpenStreetMapUriInput,
         osmAndUriInput: OsmAndUriInput,
-        plusCodeInput: PlusCodeInput,
         urbiUriInput: UrbiUriInput,
         wazeUriInput: WazeUriInput,
         yahooMapsShortLinkInput: YahooMapsShortLinkInput,
@@ -102,7 +100,7 @@ object InputRepositoryModule {
             baiduMapShortLinkInput,
             baiduMapUriInput,
             cartesIGNUriInput,
-            coordinateInput,
+            coordinateInput = CoordinateInput,
             debugUriInput,
             geoUriInput,
             googleMapsShortLinkInput,
@@ -119,7 +117,7 @@ object InputRepositoryModule {
             mapyComUriInput,
             openStreetMapUriInput,
             osmAndUriInput,
-            plusCodeInput,
+            plusCodeInput = PlusCodeInput,
             urbiUriInput,
             wazeUriInput,
             yahooMapsShortLinkInput,
@@ -176,12 +174,11 @@ object FakeInputRepository : InputRepository {
     override val cartesIGNUriInput = CartesIGNUriInput(
         uriQuote = uriQuote,
     )
-    override val coordinateInput = CoordinateInput()
+    override val coordinateInput = CoordinateInput
     override val debugUriInput = DebugUriInput(
-        debugWebViewInput = { debugWebViewInput },
         uriQuote = uriQuote,
     )
-    val debugWebViewInput = DebugWebViewInput()
+    val debugWebViewInput = DebugWebViewInput
     override val geoUriInput = GeoUriInput(
         uriQuote = uriQuote,
     )
@@ -266,7 +263,7 @@ object FakeInputRepository : InputRepository {
     override val osmAndUriInput = OsmAndUriInput(
         uriQuote = uriQuote,
     )
-    override val plusCodeInput = PlusCodeInput()
+    override val plusCodeInput = PlusCodeInput
     override val urbiUriInput = UrbiUriInput(
         urbiHtmlInput = { urbiHtmlInput },
         uriQuote = uriQuote,

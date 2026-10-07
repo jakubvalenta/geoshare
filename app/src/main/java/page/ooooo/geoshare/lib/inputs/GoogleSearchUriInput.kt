@@ -2,7 +2,7 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,17 +12,18 @@ import javax.inject.Singleton
  */
 @Singleton
 class GoogleSearchUriInput @Inject constructor(
-    override val uriQuote: UriQuote,
-) : UriInput {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_search_name)
     override val group = InputGroup.GOOGLE_MAPS
 
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www\.)?google.com/(?:search|share)$URI_REST|share\.google[/?#]$URI_REST))""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        warningMessage = resources.getString(R.string.conversion_failed_unsupported_source_google_search)
-    }
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        parseResult {
+            warningMessage = resources.getString(R.string.conversion_failed_unsupported_source_google_search)
+        }
 
     override fun toString() = "GoogleSearchUriInput"
 }

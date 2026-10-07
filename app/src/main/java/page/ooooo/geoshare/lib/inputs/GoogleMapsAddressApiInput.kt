@@ -13,6 +13,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.network.ResponseNetworkException
 import page.ooooo.geoshare.lib.network.ServerHttpClientFactory
 import page.ooooo.geoshare.lib.uri.Uri
@@ -26,66 +27,65 @@ class GoogleMapsAddressApiInput @Inject constructor(
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
-) : BasicInput<Uri>, Input.HasPermission {
+) : BasicInput, Input.HasPermission {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_address_api_name)
     override val group = InputGroup.GOOGLE_MAPS
 
-    override suspend fun fetch(match: String, block: suspend (Uri) -> ParseResult) =
-        block(Uri.parse(match, uriQuote))
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        parseResult {
+            // Parse URI
+            val uri = Uri.parse(match, uriQuote)
+            val googleMapsParseResult = GoogleMapsUriParser.parse(uri)
+            points = googleMapsParseResult.points
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        // Parse URI
-        val googleMapsParseResult = GoogleMapsUriParser.parse(data)
-        points = googleMapsParseResult.points
-
-        // Get API configuration
-        val server = serverRepository.getSelectedGoogleMapsAddress() ?: run {
-            // Go to HTML parsing, if server is not configured
-            next = MatchedInput(googleMapsHtmlInput.get(), match)
-            return@parseResult
-        }
-
-        // Parse query
-        val lastPoint = points.lastOrNull() ?: return@parseResult
-        val rawQuery = lastPoint.name?.takeIf { it.isNotEmpty() } ?: return@parseResult
-
-        // Remove trailing coordinates from query
-        val query = Regex("""[\s+]*@$LAT$COORD_SEP$LON\s*$""").replace(rawQuery, "")
-
-        // Call API
-        val client = serverHttpClientFactory.createHttpClient(server)
-        val res = try {
-            client.use { client ->
-                client
-                    .prepareRequest {
-                        url(server.getUrl(query, uriQuote))
-                        headers {
-                            accept(ContentType.Application.Json)
-                        }
-                    }
-                    .execute { response ->
-                        response.body<ServerHttpClientFactory.GoogleMapsResults>()
-                    }
-            }
-        } catch (tr: ResponseNetworkException) {
-            if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
-                // Return no points
+            // Get API configuration
+            val server = serverRepository.getSelectedGoogleMapsAddress() ?: run {
+                // Go to HTML parsing, if server is not configured
+                next = MatchedInput(googleMapsHtmlInput.get(), match)
                 return@parseResult
             }
-            throw tr
-        }
 
-        // Update points
-        val highestRankedResult = res.results?.firstOrNull() ?: return@parseResult
-        val point = GCJ02MainlandChinaPoint(
-            lat = highestRankedResult.location.latitude,
-            lon = highestRankedResult.location.longitude,
-            z = lastPoint.z,
-            name = query,
-            source = Source.API
-        )
-        points = points.dropLast(1).plus(point).toImmutableList()
-    }
+            // Parse query
+            val lastPoint = points.lastOrNull() ?: return@parseResult
+            val rawQuery = lastPoint.name?.takeIf { it.isNotEmpty() } ?: return@parseResult
+
+            // Remove trailing coordinates from query
+            val query = Regex("""[\s+]*@$LAT$COORD_SEP$LON\s*$""").replace(rawQuery, "")
+
+            // Call API
+            val client = serverHttpClientFactory.createHttpClient(server)
+            val res = try {
+                client.use { client ->
+                    client
+                        .prepareRequest {
+                            url(server.getUrl(query, uriQuote))
+                            headers {
+                                accept(ContentType.Application.Json)
+                            }
+                        }
+                        .execute { response ->
+                            response.body<ServerHttpClientFactory.GoogleMapsResults>()
+                        }
+                }
+            } catch (tr: ResponseNetworkException) {
+                if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
+                    // Return no points
+                    return@parseResult
+                }
+                throw tr
+            }
+
+            // Update points
+            val highestRankedResult = res.results?.firstOrNull() ?: return@parseResult
+            val point = GCJ02MainlandChinaPoint(
+                lat = highestRankedResult.location.latitude,
+                lon = highestRankedResult.location.longitude,
+                z = lastPoint.z,
+                name = query,
+                source = Source.API
+            )
+            points = points.dropLast(1).plus(point).toImmutableList()
+        }
 
     override fun toString() = TAG
 

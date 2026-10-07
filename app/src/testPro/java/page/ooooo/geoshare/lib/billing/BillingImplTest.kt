@@ -37,7 +37,6 @@ import page.ooooo.geoshare.lib.Message
 import kotlin.time.Duration.Companion.hours
 
 @Suppress("EmptyMethod")
-@OptIn(ExperimentalCoroutinesApi::class)
 class BillingImplTest {
     private val resources: Resources = mock {
         on { getString(R.string.app_name_pro) } doReturn "GeoShare Pro"

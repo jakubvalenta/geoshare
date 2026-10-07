@@ -4,6 +4,7 @@ import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -27,8 +28,8 @@ class GoogleMapsUriInput @Inject constructor(
     private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
     private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
-    override val uriQuote: UriQuote,
-) : UriInput, Input.HasRandomUri {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.GOOGLE_MAPS
     override val changelog = persistentListOf(
@@ -40,28 +41,30 @@ class GoogleMapsUriInput @Inject constructor(
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www|maps)\.)?google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        val googleMapsParseResult = GoogleMapsUriParser.parse(data)
-        points = googleMapsParseResult.points
-        next = if (googleMapsParseResult.isPlaceList) {
-            MatchedInput(googleMapsPlaceListInput.get(), match)
-        } else if (googleMapsParseResult.requiresHtmlParsing) {
-            MatchedInput(googleMapsHtmlInput.get(), match)
-        } else {
-            val lastPoint = points.lastOrNull()
-            if (lastPoint != null && !lastPoint.hasCoordinates()) {
-                if (lastPoint.placeId != null) {
-                    MatchedInput(googleMapsPlaceApiInput.get(), match)
-                } else if (!lastPoint.name.isNullOrEmpty()) {
-                    MatchedInput(googleMapsAddressApiInput.get(), match)
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        parseResult {
+            val uri = Uri.parse(match, uriQuote)
+            val googleMapsParseResult = GoogleMapsUriParser.parse(uri)
+            points = googleMapsParseResult.points
+            next = if (googleMapsParseResult.isPlaceList) {
+                MatchedInput(googleMapsPlaceListInput.get(), match)
+            } else if (googleMapsParseResult.requiresHtmlParsing) {
+                MatchedInput(googleMapsHtmlInput.get(), match)
+            } else {
+                val lastPoint = points.lastOrNull()
+                if (lastPoint != null && !lastPoint.hasCoordinates()) {
+                    if (lastPoint.placeId != null) {
+                        MatchedInput(googleMapsPlaceApiInput.get(), match)
+                    } else if (!lastPoint.name.isNullOrEmpty()) {
+                        MatchedInput(googleMapsAddressApiInput.get(), match)
+                    } else {
+                        null
+                    }
                 } else {
                     null
                 }
-            } else {
-                null
             }
         }
-    }
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(

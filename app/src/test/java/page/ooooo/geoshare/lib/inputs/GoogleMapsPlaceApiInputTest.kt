@@ -106,7 +106,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
                     "https://www.google.com/maps/search/?query_place_id=$placeId"
                 ),
             ),
-            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId"),
+            input.parse("https://www.google.com/maps/search/?query_place_id=$placeId"),
         )
     }
 
@@ -121,7 +121,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
                     )
                 )
             ),
-            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId"),
+            input.parse("https://www.google.com/maps/search/?query_place_id=$placeId"),
         )
         assertEquals(
             ParseResult.Success(
@@ -133,7 +133,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
                     )
                 )
             ),
-            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId&query=foo"),
+            input.parse("https://www.google.com/maps/search/?query_place_id=$placeId&query=foo"),
         )
     }
 
@@ -155,7 +155,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
                     )
                 )
             ),
-            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=$placeId&query=47.5951518,-122.3316393&api=1"),
+            input.parse("https://www.google.com/maps/search/?query_place_id=$placeId&query=47.5951518,-122.3316393&api=1"),
         )
     }
 
@@ -163,7 +163,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
     fun parse_whenPlaceIdIsNotFoundInUri_returnsNoPoints() = runTest {
         assertEquals(
             ParseResult.Success(),
-            input.fetchAndParse("https://www.google.com/spam"),
+            input.parse("https://www.google.com/spam"),
         )
     }
 
@@ -171,18 +171,18 @@ class GoogleMapsPlaceApiInputTest : InputTest {
     fun parse_whenPlaceIdIsEmpty_returnsNoPoints() = runTest {
         assertEquals(
             ParseResult.Success(),
-            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id="),
+            input.parse("https://www.google.com/maps/search/?query_place_id="),
         )
     }
 
     @Test(expected = ContentConvertNetworkException::class)
     fun parse_whenApiReturnsEmptyObject_throwsException() = runTest {
-        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=empty-object")
+        input.parse("https://www.google.com/maps/search/?query_place_id=empty-object")
     }
 
     @Test(expected = ContentConvertNetworkException::class)
     fun parse_whenApiReturnsInvalidResponse_throwsException() = runTest {
-        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=invalid")
+        input.parse("https://www.google.com/maps/search/?query_place_id=invalid")
     }
 
     @Test
@@ -196,7 +196,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
                     )
                 )
             ),
-            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=bad-request"),
+            input.parse("https://www.google.com/maps/search/?query_place_id=bad-request"),
         )
     }
 
@@ -204,22 +204,22 @@ class GoogleMapsPlaceApiInputTest : InputTest {
     fun parse_whenApiReturns404_returnsPointsWithoutCoordinates() = runTest {
         assertEquals(
             ParseResult.Success(persistentListOf(GCJ02MainlandChinaPoint(placeId = "not-found", source = Source.URI))),
-            input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=not-found"),
+            input.parse("https://www.google.com/maps/search/?query_place_id=not-found"),
         )
     }
 
     @Test(expected = ResponseNetworkException::class)
     fun parse_whenApiReturnsOther4xx_throwsException() = runTest {
-        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=405")
+        input.parse("https://www.google.com/maps/search/?query_place_id=405")
     }
 
     @Test(expected = SocketTimeoutNetworkException::class)
     fun parse_whenApiThrowsKnownException_throwsNetworkException() = runTest {
-        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=exception")
+        input.parse("https://www.google.com/maps/search/?query_place_id=exception")
     }
 
     @Test(expected = UnknownNetworkException::class)
     fun parse_whenApiThrowsUnknownException_throwsUnknownNetworkException() = runTest {
-        input.fetchAndParse("https://www.google.com/maps/search/?query_place_id=uknown-exception")
+        input.parse("https://www.google.com/maps/search/?query_place_id=uknown-exception")
     }
 }

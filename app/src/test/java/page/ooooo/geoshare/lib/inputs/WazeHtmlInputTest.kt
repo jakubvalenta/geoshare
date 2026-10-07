@@ -9,6 +9,7 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.FakeFetchTools
 
 class WazeHtmlInputTest : InputTest {
     override val resources: Resources = mock()
@@ -19,8 +20,10 @@ class WazeHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(persistentListOf(WGS84Point(43.64265563, -79.387202798, source = Source.JAVASCRIPT))),
             input.parse(
-                // language=html
-                """<html lang="en">
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en">
 <script>
 {
   "routing": {
@@ -39,7 +42,8 @@ class WazeHtmlInputTest : InputTest {
 }
 </script>
 </html>"""
-            ),
+                )
+            )
         )
     }
 
@@ -48,8 +52,11 @@ class WazeHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=html
-                """<html lang="en"><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>"""
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en"><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>"""
+                )
             )
         )
     }
@@ -59,8 +66,11 @@ class WazeHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=html
-                """<html lang="en"></html>"""
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en"></html>"""
+                )
             )
         )
     }
