@@ -8,10 +8,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toLonLatPoint
+import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.network.FetchTools
+import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,7 +30,20 @@ class YandexMapsHtmlInput @Inject constructor(
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->
             parseResult {
-                val pointPattern = Regex("""pt=$LON%2C$LAT""")
+                val uri = Uri.parse(match, uriQuote)
+                val ptPattern = Regex("""pt=$LON%2C$LAT""")
+                val llPattern = if (!uri.queryParams.contains("ll")) {
+                    // If the match (place URL) doesn't contain map center, then the '%2F%3Fll%3D...' pattern returns
+                    // correct place location. Example match:
+                    // https://yandex.com/maps/org/zapretny_gorod/5867973238
+                    Regex("${Regex.escape(uriQuote.encode(match))}%2F%3Fll%3D$LON%252C$LAT%26z%3D$Z")
+                } else {
+                    // If the match (place URL) contains map center, then the '%2F%3Fll%3D...' pattern returns the same
+                    // map center. This is not the point the user expects when processing a place URL, so the pattern
+                    // must not be used. Example match:
+                    // https://yandex.com/maps/org/zapretny_gorod/5867973238/?ll=116.096354%2C40.045755&z=13
+                    null
+                }
                 val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
                 var naivePoint: NaivePoint? = null
@@ -36,7 +51,11 @@ class YandexMapsHtmlInput @Inject constructor(
 
                 while (true) {
                     val line = data.readLine() ?: break
-                    pointPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
+                    ptPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
+                        naivePoint = it
+                        continue
+                    }
+                    llPattern?.find(line)?.toLonLatZPoint(Source.HTML)?.let {
                         naivePoint = it
                         continue
                     }
@@ -46,10 +65,10 @@ class YandexMapsHtmlInput @Inject constructor(
                     }
                 }
 
-                naivePoint?.also {
-                    points = persistentListOf(WGS84Point(it, name = name))
-                } ?: name?.also {
-                    points = persistentListOf(WGS84Point(name = it, source = Source.HTML))
+                if (naivePoint != null) {
+                    points = persistentListOf(WGS84Point(naivePoint, name = name))
+                } else if (name != null) {
+                    points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
                 }
             }
         }
