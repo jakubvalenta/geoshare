@@ -20,6 +20,7 @@ import page.ooooo.geoshare.lib.extensions.chunkedPairs
 import page.ooooo.geoshare.lib.extensions.removeRepeated
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.network.configureLogging
 import page.ooooo.geoshare.lib.network.rethrowExceptionsAsNetworkException
 import page.ooooo.geoshare.lib.network.setDefaultTimeouts
@@ -32,7 +33,7 @@ class WazeApiInput @Inject constructor(
     private val clock: Clock,
     private val engine: HttpClientEngine,
     private val log: Log,
-) : BasicInput<String>, Input.HasPermission {
+) : BasicInput, Input.HasPermission {
     @Serializable
     private data class CalculatedLocation(
         val latitude: Double,
@@ -54,11 +55,8 @@ class WazeApiInput @Inject constructor(
     override fun getName(resources: Resources) = resources.getString(R.string.input_waze_api_name)
     override val group = InputGroup.WAZE
 
-    override suspend fun fetch(match: String, block: suspend (String) -> ParseResult): ParseResult =
-        block(match)
-
-    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
-        val info = HttpClient(engine) {
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        HttpClient(engine) {
             expectSuccess = true
             configureLogging(log)
             setDefaultTimeouts()
@@ -73,49 +71,54 @@ class WazeApiInput @Inject constructor(
             client
                 .get("https://www.waze.com/row-rtserver/web/PickUpGetDriverInfo") {
                     buildUrl {
-                        parameter("token", data)
+                        parameter("token", match)
                         parameter("getUserInfo", "true")
                         parameter("_", clock.now().toEpochMilliseconds().toString())
                         accept(ContentType.Application.Json)
                     }
                 }
                 .body<PickUpGetDriverInfo>()
-        }
-        when (info.status) {
-            "error" ->
-                if (info.message?.startsWith("invalid token") == true) {
-                    warningMessage = resources.getString(R.string.input_waze_warning_route_expired)
-                }
+        }.let { info ->
+            parseResult {
+                when (info.status) {
+                    "error" ->
+                        if (info.message?.startsWith("invalid token") == true) {
+                            warningMessage = resources.getString(R.string.input_waze_warning_route_expired)
+                        }
 
-            "ok" ->
-                if (info.route != null) {
-                    points = buildList {
-                        if (info.lat != null && info.lon != null) {
-                            add(WGS84Point(info.lat, info.lon, source = Source.API))
-                        }
-                        addAll(
-                            info.route
-                                .chunkedPairs()
-                                .removeRepeated { prev, curr -> prev?.first == curr.first && prev.second == curr.second }
-                                .map { (lon, lat) -> WGS84Point(lat, lon, source = Source.API) }
-                        )
-                        if (info.calculatedLocation != null) {
-                            add(
-                                WGS84Point(
-                                    info.calculatedLocation.latitude, info.calculatedLocation.longitude,
-                                    name = listOfNotNull(info.calculatedLocation.street, info.calculatedLocation.city)
-                                        .takeIf { it.isNotEmpty() }
-                                        ?.joinToString(", "),
-                                    source = Source.API,
+                    "ok" ->
+                        if (info.route != null) {
+                            points = buildList {
+                                if (info.lat != null && info.lon != null) {
+                                    add(WGS84Point(info.lat, info.lon, source = Source.API))
+                                }
+                                addAll(
+                                    info.route
+                                        .chunkedPairs()
+                                        .removeRepeated { prev, curr -> prev?.first == curr.first && prev.second == curr.second }
+                                        .map { (lon, lat) -> WGS84Point(lat, lon, source = Source.API) }
                                 )
-                            )
+                                if (info.calculatedLocation != null) {
+                                    add(
+                                        WGS84Point(
+                                            info.calculatedLocation.latitude, info.calculatedLocation.longitude,
+                                            name = listOfNotNull(
+                                                info.calculatedLocation.street,
+                                                info.calculatedLocation.city
+                                            )
+                                                .takeIf { it.isNotEmpty() }
+                                                ?.joinToString(", "),
+                                            source = Source.API,
+                                        )
+                                    )
+                                }
+                            }.toImmutableList()
+                        } else {
+                            warningMessage = resources.getString(R.string.input_waze_warning_route_empty)
                         }
-                    }.toImmutableList()
-                } else {
-                    warningMessage = resources.getString(R.string.input_waze_warning_route_empty)
                 }
+            }
         }
-    }
 
     override fun toString() = "WazeApiInput"
 }

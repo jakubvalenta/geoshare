@@ -14,5 +14,5 @@ object GoogleMapsHtmlInputModule {
 
     @Provides
     @Singleton
-    fun provideGoogleMapsHtmlInput(): GoogleMapsHtmlInput = GoogleMapsHtmlInputImpl()
+    fun provideGoogleMapsHtmlInput(): GoogleMapsHtmlInput = GoogleMapsHtmlInputImpl
 }

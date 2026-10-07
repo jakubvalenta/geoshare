@@ -117,7 +117,7 @@ class WazeApiInputTest : InputTest {
                     ),
                 )
             ),
-            input.fetchAndParse("test-token")
+            input.parse("test-token")
         )
     }
 
@@ -154,7 +154,7 @@ class WazeApiInputTest : InputTest {
                     WGS84Point(52.469131999999995, 13.43647, source = Source.API),
                 )
             ),
-            input.fetchAndParse("test-token")
+            input.parse("test-token")
         )
     }
 
@@ -180,7 +180,7 @@ class WazeApiInputTest : InputTest {
         val input = WazeApiInput(clock = clock, engine = engine, log = log)
         assertEquals(
             ParseResult.Warning(resources.getString(R.string.input_waze_warning_route_expired)),
-            input.fetchAndParse("test-token")
+            input.parse("test-token")
         )
     }
 
@@ -197,7 +197,7 @@ class WazeApiInputTest : InputTest {
         val input = WazeApiInput(clock = clock, engine = engine, log = log)
         assertEquals(
             ParseResult.Warning(resources.getString(R.string.input_waze_warning_route_expired)),
-            input.fetchAndParse("test-token")
+            input.parse("test-token")
         )
     }
 
@@ -218,7 +218,7 @@ class WazeApiInputTest : InputTest {
         val input = WazeApiInput(clock = clock, engine = engine, log = log)
         assertEquals(
             ParseResult.Warning(resources.getString(R.string.input_waze_warning_route_empty)),
-            input.fetchAndParse("test-token"),
+            input.parse("test-token"),
         )
     }
 
@@ -239,7 +239,7 @@ class WazeApiInputTest : InputTest {
         val input = WazeApiInput(clock = clock, engine = engine, log = log)
         assertEquals(
             ParseResult.Success(),
-            input.fetchAndParse("test-token"),
+            input.parse("test-token"),
         )
     }
 
@@ -258,6 +258,6 @@ class WazeApiInputTest : InputTest {
             }
         }
         val input = WazeApiInput(clock = clock, engine = engine, log = log)
-        input.fetchAndParse("test-token")
+        input.parse("test-token")
     }
 }

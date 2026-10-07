@@ -193,7 +193,7 @@ class MapyComUriInputTest : InputTest {
                     WGS84Point(52.40594454109669, 13.620681166648865, z = 18.0, source = Source.HASH),
                 )
             ),
-            input.parse(uriString = "https://mapy.com/en/turisticka?planovani-trasy&rc=9eJ.Ex5-GG9eY14x5Ls1jBHe8t9emdXcI5&rs=osm&rs=osm&rs=osm&rs=pubt&ri=20227705&ri=120789104&ri=81032078&ri=28872262&mrp=%7B%22c%22%3A121%2C%22dt%22%3A%22%22%2C%22d%22%3Atrue%7D&xc=%5B%5D&rbf=alf&x=13.4308032&y=52.4684951&z=18"),
+            input.parse("https://mapy.com/en/turisticka?planovani-trasy&rc=9eJ.Ex5-GG9eY14x5Ls1jBHe8t9emdXcI5&rs=osm&rs=osm&rs=osm&rs=pubt&ri=20227705&ri=120789104&ri=81032078&ri=28872262&mrp=%7B%22c%22%3A121%2C%22dt%22%3A%22%22%2C%22d%22%3Atrue%7D&xc=%5B%5D&rbf=alf&x=13.4308032&y=52.4684951&z=18"),
         )
     }
 
@@ -230,11 +230,11 @@ class MapyComUriInputTest : InputTest {
     fun parse_textCoordinates() = runTest {
         assertEquals(
             ParseResult.Success(persistentListOf(WGS84Point(41.9966006, -6.1223825, source = Source.TEXT))),
-            input.parse(uriString = "41.9966006N, 6.1223825W"),
+            input.parse("41.9966006N, 6.1223825W"),
         )
         assertEquals(
             ParseResult.Success(persistentListOf(WGS84Point(-41.9966006, 6.1223825, source = Source.TEXT))),
-            input.parse(uriString = "41.9966006S, 6.1223825E"),
+            input.parse("41.9966006S, 6.1223825E"),
         )
     }
 }

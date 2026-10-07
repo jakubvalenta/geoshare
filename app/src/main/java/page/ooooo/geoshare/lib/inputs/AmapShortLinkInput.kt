@@ -5,7 +5,7 @@ import io.ktor.client.engine.HttpClientEngine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,10 +13,10 @@ import javax.inject.Singleton
 @Singleton
 class AmapShortLinkInput @Inject constructor(
     private val amapUriInput: dagger.Lazy<AmapUriInput>,
-    override val engine: HttpClientEngine,
-    override val log: Log,
-    override val uriQuote: UriQuote,
-) : HeadLocationHeaderInput {
+    val engine: HttpClientEngine,
+    val log: Log,
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_amap_short_link_name)
     override val group = InputGroup.AMAP
     override val changelog = persistentListOf(
@@ -25,9 +25,12 @@ class AmapShortLinkInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?surl\.amap\.com/\S+)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        next = MatchedInput(amapUriInput.get(), data.toString())
-    }
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        fetchTools.headLocationHeader(match, engine, log, uriQuote).run {
+            parseResult {
+                next = MatchedInput(amapUriInput.get(), this@run.toString())
+            }
+        }
 
     override fun toString() = "AmapShortLinkInput"
 }

@@ -9,13 +9,14 @@ import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
+import page.ooooo.geoshare.lib.network.FetchTools
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MapsMeUriInput @Inject constructor(
-    override val uriQuote: UriQuote,
-) : UriInput {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
 
     override val group = InputGroup.MAPS_ME
@@ -27,34 +28,35 @@ class MapsMeUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        data.run {
-            val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
-                ?.let { Q_PATH_PATTERN.matchEntire(it) }
-                ?.groupOrNull()
-                ?.replace('_', ' ')
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        Uri.parse(match, uriQuote).run {
+            parseResult {
+                val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
+                    ?.let { Q_PATH_PATTERN.matchEntire(it) }
+                    ?.groupOrNull()
+                    ?.replace('_', ' ')
 
-            (if (scheme == "ge0") host else pathParts.getOrNull(1))
-                ?.let { Regex(HASH).matchEntire(it)?.value }
-                ?.let { hash -> decodeGe0Hash(hash) }
-                ?.let {
-                    points = persistentListOf(
-                        WGS84Point(
-                            lat = it.lat?.toScale(7),
-                            lon = it.lon?.toScale(7),
-                            z = it.z,
-                            name = name,
-                            source = it.source,
+                (if (scheme == "ge0") host else pathParts.getOrNull(1))
+                    ?.let { Regex(HASH).matchEntire(it)?.value }
+                    ?.let { hash -> decodeGe0Hash(hash) }
+                    ?.let {
+                        points = persistentListOf(
+                            WGS84Point(
+                                lat = it.lat?.toScale(7),
+                                lon = it.lon?.toScale(7),
+                                z = it.z,
+                                name = name,
+                                source = it.source,
+                            )
                         )
-                    )
-                    return@run
-                }
+                        return@parseResult
+                    }
 
-            if (name != null) {
-                points = persistentListOf(WGS84Point(name = name, source = Source.URI))
+                if (name != null) {
+                    points = persistentListOf(WGS84Point(name = name, source = Source.URI))
+                }
             }
         }
-    }
 
     override fun toString() = "MapsMeUriInput"
 

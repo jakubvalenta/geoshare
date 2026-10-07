@@ -28,7 +28,7 @@ class GoogleMapsWebViewInput @Inject constructor(
      * - The URL is unlikely to be in another format such as `/?ll={lat},{lon}`
      */
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript(match: String) = """
+    override fun getUnsafeExtractionJavaScript() = """
         () => {
             if (window.__hrefWithCoordinates !== location.href) {
                 if (location.href.includes("/@") || location.href.includes("!2d") || location.href.includes("!4d")) {

@@ -10,6 +10,7 @@ import page.ooooo.geoshare.lib.geo.WGS84Point
 
 import android.content.res.Resources
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.lib.network.FakeFetchTools
 
 class AppleMapsHtmlInputTest : InputTest {
     override val resources: Resources = mock()
@@ -20,13 +21,16 @@ class AppleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML))),
             input.parse(
-                // language=html
-                """<html lang="en">
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en">
 <head>
   <meta property="place:location:latitude" content="52.4735927" />
   <meta property="place:location:longitude" content="13.4050798" />
 </head>
 </html>"""
+                )
             ),
         )
     }
@@ -36,8 +40,11 @@ class AppleMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=html
-                """<html lang="en"></html>"""
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en"></html>"""
+                )
             )
         )
     }

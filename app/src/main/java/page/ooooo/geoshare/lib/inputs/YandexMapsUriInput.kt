@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -20,8 +21,8 @@ import javax.inject.Singleton
 @Singleton
 class YandexMapsUriInput @Inject constructor(
     private val yandexMapsHtmlInput: dagger.Lazy<YandexMapsHtmlInput>,
-    override val uriQuote: UriQuote,
-) : UriInput, Input.HasRandomUri {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.YANDEX_MAPS
     override val changelog = persistentListOf(
@@ -50,60 +51,63 @@ class YandexMapsUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        data.run {
-            val z = listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[zoom]", "z")
-                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        Uri.parse(match, uriQuote).run {
+            parseResult {
+                val z = listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[zoom]", "z")
+                    .firstNotNullOfOrNull { key ->
+                        Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull()
+                    }
 
-            // Directions
-            // https://yandex.com/maps?rtext={lat}%2C{lon}~{lat}%2C{lon}~{lat}%2C{lon}
-            LAT_LON_PATTERN.findAll(
-                queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "rtext"]?.firstOrNull()
-            )
-                .mapNotNull { m -> m.toLatLonPoint(Source.URI)?.copy(z = z)?.let { WGS84Point(it) } }
-                .toImmutableList()
-                .takeIf { it.isNotEmpty() }
-                ?.let {
-                    points = it
-                    return@parseResult
-                }
-
-            // Coordinates
-            // https://yandex.com/maps?ll={lon},{lat}
-            // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
-            listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[point]", "ll")
-                .firstNotNullOfOrNull { key ->
-                    LON_LAT_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLonLatPoint(Source.URI)
-                }?.let {
-                    points = persistentListOf(WGS84Point(it, z))
-                    return@parseResult
-                }
-
-            pathParts.forEachIndexed { i, part ->
-                when (part) {
-                    "geo" -> {
-                        // POI
-                        // https://yandex.com/maps/.../.../geo/{name}/{id}/
-                        points = persistentListOf(
-                            WGS84Point(
-                                name = pathParts.getOrNull(i + 1)?.replace('_', ' '),
-                                source = Source.URI,
-                            ),
-                        )
-                        next = MatchedInput(yandexMapsHtmlInput.get(), match)
+                // Directions
+                // https://yandex.com/maps?rtext={lat}%2C{lon}~{lat}%2C{lon}~{lat}%2C{lon}
+                LAT_LON_PATTERN.findAll(
+                    queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "rtext"]?.firstOrNull()
+                )
+                    .mapNotNull { m -> m.toLatLonPoint(Source.URI)?.copy(z = z)?.let { WGS84Point(it) } }
+                    .toImmutableList()
+                    .takeIf { it.isNotEmpty() }
+                    ?.let {
+                        points = it
                         return@parseResult
                     }
 
-                    "org" -> {
-                        // Old POI -- these links seem to return 404 now; we still keep the code in case they start working again
-                        // https://yandex.com/maps/org/{id}?...
-                        next = MatchedInput(yandexMapsHtmlInput.get(), match)
+                // Coordinates
+                // https://yandex.com/maps?ll={lon},{lat}
+                // https://yandex.com/maps?whatshere%5Bpoint%5D={lon}%2C{lat}
+                listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "whatshere[point]", "ll")
+                    .firstNotNullOfOrNull { key ->
+                        LON_LAT_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.toLonLatPoint(Source.URI)
+                    }?.let {
+                        points = persistentListOf(WGS84Point(it, z))
                         return@parseResult
+                    }
+
+                pathParts.forEachIndexed { i, part ->
+                    when (part) {
+                        "geo" -> {
+                            // POI
+                            // https://yandex.com/maps/.../.../geo/{name}/{id}/
+                            points = persistentListOf(
+                                WGS84Point(
+                                    name = pathParts.getOrNull(i + 1)?.replace('_', ' '),
+                                    source = Source.URI,
+                                ),
+                            )
+                            next = MatchedInput(yandexMapsHtmlInput.get(), match)
+                            return@parseResult
+                        }
+
+                        "org" -> {
+                            // Old POI -- these links seem to return 404 now; we still keep the code in case they start working again
+                            // https://yandex.com/maps/org/{id}?...
+                            next = MatchedInput(yandexMapsHtmlInput.get(), match)
+                            return@parseResult
+                        }
                     }
                 }
             }
         }
-    }
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://yandex.com/maps?ll={lon}%2C{lat}&z={z}")

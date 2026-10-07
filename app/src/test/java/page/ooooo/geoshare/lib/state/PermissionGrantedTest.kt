@@ -16,7 +16,6 @@ import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.NoopInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
 import page.ooooo.geoshare.lib.inputs.WebViewInput
-import page.ooooo.geoshare.lib.uri.Uri
 
 class PermissionGrantedTest {
     private val source = "https://maps.google.com/foo"
@@ -29,7 +28,7 @@ class PermissionGrantedTest {
     @Test
     fun transition_whenInputIsBasicInput_returnsPermissionGrantedBasicInput() = runTest {
         val input = FakeInputRepository.googleMapsShortLinkInput
-        val matchedInput = MatchedInput<BasicInput<Uri>>(input, source)
+        val matchedInput = MatchedInput<BasicInput>(input, source)
         val state = PermissionGranted(source, matchedInput, permission, results)
         assertEquals(
             PermissionGrantedBasicInput(source, matchedInput, permission, results),
@@ -43,7 +42,7 @@ class PermissionGrantedTest {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
-            override fun getUnsafeExtractionJavaScript(match: String) = "undefined"
+            override fun getUnsafeExtractionJavaScript() = "undefined"
 
             override suspend fun parse(
                 data: String,

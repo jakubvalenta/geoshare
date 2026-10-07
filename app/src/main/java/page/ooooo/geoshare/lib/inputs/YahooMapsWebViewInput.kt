@@ -30,7 +30,7 @@ class YahooMapsWebViewInput @Inject constructor(
      * different, then it returns the point.
      */
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript(match: String) = """
+    override fun getUnsafeExtractionJavaScript() = """
         () => {
             const queryParams = new URLSearchParams(location.search);
             const lat = parseFloat(queryParams.get("lat"));

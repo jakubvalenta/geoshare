@@ -5,7 +5,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 object InitialServersImpl : InitialServers {
     /**
      * Delete all servers and populate the table with initial ones.

@@ -11,8 +11,7 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
-import javax.inject.Inject
-import javax.inject.Singleton
+import page.ooooo.geoshare.lib.network.FetchTools
 
 /**
  * Plus Codes input.
@@ -24,8 +23,7 @@ import javax.inject.Singleton
  *
  * See https://plus.codes/
  */
-@Singleton
-class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
+object PlusCodeInput : BasicInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.PLUS_CODE
     override val changelog = persistentListOf(
@@ -43,43 +41,38 @@ class PlusCodeInput @Inject constructor() : TextInput, Input.HasRandomUri {
         RegexOption.IGNORE_CASE,
     )
 
-    override suspend fun parse(
-        data: String,
-        match: String,
-        resources: Resources,
-    ) = parseResult {
-        // URL-decode code string if it was extracted from a URL
-        val codeString = data.replace("%2B", "+")
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        parseResult {
+            // URL-decode code string if it was extracted from a URL
+            val codeString = match.replace("%2B", "+")
 
-        // Global code
-        // e.g. `796RWF8Q+WF`
-        decodePlusCode(codeString)?.let {
-            points = persistentListOf(
-                GCJ02MainlandChinaPoint(
-                    lat = it.lat?.toScale(6),
-                    lon = it.lon?.toScale(6),
-                    z = it.z,
-                    name = it.name,
-                    source = it.source,
+            // Global code
+            // e.g. `796RWF8Q+WF`
+            decodePlusCode(codeString)?.let {
+                points = persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        lat = it.lat?.toScale(6),
+                        lon = it.lon?.toScale(6),
+                        z = it.z,
+                        name = it.name,
+                        source = it.source,
+                    )
                 )
-            )
-            return@parseResult
-        }
+                return@parseResult
+            }
 
-        // Local code (not implemented yet)
-        // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
-    }
+            // Local code (not implemented yet)
+            // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
+        }
 
     override fun genRandomUri(point: Point): String? =
         PlusCodeFormatter.formatPlusCode(point)
 
     override fun toString() = "PlusCodeInput"
 
-    private companion object {
-        /**
-         * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
-         */
-        private const val GLOBAL_CODE =
-            """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
-    }
+    /**
+     * See https://github.com/google/open-location-code/blob/main/Documentation/Reference/App_Developers.md#supporting-global-codes
+     */
+    private const val GLOBAL_CODE =
+        """[23456789C][23456789CFGHJMPQRV][23456789CFGHJMPQRVWX]{6}(?:\+|%2B)[23456789CFGHJMPQRVWX]{2,7}"""
 }

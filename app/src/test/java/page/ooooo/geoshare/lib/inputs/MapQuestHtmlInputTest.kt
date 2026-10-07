@@ -9,6 +9,7 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.FakeFetchTools
 
 class MapQuestHtmlInputTest : InputTest {
     override val resources: Resources = mock()
@@ -23,13 +24,16 @@ class MapQuestHtmlInputTest : InputTest {
                 )
             ),
             input.parse(
-                // language=html
-                """<html lang="en">
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en">
 <script>
 {"url":"https://www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097","geo":{"@type":"GeoCoordinates","latitude":39.91843414,"longitude":116.40497589},"address":{"@type":"PostalAddress","addressCountry":"CN","addressLocality":"Beijing","postalCode":"110101"}}
 </script>
 </html>"""
-            ),
+                )
+            )
         )
     }
 
@@ -38,8 +42,11 @@ class MapQuestHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(),
             input.parse(
-                // language=html
-                """<html lang="en"></html>"""
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en"></html>"""
+                )
             )
         )
     }

@@ -29,7 +29,7 @@ class BaiduMapWebViewInput @Inject constructor(
      * It doesn't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
      */
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript(match: String) = """
+    override fun getUnsafeExtractionJavaScript() = """
         () => {
             function deepGet(obj, ...keys) {
                 return keys.reduce((acc, key) => {

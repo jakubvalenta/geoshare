@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import io.ktor.client.engine.HttpClientEngine
-import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
@@ -12,44 +11,48 @@ import page.ooooo.geoshare.lib.extensions.toLonLatPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class YandexMapsHtmlInput @Inject constructor(
-    override val engine: HttpClientEngine,
-    override val log: Log,
-    override val uriQuote: UriQuote,
-) : BodyAsChannelInput {
+    val engine: HttpClientEngine,
+    val log: Log,
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPermission {
     override fun getName(resources: Resources) = resources.getString(R.string.input_yandex_html_name)
     override val group = InputGroup.YANDEX_MAPS
 
-    override suspend fun parse(data: ByteReadChannel, match: String, resources: Resources) = parseResult {
-        val pointPattern = Regex("""pt=$LON%2C$LAT""")
-        val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->
+            parseResult {
+                val pointPattern = Regex("""pt=$LON%2C$LAT""")
+                val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
-        var naivePoint: NaivePoint? = null
-        var name: String? = null
+                var naivePoint: NaivePoint? = null
+                var name: String? = null
 
-        while (true) {
-            val line = data.readLine() ?: break
-            pointPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
-                naivePoint = it
-                continue
-            }
-            namePattern.find(line)?.groupOrNull()?.let {
-                name = it
-                break
+                while (true) {
+                    val line = data.readLine() ?: break
+                    pointPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
+                        naivePoint = it
+                        continue
+                    }
+                    namePattern.find(line)?.groupOrNull()?.let {
+                        name = it
+                        break
+                    }
+                }
+
+                naivePoint?.also {
+                    points = persistentListOf(WGS84Point(it, name = name))
+                } ?: name?.also {
+                    points = persistentListOf(WGS84Point(name = it, source = Source.HTML))
+                }
             }
         }
-
-        naivePoint?.also {
-            points = persistentListOf(WGS84Point(it, name = name))
-        } ?: name?.also {
-            points = persistentListOf(WGS84Point(name = it, source = Source.HTML))
-        }
-    }
 
     override fun toString() = "YandexMapsHtmlInput"
 }

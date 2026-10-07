@@ -12,6 +12,7 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.lib.uri.toQueryParams
@@ -29,8 +30,8 @@ import javax.inject.Singleton
 @Singleton
 class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
-    override val uriQuote: UriQuote,
-) : UriInput, Input.HasRandomUri {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.GOOGLE_NAVIGATION_URI
     override val changelog = persistentListOf(
@@ -46,35 +47,36 @@ class GoogleNavigationUriInput @Inject constructor(
 
     override val pattern = Regex("""(google.navigation:$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        data.run {
-            val q = Regex("""(?:^|.*&)q=([^&]+).*""").matchEntire(pathParts.firstOrNull())?.groupOrNull()
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        Uri.parse(match, uriQuote).run {
+            parseResult {
+                val q = Regex("""(?:^|.*&)q=([^&]+).*""").matchEntire(pathParts.firstOrNull())?.groupOrNull()
 
-            // Coordinates
-            // google.navigation:q={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(GCJ02MainlandChinaPoint(it))
-                return@run
-            }
+                // Coordinates
+                // google.navigation:q={lat},{lon}
+                LAT_LON_PATTERN.matchEntire(q)?.toLatLonPoint(Source.URI)?.let {
+                    points = persistentListOf(GCJ02MainlandChinaPoint(it))
+                    return@parseResult
+                }
 
-            // Search
-            // google.navigation:q={query}
-            Q_PATH_PATTERN.matchEntire(q)?.groupOrNull()?.let {
-                points = persistentListOf(GCJ02MainlandChinaPoint(name = it, source = Source.URI))
-                // Go to API parsing
-                next = MatchedInput(
-                    googleMapsAddressApiInput.get(),
-                    Uri(
-                        scheme = "https",
-                        host = "maps.google.com",
-                        queryParams = listOf("q" to it).toQueryParams(),
-                        uriQuote = uriQuote,
-                    ).toString()
-                )
-                return@run
+                // Search
+                // google.navigation:q={query}
+                Q_PATH_PATTERN.matchEntire(q)?.groupOrNull()?.let {
+                    points = persistentListOf(GCJ02MainlandChinaPoint(name = it, source = Source.URI))
+                    // Go to API parsing
+                    next = MatchedInput(
+                        googleMapsAddressApiInput.get(),
+                        Uri(
+                            scheme = "https",
+                            host = "maps.google.com",
+                            queryParams = listOf("q" to it).toQueryParams(),
+                            uriQuote = uriQuote,
+                        ).toString()
+                    )
+                    return@parseResult
+                }
             }
         }
-    }
 
     override fun genRandomUri(point: Point) =
         GoogleMapsUriFormatter.formatNavigationUriString(point, uriQuote)

@@ -1,28 +1,15 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import io.ktor.utils.io.jvm.javaio.toByteReadChannel
-import page.ooooo.geoshare.lib.uri.FakeUriQuote
-import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.network.FakeFetchTools
+import page.ooooo.geoshare.lib.network.FetchTools
 
 interface InputTest {
     val resources: Resources
 
-    suspend fun TextInput.parse(text: String, match: String = "https://example.com/") =
-        this.parse(text, match, resources)
+    suspend fun BasicInput.parse(match: String) = parse(match, resources, FakeFetchTools(""))
 
-    suspend fun UriInput.parse(uriString: String, match: String = uriString) =
-        this.parse(Uri.parse(uriString, uriQuote = FakeUriQuote), match, resources)
+    suspend fun BasicInput.parse(match: String, fetchTools: FetchTools) = parse(match, resources, fetchTools)
 
-    suspend fun WebViewInput.parse(data: String, match: String = "https://example.com/") =
-        this.parse(data, match, resources)
-
-    suspend fun <T> BasicInput<T>.fetchAndParse(match: String): ParseResult =
-        fetch(match) { data -> parse(data, match, resources) }
-
-    suspend fun BodyAsChannelInput.parse(html: String, match: String = "https://example.com/") =
-        this.parse(html.byteInputStream().toByteReadChannel(), match, resources)
-
-    suspend fun BodyAsTextInput.parse(body: String, match: String = "https://example.com/") =
-        this.parse(body, match, resources)
+    suspend fun WebViewInput.parse(data: String, match: String) = parse(data, match, resources)
 }

@@ -11,6 +11,7 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.lib.network.FetchTools
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,8 +20,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class MagicEarthUriInput @Inject constructor(
-    override val uriQuote: UriQuote,
-) : UriInput, Input.HasRandomUri {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.MAGIC_EARTH
     override val changelog = persistentListOf(
@@ -29,26 +30,31 @@ class MagicEarthUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:(?:https?://)?magicearth.com|magicearth:/)/\?$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        data.run {
-            val z = listOf("z", "zoom")
-                .firstNotNullOfOrNull { key -> Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        Uri.parse(match, uriQuote).run {
+            parseResult {
+                val z = listOf("z", "zoom")
+                    .firstNotNullOfOrNull { key ->
+                        Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull()
+                    }
 
-            val name = listOf("name", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr", "q")
-                .firstNotNullOfOrNull { key -> Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.groupOrNull() }
+                val name = listOf("name", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "daddr", "q")
+                    .firstNotNullOfOrNull { key ->
+                        Q_PARAM_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.groupOrNull()
+                    }
 
-            LAT_PATTERN.matchEntire(queryParams["lat"]?.firstOrNull())?.doubleGroupOrNull()?.let { lat ->
-                LON_PATTERN.matchEntire(queryParams["lon"]?.firstOrNull())?.doubleGroupOrNull()?.let { lon ->
-                    points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
-                    return@run
+                LAT_PATTERN.matchEntire(queryParams["lat"]?.firstOrNull())?.doubleGroupOrNull()?.let { lat ->
+                    LON_PATTERN.matchEntire(queryParams["lon"]?.firstOrNull())?.doubleGroupOrNull()?.let { lon ->
+                        points = persistentListOf(WGS84Point(lat, lon, z, name, source = Source.URI))
+                        return@parseResult
+                    }
+                }
+
+                if (name != null) {
+                    points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
                 }
             }
-
-            if (name != null) {
-                points = persistentListOf(WGS84Point(z = z, name = name, source = Source.URI))
-            }
         }
-    }
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(

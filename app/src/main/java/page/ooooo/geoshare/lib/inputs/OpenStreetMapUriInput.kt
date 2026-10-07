@@ -11,6 +11,7 @@ import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeOpenStreetMapQuadTileHash
+import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -19,8 +20,8 @@ import javax.inject.Singleton
 @Singleton
 class OpenStreetMapUriInput @Inject constructor(
     private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
-    override val uriQuote: UriQuote,
-) : UriInput, Input.HasRandomUri {
+    val uriQuote: UriQuote,
+) : BasicInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.OPEN_STREET_MAP
     override val changelog = persistentListOf(
@@ -35,94 +36,99 @@ class OpenStreetMapUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?(?:www\.)?(?:openstreetmap|osm)\.org/$URI_REST)""")
 
-    override suspend fun parse(data: Uri, match: String, resources: Resources) = parseResult {
-        data.run {
-            // Short link
-            // https://osm.org/go/{hash}
-            if (pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "go") {
-                Regex(HASH).matchEntire(pathParts.getOrNull(2))?.value
-                    ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
-                    ?.let {
-                        points = persistentListOf(WGS84Point(it))
-                        return@parseResult
-                    }
-            }
-
-            // Map center
-            // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
-            Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
-                points = persistentListOf(WGS84Point(it))
-                return@parseResult
-            }
-
-            // Coordinates
-            // https://www.openstreetmap.org/?lat={lat}&lon={lon}&zoom={z}
-            // Pin
-            // https://www.openstreetmap.org/?mlat={lat}&mlon={lon}&zoom={z}
-            listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlat", "lat")
-                .firstNotNullOfOrNull { key -> LAT_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
-                ?.let { lat ->
-                    listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlon", "lon")
-                        .firstNotNullOfOrNull { key -> LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull() }
-                        ?.let { lon ->
-                            val z = listOf("z", "zoom")
-                                .firstNotNullOfOrNull { key ->
-                                    Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull()
-                                }
-                            points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
+    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+        Uri.parse(match, uriQuote).run {
+            parseResult {
+                // Short link
+                // https://osm.org/go/{hash}
+                if (pathParts.firstOrNull() == "" && pathParts.getOrNull(1) == "go") {
+                    Regex(HASH).matchEntire(pathParts.getOrNull(2))?.value
+                        ?.let { hash -> decodeOpenStreetMapQuadTileHash(hash) }
+                        ?.let {
+                            points = persistentListOf(WGS84Point(it))
                             return@parseResult
                         }
                 }
 
-            // Directions
-            // https://www.openstreetmap.org/directions?to={lat},{lon}
-            LAT_LON_PATTERN.matchEntire(queryParams["to"]?.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
-                points = persistentListOf(WGS84Point(it))
-                return@parseResult
-            }
+                // Map center
+                // https://www.openstreetmap.org/#map={z}/{lat}/{lon}
+                Regex("""map=$Z/$LAT/$LON.*""").matchEntire(fragment)?.toZLatLonPoint(Source.MAP_CENTER)?.let {
+                    points = persistentListOf(WGS84Point(it))
+                    return@parseResult
+                }
 
-            when (pathParts.getOrNull(1)) {
-                "node" ->
-                    // Node
-                    // https://www.openstreetmap.org/node/{id}
-                    pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
-                        next = MatchedInput(
-                            openStreetMapApiInput.get(),
-                            OpenStreetMapApiInput.formatUrlString(
-                                OpenStreetMapApiInput.Companion.ElementType.NODE, osmId
-                            ),
-                        )
-                        return@parseResult
+                // Coordinates
+                // https://www.openstreetmap.org/?lat={lat}&lon={lon}&zoom={z}
+                // Pin
+                // https://www.openstreetmap.org/?mlat={lat}&mlon={lon}&zoom={z}
+                listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlat", "lat")
+                    .firstNotNullOfOrNull { key ->
+                        LAT_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull()
+                    }
+                    ?.let { lat ->
+                        listOf(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "mlon", "lon")
+                            .firstNotNullOfOrNull { key ->
+                                LON_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull()
+                            }
+                            ?.let { lon ->
+                                val z = listOf("z", "zoom")
+                                    .firstNotNullOfOrNull { key ->
+                                        Z_PATTERN.matchEntire(queryParams[key]?.firstOrNull())?.doubleGroupOrNull()
+                                    }
+                                points = persistentListOf(WGS84Point(lat, lon, z, source = Source.URI))
+                                return@parseResult
+                            }
                     }
 
-                "relation" ->
-                    // Relation
-                    // https://www.openstreetmap.org/relation/{id}
-                    pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
-                        next = MatchedInput(
-                            openStreetMapApiInput.get(),
-                            OpenStreetMapApiInput.formatUrlString(
-                                OpenStreetMapApiInput.Companion.ElementType.RELATION, osmId
-                            ),
-                        )
-                        return@parseResult
-                    }
+                // Directions
+                // https://www.openstreetmap.org/directions?to={lat},{lon}
+                LAT_LON_PATTERN.matchEntire(queryParams["to"]?.firstOrNull())?.toLatLonPoint(Source.URI)?.let {
+                    points = persistentListOf(WGS84Point(it))
+                    return@parseResult
+                }
 
-                "way" ->
-                    // Way
-                    // https://www.openstreetmap.org/way/{id}
-                    pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
-                        next = MatchedInput(
-                            openStreetMapApiInput.get(),
-                            OpenStreetMapApiInput.formatUrlString(
-                                OpenStreetMapApiInput.Companion.ElementType.WAY, osmId
-                            ),
-                        )
-                        return@parseResult
-                    }
+                when (pathParts.getOrNull(1)) {
+                    "node" ->
+                        // Node
+                        // https://www.openstreetmap.org/node/{id}
+                        pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
+                            next = MatchedInput(
+                                openStreetMapApiInput.get(),
+                                OpenStreetMapApiInput.formatUrlString(
+                                    OpenStreetMapApiInput.Companion.ElementType.NODE, osmId
+                                ),
+                            )
+                            return@parseResult
+                        }
+
+                    "relation" ->
+                        // Relation
+                        // https://www.openstreetmap.org/relation/{id}
+                        pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
+                            next = MatchedInput(
+                                openStreetMapApiInput.get(),
+                                OpenStreetMapApiInput.formatUrlString(
+                                    OpenStreetMapApiInput.Companion.ElementType.RELATION, osmId
+                                ),
+                            )
+                            return@parseResult
+                        }
+
+                    "way" ->
+                        // Way
+                        // https://www.openstreetmap.org/way/{id}
+                        pathParts.getOrNull(2)?.toLongOrNull()?.let { osmId ->
+                            next = MatchedInput(
+                                openStreetMapApiInput.get(),
+                                OpenStreetMapApiInput.formatUrlString(
+                                    OpenStreetMapApiInput.Companion.ElementType.WAY, osmId
+                                ),
+                            )
+                            return@parseResult
+                        }
+                }
             }
         }
-    }
 
     override fun genRandomUri(point: Point) =
         UriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
