@@ -27,12 +27,12 @@ class GoogleMapsPlaceApiInput @Inject constructor(
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_place_api_name)
     override val group = InputGroup.GOOGLE_MAPS
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
-        parseResult {
+        parseResultAsync {
             // Parse URI
             val uri = Uri.parse(match, uriQuote)
             val googleMapsParseResult = GoogleMapsUriParser.parse(uri)
@@ -42,12 +42,12 @@ class GoogleMapsPlaceApiInput @Inject constructor(
             val server = serverRepository.getSelectedGoogleMapsPlace() ?: run {
                 // Go to HTML parsing, if server is not configured
                 next = MatchedInput(googleMapsHtmlInput.get(), match)
-                return@parseResult
+                return@parseResultAsync
             }
 
             // Parse place id
-            val lastPoint = points.lastOrNull() ?: return@parseResult
-            val placeId = lastPoint.placeId ?: return@parseResult
+            val lastPoint = points.lastOrNull() ?: return@parseResultAsync
+            val placeId = lastPoint.placeId ?: return@parseResultAsync
 
             // Call API
             val client = serverHttpClientFactory.createHttpClient(server)
@@ -67,7 +67,7 @@ class GoogleMapsPlaceApiInput @Inject constructor(
             } catch (tr: ResponseNetworkException) {
                 if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
                     // Return no points
-                    return@parseResult
+                    return@parseResultAsync
                 }
                 throw tr
             }

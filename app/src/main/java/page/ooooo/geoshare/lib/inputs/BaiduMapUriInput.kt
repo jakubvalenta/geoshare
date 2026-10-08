@@ -11,7 +11,6 @@ import page.ooooo.geoshare.lib.extensions.toLonLatZPoint
 import page.ooooo.geoshare.lib.geo.BD09MCPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -21,7 +20,7 @@ import javax.inject.Singleton
 class BaiduMapUriInput @Inject constructor(
     private val baiduMapWebViewInput: dagger.Lazy<BaiduMapWebViewInput>,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern {
+) : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.BAIDU_MAP
     override val changelog = persistentListOf(
@@ -30,7 +29,7 @@ class BaiduMapUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?(?:j\.)?map\.baidu\.com/$URI_REST)""")
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources): ParseResult =
         Uri.parse(match, uriQuote).run {
             parseResult {
                 var name: String? = null

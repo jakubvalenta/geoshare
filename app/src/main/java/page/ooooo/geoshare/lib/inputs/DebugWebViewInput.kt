@@ -17,7 +17,7 @@ object DebugWebViewInput : WebViewInput {
         () => location.href;
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String, resources: Resources) =
+    override fun parse(data: String, match: String, resources: Resources) =
         parseResult {
             points = persistentListOf(WGS84Point(NaivePoint.genRandomPoint()))
         }

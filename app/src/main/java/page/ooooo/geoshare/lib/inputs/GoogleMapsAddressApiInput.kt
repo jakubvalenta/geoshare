@@ -27,12 +27,12 @@ class GoogleMapsAddressApiInput @Inject constructor(
     private val serverHttpClientFactory: ServerHttpClientFactory,
     private val serverRepository: ServerRepository,
     private val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_address_api_name)
     override val group = InputGroup.GOOGLE_MAPS
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
-        parseResult {
+        parseResultAsync {
             // Parse URI
             val uri = Uri.parse(match, uriQuote)
             val googleMapsParseResult = GoogleMapsUriParser.parse(uri)
@@ -42,12 +42,12 @@ class GoogleMapsAddressApiInput @Inject constructor(
             val server = serverRepository.getSelectedGoogleMapsAddress() ?: run {
                 // Go to HTML parsing, if server is not configured
                 next = MatchedInput(googleMapsHtmlInput.get(), match)
-                return@parseResult
+                return@parseResultAsync
             }
 
             // Parse query
-            val lastPoint = points.lastOrNull() ?: return@parseResult
-            val rawQuery = lastPoint.name?.takeIf { it.isNotEmpty() } ?: return@parseResult
+            val lastPoint = points.lastOrNull() ?: return@parseResultAsync
+            val rawQuery = lastPoint.name?.takeIf { it.isNotEmpty() } ?: return@parseResultAsync
 
             // Remove trailing coordinates from query
             val query = Regex("""[\s+]*@$LAT$COORD_SEP$LON\s*$""").replace(rawQuery, "")
@@ -70,13 +70,13 @@ class GoogleMapsAddressApiInput @Inject constructor(
             } catch (tr: ResponseNetworkException) {
                 if (tr.response.status == HttpStatusCode.BadRequest || tr.response.status == HttpStatusCode.NotFound) {
                     // Return no points
-                    return@parseResult
+                    return@parseResultAsync
                 }
                 throw tr
             }
 
             // Update points
-            val highestRankedResult = res.results?.firstOrNull() ?: return@parseResult
+            val highestRankedResult = res.results?.firstOrNull() ?: return@parseResultAsync
             val point = GCJ02MainlandChinaPoint(
                 lat = highestRankedResult.location.latitude,
                 lon = highestRankedResult.location.longitude,

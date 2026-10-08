@@ -44,11 +44,9 @@ class PermissionGrantedTest {
 
             override fun getUnsafeExtractionJavaScript() = "undefined"
 
-            override suspend fun parse(
-                data: String,
-                match: String,
-                resources: Resources,
-            ) = throw NotImplementedError()
+            override fun parse(data: String, match: String, resources: Resources): ParseResult {
+                throw NotImplementedError()
+            }
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)
         val state = PermissionGranted(source, matchedInput, permission, results)

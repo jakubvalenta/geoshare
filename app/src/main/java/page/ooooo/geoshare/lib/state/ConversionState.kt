@@ -18,6 +18,8 @@ import page.ooooo.geoshare.lib.Log
 import page.ooooo.geoshare.lib.calcExponentialBackoffMillis
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.inputs.BasicInput
+import page.ooooo.geoshare.lib.inputs.BasicOfflineInput
+import page.ooooo.geoshare.lib.inputs.BasicOnlineInput
 import page.ooooo.geoshare.lib.inputs.Input
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.NoopInput
@@ -113,17 +115,20 @@ data class InputMatched(
     val permission: Permission? = null,
     val results: Results = emptyMap(),
 ) : ConversionState, ConversionState.HasSource {
-    override suspend fun transition(stateContext: ConversionStateContext): ConversionState? {
-        return if (matchedInput.input is Input.HasPermission) {
-            when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
-                Permission.ALWAYS -> PermissionGranted(source, matchedInput, Permission.ALWAYS, results)
-                Permission.ASK -> PermissionRequested(source, matchedInput, results)
-                Permission.NEVER -> PermissionDenied(source, matchedInput, results)
-            }
-        } else {
-            PermissionGranted(source, matchedInput, permission, results)
+    override suspend fun transition(stateContext: ConversionStateContext): ConversionState =
+        when (matchedInput.input) {
+            is NoopInput,
+            is BasicOfflineInput,
+                -> PermissionGranted(source, matchedInput, permission, results)
+
+            is BasicOnlineInput,
+            is WebViewInput,
+                -> when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
+                    Permission.ALWAYS -> PermissionGranted(source, matchedInput, Permission.ALWAYS, results)
+                    Permission.ASK -> PermissionRequested(source, matchedInput, results)
+                    Permission.NEVER -> PermissionDenied(source, matchedInput, results)
+                }
         }
-    }
 
     override fun toString() =
         "InputMatched(source=$source, matchedInput=$matchedInput, permission=$permission, results=$results)"
@@ -215,7 +220,10 @@ data class PermissionGrantedBasicInput(
                         delay(delayMillis.milliseconds)
                     }
                     when (
-                        val result = matchedInput.input.parse(matchedInput.match, stateContext.resources)
+                        val result = when (matchedInput.input) {
+                            is BasicOfflineInput -> matchedInput.input.parse(matchedInput.match, stateContext.resources)
+                            is BasicOnlineInput -> matchedInput.input.parse(matchedInput.match, stateContext.resources)
+                        }
                     ) {
                         is ParseResult.Success -> DataParsed(
                             source, matchedInput, permission, results + (matchedInput to result)
@@ -253,10 +261,13 @@ data class PermissionGrantedBasicInput(
     }
 
     override fun getLoadingIndicatorTitle(resources: Resources) =
-        if (matchedInput.input is Input.HasPermission) {
-            resources.getString(R.string.conversion_connecting, matchedInput.input.group.getName(resources))
-        } else {
-            null
+        when (matchedInput.input) {
+            is BasicOfflineInput -> null
+            is BasicOnlineInput,
+            is WebViewInput,
+                -> resources.getString(
+                R.string.conversion_connecting, matchedInput.input.group.getName(resources)
+            )
         }
 
     override val uriString = matchedInput.match
@@ -276,7 +287,7 @@ data class PermissionGrantedBasicInput(
  *
  * 1. Load [matchedInput]'s match as a page URL in a WebView.
  * 2. Get JavaScript code using [WebViewInput.getUnsafeExtractionJavaScript] and call it periodically.
- * 3. Once the result of the extraction JavaScript stops changing, complete [pendingData].
+ * 3. Once the result of the extraction JavaScript is not undefined, complete [pendingData].
  *
  * When it fails, it retries up to [maxAttempts] times. Retrying is done by recursively transitioning this state while
  * tracking the number of attempts made and the cause of the last failure in [lastAttempt].

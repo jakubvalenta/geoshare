@@ -15,7 +15,7 @@ class YandexMapsShortLinkInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern, Input.HasPermission {
+) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_yandex_short_link_name)
     override val group = InputGroup.YANDEX_MAPS
 

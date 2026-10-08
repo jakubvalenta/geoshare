@@ -33,7 +33,7 @@ class WazeApiInput @Inject constructor(
     private val clock: Clock,
     private val engine: HttpClientEngine,
     private val log: Log,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     @Serializable
     private data class CalculatedLocation(
         val latitude: Double,

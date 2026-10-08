@@ -4,22 +4,17 @@ import android.content.res.Resources
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.network.FetchTools
 
-class InputHasPermissionTest {
+class InputHasPatternTest {
     @Test
     fun match_returnsFirstRegexGroup() {
-        val input = object : BasicInput, Input.HasPattern {
+        val input = object : BasicOfflineInput, Input.HasPattern {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
             override val pattern = Regex("""(foo)""")
 
-            override suspend fun parse(
-                match: String,
-                resources: Resources,
-                fetchTools: FetchTools,
-            ): ParseResult {
+            override fun parse(match: String, resources: Resources): ParseResult {
                 throw NotImplementedError()
             }
         }

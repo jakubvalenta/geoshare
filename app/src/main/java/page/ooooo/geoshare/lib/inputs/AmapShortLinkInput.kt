@@ -16,7 +16,7 @@ class AmapShortLinkInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern {
+) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_amap_short_link_name)
     override val group = InputGroup.AMAP
     override val changelog = persistentListOf(

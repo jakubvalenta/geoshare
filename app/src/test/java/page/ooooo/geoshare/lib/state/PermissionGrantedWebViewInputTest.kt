@@ -51,7 +51,7 @@ class PermissionGrantedWebViewInputTest {
 
         override fun getUnsafeExtractionJavaScript() = "undefined"
 
-        override suspend fun parse(data: String, match: String, resources: Resources) =
+        override fun parse(data: String, match: String, resources: Resources) =
             result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
     }
     private val matchedInput = MatchedInput<WebViewInput>(input, source)
@@ -113,7 +113,7 @@ class PermissionGrantedWebViewInputTest {
 
                 override fun getUnsafeExtractionJavaScript() = "undefined"
 
-                override suspend fun parse(data: String, match: String, resources: Resources) =
+                override fun parse(data: String, match: String, resources: Resources) =
                     ParseResult.Warning(
                         resources.getString(R.string.conversion_failed_unsupported_source_place_list)
                     )
@@ -285,7 +285,7 @@ class PermissionGrantedWebViewInputTest {
 
             override fun getUnsafeExtractionJavaScript() = "undefined"
 
-            override suspend fun parse(data: String, match: String, resources: Resources) =
+            override fun parse(data: String, match: String, resources: Resources) =
                 throw CancellationException()
         }
         val matchedInput = MatchedInput<WebViewInput>(input, source)

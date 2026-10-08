@@ -24,7 +24,7 @@ class YandexMapsHtmlInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_yandex_html_name)
     override val group = InputGroup.YANDEX_MAPS
 
@@ -37,7 +37,7 @@ class YandexMapsHtmlInput @Inject constructor(
             // Set a custom user agent, so that Yandex Maps returns an HTML with the '...ll%3D...' value.
             userAgent = DESKTOP_USER_AGENT,
         ) { data ->
-            parseResult {
+            parseResultAsync {
                 val uri = Uri.parse(match, uriQuote)
                 val ptPattern = Regex("""pt=$LON%2C$LAT""")
                 val llPattern = if (!uri.queryParams.contains("ll")) {

@@ -19,7 +19,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern, Input.HasPermission {
+) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_short_link_name)
     override val group = InputGroup.GOOGLE_MAPS
     override val changelog = persistentListOf(
