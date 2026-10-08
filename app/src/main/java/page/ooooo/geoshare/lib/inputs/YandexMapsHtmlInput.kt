@@ -66,9 +66,11 @@ class YandexMapsHtmlInput @Inject constructor(
                         naivePoint = it
                         continue
                     }
-                    namePattern.find(line)?.groupOrNull()?.let {
-                        name = it
-                        break
+                    if (name == null) {
+                        namePattern.find(line)?.groupOrNull()?.let {
+                            name = it
+                            continue
+                        }
                     }
                 }
 
