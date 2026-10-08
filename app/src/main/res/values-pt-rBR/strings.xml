@@ -338,4 +338,7 @@
     <string name="user_preferences_finish_never">Não fechar o app automaticamente</string>
     <string name="user_preferences_finish_title">Fechamento</string>
     <string name="user_preferences_server_edit">Editar servidores</string>
+    <string name="input_waze_warning_route_empty">A rota está vazia. Tente voltar ao Waze, espere pelo GPS, e compartilhe a rota novamente.</string>
+    <string name="input_waze_warning_route_expired">A rota expirou.</string>
+    <string name="network_exception_content_convert">Resposta de conteúdo inválida</string>
 </resources>
