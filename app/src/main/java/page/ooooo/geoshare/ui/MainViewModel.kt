@@ -269,7 +269,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun retry() {
-        (_conversionState.value as? ConversionState.HasError)?.apply {
+        (_conversionState.value as? ConversionState.HasSource)?.apply {
             transitionConversion {
                 SourceReceived(source)
             }

@@ -3,7 +3,9 @@ package page.ooooo.geoshare.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,6 +19,7 @@ fun MainScaffold(
     actions: @Composable () -> Unit,
     topContent: LazyListScope.() -> Unit,
     bottomContent: LazyListScope.() -> Unit,
+    mainExpandable: Boolean,
     mainExpandedHeight: Dp = LocalSpacing.current.largeTopAppBarExpandedHeight,
     mainTitle: (@Composable (maxLines: Int) -> Unit)? = null,
     supportingTitle: (@Composable (maxLines: Int) -> Unit)? = null,
@@ -36,6 +39,7 @@ fun MainScaffold(
                         actions()
                     }
                 },
+                expandable = mainExpandable,
                 expandedHeight = mainExpandedHeight,
             ) {
                 topContent()
@@ -57,15 +61,17 @@ fun MainScaffold(
             }
         },
         supportingPane = { wide ->
-            LargeTopAppBarPane(
-                modifier = Modifier.testTag("geoShareMainSupportingPane"),
-                actions = {
-                    if (wide) {
-                        actions()
-                    }
-                },
-            ) {
-                if (wide) {
+            if (wide) {
+                TopAppBar(
+                    title = {},
+                    modifier = Modifier.testTag("geoShareMainSupportingPane"),
+                    actions = {
+                        if (wide) {
+                            actions()
+                        }
+                    },
+                )
+                LazyColumn {
                     if (supportingTitle != null) {
                         item(key = "supporting_title", contentType = "column") {
                             Column(Modifier.padding(horizontal = LocalSpacing.current.windowPadding)) {

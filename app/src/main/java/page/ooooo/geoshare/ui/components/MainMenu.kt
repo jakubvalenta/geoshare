@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +40,6 @@ import page.ooooo.geoshare.lib.state.ConversionState
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainMenu(
@@ -55,7 +53,6 @@ fun MainMenu(
     onNavigateToInputsScreen: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
 ) {
-    val spacing = LocalSpacing.current
     var expanded by retain { mutableStateOf(false) }
 
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
@@ -67,7 +64,7 @@ fun MainMenu(
             modifier = Modifier.testTag("geoShareMainBillingIcon"),
         )
     }
-    Box(Modifier.padding(end = spacing.windowPadding - 14.dp)) {
+    Box {
         IconButton(
             { expanded = true },
             Modifier.testTag("geoShareMainMenuButton"),

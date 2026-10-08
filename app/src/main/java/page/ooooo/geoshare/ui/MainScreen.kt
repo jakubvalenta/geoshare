@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -125,6 +126,7 @@ import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MainScaffold
 import page.ooooo.geoshare.ui.components.MainSourceBar
 import page.ooooo.geoshare.ui.components.MainSubmit
+import page.ooooo.geoshare.ui.components.MainTextField
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
@@ -135,8 +137,8 @@ import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.components.fakeStateLog
-import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
+import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
@@ -442,29 +444,16 @@ private fun MainScreen(
                 )
             },
             topContent = {
-                item(key = "main_source_bar", contentType = "main_source_bar") {
-                    MainSourceBar(
-                        currentState = conversionState,
-                        errorMessageResId = errorMessageResId,
-                        logExpanded = logExpanded,
-                        source = source,
-                        start = start,
-                        stateLog = stateLog,
-                        onSelectUri = onSelectUri,
-                        onSetLogExpanded = { logExpanded = it },
-                        onSetErrorMessageResId = { errorMessageResId = it },
-                        onSetSource = onSetSource,
-                        onSubmit = onSubmit,
-                    )
-                }
-                item(key = "conversion_state_log_list", contentType = "conversion_state_log_list") {
-                    ConversionStateLogList(
-                        expanded = logExpanded,
-                        stateLog = stateLog,
-                        onUriClick = onSelectUri,
-                    )
-                }
                 if (conversionState is ConversionState.Initial) {
+                    item(key = "main_text_field", contentType = "main_text_field") {
+                        MainTextField(
+                            errorMessageResId = errorMessageResId,
+                            source = source,
+                            onSetErrorMessageResId = { errorMessageResId = it },
+                            onSetSource = onSetSource,
+                            onSubmit = onSubmit,
+                        )
+                    }
                     item(key = "main_submit", contentType = "main_submit") {
                         MainSubmit(
                             source = source,
@@ -473,56 +462,63 @@ private fun MainScreen(
                         )
                     }
                 } else {
-                    item(key = "result", contentType = "result") {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = mainContainerColor(conversionState),
-                            ),
-                        ) {
-                            when (conversionState) {
-                                is ConversionState.HasError ->
-                                    ResultError(
-                                        currentState = conversionState,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onRetry = onRetry,
-                                    )
+                    item(key = "result", contentType = "column") {
+                        Column {
+                            ConversionStateLogList(
+                                expanded = logExpanded,
+                                stateLog = stateLog,
+                                onUriClick = onSelectUri,
+                            )
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = mainContainerColor(conversionState),
+                                ),
+                            ) {
+                                when (conversionState) {
+                                    is ConversionState.HasError ->
+                                        ResultError(
+                                            currentState = conversionState,
+                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            onRetry = onRetry,
+                                        )
 
-                                is ConversionState.HasResult ->
-                                    ResultCoordinates(
-                                        points = conversionState.points,
-                                        coordinateConverter = coordinateConverter,
-                                        outputsForPointChips = outputsForPointChips,
-                                        outputsForPointsChips = outputsForPointsChips,
-                                        userPreferencesValues = userPreferencesValues,
-                                        onExecute = onExecute,
-                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                        onSelect = { index ->
-                                            onCancelAction()
-                                            selectedPointIndex = index
-                                        },
-                                    ) { paddingValues ->
-                                        if (helpLifecycleMessage != null) {
-                                            helpLifecycleMessage(Modifier.padding(paddingValues))
-                                        } else {
-                                            HelpShareSourceMessage(
-                                                dismissedHelpMessages = dismissedHelpMessages,
-                                                outputsForAppsByCategory = outputsForAppsByCategory,
-                                                sourceComesFromIntent = sourceComesFromIntent,
-                                                modifier = Modifier.padding(paddingValues),
-                                                onDismissHelpMessage = onDismissHelpMessage,
-                                                onExecute = onExecute,
+                                    is ConversionState.HasResult ->
+                                        ResultCoordinates(
+                                            points = conversionState.points,
+                                            coordinateConverter = coordinateConverter,
+                                            outputsForPointChips = outputsForPointChips,
+                                            outputsForPointsChips = outputsForPointsChips,
+                                            userPreferencesValues = userPreferencesValues,
+                                            onExecute = onExecute,
+                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                            onSelect = { index ->
+                                                onCancelAction()
+                                                selectedPointIndex = index
+                                            },
+                                        ) { paddingValues ->
+                                            if (helpLifecycleMessage != null) {
+                                                helpLifecycleMessage(Modifier.padding(paddingValues))
+                                            } else {
+                                                HelpShareSourceMessage(
+                                                    dismissedHelpMessages = dismissedHelpMessages,
+                                                    outputsForAppsByCategory = outputsForAppsByCategory,
+                                                    sourceComesFromIntent = sourceComesFromIntent,
+                                                    modifier = Modifier.padding(paddingValues),
+                                                    onDismissHelpMessage = onDismissHelpMessage,
+                                                    onExecute = onExecute,
+                                                )
+                                            }
+                                        }
+
+                                    is ConversionState.HasDescription ->
+                                        conversionState.getLoadingIndicatorTitle(resources)?.let { title ->
+                                            MainLoadingIndicator(
+                                                currentState = conversionState,
+                                                title = title,
+                                                onCancel = onCancelConversion,
                                             )
                                         }
-                                    }
-
-                                is ConversionState.HasDescription ->
-                                    conversionState.getLoadingIndicatorTitle(resources)?.let { title ->
-                                        MainLoadingIndicator(
-                                            currentState = conversionState,
-                                            title = title,
-                                            onCancel = onCancelConversion,
-                                        )
-                                    }
+                                }
                             }
                         }
                     }
@@ -585,13 +581,10 @@ private fun MainScreen(
                         }
                 }
             },
-            mainExpandedHeight = if (conversionState is ConversionState.Initial) {
-                spacing.largeTopAppBarExpandedHeight + spacing.medium
-            } else {
-                spacing.largeTopAppBarExpandedHeight
-            },
-            mainTitle = if (conversionState is ConversionState.Initial) {
-                {
+            mainExpandable = conversionState is ConversionState.Initial,
+            mainExpandedHeight = spacing.largeTopAppBarExpandedHeight + spacing.medium,
+            mainTitle = {
+                if (conversionState is ConversionState.Initial) {
                     val billingStatus by billingStatus.collectAsStateWithLifecycle()
                     MainHeadline(
                         appNameResId = if (billingStatus is BillingStatus.Purchased) {
@@ -599,11 +592,19 @@ private fun MainScreen(
                         } else {
                             R.string.app_name
                         },
-                        modifier = Modifier.offset(x = -(12).dp),
+                        modifier = Modifier.offset((-12).dp),
+                    )
+                } else {
+                    MainSourceBar(
+                        currentState = conversionState,
+                        logExpanded = logExpanded,
+                        source = source,
+                        start = start,
+                        stateLog = stateLog,
+                        onSelectUri = onSelectUri,
+                        onSetLogExpanded = { logExpanded = it },
                     )
                 }
-            } else {
-                null
             },
             supportingTitle = if (conversionState is ConversionState.HasResult) {
                 {

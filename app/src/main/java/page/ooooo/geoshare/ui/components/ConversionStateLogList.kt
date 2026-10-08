@@ -16,13 +16,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -48,12 +49,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
-import page.ooooo.geoshare.lib.state.ConversionState
-import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
+import page.ooooo.geoshare.lib.state.ConversionState
 import page.ooooo.geoshare.lib.state.ExtendedStateLog
 import page.ooooo.geoshare.lib.state.ExtendedStateLogItem
+import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.Duration.Companion.milliseconds
@@ -67,27 +68,26 @@ fun ConversionStateLogList(
     initialItemsExpanded: Boolean = false,
     onUriClick: (uriString: String) -> Unit,
 ) {
-    val colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     val spacing = LocalSpacing.current
 
     val stateLog by stateLog.collectAsStateWithLifecycle()
 
     if (stateLog.isNotEmpty()) {
+        // TODO Fix animation
         AnimatedVisibility(
             expanded,
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
             SelectionContainer {
-                Column(
-                    Modifier.padding(bottom = spacing.tiny),
-                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-                ) {
-                    stateLog.forEachIndexed { index, item ->
-                        SegmentedListItem(
-                            shapes = ListItemDefaults.segmentedShapes(index, stateLog.size),
-                            colors = colors,
-                        ) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
+                    Column(
+                        Modifier
+                            .padding(horizontal = spacing.windowPadding)
+                            .padding(bottom = spacing.tiny),
+                        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+                    ) {
+                        stateLog.forEachIndexed { index, item ->
                             key(item.id) {
                                 ConversionStateLogListItem(
                                     item = item,
@@ -95,6 +95,9 @@ fun ConversionStateLogList(
                                     initialExpanded = initialItemsExpanded,
                                     onUriClick = onUriClick,
                                 )
+                            }
+                            if (index < stateLog.size - 1) {
+                                HorizontalDivider(Modifier.padding(vertical = spacing.tiny), thickness = Dp.Hairline)
                             }
                         }
                     }
@@ -109,7 +112,7 @@ fun ConversionStateLogList(
 private fun ConversionStateLogListItem(
     item: ExtendedStateLogItem<ConversionState.HasDescription>,
     animationsEnabled: Boolean = true,
-    iconSize: Dp = 24.dp,
+    iconSize: Dp = 16.dp,
     initialExpanded: Boolean = false,
     onUriClick: (uriString: String) -> Unit,
 ) {
@@ -149,13 +152,10 @@ private fun ConversionStateLogListItem(
                 Text(
                     item.state.getDescription(resources),
                     Modifier.weight(1f),
-                    style = MaterialTheme.typography.bodyMedium,
                 )
-                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
-                    when (item) {
-                        is ExtendedStateLogItem.Finished -> SecondsTimeText(item.end - item.start)
-                        is ExtendedStateLogItem.Pending -> ElapsedTimeText(item.start)
-                    }
+                when (item) {
+                    is ExtendedStateLogItem.Finished -> SecondsTimeText(item.end - item.start)
+                    is ExtendedStateLogItem.Pending -> ElapsedTimeText(item.start)
                 }
             }
             item.state.getDetails(resources)?.let { details ->
@@ -176,7 +176,6 @@ private fun ConversionStateLogListItem(
                     textDecoration = TextDecoration.Underline,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
-                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
@@ -255,15 +254,17 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource): ExtendedStateLog<C
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        val timeSource = TestTimeSource()
-        ConversionStateLogList(
-            expanded = true,
-            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            animationsEnabled = false,
-            initialItemsExpanded = true,
-            onUriClick = {},
-        )
+        Surface {
+            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            val timeSource = TestTimeSource()
+            ConversionStateLogList(
+                expanded = true,
+                stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
+                animationsEnabled = false,
+                initialItemsExpanded = true,
+                onUriClick = {},
+            )
+        }
     }
 }
 
@@ -271,14 +272,16 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-        val timeSource = TestTimeSource()
-        ConversionStateLogList(
-            expanded = true,
-            stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            animationsEnabled = false,
-            initialItemsExpanded = true,
-            onUriClick = {},
-        )
+        Surface {
+            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            val timeSource = TestTimeSource()
+            ConversionStateLogList(
+                expanded = true,
+                stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
+                animationsEnabled = false,
+                initialItemsExpanded = true,
+                onUriClick = {},
+            )
+        }
     }
 }
