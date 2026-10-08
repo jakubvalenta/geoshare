@@ -121,17 +121,16 @@ data class InputMatched(
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasMatchedInput {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState =
         when (matchedInput.input) {
-            is NoopInput,
-            is BasicOfflineInput,
-                -> PermissionGranted(source, matchedInput, permission, results)
-
-            is BasicOnlineInput,
-            is WebViewInput,
-                -> when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
+            // Online interfaces must be checked before offline interfaces, so that online interfaces take precedence if
+            // the input extends both an online and offline interface
+            is BasicOnlineInput, is WebViewInput ->
+                when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                     Permission.ALWAYS -> PermissionGranted(source, matchedInput, Permission.ALWAYS, results)
                     Permission.ASK -> PermissionRequested(source, matchedInput, results)
                     Permission.NEVER -> PermissionDenied(source, matchedInput, results)
                 }
+
+            is BasicOfflineInput, is NoopInput -> PermissionGranted(source, matchedInput, permission, results)
         }
 
     override fun toString() =

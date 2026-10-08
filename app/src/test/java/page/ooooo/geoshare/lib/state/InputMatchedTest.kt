@@ -217,4 +217,32 @@ class InputMatchedTest {
             state.transition(stateContext),
         )
     }
+
+    @Test
+    fun transition_whenInputIsNoopInputAndWebViewInputAndPermissionIsNever_returnsPermissionDenied() = runTest {
+        val input = object : NoopInput, WebViewInput {
+            override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
+
+            override fun getUnsafeExtractionJavaScript() = "undefined"
+
+            override fun parse(data: String, match: String, resources: Resources): ParseResult {
+                throw NotImplementedError()
+            }
+        }
+        val matchedInput = MatchedInput(input, source)
+        val userPreferencesRepository = FakeUserPreferencesRepository(
+            UserPreferencesValues(connectionPermission = Permission.ASK)
+        )
+        val stateContext = ConversionStateContext(
+            log = log,
+            resources = resources,
+            userPreferencesRepository = userPreferencesRepository,
+        )
+        val state = InputMatched(source, matchedInput, Permission.NEVER, results)
+        assertEquals(
+            PermissionDenied(source, matchedInput, results),
+            state.transition(stateContext),
+        )
+    }
 }
