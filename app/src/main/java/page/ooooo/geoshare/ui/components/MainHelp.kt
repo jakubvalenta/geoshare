@@ -40,7 +40,7 @@ fun MainHelp(
     Column(
         Modifier
             .padding(horizontal = spacing.windowPadding)
-            .padding(top = spacing.medium)
+            .padding(top = spacing.tiny)
     ) {
         message?.invoke(PaddingValues(bottom = spacing.small))
         TextButton(onNavigateToInputsScreen) {

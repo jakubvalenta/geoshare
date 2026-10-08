@@ -59,7 +59,6 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
  */
 @Composable
 fun LargeTopAppBarPane(
-    // TODO Rename
     modifier: Modifier = Modifier,
     title: (@Composable (maxLines: Int) -> Unit)? = null,
     onBack: (() -> Unit)? = null,

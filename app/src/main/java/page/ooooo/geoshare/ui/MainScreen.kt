@@ -582,7 +582,6 @@ private fun MainScreen(
                 }
             },
             mainExpandable = conversionState is ConversionState.Initial,
-            mainExpandedHeight = spacing.largeTopAppBarExpandedHeight + spacing.medium,
             mainTitle = {
                 if (conversionState is ConversionState.Initial) {
                     val billingStatus by billingStatus.collectAsStateWithLifecycle()

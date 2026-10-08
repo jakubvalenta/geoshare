@@ -3,12 +3,14 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -73,25 +75,25 @@ fun ConversionStateLogList(
     val stateLog by stateLog.collectAsStateWithLifecycle()
 
     if (stateLog.isNotEmpty()) {
-        // TODO Fix animation
         AnimatedVisibility(
             expanded,
+            // Fill max width to make the animation expand only vertically and not also horizontally
+            modifier = Modifier.fillMaxWidth(),
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
             SelectionContainer {
                 CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
                     Column(
-                        Modifier
-                            .padding(horizontal = spacing.windowPadding)
-                            .padding(bottom = spacing.tiny),
+                        Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
                         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
                     ) {
+                        val enterAnimationFinished = transition.currentState == EnterExitState.Visible
                         stateLog.forEachIndexed { index, item ->
                             key(item.id) {
                                 ConversionStateLogListItem(
                                     item = item,
-                                    animationsEnabled = animationsEnabled,
+                                    animationsEnabled = animationsEnabled && enterAnimationFinished,
                                     initialExpanded = initialItemsExpanded,
                                     onUriClick = onUriClick,
                                 )
@@ -197,7 +199,7 @@ fun fakeStateLog(source: String, timeSource: TestTimeSource): ExtendedStateLog<C
         },
         succeeded = false,
         start = timeSource.markNow(),
-        end = timeSource.apply { plusAssign(30.milliseconds) }.markNow(),
+        end = timeSource.apply { plusAssign(5.milliseconds) }.markNow(),
     ),
     ExtendedStateLogItem.Finished(
         id = 1,
