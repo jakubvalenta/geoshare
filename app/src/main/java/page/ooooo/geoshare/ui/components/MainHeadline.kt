@@ -55,6 +55,7 @@ fun MainHeadline(
             stringResource(appNameResId),
             Modifier.testTag("geoShareAppHeadlineText"),
             color = MaterialTheme.colorScheme.primary,
+            maxLines = 1,
             style = MaterialTheme.typography.headlineLarge,
         )
     }

@@ -42,6 +42,7 @@ class PermissionGrantedTest {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
+            @Suppress("SameReturnValue")
             override fun getUnsafeExtractionJavaScript() = "undefined"
 
             override fun parse(data: String, match: String, resources: Resources): ParseResult {

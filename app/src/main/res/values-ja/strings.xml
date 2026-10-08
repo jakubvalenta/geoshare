@@ -51,7 +51,7 @@
     <string name="help_open_by_default_action">FAQでさらに探索</string>
     <string name="conversion_connecting">%1$sに接続中…</string>
     <string name="conversion_permission">%1$sに接続しますか？</string>
-    <string name="conversion_processing">%1$sの型のリンクを処理しています…</string>
+    <string name="conversion_processing">%1$sの型のリンクを処理しています</string>
     <string name="conversion_succeeded_copy_name">名前をコピー</string>
     <string name="help_open_by_default_text">地図のリンクをタップしたときに、デフォルトの地図アプリの代わりに常に%1$sが開くようにAndroidを設定できます。</string>
     <string name="help_open_by_default_title">地図のリンクを常に%1$sで開く</string>

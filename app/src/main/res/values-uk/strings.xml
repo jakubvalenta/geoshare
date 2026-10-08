@@ -324,7 +324,7 @@
     <string name="user_preferences_finish_never">Не закривати застосунок автоматично</string>
     <string name="user_preferences_finish_title">Закриття</string>
     <string name="conversion_failed_unsupported_source_google_search">Посилання на Google Пошук не підтримуються</string>
-    <string name="conversion_processing">Обробка посилання типу %1$s…</string>
+    <string name="conversion_processing">Обробка посилання типу %1$s</string>
     <string name="conversion_succeeded_copy_name">Копіювати назву</string>
     <string name="help_open_by_default_action">Дізнайтеся більше в розділі «ЧаПи»</string>
     <string name="help_open_by_default_text">Ви можете налаштувати Android так, аби натискання на посилання мапи завжди відкривало %1$s замість типової мапи.</string>

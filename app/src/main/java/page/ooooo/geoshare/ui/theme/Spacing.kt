@@ -17,7 +17,7 @@ data class Spacing(
     val largeButtonMaxWidth: Dp = 400.dp,
     val largeTopAppBarCollapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight,
     val largeTopAppBarExpandedHeight: Dp = TopAppBarDefaults.LargeAppBarExpandedHeight,
-    val windowPadding: Dp = 16.dp,
+    val windowPadding: Dp = 15.dp,
 )
 
 val defaultSpacing = Spacing()

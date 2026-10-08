@@ -65,6 +65,7 @@ fun LargeTopAppBarPane(
     actions: @Composable RowScope.() -> Unit = {},
     backIcon: ImageVector = Icons.AutoMirrored.Default.ArrowBack,
     collapsedHeight: Dp = LocalSpacing.current.largeTopAppBarCollapsedHeight,
+    expandable: Boolean = true,
     expandedHeight: Dp = LocalSpacing.current.largeTopAppBarExpandedHeight,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(
         containerColor = Color.Transparent,
@@ -82,10 +83,10 @@ fun LargeTopAppBarPane(
     val spacing = LocalSpacing.current
 
     val listState = rememberLazyListState()
-    var titleAlpha by remember { mutableFloatStateOf(0f) }
+    var titleAlpha by remember(expandable) { mutableFloatStateOf(if (expandable) 0f else 1f) }
 
-    LaunchedEffect(listState, title, collapsedHeight, expandedHeight) {
-        if (title != null) {
+    LaunchedEffect(listState, title, collapsedHeight, expandable, expandedHeight) {
+        if (expandable && title != null) {
             // Notice that we assume the title has only one line, while in reality it often has two and sometimes even
             // three lines. It means that when scrolling the pane, an expanded multi-line title disappears a bit earlier
             // than it should. But it's not a big deal, and it saves us some measuring of composables.
@@ -125,7 +126,7 @@ fun LargeTopAppBarPane(
         colors = colors,
     )
     LazyColumn(modifier, state = listState) {
-        if (title != null) {
+        if (expandable && title != null) {
             item(key = "title", contentType = "column") {
                 Column(
                     Modifier

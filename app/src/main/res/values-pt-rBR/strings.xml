@@ -311,7 +311,7 @@
     <string name="network_exception_too_many_requests_wait">Solicitações demais, aguarde por %1$ds</string>
     <string name="user_preferences_dynamic_color_title">Cores dinâmicas</string>
     <string name="user_preferences_section_appearance">Aparência</string>
-    <string name="conversion_processing">Processando link do tipo %1$s…</string>
+    <string name="conversion_processing">Processando link do tipo %1$s</string>
     <string name="conversion_succeeded_copy_name">Copiar nome</string>
     <string name="help_open_by_default_action">Saiba mais nas FAQ</string>
     <string name="help_open_by_default_text">Você pode configurar o Android para que tocar em um link de mapa sempre abre o %1$s em vez do mapa padrão.</string>

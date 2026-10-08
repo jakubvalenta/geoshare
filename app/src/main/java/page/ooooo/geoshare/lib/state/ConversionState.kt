@@ -41,6 +41,10 @@ interface ConversionState : State<ConversionStateContext> {
         val source: String
     }
 
+    interface HasMatchedInput {
+        val matchedInput: MatchedInput<*>
+    }
+
     interface HasDescription {
         fun getDescription(resources: Resources): String
         fun getDetails(resources: Resources): String? = null
@@ -50,13 +54,13 @@ interface ConversionState : State<ConversionStateContext> {
         val uriString: String? get() = null
     }
 
-    interface HasError : HasSource {
+    interface HasError {
         val message: String
         val stackTrace: String?
         val warning: Boolean
     }
 
-    interface HasResult : HasSource {
+    interface HasResult {
         val points: Points
     }
 
@@ -111,23 +115,22 @@ data class SourceReceived(
 
 data class InputMatched(
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    override val matchedInput: MatchedInput<*>,
     val permission: Permission? = null,
     val results: Results = emptyMap(),
-) : ConversionState, ConversionState.HasSource {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasMatchedInput {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState =
         when (matchedInput.input) {
-            is NoopInput,
-            is BasicOfflineInput,
-                -> PermissionGranted(source, matchedInput, permission, results)
-
-            is BasicOnlineInput,
-            is WebViewInput,
-                -> when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
+            // Online interfaces must be checked before offline interfaces, so that online interfaces take precedence if
+            // the input extends both an online and offline interface
+            is BasicOnlineInput, is WebViewInput ->
+                when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
                     Permission.ALWAYS -> PermissionGranted(source, matchedInput, Permission.ALWAYS, results)
                     Permission.ASK -> PermissionRequested(source, matchedInput, results)
                     Permission.NEVER -> PermissionDenied(source, matchedInput, results)
                 }
+
+            is BasicOfflineInput, is NoopInput -> PermissionGranted(source, matchedInput, permission, results)
         }
 
     override fun toString() =
@@ -136,9 +139,9 @@ data class InputMatched(
 
 data class PermissionRequested(
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    override val matchedInput: MatchedInput<*>,
     val results: Results = emptyMap(),
-) : ConversionState, ConversionState.HasPermission, ConversionState.HasSource {
+) : ConversionState, ConversionState.HasPermission, ConversionState.HasSource, ConversionState.HasMatchedInput {
     override suspend fun grant(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState {
         if (doNotAsk) {
             stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
@@ -158,10 +161,10 @@ data class PermissionRequested(
 
 data class PermissionGranted(
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    override val matchedInput: MatchedInput<*>,
     val permission: Permission?,
     val results: Results = emptyMap(),
-) : ConversionState, ConversionState.HasSource {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasMatchedInput {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState =
         when (matchedInput.input) {
             is BasicInput ->
@@ -372,9 +375,9 @@ data class PermissionGrantedWebViewInput(
 
 data class PermissionDenied(
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    override val matchedInput: MatchedInput<*>,
     val results: Results,
-) : ConversionState, ConversionState.HasSource {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasMatchedInput {
     override suspend fun transition(stateContext: ConversionStateContext) =
         DataParsed(source, matchedInput, Permission.NEVER, results + (matchedInput to ParseResult.Success()))
 
@@ -383,10 +386,10 @@ data class PermissionDenied(
 
 data class DataParsed(
     override val source: String,
-    val matchedInput: MatchedInput<*>,
+    override val matchedInput: MatchedInput<*>,
     val permission: Permission?,
     val results: Results,
-) : ConversionState, ConversionState.HasSource {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasMatchedInput {
     override suspend fun transition(stateContext: ConversionStateContext): ConversionState =
         results.values.reversed().merge().run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
@@ -445,7 +448,7 @@ data class DataParsed(
 data class ConversionSucceeded(
     override val source: String,
     override val points: Points,
-) : ConversionState, ConversionState.HasResult {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasResult {
     override fun toString() = "ConversionSucceeded(source=$source, points=$points)"
 }
 
@@ -454,6 +457,6 @@ data class ConversionFailed(
     override val message: String,
     override val stackTrace: String? = null,
     override val warning: Boolean = false,
-) : ConversionState, ConversionState.HasError {
+) : ConversionState, ConversionState.HasSource, ConversionState.HasError {
     override fun toString() = "ConversionFailed(source=$source, message=$message, warning=$warning)"
 }
