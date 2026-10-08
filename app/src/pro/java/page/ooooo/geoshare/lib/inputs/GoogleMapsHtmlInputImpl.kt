@@ -2,7 +2,6 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -16,10 +15,10 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor(
     private val uriQuote: UriQuote,
-) : GoogleMapsHtmlInput, BasicInput {
+) : GoogleMapsHtmlInput, BasicOfflineInput {
     override val group = InputGroup.GOOGLE_MAPS
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources) =
         parseResult {
             // Default to URI parsing
             val uri = Uri.parse(match, uriQuote)

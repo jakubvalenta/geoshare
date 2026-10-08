@@ -18,20 +18,20 @@ class UrbiHtmlInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_urbi_html_name)
     override val group = InputGroup.URBI
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->
-            parseResult {
+            parseResultAsync {
                 val pattern = Regex("""property="twitter:image" content="([^"]+)""")
 
                 while (true) {
                     val line = data.readLine() ?: break
                     pattern.find(line)?.groupOrNull()?.let { attr ->
                         next = MatchedInput(urbiUriInput.get(), attr.decodeBasicHtmlEntities())
-                        return@parseResult
+                        return@parseResultAsync
                     }
                 }
             }

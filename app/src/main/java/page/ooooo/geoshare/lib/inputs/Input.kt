@@ -22,33 +22,39 @@ sealed interface Input {
         fun match(source: String) = pattern.find(source)?.groupOrNull()
     }
 
-    interface HasPermission
-
     interface HasRandomUri {
         fun genRandomUri(point: Point): String?
     }
 }
 
+sealed interface BasicInput : Input
+
 /**
- * Input that expects the caller to call [parse] with the match.
- *
- * The implementation of the [parse] method can do anything. It can parse the match as URL, or it can make a HEAD
- * request to resolve a short link and then parse the resulting URL, or it can make a GET request to parse an HTML page.
+ * Input that expects the caller to call [parse] with a match. The implementation of [parse] must not make any network
+ * connections.
  */
-interface BasicInput : Input {
+interface BasicOfflineInput : BasicInput {
+    fun parse(match: String, resources: Resources): ParseResult
+}
+
+/**
+ * Input that expects the caller to call [parse] with a match. The implementation of [parse] can make network
+ * connections.
+ */
+interface BasicOnlineInput : BasicInput {
     suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools = DefaultFetchTools): ParseResult
 }
 
 /**
- * Input that expects the caller to render a WebView with the match as the page URL, call
- * [getUnsafeExtractionJavaScript] to extract data from the WebView, and then call [parse] with the extracted data.
+ * Input that expects the caller to render a WebView with a match as the page URL, call [getUnsafeExtractionJavaScript]
+ * to get JavaScript that extracts data from the WebView, and then call [parse] with the extracted data.
  */
-interface WebViewInput : Input, Input.HasPermission {
+interface WebViewInput : Input {
     val timeout: Duration get() = 60.seconds
 
     fun getUnsafeExtractionJavaScript(): String
 
-    suspend fun parse(data: String, match: String, resources: Resources): ParseResult
+    fun parse(data: String, match: String, resources: Resources): ParseResult
 
     fun extendWebSettings(settings: WebSettings) {}
     fun shouldInterceptRequest(requestUrlString: String): Boolean = false

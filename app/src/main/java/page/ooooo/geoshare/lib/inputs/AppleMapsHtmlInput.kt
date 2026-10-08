@@ -20,7 +20,7 @@ class AppleMapsHtmlInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_apple_maps_html_name)
     override val group = InputGroup.APPLE_MAPS
 
@@ -33,7 +33,7 @@ class AppleMapsHtmlInput @Inject constructor(
             // Set a custom user agent, so that Apple Maps doesn't show "Unsupported browser"
             userAgent = DESKTOP_USER_AGENT,
         ) { data ->
-            parseResult {
+            parseResultAsync {
                 val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")
                 val lonPattern = Regex("""<meta property="place:location:longitude" content="$LON"""")
 
@@ -50,7 +50,7 @@ class AppleMapsHtmlInput @Inject constructor(
                     }
                     if (lat != null && lon != null) {
                         points = persistentListOf(WGS84Point(lat, lon, source = Source.HTML))
-                        return@parseResult
+                        return@parseResultAsync
                     }
                 }
             }

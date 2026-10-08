@@ -22,7 +22,8 @@ import page.ooooo.geoshare.lib.FakeLog
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.BasicInput
-import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.lib.inputs.BasicOfflineInput
+import page.ooooo.geoshare.lib.inputs.BasicOnlineInput
 import page.ooooo.geoshare.lib.inputs.InputGroup
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.inputs.ParseResult
@@ -41,11 +42,11 @@ import kotlin.time.measureTime
 class PermissionGrantedBasicInputTest {
     private val log = FakeLog
     private val source = "https://maps.google.com/foo"
-    private val input = object : BasicInput, Input.HasPermission {
+    private val input = object : BasicOfflineInput {
         override fun getName(resources: Resources) = "Test Input"
         override val group = InputGroup.DEBUG
 
-        override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+        override fun parse(match: String, resources: Resources) =
             result
     }
     private val matchedInput = MatchedInput<BasicInput>(input, source)
@@ -79,7 +80,7 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputFetchSucceedsAndParseReturnsSuccess_returnsDataParsed() = runTest {
+    fun transition_whenInputParseSucceedsAndInputIsOfflineResultIsSuccess_returnsDataParsed() = runTest {
         val state = PermissionGrantedBasicInput(
             source,
             matchedInput,
@@ -101,13 +102,43 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputFetchSucceedsAndParseReturnsWarning_returnsConversionFailed() =
+    fun transition_whenInputParseSucceedsAndResultIsOnlineSuccess_returnsDataParsed() = runTest {
+        val input = object : BasicOnlineInput {
+            override fun getName(resources: Resources) = "Test Input"
+            override val group = InputGroup.DEBUG
+
+            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+                result
+        }
+        val matchedInput = MatchedInput<BasicInput>(input, source)
+        val state = PermissionGrantedBasicInput(
+            source,
+            matchedInput,
+            permission,
+            results,
+            lastAttempt = null,
+            maxAttempts,
+            dispatcher = testScheduler,
+        )
+        assertEquals(
+            DataParsed(
+                source,
+                matchedInput,
+                permission,
+                results + (matchedInput to result),
+            ),
+            state.transition(stateContext),
+        )
+    }
+
+    @Test
+    fun transition_whenInputParseSucceedsAndResultIsWarning_returnsConversionFailed() =
         runTest {
-            val input = object : BasicInput {
+            val input = object : BasicOfflineInput {
                 override fun getName(resources: Resources) = "Test Input"
                 override val group = InputGroup.DEBUG
 
-                override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+                override fun parse(match: String, resources: Resources) =
                     ParseResult.Warning(
                         resources.getString(R.string.conversion_failed_unsupported_source_place_list)
                     )
@@ -133,12 +164,12 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputFetchThrowsCancellationException_returnsConversionFailed() = runTest {
-        val input = object : BasicInput {
+    fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
+        val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
-            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw CancellationException()
         }
         val matchedInput = MatchedInput<BasicInput>(input, source)
@@ -158,12 +189,12 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputFetchThrowsMalformedURLException_returnsConversionFailed() = runTest {
-        val input = object : BasicInput {
+    fun transition_whenInputParseThrowsMalformedURLException_returnsConversionFailed() = runTest {
+        val input = object : BasicOfflineInput {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
-            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+            override fun parse(match: String, resources: Resources) =
                 throw MalformedURLException()
         }
         val matchedInput = MatchedInput<BasicInput>(input, source)
@@ -186,13 +217,13 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_retries() = runTest {
+    fun transition_whenInputParseThrowsRecoverableNetworkExceptionAndLastAttemptIsNull_retries() = runTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
-        val input = object : BasicInput {
+        val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
-            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw cause
         }
         val matchedInput = MatchedInput<BasicInput>(input, source)
@@ -222,13 +253,13 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndRetries() = runTest {
+    fun transition_whenInputParseThrowsRecoverableNetworkExceptionAndLastAttemptIsOne_waitsAndRetries() = runTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
-        val input = object : BasicInput {
+        val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
-            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw cause
         }
         val matchedInput = MatchedInput<BasicInput>(input, source)
@@ -259,13 +290,13 @@ class PermissionGrantedBasicInputTest {
     }
 
     @Test
-    fun transition_whenInputFetchThrowsRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
+    fun transition_whenInputParseThrowsRecoverableNetworkExceptionAndLastAttemptIsMaxAttempts_returnsConversionFailed() =
         runTest {
-            val input = object : BasicInput {
+            val input = object : BasicOfflineInput {
                 override fun getName(resources: Resources) = "Test Input"
                 override val group = InputGroup.DEBUG
 
-                override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+                override fun parse(match: String, resources: Resources) =
                     throw NotImplementedError()
             }
             val matchedInput = MatchedInput<BasicInput>(input, source)
@@ -292,7 +323,7 @@ class PermissionGrantedBasicInputTest {
         }
 
     @Test
-    fun transition_whenInputFetchThrowsUnrecoverableNetworkException_returnsConversionFailed() = runTest {
+    fun transition_whenInputParseThrowsUnrecoverableNetworkException_returnsConversionFailed() = runTest {
         val requestUrl = "https://www.example.com/request"
         val request: HttpRequest = mock {
             on { url } doReturn Url(requestUrl)
@@ -305,11 +336,11 @@ class PermissionGrantedBasicInputTest {
             on { this.call } doReturn call
         }
         val cause = ResponseNetworkException(response, Exception())
-        val input = object : BasicInput {
+        val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
             override val group = InputGroup.DEBUG
 
-            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
+            override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw cause
         }
         val matchedInput = MatchedInput<BasicInput>(input, source)

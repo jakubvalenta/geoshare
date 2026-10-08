@@ -12,9 +12,8 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.network.FetchTools
 
-object CoordinateInput : BasicInput, Input.HasPattern, Input.HasRandomUri {
+object CoordinateInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.COORDINATES
     override val changelog = persistentListOf(
@@ -28,7 +27,7 @@ object CoordinateInput : BasicInput, Input.HasPattern, Input.HasRandomUri {
 
     override val pattern = Regex("""([\d.\-\p{Zs},°'′"″NSWE]*\d[\d.\-\p{Zs},°'′"″NSWE]*)""")
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources): ParseResult =
         parseResult {
             // Decimal
             // e.g. `N 41.40338, E 2.17403`

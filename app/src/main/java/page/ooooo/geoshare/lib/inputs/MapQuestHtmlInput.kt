@@ -20,7 +20,7 @@ class MapQuestHtmlInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_map_quest_html_name)
     override val group = InputGroup.MAP_QUEST
 
@@ -33,14 +33,14 @@ class MapQuestHtmlInput @Inject constructor(
             // Set a custom user agent, so that MapQuest doesn't return empty 202 Accepted response
             userAgent = DESKTOP_USER_AGENT,
         ) { data ->
-            parseResult {
+            parseResultAsync {
                 val latLonPattern = Regex(""""latitude":$LAT,"longitude":$LON""")
 
                 while (true) {
                     val line = data.readLine() ?: break
                     latLonPattern.find(line)?.toLatLonPoint(source = Source.HTML)?.let {
                         points = persistentListOf(GCJ02MainlandChinaPoint(it))
-                        return@parseResult
+                        return@parseResultAsync
                     }
                 }
             }

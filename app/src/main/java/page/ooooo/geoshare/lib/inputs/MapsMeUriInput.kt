@@ -2,21 +2,20 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.uri.Uri
-import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.lib.extensions.groupOrNull
 import page.ooooo.geoshare.lib.extensions.toScale
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodeGe0Hash
-import page.ooooo.geoshare.lib.network.FetchTools
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MapsMeUriInput @Inject constructor(
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern {
+) : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
 
     override val group = InputGroup.MAPS_ME
@@ -28,7 +27,7 @@ class MapsMeUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST)""")
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources) =
         Uri.parse(match, uriQuote).run {
             parseResult {
                 val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))

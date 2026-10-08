@@ -7,9 +7,11 @@ import page.ooooo.geoshare.lib.network.FetchTools
 interface InputTest {
     val resources: Resources
 
-    suspend fun BasicInput.parse(match: String) = parse(match, resources, FakeFetchTools(""))
+    suspend fun BasicOfflineInput.parse(match: String) = parse(match, resources)
 
-    suspend fun BasicInput.parse(match: String, fetchTools: FetchTools) = parse(match, resources, fetchTools)
+    suspend fun BasicOnlineInput.parse(match: String) = parse(match, resources, FakeFetchTools(""))
+
+    suspend fun BasicOnlineInput.parse(match: String, fetchTools: FetchTools) = parse(match, resources, fetchTools)
 
     suspend fun WebViewInput.parse(data: String, match: String) = parse(data, match, resources)
 }

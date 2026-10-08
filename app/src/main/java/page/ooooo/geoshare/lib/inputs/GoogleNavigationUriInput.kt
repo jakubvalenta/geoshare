@@ -12,7 +12,6 @@ import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.lib.uri.toQueryParams
@@ -31,7 +30,7 @@ import javax.inject.Singleton
 class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.GOOGLE_NAVIGATION_URI
     override val changelog = persistentListOf(
@@ -47,7 +46,7 @@ class GoogleNavigationUriInput @Inject constructor(
 
     override val pattern = Regex("""(google.navigation:$URI_REST)""")
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources) =
         Uri.parse(match, uriQuote).run {
             parseResult {
                 val q = Regex("""(?:^|.*&)q=([^&]+).*""").matchEntire(pathParts.firstOrNull())?.groupOrNull()

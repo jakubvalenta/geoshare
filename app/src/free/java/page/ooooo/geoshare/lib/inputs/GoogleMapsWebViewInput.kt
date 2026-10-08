@@ -46,7 +46,7 @@ class GoogleMapsWebViewInput @Inject constructor(
         }
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
+    override fun parse(data: String, match: String, resources: Resources) = parseResult {
         next = MatchedInput(googleMapsUriInput.get(), data)
     }
 

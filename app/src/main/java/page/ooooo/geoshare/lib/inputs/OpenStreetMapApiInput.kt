@@ -18,7 +18,7 @@ class OpenStreetMapApiInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_open_street_map_api_name)
     override val group = InputGroup.OPEN_STREET_MAP
 

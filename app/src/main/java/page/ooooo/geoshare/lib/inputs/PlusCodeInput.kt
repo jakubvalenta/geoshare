@@ -11,7 +11,6 @@ import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.geo.decodePlusCode
-import page.ooooo.geoshare.lib.network.FetchTools
 
 /**
  * Plus Codes input.
@@ -23,7 +22,7 @@ import page.ooooo.geoshare.lib.network.FetchTools
  *
  * See https://plus.codes/
  */
-object PlusCodeInput : BasicInput, Input.HasPattern, Input.HasRandomUri {
+object PlusCodeInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.PLUS_CODE
     override val changelog = persistentListOf(
@@ -41,7 +40,7 @@ object PlusCodeInput : BasicInput, Input.HasPattern, Input.HasRandomUri {
         RegexOption.IGNORE_CASE,
     )
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources) =
         parseResult {
             // URL-decode code string if it was extracted from a URL
             val codeString = match.replace("%2B", "+")

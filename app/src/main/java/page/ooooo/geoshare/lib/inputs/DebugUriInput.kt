@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
-import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,13 +13,13 @@ import javax.inject.Singleton
 @Singleton
 class DebugUriInput @Inject constructor(
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern {
+) : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.DEBUG
 
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources) =
         parseResult {
             next = MatchedInput(DebugWebViewInput, match)
         }

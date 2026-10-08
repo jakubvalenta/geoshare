@@ -1,7 +1,6 @@
 package page.ooooo.geoshare.ui
 
 import android.content.res.Resources
-import android.util.Log
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -260,9 +259,5 @@ class ServerViewModel @Inject constructor(
 
     fun dismissMessage() {
         _message.value = null
-    }
-
-    private companion object {
-        private const val TAG = "ServerViewModel"
     }
 }

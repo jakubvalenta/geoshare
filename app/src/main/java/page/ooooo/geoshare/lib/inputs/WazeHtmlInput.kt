@@ -19,20 +19,20 @@ class WazeHtmlInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPermission {
+) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_waze_html_name)
     override val group = InputGroup.WAZE
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->
-            parseResult {
+            parseResultAsync {
                 val pattern = Regex(""""latLng":\{"lat":$LAT,"lng":$LON\}""")
 
                 while (true) {
                     val line = data.readLine() ?: break
                     pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
                         points = persistentListOf(WGS84Point(it))
-                        return@parseResult
+                        return@parseResultAsync
                     }
                 }
             }

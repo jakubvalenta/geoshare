@@ -47,7 +47,7 @@ class YahooMapsWebViewInput @Inject constructor(
         };
     """.trimIndent()
 
-    override suspend fun parse(data: String, match: String, resources: Resources) = parseResult {
+    override fun parse(data: String, match: String, resources: Resources) = parseResult {
         val json = Json {
             explicitNulls = false
         }

@@ -10,7 +10,6 @@ import page.ooooo.geoshare.lib.formatters.UriFormatter
 import page.ooooo.geoshare.lib.geo.GCJ02GreaterChinaAndTaiwanPoint
 import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.FetchTools
 import page.ooooo.geoshare.lib.uri.Uri
 import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
@@ -19,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class AmapUriInput @Inject constructor(
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.AMAP
     override val changelog = persistentListOf(
@@ -28,7 +27,7 @@ class AmapUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?wb\.amap\.com/$URI_REST)""")
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources): ParseResult =
         Uri.parse(match, uriQuote).run {
             parseResult {
                 // Coordinates and name in param 'p' (mobile)

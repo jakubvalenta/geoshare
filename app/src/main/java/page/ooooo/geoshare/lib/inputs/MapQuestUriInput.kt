@@ -2,11 +2,10 @@ package page.ooooo.geoshare.lib.inputs
 
 import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
-import page.ooooo.geoshare.lib.uri.Uri
-import page.ooooo.geoshare.lib.uri.UriQuote
 import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.network.FetchTools
+import page.ooooo.geoshare.lib.uri.Uri
+import page.ooooo.geoshare.lib.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,7 +13,7 @@ import javax.inject.Singleton
 class MapQuestUriInput @Inject constructor(
     val mapQuestHtmlInput: dagger.Lazy<MapQuestHtmlInput>,
     val uriQuote: UriQuote,
-) : BasicInput, Input.HasPattern {
+) : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.MAP_QUEST
     override val changelog = persistentListOf(
@@ -24,7 +23,7 @@ class MapQuestUriInput @Inject constructor(
 
     override val pattern = Regex("""((?:https?://)?(?:(?:www\.)?mapquest\.com|mapq\.st)[/?#]$URI_REST)""")
 
-    override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
+    override fun parse(match: String, resources: Resources) =
         Uri.parse(match, uriQuote).run {
             parseResult {
                 // Search
