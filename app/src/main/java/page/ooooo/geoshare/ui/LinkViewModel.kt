@@ -57,7 +57,6 @@ class LinkViewModel @Inject constructor(
      * Navigate to the list, insert, or update screen; and reset or prefill the form.
      */
     suspend fun navigateTo(destination: Int?) {
-        Log.d(TAG, "navigateTo($destination)")
         if (_destination.value == destination) {
             // Do nothing, so that we don't overwrite values restored after process death for no reason
         } else if (destination == null || destination == -1) {
