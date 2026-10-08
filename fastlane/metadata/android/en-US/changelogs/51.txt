@@ -1,13 +1,13 @@
-- Added Kagi Maps support.
-- Added MapQuest support.
-- Added Yahoo! Maps support.
+- Added Kagi Maps.
+- Added MapQuest.
+- Added Yahoo! Maps.
 - Added Cartes.app web map.
-- Improved Amap support by extracting desktop links.
-- Improved Apple Maps direction links support by extracting waypoints.
-- Improved Baidu Map search links support.
-- Improved Google Maps direction links support by extraction waypoints from API links.
-- Improved Waze support by extracting route links.
-- Improved result screen by moving souce to the top bar.
-- Improved preferences screen by putting API server list on a separate screen.
-- Fixed Yandex Maps POI link support.
-- Fixed Open original link button cancelling link processing.
+- Improved Amap desktop links.
+- Improved Apple Maps waypoints.
+- Improved Baidu Map search links.
+- Improved Google Maps waypoints of API links.
+- Improved Waze route links.
+- Improved result screen by moving source to top bar.
+- Improved preferences by putting server list on separate screen.
+- Fixed Yandex Maps POI links.
+- Fixed Open original link button cancelling processing.
