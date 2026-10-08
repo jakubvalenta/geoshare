@@ -345,4 +345,7 @@
     <string name="input_kagi_maps_warning_account">Посилання з ідентифікаторами місць не підтримуються, оскільки для них потрібен обліковий запис Kagi.</string>
     <string name="input_map_quest_name">MapQuest</string>
     <string name="input_yahoo_maps_name">Yahoo! Maps</string>
+    <string name="input_waze_warning_route_empty">Маршрут порожній. Спробуйте повернутися до Waze, зачекати на GPS і знову поділитися маршрутом.</string>
+    <string name="input_waze_warning_route_expired">Термін дії маршруту минув.</string>
+    <string name="network_exception_content_convert">Некоректний вміст відповіді</string>
 </resources>
