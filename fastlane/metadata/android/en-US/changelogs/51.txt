@@ -7,6 +7,7 @@
 - Improved Baidu Map search links support.
 - Improved Google Maps direction links support by extraction waypoints from API links.
 - Improved Waze support by extracting route links.
+- Improved result screen by moving souce to the top bar.
 - Improved preferences screen by putting API server list on a separate screen.
 - Fixed Yandex Maps POI link support.
 - Fixed Open original link button cancelling link processing.
