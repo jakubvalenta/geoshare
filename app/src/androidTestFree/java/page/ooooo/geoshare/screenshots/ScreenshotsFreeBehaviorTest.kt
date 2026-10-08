@@ -162,6 +162,7 @@ class ScreenshotsFreeBehaviorTest {
         setMainInput()
         submitMainForm()
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
+        quickWaitForStableInActiveWindow() // Wait for the result to render
         saveScreenshot("main_strings/help_message_share_source")
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
@@ -209,7 +210,7 @@ class ScreenshotsFreeBehaviorTest {
 
         // Licenses
         onElement { textAsString() == "Licenses" }.click()
-        quickWaitForStableInActiveWindow()
+        waitForStableInActiveWindow() // Wait for the licenses screen to render, quick wait is not enough
         saveScreenshot("main_strings/licenses")
         pressBack() // Go back to about screen
 
@@ -578,6 +579,7 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_log")
         onElement { viewIdResourceName == "geoShareMainSourceIcon" }.click() // Collapse log
+        quickWaitForStableInActiveWindow() // Wait for the log exit animation
 
         // Conversion - Result - Message - Copy success
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
