@@ -51,7 +51,7 @@ class InitialLinksTest  {
 
     @Test
     @Throws(IOException::class)
-    fun migrations_transformEarliestDataToInitialData() = runBlocking {
+    fun migrations_migrateEarliestDatabaseVersion() = runBlocking {
         val testDb = "link-migration-test"
 
         // Create earliest version of the database
