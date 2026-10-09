@@ -31,6 +31,9 @@ class ShareLinkUriOutput @Inject constructor(
             actionContext.context.openUriInDefaultApp(uriString)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
+    override fun isEnabled(value: Point, uriQuote: UriQuote) =
+        !getUriString(value, uriQuote).isNullOrEmpty()
+
     @Composable
     override fun label(appDetail: AppDetail?) =
         stringResource(R.string.output_open_link, link.name)

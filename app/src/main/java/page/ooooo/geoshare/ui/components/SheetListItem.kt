@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 fun SheetListItem(
     headlineText: String,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
     supportingText: String? = null,
     icon: IconDescriptor? = null,
@@ -27,6 +28,7 @@ fun SheetListItem(
                 this
             }
         },
+        enabled = enabled,
         supportingContent = supportingText?.let { text ->
             {
                 Text(text, overflow = TextOverflow.Ellipsis, maxLines = 1)
@@ -38,7 +40,10 @@ fun SheetListItem(
                 contentDescription = null,
             )
         },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        colors = ListItemDefaults.colors(
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+        ),
     ) {
         Text(headlineText, Modifier.testTag("geoShareSheetListItemHeadline"))
     }

@@ -52,10 +52,10 @@ import page.ooooo.geoshare.lib.android.isMessagingApp
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
+import page.ooooo.geoshare.lib.geo.Point
 import page.ooooo.geoshare.lib.geo.Points
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.toAction
 import page.ooooo.geoshare.ui.OutputDetailsForApp
 import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
@@ -104,10 +104,13 @@ fun ResultApps(
                 .forEach { outputsForApp ->
                     key(outputsForApp.packageName) {
                         ResultAppsAppIcon(
+                            lastPoint = lastPoint,
                             outputsForApp = outputsForApp,
+                            points = points,
                             iconSize = iconSize,
+                            source = source,
                             width = itemWidth,
-                            onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                            onExecute = onExecute,
                             onHideApp = { onHideApp(outputsForApp.packageName) },
                         )
                     }
@@ -116,10 +119,13 @@ fun ResultApps(
             outputsForSharing?.let { outputsForSharing ->
                 key(outputsForSharing.defaultOutputDetail.output.id) {
                     ResultAppsShareIcon(
+                        lastPoint = lastPoint,
                         outputsForSharing = outputsForSharing,
+                        points = points,
                         iconSize = iconSize,
+                        source = source,
                         width = itemWidth,
-                        onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                        onExecute = onExecute,
                     )
                 }
             }
@@ -137,10 +143,13 @@ fun ResultApps(
                     .forEach { outputsForApp ->
                         key(outputsForApp.packageName) {
                             ResultAppsAppIcon(
-                                outputsForApp = outputsForApp,
                                 iconSize = iconSize,
+                                lastPoint = lastPoint,
+                                outputsForApp = outputsForApp,
+                                points = points,
+                                source = source,
                                 width = itemWidth,
-                                onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                                onExecute = onExecute,
                                 onHideApp = { onHideApp(outputsForApp.packageName) },
                             )
                         }
@@ -172,10 +181,13 @@ fun ResultApps(
                 outputsForLinks.forEach { outputsForLink ->
                     key(outputsForLink.group) {
                         ResultAppsLinkIcon(
-                            outputsForLink = outputsForLink,
                             iconSize = iconSize,
+                            lastPoint = lastPoint,
+                            outputsForLink = outputsForLink,
+                            points = points,
+                            source = source,
                             width = itemWidth,
-                            onClick = { output -> onExecute(output.toAction(lastPoint, points, source)) },
+                            onExecute = onExecute,
                             onDisableLinkGroup = { onDisableLinkGroup(outputsForLink.group) },
                         )
                     }
@@ -218,10 +230,13 @@ private fun ResultAppsHeadline(text: String, extra: (@Composable RowScope.() -> 
 
 @Composable
 private fun ResultAppsAppIcon(
-    outputsForApp: OutputDetailsForApp,
     iconSize: Dp,
+    lastPoint: Point,
+    outputsForApp: OutputDetailsForApp,
+    points: Points,
+    source: String,
     width: Dp,
-    onClick: (output: Output) -> Unit,
+    onExecute: (Action<*>) -> Unit,
     onHideApp: () -> Unit,
 ) {
     AppIcon(
@@ -229,13 +244,16 @@ private fun ResultAppsAppIcon(
         menu = { expanded, onDismissRequest ->
             AppMenu(
                 expanded = expanded,
+                lastPoint = lastPoint,
                 outputDetails = outputsForApp.all,
-                onClick = onClick,
+                points = points,
+                source = source,
                 onDismissRequest = onDismissRequest,
+                onExecute = onExecute,
                 onHide = onHideApp,
             )
         },
-        onClick = { onClick(outputsForApp.default.output) },
+        onClick = { onExecute(outputsForApp.default.output.toAction(lastPoint, points, source)) },
         modifier = Modifier
             .width(width)
             .testTag("geoShareApp_${outputsForApp.packageName}"),
@@ -251,23 +269,29 @@ private fun ResultAppsAppIcon(
 
 @Composable
 private fun ResultAppsShareIcon(
-    outputsForSharing: OutputDetailsForSharing,
     iconSize: Dp,
+    lastPoint: Point,
+    outputsForSharing: OutputDetailsForSharing,
+    points: Points,
+    source: String,
     width: Dp,
-    onClick: (output: Output) -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
 ) {
     AppIcon(
         label = null,
         menu = { expanded, onDismissRequest ->
             AppMenu(
                 expanded = expanded,
+                lastPoint = lastPoint,
                 outputDetails = outputsForSharing.outputDetails,
-                onClick = onClick,
+                points = points,
+                source = source,
                 onDismissRequest = onDismissRequest,
+                onExecute = onExecute,
                 onHide = null,
             )
         },
-        onClick = { onClick(outputsForSharing.defaultOutputDetail.output) },
+        onClick = { onExecute(outputsForSharing.defaultOutputDetail.output.toAction(lastPoint, points, source)) },
         modifier = Modifier
             .width(width)
             .testTag("geoShareAppShare"),
@@ -288,10 +312,13 @@ private fun ResultAppsShareIcon(
 
 @Composable
 private fun ResultAppsLinkIcon(
-    outputsForLink: OutputDetailsForLink,
     iconSize: Dp,
+    lastPoint: Point,
+    outputsForLink: OutputDetailsForLink,
+    points: Points,
+    source: String,
     width: Dp,
-    onClick: (output: Output) -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
     onDisableLinkGroup: () -> Unit,
 ) {
     AppIcon(
@@ -299,13 +326,16 @@ private fun ResultAppsLinkIcon(
         menu = { expanded, onDismissRequest ->
             AppMenu(
                 expanded = expanded,
+                lastPoint = lastPoint,
                 outputDetails = outputsForLink.all,
-                onClick = onClick,
+                points = points,
+                source = source,
+                onExecute = onExecute,
                 onDismissRequest = onDismissRequest,
                 onHide = onDisableLinkGroup,
             )
         },
-        onClick = { onClick(outputsForLink.default.output) },
+        onClick = { onExecute(outputsForLink.default.output.toAction(lastPoint, points, source)) },
         modifier = Modifier
             .width(width)
             .testTag("geoShareLink_${outputsForLink.group}"),

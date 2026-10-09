@@ -55,8 +55,13 @@ import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.lib.geo.CoordinateConverter
 import page.ooooo.geoshare.lib.geo.Geometries
+import page.ooooo.geoshare.lib.geo.Point
+import page.ooooo.geoshare.lib.geo.Points
+import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.Output
 import page.ooooo.geoshare.lib.outputs.ShareDisplayGeoUriOutput
+import page.ooooo.geoshare.lib.outputs.isEnabled
+import page.ooooo.geoshare.lib.outputs.toAction
 import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -125,9 +130,12 @@ fun AppIcon(
 @Composable
 fun AppMenu(
     expanded: Boolean,
+    lastPoint: Point,
     outputDetails: List<OutputDetail<Output>>,
-    onClick: (Output) -> Unit,
+    points: Points,
+    source: String,
     onDismissRequest: () -> Unit,
+    onExecute: (Action<*>) -> Unit,
     onHide: (() -> Unit)?,
 ) {
     DropdownMenu(
@@ -137,27 +145,27 @@ fun AppMenu(
         shape = ShapeDefaults.Large,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
-        outputDetails
-            .zipWithNextFirstNull { prevOutputDetail, outputDetail ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            outputDetail.label(),
-                            Modifier.testTag("geoShareAppOutput"),
-                        )
-                    },
-                    onClick = {
-                        onDismissRequest()
-                        onClick(outputDetail.output)
-                    },
-                    leadingIcon = {
-                        IconFromDescriptor(
-                            outputDetail.menuIcon?.takeIf { it != prevOutputDetail?.menuIcon } ?: SpacerIconDescriptor,
-                            contentDescription = null,
-                        )
-                    },
-                )
-            }
+        outputDetails.zipWithNextFirstNull { prevOutputDetail, outputDetail ->
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        outputDetail.label(),
+                        Modifier.testTag("geoShareAppOutput"),
+                    )
+                },
+                onClick = {
+                    onDismissRequest()
+                    onExecute(outputDetail.output.toAction(lastPoint, points, source))
+                },
+                leadingIcon = {
+                    IconFromDescriptor(
+                        outputDetail.menuIcon?.takeIf { it != prevOutputDetail?.menuIcon } ?: SpacerIconDescriptor,
+                        contentDescription = null,
+                    )
+                },
+                enabled = outputDetail.output.isEnabled(lastPoint, points, source),
+            )
+        }
         if (onHide != null) {
             HorizontalDivider()
             DropdownMenuItem(
