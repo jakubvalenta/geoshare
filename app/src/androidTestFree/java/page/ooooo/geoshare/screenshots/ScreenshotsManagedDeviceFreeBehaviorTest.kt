@@ -24,17 +24,14 @@ import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.local.preferences.HelpMessage
 import page.ooooo.geoshare.data.local.preferences.NoopAutomation
 import page.ooooo.geoshare.data.local.preferences.OpenDisplayGeoUriAutomation
-import page.ooooo.geoshare.data.local.preferences.OpenPointsGpxAutomation
 import page.ooooo.geoshare.data.local.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.local.preferences.SendPointAutomation
-import page.ooooo.geoshare.data.local.preferences.ShareDisplayGeoUriAutomation
-import page.ooooo.geoshare.data.local.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.lib.android.PackageNames
 import page.ooooo.geoshare.lib.geo.Source
 import page.ooooo.geoshare.lib.geo.Srs
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.InputGroupId
 import page.ooooo.geoshare.tests.NETWORK_TIMEOUT
+import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.chooseFile
 import page.ooooo.geoshare.tests.confirmDialog
@@ -50,13 +47,9 @@ import page.ooooo.geoshare.tests.goBackToMainForm
 import page.ooooo.geoshare.tests.goToInputList
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.grantConnectionPermission
-import page.ooooo.geoshare.tests.grantSystemPermission
 import page.ooooo.geoshare.tests.hideKeyboard
-import page.ooooo.geoshare.tests.isAppInstalled
 import page.ooooo.geoshare.tests.launchApplication
-import page.ooooo.geoshare.tests.launchNavigationInApp
 import page.ooooo.geoshare.tests.longScrollSheet
-import page.ooooo.geoshare.tests.mockLocation
 import page.ooooo.geoshare.tests.onElementOrScrollToElement
 import page.ooooo.geoshare.tests.onMainScrollablePane
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
@@ -64,11 +57,9 @@ import page.ooooo.geoshare.tests.saveLinkForm
 import page.ooooo.geoshare.tests.saveScreenshot
 import page.ooooo.geoshare.tests.saveServerForm
 import page.ooooo.geoshare.tests.scrollToAppIcon
-import page.ooooo.geoshare.tests.scrollToAppIcons
 import page.ooooo.geoshare.tests.scrollToAutomationItem
 import page.ooooo.geoshare.tests.scrollToBottom
 import page.ooooo.geoshare.tests.scrollToLinkIcon
-import page.ooooo.geoshare.tests.scrollToTop
 import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
@@ -81,9 +72,15 @@ import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Make screenshots for documentation purposes, such as the Weblate translation service.
+ * Takes screenshots for documentation purposes, such as the Weblate translation service.
+ *
+ * This test suit must be run on a device with the Google Maps app installed.
+ *
+ * There is only one big method [screenshotsManagedDevice] annotated with [Test], so that the screenshot files are not
+ * deleted after each test method, which AndroidJunitRunner does. The method is however internally split into several
+ * smaller methods not annotated with [Test], so that they can be conveniently commented out during development.
  */
-class ScreenshotsFreeBehaviorTest {
+class ScreenshotsManagedDeviceFreeBehaviorTest {
     companion object {
         @BeforeClass
         @JvmStatic
@@ -100,19 +97,9 @@ class ScreenshotsFreeBehaviorTest {
         }
     }
 
-    /**
-     * Takes all screenshots in one big test method.
-     *
-     * This method is not split into several smaller methods annotated with [Test], because AndroidJunitRunner's
-     * `clearPackageData` setting (which we set in build.gradle) clears all files from
-     * `build/outputs/(connected|managed_device)_android_test_additional_output` after each test method. But we want all
-     * screenshot files to be kept there, so that we can later copy them to `docs/screenshots`.
-     *
-     * This method is however internally split into several smaller methods not annotated with [Test], so that they can
-     * be conveniently commented out during development.
-     */
     @Test
-    fun screenshots() = uiAutomator {
+    fun screenshotsManagedDevice() = uiAutomator {
+        assumeAppInstalled(PackageNames.GOOGLE_MAPS)
         runBlocking {
             assumeDomainResolvable("maps.google.com")
         }
@@ -126,22 +113,16 @@ class ScreenshotsFreeBehaviorTest {
 
         // 2. Test preferences, while they still have default values, because later tests might change them
         testPreferences()
-        testPreferencesAutomationMessaging()
-        testPreferencesAutomationOsmAnd()
 
         // 3. Test all other screens in alphabetical order
         testAbout()
         testAutomationCopyAndSave()
         testAutomationOpen()
-        testAutomationShare()
         testFaq()
         testConversionErrors()
         testConversionPermission()
         testConversionResultApps()
-        testConversionResultAppsMessaging()
-        testConversionResultAppsOsmAnd()
         testConversionResultChecks()
-        testConversionResultLocation()
         testConversionResultPointName()
         testConversionResultPoints()
         testMain()
@@ -271,10 +252,6 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     fun testAutomationOpen() = uiAutomator {
-        if (!isAppInstalled(PackageNames.GOOGLE_MAPS)) {
-            return@uiAutomator
-        }
-
         // Automation - Open app - Waiting
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         scrollToAutomationItem(OpenDisplayGeoUriAutomation(PackageNames.GOOGLE_MAPS)).click()
@@ -285,50 +262,6 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/automation_open_app_waiting")
         onElement { viewIdResourceName == "geoShareResultAutomationCancel" }.click()
-
-        // Reset automation
-        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        scrollToAutomationItem(NoopAutomation).click()
-
-        goBackToMainForm()
-    }
-
-    fun testAutomationShare() = uiAutomator {
-        // Require at least two installed map apps, so that Android shows a share menu
-        if (!isAppInstalled(PackageNames.GOOGLE_MAPS) || !isAppInstalled(PackageNames.OSMAND_PLUS)) {
-            return@uiAutomator
-        }
-
-        // Automation - Share - Waiting
-        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        scrollToAutomationItem(ShareDisplayGeoUriAutomation).click()
-        goBackToMainForm()
-        setMainInput()
-        submitMainForm()
-        onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/automation_share_waiting")
-        runBlocking {
-            delay(5.seconds) // Wait for the automation waiting to finish
-        }
-        pressBack() // Close the system share menu
-
-        // Automation - Share GPX route - Waiting
-        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        scrollToAutomationItem(ShareRouteGpxAutomation).click()
-        goBackToMainForm()
-        setMainInput()
-        submitMainForm()
-        onElement { viewIdResourceName == "geoShareResultAutomationCounter" }
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/automation_share_gpx_route_waiting")
-        runBlocking {
-            delay(5.seconds) // Wait for the automation waiting to finish
-        }
-        pressBack() // Close the system share menu
-
-        // Automation - Share GPX route - Success
-        saveScreenshot("main_strings/automation_share_gpx_route_success") // Don't wait, because the message will disappear fast
 
         // Reset automation
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
@@ -414,10 +347,6 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     fun testConversionResultApps() = uiAutomator {
-        if (!isAppInstalled(PackageNames.GOOGLE_MAPS)) {
-            return@uiAutomator
-        }
-
         shareUri()
 
         // Conversion - Result - App - Google Maps
@@ -449,38 +378,6 @@ class ScreenshotsFreeBehaviorTest {
         goBackToMainForm()
     }
 
-    fun testConversionResultAppsMessaging() = uiAutomator {
-        if (!isAppInstalled(PackageNames.CONVERSATIONS)) {
-            return@uiAutomator
-        }
-
-        shareUri()
-
-        // Conversion - Result - App - Messaging
-        scrollToAppIcon(PackageNames.CONVERSATIONS).longClick()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_app_messaging")
-        pressBack() // Close app menu
-
-        goBackToMainForm()
-    }
-
-    fun testConversionResultAppsOsmAnd() = uiAutomator {
-        if (!isAppInstalled(PackageNames.OSMAND_PLUS)) {
-            return@uiAutomator
-        }
-
-        shareUri()
-
-        // Conversion - Result - App - OsmAnd
-        scrollToAppIcon(PackageNames.OSMAND_PLUS).longClick()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_app_osmand")
-        pressBack() // Close app menu
-
-        goBackToMainForm()
-    }
-
     fun testConversionResultChecks() = uiAutomator {
         // Conversion - Check - Experimental
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
@@ -504,43 +401,6 @@ class ScreenshotsFreeBehaviorTest {
         goBackToMainForm()
     }
 
-    fun testConversionResultLocation() = uiAutomator {
-        if (!isAppInstalled(PackageNames.TOMTOM)) {
-            return@uiAutomator
-        }
-
-        shareUri()
-
-        // Conversion - Result - Location - Rationale
-        scrollToAppIcons()
-        scrollToAppIcon(PackageNames.TOMTOM)
-        launchNavigationInApp()
-        onElement(20_000) { viewIdResourceName == "geoShareLocationRationaleDialog" }.let { dialog ->
-            quickWaitForStableInActiveWindow()
-            saveScreenshot("main_strings/conversion_result_location_rationale")
-            dialog.confirmDialog()
-        }
-
-        // Conversion - Result - Location - Loading
-        waitForStableInActiveWindow() // Wait, otherwise tapping the location permission grant button does nothing
-        grantSystemPermission()
-        onMainScrollablePane().scrollToTop()
-        onElement { viewIdResourceName == "geoShareResultSmallLoadingIndicatorMessage" }
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_location_loading_indicator")
-
-        // Conversion - Message - Error
-        mockLocation {
-            // Don't set location
-        }
-        runBlocking {
-            delay(2.seconds)
-        }
-        saveScreenshot("main_strings/conversion_result_message_error")
-
-        goBackToMainForm()
-    }
-
     fun testConversionResultPointName() = uiAutomator {
         shareUri(WGS84Point(52.47254, 13.4345, name = "Marked Location", source = Source.GENERATED))
 
@@ -556,10 +416,6 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     fun testConversionResultPoints() = uiAutomator {
-        if (!isAppInstalled(PackageNames.GOOGLE_MAPS)) {
-            return@uiAutomator
-        }
-
         shareUri("https://www.openstreetmap.org/relation/910699")
         grantConnectionPermission()
 
@@ -641,13 +497,9 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     fun testFaq() = uiAutomator {
-        // FAQ
+        // FAQ - How it works
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuFaq" }.click()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/faq_list")
-
-        // FAQ - How it works
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.HOW_IT_WORKS}" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/faq_how_it_works")
@@ -823,10 +675,6 @@ class ScreenshotsFreeBehaviorTest {
     }
 
     fun testPreferences() = uiAutomator {
-        if (!isAppInstalled(PackageNames.GOOGLE_MAPS)) {
-            return@uiAutomator
-        }
-
         // Preferences - List (initial values, before the user changes anything)
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
@@ -920,34 +768,6 @@ class ScreenshotsFreeBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_developer_options")
         goBackToElement { viewIdResourceName == "geoShareUserPreferencesListPane" }
-
-        goBackToMainForm()
-    }
-
-    fun testPreferencesAutomationMessaging() = uiAutomator {
-        if (!isAppInstalled(PackageNames.CONVERSATIONS)) {
-            return@uiAutomator
-        }
-
-        // Preferences - Automation - Messaging
-        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-        scrollToAutomationItem(SendPointAutomation(PackageNames.CONVERSATIONS))
-        saveScreenshot("main_strings/preferences_automation_messaging")
-
-        goBackToMainForm()
-    }
-
-    fun testPreferencesAutomationOsmAnd() = uiAutomator {
-        if (!isAppInstalled(PackageNames.OSMAND_PLUS)) {
-            return@uiAutomator
-        }
-
-        // Preferences - Automation - OsmAnd
-        goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
-        onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }
-        scrollToAutomationItem(OpenPointsGpxAutomation(PackageNames.OSMAND_PLUS))
-        saveScreenshot("main_strings/preferences_automation_osm_and")
 
         goBackToMainForm()
     }
