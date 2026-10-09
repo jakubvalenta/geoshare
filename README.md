@@ -284,9 +284,8 @@ fastlane metadata
 
     ```shell
     ./gradlew :app:mediumPhoneApi37FreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceFreeBehaviorTest
-    ./gradlew :app:mediumPhoneApi37ProActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceFreeBehaviorTest
-    ./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceFreeBehaviorTest
-    ./gradlew :app:copyScreenshots
+    ./gradlew :app:mediumPhoneApi37ProActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceProBehaviorTest
+    ./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceDemoBehaviorTest
     ```
 
    Then copy the resulting screenshots from
