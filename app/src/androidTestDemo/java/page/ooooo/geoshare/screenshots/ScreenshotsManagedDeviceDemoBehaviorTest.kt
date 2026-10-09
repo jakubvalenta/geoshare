@@ -24,7 +24,12 @@ import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import kotlin.time.Duration.Companion.seconds
 
-class ScreenshotsDemoBehaviorTest {
+/**
+ * Takes screenshots for documentation purposes, such as the Weblate translation service.
+ *
+ * This test suit must be run on a device with the Google Maps app installed.
+ */
+class ScreenshotsManagedDeviceDemoBehaviorTest {
     companion object {
         @BeforeClass
         @JvmStatic
@@ -41,11 +46,6 @@ class ScreenshotsDemoBehaviorTest {
         }
     }
 
-    /**
-     * Takes all screenshots in one big test method.
-     *
-     * See `ScreenshotsFreeBehaviorTest`.
-     */
     @Test
     fun screenshots() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
@@ -57,12 +57,6 @@ class ScreenshotsDemoBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
 
-        // Test all screens in alphabetical order
-        testBilling()
-        testPreferences()
-    }
-
-    fun testBilling() = uiAutomator {
         // Billing - Not purchased
         onElement { viewIdResourceName == "geoShareMainBillingIcon" }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" }
@@ -102,11 +96,8 @@ class ScreenshotsDemoBehaviorTest {
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/billing_message_expiration")
         onElement { viewIdResourceName == "geoShareBillingManageButtonSubscription" }.click() // Cancel subscription
-
         goBackToMainForm()
-    }
 
-    fun testPreferences() = uiAutomator {
         // Preferences - Automation - Billing badge
         onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
         onElement { viewIdResourceName == "geoShareMainMenuUserPreferences" }.click()
@@ -117,7 +108,5 @@ class ScreenshotsDemoBehaviorTest {
         goToUserPreferencesDetail(UserPreferenceGroupId.AUTOMATION)
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/preferences_automation_billing_wall")
-
-        goBackToMainForm()
     }
 }

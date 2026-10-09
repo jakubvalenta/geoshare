@@ -15,7 +15,6 @@ import page.ooooo.geoshare.tests.configureServer
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode
 import page.ooooo.geoshare.tests.enableDarkMode
 import page.ooooo.geoshare.tests.enableSystemUIDemoMode
-import page.ooooo.geoshare.tests.goBackToMainForm
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.grantConnectionPermission
 import page.ooooo.geoshare.tests.launchApplication
@@ -26,7 +25,12 @@ import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
-class ScreenshotsProBehaviorTest {
+/**
+ * Takes screenshots for documentation purposes, such as the Weblate translation service.
+ *
+ * This test suit must be run on a device with the Google Maps app installed.
+ */
+class ScreenshotsManagedDeviceProBehaviorTest {
     companion object {
         @BeforeClass
         @JvmStatic
@@ -43,11 +47,6 @@ class ScreenshotsProBehaviorTest {
         }
     }
 
-    /**
-     * Takes all screenshots in one big test method.
-     *
-     * See `ScreenshotsFreeBehaviorTest`.
-     */
     @Test
     fun screenshots() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
@@ -59,15 +58,13 @@ class ScreenshotsProBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
 
-        // Test all screens in alphabetical order
-        testConversion()
-        testPreferences()
-    }
-
-    fun testConversion() = uiAutomator {
-        configureServer(TestServer.None)
+        // Preferences - Servers - Page 1
+        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
+        quickWaitForStableInActiveWindow()
+        saveScreenshot("pro_strings/preferences_servers_page_1")
 
         // Conversion - Error - Unsupported source place list
+        configureServer(TestServer.None)
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
         onElement { viewIdResourceName == "geoShareConversionErrorMessage" }
         saveScreenshot("main_strings/conversion_error_unsupported_source_place_list")
@@ -87,16 +84,5 @@ class ScreenshotsProBehaviorTest {
         grantConnectionPermission()
         onElement { viewIdResourceName == "geoShareResultLastPointName" }
         saveScreenshot("main_strings/conversion_result_check_points_name_only")
-
-        goBackToMainForm()
-    }
-
-    fun testPreferences() = uiAutomator {
-        // Preferences - Servers - Page 1
-        goToUserPreferencesDetail(UserPreferenceGroupId.SERVERS)
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("pro_strings/preferences_servers_page_1")
-
-        goBackToMainForm()
     }
 }
