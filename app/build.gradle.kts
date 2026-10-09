@@ -176,20 +176,3 @@ dependencies {
     androidTestImplementation(libs.fastlane.screengrab)
     androidTestUtil(libs.androidx.test.orchestrator)
 }
-
-tasks.register<Copy>("copyScreenshots") {
-    group = "verification"
-    description = "Copies screenshots from instrument test outputs to docs/screenshots"
-
-    @Suppress("UnstableApiUsage")
-    val deviceNames = android.testOptions.managedDevices.localDevices.names
-
-    for (flavor in android.productFlavors.names) {
-        for (device in deviceNames) {
-            val path = "outputs/managed_device_android_test_additional_output/debug/flavors/$flavor/$device"
-            from(layout.buildDirectory.dir(path))
-        }
-    }
-    into("$rootDir/docs/screenshots")
-    include("**/*.webp")
-}

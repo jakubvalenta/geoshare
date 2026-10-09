@@ -283,44 +283,38 @@ fastlane metadata
    to have an emulator set up. Run:
 
     ```shell
-    ./gradlew :app:mediumPhoneApi37FreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
-    ./gradlew :app:mediumPhoneApi37ProActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
-    ./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:mediumPhoneApi37FreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceFreeBehaviorTest
+    ./gradlew :app:mediumPhoneApi37ProActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceFreeBehaviorTest
+    ./gradlew :app:mediumPhoneApi37DemoDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsManagedDeviceFreeBehaviorTest
     ./gradlew :app:copyScreenshots
     ```
+
+   Then copy the resulting screenshots from
+   `app/build/outputs/managed_device_android_test_additional_output/debug/flavors`
+   to `docs/screenshots`:
 
 2. Some screenshots require the OsmAnd~ and Conversations apps installed.
    Install these apps in an emulator, start it, and run:
 
     ```shell
-    ./gradlew :app:connectedFreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:connectedFreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsEmulatorFreeBehaviorTest
     ```
 
-   Then copy the following screenshots from
-   `build/outputs/connected_android_test_additional_output/freeDebugAndroidTest/connected/<device>`
-   to `docs/screenshots`:
-
-    - `main_strings/automation_share_gpx_route_success.webp`
-    - `main_strings/automation_share_gpx_route_waiting.webp`
-    - `main_strings/automation_share_waiting.webp`
-    - `main_strings/conversion_result_app_messaging.webp`
-    - `main_strings/conversion_result_app_osmand.webp`
+   Then copy the resulting screenshots from
+   `app/build/outputs/connected_android_test_additional_output`
+   to `docs/screenshots`.
 
 3. A few screenshots require the TomTom app installed. It seems to be easier to
    install the app on a physical device. So install the app on a physical
    device, start it, and run:
 
     ```shell
-    ./gradlew :app:connectedFreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.package=page.ooooo.geoshare.screenshots
+    ./gradlew :app:connectedFreeActiveDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=page.ooooo.geoshare.screenshots.ScreenshotsPhysicalDeviceFreeBehaviorTest
     ```
 
-   Then copy the following screenshots from
-   `build/outputs/connected_android_test_additional_output/freeDebugAndroidTest/connected/<device>`
-   to `docs/screenshots`:
-
-    - `main_strings/conversion_result_location_loading_indicator.webp`
-    - `main_strings/conversion_result_location_rationale.webp`
-    - `main_strings/conversion_result_message_error.webp`
+   Then copy the resulting screenshots from
+   `app/build/outputs/connected_android_test_additional_output`
+   to `docs/screenshots`.
 
 ### Manual testing
 
