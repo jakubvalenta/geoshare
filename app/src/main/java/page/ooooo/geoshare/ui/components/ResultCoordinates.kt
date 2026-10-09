@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
@@ -58,7 +61,6 @@ import page.ooooo.geoshare.lib.outputs.PointOutput
 import page.ooooo.geoshare.lib.outputs.PointsOutput
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.OutputDetail
-import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.toOutputDetail
@@ -74,7 +76,6 @@ fun ResultCoordinates(
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onSelect: (index: Int?) -> Unit,
     initialExpanded: Boolean = false,
-    message: (@Composable (padding: PaddingValues) -> Unit)? = null,
 ) {
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
@@ -85,183 +86,176 @@ fun ResultCoordinates(
 
     var expanded by retain { mutableStateOf(initialExpanded) }
 
-    Column {
-        Text(
-            points.lastOrNull()?.cleanName?.takeIf { it.isNotEmpty() }
-                ?: if (points.size > 1) {
-                    stringResource(R.string.conversion_succeeded_point_last)
-                } else {
-                    stringResource(R.string.conversion_succeeded_title)
-                },
-            Modifier
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.small, bottom = spacing.extraTiny)
-                .testTag("geoShareResultLastPointName"),
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 3,
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = spacing.windowPadding, end = spacing.windowPadding - 10.dp)
-                .testTag("geoShareResultLastPointSource_${lastPoint.source}"),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (lastPoint.hasCoordinates()) {
-                SelectionContainer {
-                    Text(
-                        when (userPreferencesValues.coordinateFormat) {
-                            CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
-                                coordinateConverter.toWGS84(lastPoint)
-                            )
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+        Column {
+            Text(
+                points.lastOrNull()?.cleanName?.takeIf { it.isNotEmpty() }
+                    ?: if (points.size > 1) {
+                        stringResource(R.string.conversion_succeeded_point_last)
+                    } else {
+                        stringResource(R.string.conversion_succeeded_title)
+                    },
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.small, bottom = spacing.extraTiny)
+                    .testTag("geoShareResultLastPointName"),
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 3,
+                style = MaterialTheme.typography.headlineSmall,
+            )
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = spacing.windowPadding, end = spacing.windowPadding - 10.dp)
+                    .testTag("geoShareResultLastPointSource_${lastPoint.source}"),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (lastPoint.hasCoordinates()) {
+                    SelectionContainer {
+                        Text(
+                            when (userPreferencesValues.coordinateFormat) {
+                                CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
+                                    coordinateConverter.toWGS84(lastPoint)
+                                )
 
-                            CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
-                                coordinateConverter.toWGS84(lastPoint)
-                            )
+                                CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
+                                    coordinateConverter.toWGS84(lastPoint)
+                                )
+                            },
+                            Modifier
+                                .weight(1f)
+                                .testTag("geoShareResultLastPointCoordinates"),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                } else {
+                    ResultCoordinatesCheck(
+                        buildAnnotatedString {
+                            append(stringResource(R.string.conversion_succeeded_check_name_only))
+                            append(" ")
+                            ClickableLink(stringResource(R.string.faq_title)) {
+                                onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                            }
                         },
                         Modifier
                             .weight(1f)
-                            .testTag("geoShareResultLastPointCoordinates"),
-                        style = MaterialTheme.typography.bodyLarge,
+                            .testTag("geoShareResultCheckNameOnly"),
                     )
                 }
-            } else {
+                IconButton(
+                    { onSelect(points.size - 1) },
+                    Modifier.testTag("geoShareResultLastPointMenu")
+                ) {
+                    Icon(
+                        painterResource(R.drawable.content_copy_24px),
+                        contentDescription = stringResource(R.string.nav_menu_content_description),
+                    )
+                }
+            }
+            if (!lastPoint.isAccurate()) {
                 ResultCoordinatesCheck(
-                    buildAnnotatedString {
-                        append(stringResource(R.string.conversion_succeeded_check_name_only))
-                        append(" ")
-                        ClickableLink(stringResource(R.string.faq_title)) {
-                            onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
-                        }
-                    },
+                    stringResource(R.string.conversion_succeeded_check_srs),
                     Modifier
-                        .weight(1f)
-                        .testTag("geoShareResultCheckNameOnly"),
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(bottom = spacing.tiny)
+                        .testTag("geoShareResultCheckSRS"),
+                )
+            } else if (lastPoint.source == Source.JAVASCRIPT) {
+                ResultCoordinatesCheck(
+                    stringResource(R.string.conversion_succeeded_check_experimental),
+                    Modifier
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(bottom = spacing.tiny)
+                        .testTag("geoShareResultCheckExperimental"),
+                )
+            } else if (lastPoint.source == Source.MAP_CENTER) {
+                ResultCoordinatesCheck(
+                    stringResource(R.string.conversion_succeeded_check_map_center),
+                    Modifier
+                        .padding(horizontal = spacing.windowPadding)
+                        .padding(bottom = spacing.tiny)
+                        .testTag("geoShareResultCheckMapCenter"),
                 )
             }
-            IconButton(
-                { onSelect(points.size - 1) },
-                Modifier.testTag("geoShareResultLastPointMenu")
-            ) {
-                Icon(
-                    painterResource(R.drawable.content_copy_24px),
-                    contentDescription = stringResource(R.string.nav_menu_content_description),
-                )
-            }
-        }
-        if (!lastPoint.isAccurate()) {
-            ResultCoordinatesCheck(
-                stringResource(R.string.conversion_succeeded_check_srs),
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(bottom = spacing.extraTiny)
-                    .testTag("geoShareResultCheckSRS"),
-            )
-        } else if (lastPoint.source == Source.JAVASCRIPT) {
-            ResultCoordinatesCheck(
-                stringResource(R.string.conversion_succeeded_check_experimental),
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(bottom = spacing.extraTiny)
-                    .testTag("geoShareResultCheckExperimental"),
-            )
-        } else if (lastPoint.source == Source.MAP_CENTER) {
-            ResultCoordinatesCheck(
-                stringResource(R.string.conversion_succeeded_check_map_center),
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(bottom = spacing.extraTiny)
-                    .testTag("geoShareResultCheckMapCenter"),
-            )
-        }
-        if (outputsForPointChips.isNotEmpty()) {
             ScrollableChips(
                 contentPadding = PaddingValues(
                     start = spacing.windowPadding,
                     end = spacing.windowPadding,
-                    bottom = spacing.extraTiny,
+                    bottom = spacing.tiny,
                 ),
             ) {
                 outputsForPointChips.forEach { outputDetail ->
-                    StyledChip(
-                        label = outputDetail.label(),
-                        modifier = Modifier.testTag("geoShareResultChip_${outputDetail.output.id}"),
-                        icon = outputDetail.icon?.let {
-                            { IconFromDescriptor(it, contentDescription = null) }
-                        },
-                    ) {
-                        onExecute(outputDetail.output.toAction(lastPoint))
+                    key(outputDetail.output.id) {
+                        StyledChip(
+                            label = outputDetail.label(),
+                            modifier = Modifier.testTag("geoShareResultChip_${outputDetail.output.id}"),
+                            icon = outputDetail.icon?.let {
+                                { IconFromDescriptor(it, contentDescription = null) }
+                            },
+                        ) {
+                            onExecute(outputDetail.output.toAction(lastPoint))
+                        }
                     }
                 }
             }
-        }
-        message?.invoke(
-            PaddingValues(
-                start = spacing.windowPadding,
-                end = spacing.windowPadding,
-                bottom = spacing.tiny + spacing.extraTiny,
-            )
-        )
-        points.takeIf { points.size > 1 }?.let { points ->
-            Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
-                Column(Modifier.padding(top = spacing.small)) {
-                    ExpandablePane(
-                        expanded = expanded,
-                        onSetExpanded = { expanded = it },
-                        title = {
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(R.string.conversion_succeeded_point_all, points.size),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.testTag("geoShareResultPointsHeadline"),
-                                )
-                                if (points.any { !it.hasCoordinates() }) {
-                                    ResultCoordinatesCheck(
-                                        buildAnnotatedString {
-                                            append(stringResource(R.string.conversion_succeeded_check_name_only_points))
-                                            append(" ")
-                                            ClickableLink(stringResource(R.string.faq_title)) {
-                                                onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
-                                            }
-                                        },
-                                        Modifier
-                                            .padding(top = spacing.tiny)
-                                            .testTag("geoShareResultCheckNameOnlyPoints"),
+            points.takeIf { points.size > 1 }?.let { points ->
+                Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+                    Column(Modifier.padding(top = spacing.small)) {
+                        ExpandablePane(
+                            expanded = expanded,
+                            onSetExpanded = { expanded = it },
+                            title = {
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        stringResource(R.string.conversion_succeeded_point_all, points.size),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.testTag("geoShareResultPointsHeadline"),
                                     )
+                                    if (points.any { !it.hasCoordinates() }) {
+                                        ResultCoordinatesCheck(
+                                            buildAnnotatedString {
+                                                append(stringResource(R.string.conversion_succeeded_check_name_only_points))
+                                                append(" ")
+                                                ClickableLink(stringResource(R.string.faq_title)) {
+                                                    onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                                                }
+                                            },
+                                            Modifier
+                                                .padding(top = spacing.tiny)
+                                                .testTag("geoShareResultCheckNameOnlyPoints"),
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(horizontal = spacing.windowPadding)
-                            .testTag("geoShareResultPoints"),
-                    ) {
-                        Column(Modifier.padding(top = spacing.tiny)) {
-                            points.forEachIndexed { index, point ->
-                                ResultPoint(
-                                    point = point,
-                                    index = index,
-                                    coordinateFormat = userPreferencesValues.coordinateFormat,
-                                    coordinateConverter = coordinateConverter,
-                                    onSelect = { onSelect(index) },
-                                )
-                                if (index < points.size - 1) {
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = spacing.windowPadding)
+                                .testTag("geoShareResultPoints"),
+                        ) {
+                            Column(Modifier.padding(top = spacing.tiny)) {
+                                points.forEachIndexed { index, point ->
+                                    ResultPoint(
+                                        point = point,
+                                        index = index,
+                                        coordinateFormat = userPreferencesValues.coordinateFormat,
+                                        coordinateConverter = coordinateConverter,
+                                        onSelect = { onSelect(index) },
+                                    )
                                     HorizontalDivider()
                                 }
                             }
                         }
-                    }
-                    if (outputsForPointsChips.isNotEmpty()) {
                         ScrollableChips(Modifier.testTag("geoShareResultPointsChips")) {
                             outputsForPointsChips.forEach { outputDetail ->
-                                StyledChip(
-                                    label = outputDetail.label(),
-                                    icon = outputDetail.icon?.let {
-                                        { IconFromDescriptor(it, contentDescription = null) }
-                                    },
-                                ) {
-                                    onExecute(outputDetail.output.toAction(points))
+                                key(outputDetail.output.id) {
+                                    StyledChip(
+                                        label = outputDetail.label(),
+                                        icon = outputDetail.icon?.let {
+                                            { IconFromDescriptor(it, contentDescription = null) }
+                                        },
+                                    ) {
+                                        onExecute(outputDetail.output.toAction(points))
+                                    }
                                 }
                             }
                         }
@@ -308,31 +302,29 @@ private fun ResultCoordinatesCheck(text: AnnotatedString, modifier: Modifier = M
 @Composable
 private fun DefaultPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(WGS84Point(NaivePoint.example)),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -340,31 +332,29 @@ private fun DefaultPreview() {
 @Composable
 private fun DarkPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(WGS84Point(NaivePoint.example)),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -372,46 +362,29 @@ private fun DarkPreview() {
 @Composable
 private fun DescriptionPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            ) { paddingValues ->
-                if (helpLifecycleMessage != null) {
-                    helpLifecycleMessage(Modifier.padding(paddingValues))
-                } else {
-                    HelpShareSourceMessage(
-                        dismissedHelpMessages = MutableStateFlow(emptySet()),
-                        outputsForAppsByCategory = MutableStateFlow(
-                            OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-                        ),
-                        sourceComesFromIntent = MutableStateFlow(false),
-                        modifier = Modifier.padding(paddingValues),
-                        onDismissHelpMessage = {},
-                        onExecute = {},
-                    )
-                }
-            }
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -419,46 +392,29 @@ private fun DescriptionPreview() {
 @Composable
 private fun DarkDescriptionPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            ) { paddingValues ->
-                if (helpLifecycleMessage != null) {
-                    helpLifecycleMessage(Modifier.padding(paddingValues))
-                } else {
-                    HelpShareSourceMessage(
-                        dismissedHelpMessages = MutableStateFlow(emptySet()),
-                        outputsForAppsByCategory = MutableStateFlow(
-                            OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-                        ),
-                        sourceComesFromIntent = MutableStateFlow(false),
-                        modifier = Modifier.padding(paddingValues),
-                        onDismissHelpMessage = {},
-                        onExecute = {},
-                    )
-                }
-            }
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -466,34 +422,32 @@ private fun DarkDescriptionPreview() {
 @Composable
 private fun NamePreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.example),
-                    GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
-                ),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(
+                WGS84Point(NaivePoint.example),
+                GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
+            ),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -501,34 +455,32 @@ private fun NamePreview() {
 @Composable
 private fun DarkNamePreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.example),
-                    GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
-                ),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(
+                WGS84Point(NaivePoint.example),
+                GCJ02Point(31.22850685422705, 121.47552456472106, z = 11.0, source = Source.MAP_CENTER),
+            ),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -536,40 +488,38 @@ private fun DarkNamePreview() {
 @Composable
 private fun PointsPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(name = "Central Park", source = Source.GENERATED),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                ),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                initialExpanded = true,
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(name = "Central Park", source = Source.GENERATED),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+            ),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            initialExpanded = true,
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -577,40 +527,38 @@ private fun PointsPreview() {
 @Composable
 private fun DarkPointsPreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(name = "Central Park", source = Source.GENERATED),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                ),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                initialExpanded = true,
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(name = "Central Park", source = Source.GENERATED),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+            ),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            initialExpanded = true,
+            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -618,40 +566,38 @@ private fun DarkPointsPreview() {
 @Composable
 private fun PointsWithNamePreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
-                ),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                initialExpanded = true,
-                userPreferencesValues = MutableStateFlow(
-                    defaultFakeUserPreferences.copy(
-                        coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                    )
-                ),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
+            ),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            initialExpanded = true,
+            userPreferencesValues = MutableStateFlow(
+                defaultFakeUserPreferences.copy(
+                    coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                )
+            ),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }
 
@@ -659,39 +605,37 @@ private fun PointsWithNamePreview() {
 @Composable
 private fun DarkPointsWithNamePreview() {
     AppTheme {
-        Surface(color = MaterialTheme.colorScheme.secondaryContainer) {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val appDetails = getFakeAppDetails(context)
-            ResultCoordinates(
-                points = persistentListOf(
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint()),
-                    WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
-                ),
-                coordinateConverter = coordinateConverter,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
-                ),
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
-                ),
-                initialExpanded = true,
-                userPreferencesValues = MutableStateFlow(
-                    defaultFakeUserPreferences.copy(
-                        coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
-                    )
-                ),
-                onExecute = {},
-                onNavigateToFaqScreen = {},
-                onSelect = {},
-            )
-        }
+        val context = LocalContext.current
+        val geometries = Geometries(context)
+        val coordinateConverter = CoordinateConverter(geometries)
+        val log = DefaultLog
+        val outputRepository = OutputRepository(
+            coordinateConverter = coordinateConverter,
+            log = log,
+        )
+        val appDetails = getFakeAppDetails(context)
+        ResultCoordinates(
+            points = persistentListOf(
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint()),
+                WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
+            ),
+            coordinateConverter = coordinateConverter,
+            outputsForPointChips = MutableStateFlow(
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+            ),
+            outputsForPointsChips = MutableStateFlow(
+                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+            ),
+            initialExpanded = true,
+            userPreferencesValues = MutableStateFlow(
+                defaultFakeUserPreferences.copy(
+                    coordinateFormat = CoordinateFormat.DEG_MIN_SEC,
+                )
+            ),
+            onExecute = {},
+            onNavigateToFaqScreen = {},
+            onSelect = {},
+        )
     }
 }

@@ -1,7 +1,9 @@
 package page.ooooo.geoshare.ui.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -17,7 +19,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 fun MainScaffold(
     actions: @Composable () -> Unit,
     topContent: LazyListScope.() -> Unit,
-    bottomContent: LazyListScope.() -> Unit,
+    bottomContent: (LazyListScope.() -> Unit)?,
     mainExpandable: Boolean,
     mainTitle: (@Composable (maxLines: Int) -> Unit)? = null,
     supportingTitle: (@Composable (maxLines: Int) -> Unit)? = null,
@@ -48,20 +50,25 @@ fun MainScaffold(
             ) {
                 topContent()
                 if (!wide) {
-                    item(key = "supporting_title", contentType = "column") {
-                        val spacing = LocalSpacing.current
-                        Column(
-                            Modifier
-                                .padding(horizontal = spacing.windowPadding)
-                                .padding(top = spacing.small)
-                        ) {
-                            if (supportingTitle != null) {
+                    if (supportingTitle != null) {
+                        item(key = "supporting_title", contentType = "column") {
+                            val spacing = LocalSpacing.current
+                            Column(
+                                Modifier
+                                    .padding(horizontal = spacing.windowPadding)
+                                    .padding(top = spacing.small)
+                            ) {
                                 supportingTitle(Int.MAX_VALUE)
                             }
-                            // If there is no title, leave the empty column to create a space
+                        }
+                    } else if (bottomContent != null) {
+                        item(key = "bottom_content_spacer", contentType = "spacer") {
+                            Spacer(Modifier.height(spacing.small))
                         }
                     }
-                    bottomContent()
+                    if (bottomContent != null) {
+                        bottomContent()
+                    }
                 }
             }
         },
@@ -84,7 +91,9 @@ fun MainScaffold(
                             }
                         }
                     }
-                    bottomContent()
+                    if (bottomContent != null) {
+                        bottomContent()
+                    }
                 }
             }
         },

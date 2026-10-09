@@ -37,7 +37,7 @@ import kotlin.time.TestTimeSource
 
 @Composable
 fun MainSourceBar(
-    currentState: ConversionState,
+    conversionState: ConversionState,
     logExpanded: Boolean,
     source: StateFlow<String>,
     start: StateFlow<ComparableTimeMark?>,
@@ -47,7 +47,7 @@ fun MainSourceBar(
 ) {
     Row {
         MainSourceButton(
-            currentState = currentState,
+            conversionState = conversionState,
             source = source,
             modifier = Modifier.weight(1f),
             onSelectUri = onSelectUri,
@@ -63,7 +63,7 @@ fun MainSourceBar(
 
 @Composable
 private fun MainSourceButton(
-    currentState: ConversionState,
+    conversionState: ConversionState,
     source: StateFlow<String>,
     modifier: Modifier = Modifier,
     onSelectUri: (uriString: String) -> Unit,
@@ -71,10 +71,10 @@ private fun MainSourceButton(
     val spacing = LocalSpacing.current
 
     val source by source.collectAsStateWithLifecycle()
-    val match = remember(currentState) {
-        when (currentState) {
-            is ConversionState.HasMatchedInput -> currentState.matchedInput.match
-            is ConversionState.HasSource -> currentState.source
+    val match = remember(conversionState) {
+        when (conversionState) {
+            is ConversionState.HasMatchedInput -> conversionState.matchedInput.match
+            is ConversionState.HasSource -> conversionState.source
             else -> ""
         }
             .replace('\n', ' ')
@@ -163,7 +163,7 @@ private fun DefaultPreview() {
             val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = PermissionGrantedBasicInput(
+                conversionState = PermissionGrantedBasicInput(
                     source = source,
                     matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                     permission = Permission.ALWAYS,
@@ -188,7 +188,7 @@ private fun DarkPreview() {
             val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = PermissionGrantedBasicInput(
+                conversionState = PermissionGrantedBasicInput(
                     source = source,
                     matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                     permission = Permission.ALWAYS,
@@ -213,7 +213,7 @@ private fun ShortTimePreview() {
             val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = ConversionSucceeded(
+                conversionState = ConversionSucceeded(
                     source = source,
                     points = persistentListOf(),
                 ),
@@ -236,7 +236,7 @@ private fun DarkShortTimePreview() {
             val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = ConversionSucceeded(
+                conversionState = ConversionSucceeded(
                     source = source,
                     points = persistentListOf(),
                 ),
@@ -259,7 +259,7 @@ private fun ExpandedShortTimePreview() {
             val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = PermissionGrantedBasicInput(
+                conversionState = PermissionGrantedBasicInput(
                     source = source,
                     matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                     permission = Permission.ALWAYS,
@@ -284,7 +284,7 @@ private fun DarkExpandedShortTimePreview() {
             val source = "https://www.openstreetmap.org/#map=16/27.092414/30.377172"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = PermissionGrantedBasicInput(
+                conversionState = PermissionGrantedBasicInput(
                     source = source,
                     matchedInput = MatchedInput(FakeInputRepository.googleMapsAddressApiInput, source),
                     permission = Permission.ALWAYS,
@@ -309,7 +309,7 @@ private fun TextAndEmptyLogPreview() {
             val source = "41°24′12.2″N 2°10′26.5″E"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = PermissionGrantedBasicInput(
+                conversionState = PermissionGrantedBasicInput(
                     source = source,
                     matchedInput = MatchedInput(FakeInputRepository.coordinateInput, source),
                     permission = Permission.ALWAYS,
@@ -334,7 +334,7 @@ private fun DarkSubmittedTextAndEmptyLogPreview() {
             val source = "41°24′12.2″N 2°10′26.5″E"
             val timeSource = TestTimeSource()
             MainSourceBar(
-                currentState = PermissionGrantedBasicInput(
+                conversionState = PermissionGrantedBasicInput(
                     source = source,
                     matchedInput = MatchedInput(FakeInputRepository.coordinateInput, source),
                     permission = Permission.ALWAYS,
