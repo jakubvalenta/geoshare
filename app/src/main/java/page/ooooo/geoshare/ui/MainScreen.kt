@@ -11,7 +11,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -31,10 +30,8 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -51,7 +48,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,7 +83,6 @@ import page.ooooo.geoshare.lib.geo.Geometries
 import page.ooooo.geoshare.lib.geo.NaivePoint
 import page.ooooo.geoshare.lib.geo.WGS84Point
 import page.ooooo.geoshare.lib.inputs.MatchedInput
-import page.ooooo.geoshare.lib.inputs.WebViewInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.lib.outputs.Action
 import page.ooooo.geoshare.lib.outputs.ActionContext
@@ -133,12 +128,10 @@ import page.ooooo.geoshare.ui.components.ResultCoordinates
 import page.ooooo.geoshare.ui.components.ResultError
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
-import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import kotlin.math.floor
 import kotlin.time.ComparableTimeMark
 import kotlin.time.TestTimeSource
 
@@ -441,97 +434,129 @@ private fun MainScreen(
                 )
             },
             topContent = {
-                if (conversionState is ConversionState.Initial) {
-                    item(key = "main_text_field", contentType = "main_text_field") {
-                        MainTextField(
-                            errorMessageResId = errorMessageResId,
-                            source = source,
-                            onSetErrorMessageResId = { errorMessageResId = it },
-                            onSetSource = onSetSource,
-                            onSubmit = onSubmit,
-                        )
-                    }
-                    item(key = "main_submit", contentType = "main_submit") {
-                        MainSubmit(
-                            source = source,
-                            onSetErrorMessageResId = { errorMessageResId = it },
-                            onSubmit = onSubmit,
-                        )
-                    }
-                } else {
-                    item(key = "result", contentType = "column") {
-                        Column {
-                            ConversionStateLogList(
-                                expanded = logExpanded,
-                                stateLog = stateLog,
-                                onUriClick = onSelectUri,
+                when (conversionState) {
+                    is ConversionState.Initial -> {
+                        item(key = "main_text_field", contentType = "main_text_field") {
+                            MainTextField(
+                                errorMessageResId = errorMessageResId,
+                                source = source,
+                                onSetErrorMessageResId = { errorMessageResId = it },
+                                onSetSource = onSetSource,
+                                onSubmit = onSubmit,
                             )
-                            when (conversionState) {
-                                is ConversionState.HasError ->
-                                    ResultError(
-                                        conversionState = conversionState,
-                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                        onRetry = onRetry,
-                                    )
-
-                                is ConversionState.HasResult ->
-                                    ResultCoordinates(
-                                        points = conversionState.points,
-                                        coordinateConverter = coordinateConverter,
-                                        outputsForPointChips = outputsForPointChips,
-                                        outputsForPointsChips = outputsForPointsChips,
-                                        userPreferencesValues = userPreferencesValues,
-                                        onExecute = onExecute,
-                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                        onSelect = { index ->
-                                            onCancelAction()
-                                            selectedPointIndex = index
-                                        },
-                                    )
-
-                                is ConversionState.HasDescription ->
-                                    conversionState.getLoadingIndicatorTitle(resources)?.let { title ->
-                                        MainLoadingIndicator(
-                                            conversionState = conversionState,
-                                            title = title,
-                                            onCancel = onCancelConversion,
-                                        )
+                        }
+                        item(key = "main_submit", contentType = "main_submit") {
+                            MainSubmit(
+                                source = source,
+                                onSetErrorMessageResId = { errorMessageResId = it },
+                                onSubmit = onSubmit,
+                            )
+                        }
+                    }
+                    else -> {
+                        item(key = "result", contentType = "column") {
+                            Column(
+                                Modifier.run {
+                                    if (conversionState is PermissionGrantedWebViewInput) {
+                                        Modifier.fillParentMaxSize()
+                                    } else {
+                                        this
                                     }
-                            }
-                            if (helpLifecycleMessage != null) {
-                                helpLifecycleMessage(
-                                    Modifier
-                                        .padding(horizontal = spacing.windowPadding)
-                                        .padding(top = spacing.small)
+                                }
+                            ) {
+                                ConversionStateLogList(
+                                    expanded = logExpanded,
+                                    stateLog = stateLog,
+                                    onUriClick = onSelectUri,
                                 )
-                            } else {
-                                HelpShareSourceMessage(
-                                    dismissedHelpMessages = dismissedHelpMessages,
-                                    outputsForAppsByCategory = outputsForAppsByCategory,
-                                    sourceComesFromIntent = sourceComesFromIntent,
-                                    modifier = Modifier
-                                        .padding(horizontal = spacing.windowPadding)
-                                        .padding(top = spacing.small),
-                                    onDismissHelpMessage = onDismissHelpMessage,
-                                    onExecute = onExecute,
-                                )
+                                when (conversionState) {
+                                    is ConversionState.HasError ->
+                                        ResultError(
+                                            conversionState = conversionState,
+                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                            onRetry = onRetry,
+                                        )
+
+                                    is ConversionState.HasResult -> {
+                                        ResultCoordinates(
+                                            points = conversionState.points,
+                                            coordinateConverter = coordinateConverter,
+                                            outputsForPointChips = outputsForPointChips,
+                                            outputsForPointsChips = outputsForPointsChips,
+                                            userPreferencesValues = userPreferencesValues,
+                                            onExecute = onExecute,
+                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                            onSelect = { index ->
+                                                onCancelAction()
+                                                selectedPointIndex = index
+                                            },
+                                        )
+                                        if (helpLifecycleMessage != null) {
+                                            helpLifecycleMessage(
+                                                Modifier
+                                                    .padding(horizontal = spacing.windowPadding)
+                                                    .padding(top = spacing.small)
+                                            )
+                                        } else {
+                                            HelpShareSourceMessage(
+                                                dismissedHelpMessages = dismissedHelpMessages,
+                                                outputsForAppsByCategory = outputsForAppsByCategory,
+                                                sourceComesFromIntent = sourceComesFromIntent,
+                                                modifier = Modifier
+                                                    .padding(horizontal = spacing.windowPadding)
+                                                    .padding(top = spacing.small),
+                                                onDismissHelpMessage = onDismissHelpMessage,
+                                                onExecute = onExecute,
+                                            )
+                                        }
+                                    }
+
+                                    is ConversionState.HasDescription ->
+                                        conversionState.getLoadingIndicatorTitle(resources)?.let { title ->
+                                            MainLoadingIndicator(
+                                                conversionState = conversionState,
+                                                title = title,
+                                                onCancel = onCancelConversion,
+                                            )
+                                        }
+                                }
+
+                                if (conversionState is PermissionGrantedWebViewInput) {
+                                    Box(
+                                        Modifier
+                                            // Clip to bounds, so that the WebView inside this box never overflows the
+                                            // top edge of the box. The overflowing can happen due to how
+                                            // Modifier.requiredSize, which we use in ConversionWebView, works.
+                                            .clipToBounds()
+                                    ) {
+                                        ConversionWebView(
+                                            unsafeUrl = conversionState.matchedInput.match,
+                                            unsafeExtractionJavascript = conversionState.matchedInput.input.getUnsafeExtractionJavaScript(),
+                                            pendingExtractionResult = conversionState.pendingData,
+                                            extendWebSettings = { conversionState.matchedInput.input.extendWebSettings(it) },
+                                            shouldInterceptRequest = {
+                                                conversionState.matchedInput.input.shouldInterceptRequest(
+                                                    it
+                                                )
+                                            },
+                                        )
+                                        if (!BuildConfig.DEBUG) {
+                                            Box(
+                                                Modifier
+                                                    .fillMaxSize()
+                                                    .background(MaterialTheme.colorScheme.surface)
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
-                if (conversionState is PermissionGrantedWebViewInput) {
-                    item(key = "main_web_view", contentType = "main_web_view") {
-                        MainWebView(
-                            matchedInput = conversionState.matchedInput,
-                            pendingData = conversionState.pendingData,
-                        )
-                    }
-                }
             },
-            bottomContent = {
-                when (conversionState) {
-                    is ConversionState.Initial ->
+            bottomContent = when (conversionState) {
+                is ConversionState.Initial -> {
+                    {
                         item(key = "main_help", contentType = "main_help") {
                             MainHelp(
                                 inputRepository = inputRepository,
@@ -551,8 +576,11 @@ private fun MainScreen(
                                 }
                             }
                         }
+                    }
+                }
 
-                    is ConversionState.HasResult ->
+                is ConversionState.HasResult -> {
+                    {
                         item(key = "result_apps", contentType = "result_apps") {
                             ResultApps(
                                 outputsForAppsByCategory = outputsForAppsByCategory,
@@ -575,7 +603,10 @@ private fun MainScreen(
                                 )
                             }
                         }
+                    }
                 }
+
+                else -> null
             },
             mainExpandable = conversionState is ConversionState.Initial,
             mainTitle = {
@@ -695,44 +726,6 @@ private fun MainScreen(
                     )
                 }
             }
-    }
-}
-
-@Composable
-private fun MainWebView(
-    matchedInput: MatchedInput<WebViewInput>,
-    pendingData: CompletableDeferred<String>,
-) {
-    BoxWithConstraints(
-        Modifier
-            .fillMaxSize()
-            // Clip to bounds, so that the WebView inside this box never overflows the top edge of the box, which
-            // can happen due to how Modifier.requiredSize, which we use in ConversionWebView, works
-            .clipToBounds()
-    ) {
-        val density = LocalDensity.current
-        val wholeSquaresCount = floor(maxWidth.value / 30)
-        val squarePx = with(density) { (maxWidth / wholeSquaresCount).toPx() }
-        Box(
-            Modifier
-                .fillMaxSize()
-                .graphicsLayer { alpha = 0.1f }
-                .checkeredBackground(squarePx)
-        )
-        ConversionWebView(
-            unsafeUrl = matchedInput.match,
-            unsafeExtractionJavascript = matchedInput.input.getUnsafeExtractionJavaScript(),
-            pendingExtractionResult = pendingData,
-            extendWebSettings = { matchedInput.input.extendWebSettings(it) },
-            shouldInterceptRequest = { matchedInput.input.shouldInterceptRequest(it) },
-        )
-        if (!BuildConfig.DEBUG) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-            )
-        }
     }
 }
 
