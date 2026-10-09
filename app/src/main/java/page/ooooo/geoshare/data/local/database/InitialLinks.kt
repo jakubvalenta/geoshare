@@ -894,7 +894,7 @@ object InitialLinks : InitialData {
                 db.execSQL(
                     "UPDATE link SET coordsUriTemplate = ?, nameUriTemplate = ? WHERE uuid = ? AND coordsUriTemplate = ? AND nameUriTemplate = ?",
                     arrayOf<Any>(
-                        "https://maps.google.com/?q={lat}%2C{lon}", // TODO Check if shows marker
+                        "https://maps.google.com/?q={lat}%2C{lon}",
                         "https://maps.google.com/?q={q}",
                         Uuid.parse(GOOGLE_MAPS_DISPLAY_UUID).toByteArray(),
                         "https://www.google.com/maps/search/?api=1&query={lat}%2C{lon}",
