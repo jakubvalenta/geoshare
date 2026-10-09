@@ -31,6 +31,9 @@ sealed interface CopyPointTextOutput :
 
     fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
 
+    override fun isEnabled(value: Point, uriQuote: UriQuote) =
+        !getText(value, uriQuote).isNullOrEmpty()
+
     override suspend fun execute(value: Point, actionContext: ActionContext) =
         getText(value, actionContext.uriQuote)
             ?.let { text ->

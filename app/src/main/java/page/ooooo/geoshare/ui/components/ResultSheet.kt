@@ -89,20 +89,19 @@ fun ResultSheet(
                         null
                     },
                 ) {
-                    outputsForPoint
-                        .filter { it.output.isAvailable(selectedPoint) }
-                        .zipWithNextFirstNull { prevOutputDetail, outputDetail ->
-                            SheetListItem(
-                                headlineText = outputDetail.label(),
-                                onClick = {
-                                    hide()
-                                    onExecute(outputDetail.output.toAction(selectedPoint))
-                                },
-                                supportingText = outputDetail.output.getDescription(selectedPoint),
-                                icon = outputDetail.icon,
-                                prevIcon = prevOutputDetail?.icon,
-                            )
-                        }
+                    outputsForPoint.zipWithNextFirstNull { prevOutputDetail, outputDetail ->
+                        SheetListItem(
+                            headlineText = outputDetail.label(),
+                            enabled = outputDetail.output.isEnabled(selectedPoint),
+                            onClick = {
+                                hide()
+                                onExecute(outputDetail.output.toAction(selectedPoint))
+                            },
+                            supportingText = outputDetail.output.getDescription(selectedPoint),
+                            icon = outputDetail.icon,
+                            prevIcon = prevOutputDetail?.icon,
+                        )
+                    }
                 }
             }
             item(key = "points_section", contentType = "sheet_section") {
@@ -114,20 +113,19 @@ fun ResultSheet(
                     },
                     first = false,
                 ) {
-                    outputsForPoints
-                        .filter { it.output.isAvailable(points) }
-                        .zipWithNextFirstNull { prevOutputDetail, outputDetail ->
-                            SheetListItem(
-                                headlineText = outputDetail.label(),
-                                onClick = {
-                                    hide()
-                                    onExecute(outputDetail.output.toAction(points))
-                                },
-                                supportingText = outputDetail.output.getDescription(points),
-                                icon = outputDetail.icon,
-                                prevIcon = prevOutputDetail?.icon,
-                            )
-                        }
+                    outputsForPoints.zipWithNextFirstNull { prevOutputDetail, outputDetail ->
+                        SheetListItem(
+                            headlineText = outputDetail.label(),
+                            enabled = outputDetail.output.isEnabled(points),
+                            onClick = {
+                                hide()
+                                onExecute(outputDetail.output.toAction(points))
+                            },
+                            supportingText = outputDetail.output.getDescription(points),
+                            icon = outputDetail.icon,
+                            prevIcon = prevOutputDetail?.icon,
+                        )
+                    }
                 }
             }
         }

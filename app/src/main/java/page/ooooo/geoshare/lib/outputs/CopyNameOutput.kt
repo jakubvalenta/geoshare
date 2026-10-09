@@ -18,9 +18,6 @@ object CopyNameOutput : CopyPointTextOutput {
     override fun getText(value: Point, uriQuote: UriQuote) =
         value.cleanName
 
-    override fun isAvailable(value: Point) =
-        value.hasName()
-
     @Composable
     override fun label(appDetail: AppDetail?) =
         stringResource(R.string.conversion_succeeded_copy_name)

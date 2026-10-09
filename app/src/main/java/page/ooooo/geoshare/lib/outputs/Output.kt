@@ -73,7 +73,7 @@ sealed interface PointOutput : Output {
     /**
      * Returns true if the output can be executed for the given [value] and should be visible in the UI.
      */
-    fun isAvailable(value: Point): Boolean = true
+    fun isEnabled(value: Point, uriQuote: UriQuote = DefaultUriQuote): Boolean = true
 
     /**
      * Output that takes a single [Point].
@@ -127,7 +127,7 @@ sealed interface PointsOutput : Output {
      * Returns true if the output can be executed for the given [value] and should be visible in the UI.
      */
     @Suppress("SameReturnValue")
-    fun isAvailable(value: Points): Boolean = true
+    fun isEnabled(value: Points): Boolean = true
 
     /**
      * Output that takes a [Point] list.
@@ -176,6 +176,9 @@ sealed interface StringOutput : Output {
 
     suspend fun execute(value: String, actionContext: ActionContext): ActionResult
 
+    @Suppress("SameReturnValue")
+    fun isEnabled(value: String, uriQuote: UriQuote = DefaultUriQuote): Boolean = true
+
     fun toAction(value: String) = BasicAction.WithString(value, this)
 }
 
@@ -184,4 +187,11 @@ fun Output.toAction(point: Point, points: Points, source: String): Action<*> =
         is PointOutput -> toAction(point)
         is PointsOutput -> toAction(points)
         is StringOutput -> toAction(source)
+    }
+
+fun Output.isEnabled(point: Point, points: Points, source: String): Boolean =
+    when (this) {
+        is PointOutput -> isEnabled(point)
+        is PointsOutput -> isEnabled(points)
+        is StringOutput -> isEnabled(source)
     }

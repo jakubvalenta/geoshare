@@ -36,7 +36,7 @@ class SendPointOutput @Inject constructor(
         UriFormatter.formatUriString(
             point = coordinateConverter.toSrs(value, Srs.GCJ02_MAINLAND_CHINA),
             // Use https://maps.google.com/?q= instead of https://www.google.com/maps/search/?api=1&q=, because
-            // Telegram doesn't support the API link
+            // Telegram doesn't show a map preview when using the API link.
             coordsUriTemplate = "https://maps.google.com/?q={lat}%2C{lon}",
             nameUriTemplate = "https://maps.google.com/?q={q}",
             uriQuote = uriQuote,

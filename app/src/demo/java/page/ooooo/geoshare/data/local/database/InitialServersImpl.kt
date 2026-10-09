@@ -2,7 +2,6 @@ package page.ooooo.geoshare.data.local.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 object InitialServersImpl : InitialServers {
@@ -98,6 +97,11 @@ object InitialServersImpl : InitialServers {
                         Uuid.parse("c5c215a1-c453-4de9-adb3-daecbd7dc876").toByteArray(),
                     )
                 )
+            }
+        },
+        object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Do nothing
             }
         },
     )
