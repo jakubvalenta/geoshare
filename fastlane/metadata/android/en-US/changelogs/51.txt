@@ -1,13 +1,13 @@
 - Added Kagi Maps.
 - Added MapQuest.
 - Added Yahoo! Maps.
-- Added Cartes.app web map.
+- Added Cartes web map.
 - Improved Amap desktop links.
-- Improved Apple Maps waypoints.
+- Improved Apple Maps & Google Maps waypoints.
 - Improved Baidu Map search links.
-- Improved Google Maps waypoints of API links.
 - Improved Waze route links.
-- Improved result screen by moving source to top bar.
-- Improved preferences by putting server list on separate screen.
-- Fixed Yandex Maps POI links.
-- Fixed Open original link button cancelling processing.
+- Improved web maps Google Maps URL template and disabled search if not relevant.
+- Improved original link by moving it to top bar.
+- Improved preferences by putting server list to separate screen.
+- Fixed Yandex POI links.
+- Fixed original link button cancelling processing.
