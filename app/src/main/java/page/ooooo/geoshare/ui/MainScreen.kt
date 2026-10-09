@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -138,7 +136,6 @@ import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.checkeredBackground
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
-import page.ooooo.geoshare.ui.components.mainContainerColor
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.math.floor
@@ -432,7 +429,7 @@ private fun MainScreen(
         MainScaffold(
             actions = {
                 MainMenu(
-                    currentState = conversionState,
+                    conversionState = conversionState,
                     billingAppNameResId = billingAppNameResId,
                     billingStatus = billingStatus,
                     changelogShown = changelogShown,
@@ -469,56 +466,55 @@ private fun MainScreen(
                                 stateLog = stateLog,
                                 onUriClick = onSelectUri,
                             )
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = mainContainerColor(conversionState),
-                                ),
-                            ) {
-                                when (conversionState) {
-                                    is ConversionState.HasError ->
-                                        ResultError(
-                                            currentState = conversionState,
-                                            onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                            onRetry = onRetry,
+                            when (conversionState) {
+                                is ConversionState.HasError ->
+                                    ResultError(
+                                        conversionState = conversionState,
+                                        onNavigateToInputsScreen = onNavigateToInputsScreen,
+                                        onRetry = onRetry,
+                                    )
+
+                                is ConversionState.HasResult ->
+                                    ResultCoordinates(
+                                        points = conversionState.points,
+                                        coordinateConverter = coordinateConverter,
+                                        outputsForPointChips = outputsForPointChips,
+                                        outputsForPointsChips = outputsForPointsChips,
+                                        userPreferencesValues = userPreferencesValues,
+                                        onExecute = onExecute,
+                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                        onSelect = { index ->
+                                            onCancelAction()
+                                            selectedPointIndex = index
+                                        },
+                                    )
+
+                                is ConversionState.HasDescription ->
+                                    conversionState.getLoadingIndicatorTitle(resources)?.let { title ->
+                                        MainLoadingIndicator(
+                                            conversionState = conversionState,
+                                            title = title,
+                                            onCancel = onCancelConversion,
                                         )
-
-                                    is ConversionState.HasResult ->
-                                        ResultCoordinates(
-                                            points = conversionState.points,
-                                            coordinateConverter = coordinateConverter,
-                                            outputsForPointChips = outputsForPointChips,
-                                            outputsForPointsChips = outputsForPointsChips,
-                                            userPreferencesValues = userPreferencesValues,
-                                            onExecute = onExecute,
-                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                            onSelect = { index ->
-                                                onCancelAction()
-                                                selectedPointIndex = index
-                                            },
-                                        ) { paddingValues ->
-                                            if (helpLifecycleMessage != null) {
-                                                helpLifecycleMessage(Modifier.padding(paddingValues))
-                                            } else {
-                                                HelpShareSourceMessage(
-                                                    dismissedHelpMessages = dismissedHelpMessages,
-                                                    outputsForAppsByCategory = outputsForAppsByCategory,
-                                                    sourceComesFromIntent = sourceComesFromIntent,
-                                                    modifier = Modifier.padding(paddingValues),
-                                                    onDismissHelpMessage = onDismissHelpMessage,
-                                                    onExecute = onExecute,
-                                                )
-                                            }
-                                        }
-
-                                    is ConversionState.HasDescription ->
-                                        conversionState.getLoadingIndicatorTitle(resources)?.let { title ->
-                                            MainLoadingIndicator(
-                                                currentState = conversionState,
-                                                title = title,
-                                                onCancel = onCancelConversion,
-                                            )
-                                        }
-                                }
+                                    }
+                            }
+                            if (helpLifecycleMessage != null) {
+                                helpLifecycleMessage(
+                                    Modifier
+                                        .padding(horizontal = spacing.windowPadding)
+                                        .padding(top = spacing.small)
+                                )
+                            } else {
+                                HelpShareSourceMessage(
+                                    dismissedHelpMessages = dismissedHelpMessages,
+                                    outputsForAppsByCategory = outputsForAppsByCategory,
+                                    sourceComesFromIntent = sourceComesFromIntent,
+                                    modifier = Modifier
+                                        .padding(horizontal = spacing.windowPadding)
+                                        .padding(top = spacing.small),
+                                    onDismissHelpMessage = onDismissHelpMessage,
+                                    onExecute = onExecute,
+                                )
                             }
                         }
                     }
@@ -595,7 +591,7 @@ private fun MainScreen(
                     )
                 } else {
                     MainSourceBar(
-                        currentState = conversionState,
+                        conversionState = conversionState,
                         logExpanded = logExpanded,
                         source = source,
                         start = start,

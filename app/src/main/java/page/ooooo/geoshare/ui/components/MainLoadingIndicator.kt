@@ -8,10 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,17 +26,17 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.local.preferences.Permission
 import page.ooooo.geoshare.lib.Attempt
-import page.ooooo.geoshare.lib.state.ConversionState
-import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.lib.inputs.MatchedInput
 import page.ooooo.geoshare.lib.network.ConnectTimeoutNetworkException
+import page.ooooo.geoshare.lib.state.ConversionState
+import page.ooooo.geoshare.lib.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainLoadingIndicator(
-    currentState: ConversionState.HasDescription,
+    conversionState: ConversionState.HasDescription,
     title: String,
     initialExpanded: Boolean = false,
     onCancel: () -> Unit,
@@ -43,41 +44,43 @@ fun MainLoadingIndicator(
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = spacing.windowPadding)
-            .padding(top = spacing.small, bottom = spacing.small),
-        verticalArrangement = Arrangement.spacedBy(spacing.small),
-    ) {
-        Text(
-            title,
-            style = MaterialTheme.typography.headlineSmall,
-        )
-        LoadingIndicator(
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)) {
+        Column(
             Modifier
-                .size(96.dp)
-                .align(Alignment.CenterHorizontally),
-            color = MaterialTheme.colorScheme.tertiary,
-        )
-        Button(
-            onCancel,
-            Modifier
-                .align(Alignment.CenterHorizontally)
-                .testTag("geoShareMainLoadingIndicatorCancel"),
-            colors = ButtonDefaults.elevatedButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-            ),
+                .fillMaxWidth()
+                .padding(horizontal = spacing.windowPadding)
+                .padding(top = spacing.small, bottom = spacing.small),
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
-            Text(stringResource(R.string.conversion_loading_indicator_cancel))
-        }
-        currentState.getDetails(resources)?.let { details ->
-            ResultDetails(
-                details,
-                Modifier.testTag("geoShareMainLoadingIndicatorDescription"),
-                initialExpanded = initialExpanded,
+            Text(
+                title,
+                style = MaterialTheme.typography.headlineSmall,
             )
+            LoadingIndicator(
+                Modifier
+                    .size(96.dp)
+                    .align(Alignment.CenterHorizontally),
+                color = MaterialTheme.colorScheme.tertiary,
+            )
+            Button(
+                onCancel,
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .testTag("geoShareMainLoadingIndicatorCancel"),
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            ) {
+                Text(stringResource(R.string.conversion_loading_indicator_cancel))
+            }
+            conversionState.getDetails(resources)?.let { details ->
+                ResultDetails(
+                    details,
+                    Modifier.testTag("geoShareMainLoadingIndicatorDescription"),
+                    initialExpanded = initialExpanded,
+                )
+            }
         }
     }
 }
@@ -96,16 +99,14 @@ private fun DefaultPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(3, ConnectTimeoutNetworkException(Exception())),
         )
-        Surface(color = mainContainerColor(state)) {
-            MainLoadingIndicator(
-                currentState = state,
-                title = stringResource(
-                    R.string.conversion_connecting,
-                    state.matchedInput.input.group.getName(LocalResources.current),
-                ),
-                onCancel = {},
-            )
-        }
+        MainLoadingIndicator(
+            conversionState = state,
+            title = stringResource(
+                R.string.conversion_connecting,
+                state.matchedInput.input.group.getName(LocalResources.current),
+            ),
+            onCancel = {},
+        )
     }
 }
 
@@ -121,15 +122,13 @@ private fun DarkPreview() {
             results = emptyMap(),
             lastAttempt = Attempt(3, ConnectTimeoutNetworkException(Exception())),
         )
-        Surface(color = mainContainerColor(state)) {
-            MainLoadingIndicator(
-                currentState = state,
-                title = stringResource(
-                    R.string.conversion_connecting,
-                    state.matchedInput.input.group.getName(LocalResources.current),
-                ),
-                onCancel = {},
-            )
-        }
+        MainLoadingIndicator(
+            conversionState = state,
+            title = stringResource(
+                R.string.conversion_connecting,
+                state.matchedInput.input.group.getName(LocalResources.current),
+            ),
+            onCancel = {},
+        )
     }
 }

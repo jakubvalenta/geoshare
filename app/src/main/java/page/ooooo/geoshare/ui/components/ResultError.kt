@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,62 +28,72 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun ResultError(
-    currentState: ConversionState.HasError,
+    conversionState: ConversionState.HasError,
     initialExpanded: Boolean = false,
     onNavigateToInputsScreen: () -> Unit,
     onRetry: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
-    Column(Modifier.fillMaxWidth()) {
-        Text(
-            stringResource(R.string.conversion_error_title),
-            Modifier
-                .padding(horizontal = spacing.windowPadding)
-                .padding(top = spacing.small, bottom = spacing.small),
-            style = MaterialTheme.typography.headlineSmall,
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = if (conversionState.warning) {
+                MaterialTheme.colorScheme.surfaceContainerHighest
+            } else {
+                MaterialTheme.colorScheme.errorContainer
+            },
         )
-        SelectionContainer {
-            Column(
-                Modifier.padding(horizontal = spacing.windowPadding),
-                verticalArrangement = Arrangement.spacedBy(spacing.tiny),
-            ) {
-                Text(
-                    currentState.message,
-                    Modifier.testTag("geoShareConversionErrorMessage"),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                currentState.stackTrace?.let { details ->
-                    ResultDetails(
-                        details,
-                        initialExpanded = initialExpanded,
-                    )
-                }
-            }
-        }
-        ScrollableChips {
-            if (!currentState.warning) {
-                StyledChip(
-                    stringResource(R.string.conversion_error_retry),
-                    icon = {
-                        Icon(Icons.Default.Refresh, null)
-                    },
-                    onClick = onRetry,
-                )
-                val uriHandler = LocalUriHandler.current
-                StyledChip(
-                    stringResource(R.string.conversion_error_report),
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            Text(
+                stringResource(R.string.conversion_error_title),
+                Modifier
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.small, bottom = spacing.small),
+                style = MaterialTheme.typography.headlineSmall,
+            )
+            SelectionContainer {
+                Column(
+                    Modifier.padding(horizontal = spacing.windowPadding),
+                    verticalArrangement = Arrangement.spacedBy(spacing.tiny),
                 ) {
-                    uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+                    Text(
+                        conversionState.message,
+                        Modifier.testTag("geoShareConversionErrorMessage"),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    conversionState.stackTrace?.let { details ->
+                        ResultDetails(
+                            details,
+                            initialExpanded = initialExpanded,
+                        )
+                    }
                 }
             }
-            StyledChip(
-                stringResource(R.string.inputs_title),
-                icon = {
-                    Icon(painterResource(R.drawable.map_24px), null)
-                },
-            ) {
-                onNavigateToInputsScreen()
+            ScrollableChips {
+                if (!conversionState.warning) {
+                    StyledChip(
+                        stringResource(R.string.conversion_error_retry),
+                        icon = {
+                            Icon(Icons.Default.Refresh, null)
+                        },
+                        onClick = onRetry,
+                    )
+                    val uriHandler = LocalUriHandler.current
+                    StyledChip(
+                        stringResource(R.string.conversion_error_report),
+                    ) {
+                        uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+                    }
+                }
+                StyledChip(
+                    stringResource(R.string.inputs_title),
+                    icon = {
+                        Icon(painterResource(R.drawable.map_24px), null)
+                    },
+                ) {
+                    onNavigateToInputsScreen()
+                }
             }
         }
     }
@@ -100,13 +111,11 @@ private fun DefaultPreview() {
             stackTrace = NotImplementedError().stackTraceToString(),
             warning = false,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
 
@@ -120,13 +129,11 @@ private fun DarkPreview() {
             stackTrace = NotImplementedError().stackTraceToString(),
             warning = false,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
 
@@ -140,14 +147,12 @@ private fun ExpandedPreview() {
             stackTrace = NotImplementedError().stackTraceToString(),
             warning = false,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                initialExpanded = true,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            initialExpanded = true,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
 
@@ -161,14 +166,12 @@ private fun DarkExpandedPreview() {
             stackTrace = NotImplementedError().stackTraceToString(),
             warning = false,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                initialExpanded = true,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            initialExpanded = true,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
 
@@ -181,13 +184,11 @@ private fun NoDetailsPreview() {
             message = stringResource(R.string.conversion_failed_reason_no_points),
             warning = false,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
 
@@ -200,13 +201,11 @@ private fun DarkNoDetailsPreview() {
             message = stringResource(R.string.conversion_failed_reason_no_points),
             warning = false,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
 
@@ -219,13 +218,11 @@ private fun WarningPreview() {
             message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
             warning = true,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
 
@@ -238,12 +235,10 @@ private fun DarkWarningPreview() {
             message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
             warning = true,
         )
-        Surface(color = mainContainerColor(state)) {
-            ResultError(
-                currentState = state,
-                onNavigateToInputsScreen = {},
-                onRetry = {},
-            )
-        }
+        ResultError(
+            conversionState = state,
+            onNavigateToInputsScreen = {},
+            onRetry = {},
+        )
     }
 }
