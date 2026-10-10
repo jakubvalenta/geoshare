@@ -402,7 +402,7 @@ class MainBehaviorTest {
         shareUri()
 
         // Help message OPEN_BY_DEFAULT is visible
-        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object exception
         onMainScrollablePane().scrollToBottom()
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
 

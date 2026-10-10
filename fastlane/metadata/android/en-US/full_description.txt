@@ -10,7 +10,6 @@ Share a map link with GeoShare and the app will open it in another installed map
 - Cartes IGN
 - CoMaps
 - HERE WeGo
-- Yahoo! Maps
 - Kagi Maps
 - Magic Earth
 - MapQuest
@@ -22,6 +21,7 @@ Share a map link with GeoShare and the app will open it in another installed map
 - Plus Codes (global only)
 - Urbi
 - Waze
+- Yahoo! Maps
 - Yandex Maps
 - coordinates
 

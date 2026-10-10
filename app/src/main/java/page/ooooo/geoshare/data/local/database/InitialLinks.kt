@@ -881,7 +881,7 @@ object InitialLinks : InitialData {
         },
         object : Migration(13, 14) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Update Cartes.app search URL -- remove coordinate template
+                // Update Cartes.app search URL -- clear coordinate template
                 db.execSQL(
                     "UPDATE link SET coordsUriTemplate = ? WHERE uuid = ? AND coordsUriTemplate = ?",
                     arrayOf<Any>(

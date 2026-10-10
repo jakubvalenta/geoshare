@@ -10,7 +10,6 @@
 - Cartes IGN
 - CoMaps
 - HERE WeGo
-- Yahoo! Maps
 - Kagi Maps
 - Magic Earth
 - MapQuest
@@ -22,6 +21,7 @@
 - Plus Codes (лише глобально)
 - Urbi
 - Waze
+- Yahoo! Maps
 - Yandex Maps
 - координати
 
