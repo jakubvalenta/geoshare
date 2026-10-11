@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.data
 
 import page.ooooo.geoshare.BuildConfig
+import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.inputs.AmapShortLinkInput
 import page.ooooo.geoshare.data.inputs.AmapUriInput
 import page.ooooo.geoshare.data.inputs.AppleMapsUriInput
@@ -112,6 +113,17 @@ interface InputRepository {
                 this
             }
         }
+
+    fun genRandomUris(randomPoint: Point): List<String> =
+        listOf(
+            googleMapsShortLinkInput,
+            googleMapsUriInput,
+            appleMapsUriInput,
+            *all
+                .filterIsInstance<Input.HasRandomUri>()
+                .shuffled()
+                .toTypedArray(),
+        ).mapNotNull { it.genRandomUri(randomPoint) }
 }
 
 @Singleton
