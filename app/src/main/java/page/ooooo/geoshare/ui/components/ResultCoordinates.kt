@@ -32,8 +32,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,24 +47,25 @@ import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.getFakeAppDetails
-import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Points
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
+import page.ooooo.geoshare.data.formatters.CoordinateFormatter
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.GCJ02Point
+import page.ooooo.geoshare.data.geo.Geometries
+import page.ooooo.geoshare.data.geo.NaivePoint
+import page.ooooo.geoshare.data.geo.Points
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.outputs.Action
+import page.ooooo.geoshare.data.outputs.PointOutput
+import page.ooooo.geoshare.data.outputs.PointsOutput
+import page.ooooo.geoshare.data.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 import page.ooooo.geoshare.ui.toOutputDetail
 
 @Composable
@@ -134,8 +137,12 @@ fun ResultCoordinates(
                         buildAnnotatedString {
                             append(stringResource(R.string.conversion_succeeded_check_name_only))
                             append(" ")
-                            ClickableLink(stringResource(R.string.faq_title)) {
-                                onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                            withLink(
+                                LinkAnnotation.Clickable(tag = "link", styles = defaultLinkStyles()) {
+                                    onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                                }
+                            ) {
+                                append(stringResource(R.string.faq_title))
                             }
                         },
                         Modifier
@@ -217,8 +224,12 @@ fun ResultCoordinates(
                                             buildAnnotatedString {
                                                 append(stringResource(R.string.conversion_succeeded_check_name_only_points))
                                                 append(" ")
-                                                ClickableLink(stringResource(R.string.faq_title)) {
-                                                    onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                                                withLink(
+                                                    LinkAnnotation.Clickable(tag = "link", styles = defaultLinkStyles()) {
+                                                        onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
+                                                    }
+                                                ) {
+                                                    append(stringResource(R.string.faq_title))
                                                 }
                                             },
                                             Modifier

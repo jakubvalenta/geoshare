@@ -29,7 +29,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.CompletableDeferred
 import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.lib.network.WebViewNetworkException
+import page.ooooo.geoshare.data.network.WebViewNetworkException
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds

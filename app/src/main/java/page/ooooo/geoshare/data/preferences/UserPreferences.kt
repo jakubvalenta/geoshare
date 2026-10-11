@@ -1,0 +1,527 @@
+package page.ooooo.geoshare.data.preferences
+
+import android.os.Build
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
+import page.ooooo.geoshare.BuildConfig
+import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.log.Log
+import page.ooooo.geoshare.data.android.AppActivity
+import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.FileActivity
+import page.ooooo.geoshare.data.android.FileType
+import page.ooooo.geoshare.data.android.TextActivity
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.android.UriScheme
+import page.ooooo.geoshare.data.android.getPackageNames
+import page.ooooo.geoshare.data.android.sorted
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+
+interface UserPreference<T> {
+    fun getValue(values: UserPreferencesValues): T
+    fun getValue(preferences: Preferences, log: Log = DefaultLog): T
+    fun setValue(preferences: MutablePreferences, value: T, log: Log = DefaultLog)
+}
+
+interface TextPreference<T> : UserPreference<T> {
+    @Suppress("EmptyMethod")
+    val key: Preferences.Key<String>
+
+    @Suppress("EmptyMethod")
+    val default: T
+
+    fun serialize(value: T, log: Log = DefaultLog): String
+
+    fun deserialize(value: String?, log: Log = DefaultLog): T
+
+    fun isValid(value: String?): Boolean = true
+
+    override fun getValue(preferences: Preferences, log: Log): T =
+        deserialize(preferences[key], log)
+
+    override fun setValue(preferences: MutablePreferences, value: T, log: Log) =
+        preferences.set(key, serialize(value, log))
+}
+
+interface NullableIntPreference : TextPreference<Int?> {
+    override fun serialize(value: Int?, log: Log) =
+        value.toString()
+
+    override fun deserialize(value: String?, log: Log) =
+        value?.toIntOrNull() ?: default
+}
+
+interface DurationPreference : TextPreference<Duration> {
+    val minSec: Int
+    val maxSec: Int
+
+    override fun serialize(value: Duration, log: Log) =
+        value.toInt(DurationUnit.SECONDS).toString()
+
+    override fun deserialize(value: String?, log: Log) =
+        value?.toIntOrNull()?.coerceIn(minSec, maxSec)?.seconds ?: default
+
+    override fun isValid(value: String?) =
+        value?.toIntOrNull()?.let { it in minSec..maxSec } == true
+}
+
+interface OptionsPreference<T> : UserPreference<T> {
+    val default: T
+}
+
+object ConnectionPermissionPreference : OptionsPreference<Permission> {
+    val key = stringPreferencesKey("connect_to_google_permission")
+    override val default = Permission.ASK
+    val loading = default
+
+    override fun getValue(values: UserPreferencesValues) = values.connectionPermission
+
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
+        try {
+            Permission.valueOf(it)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    } ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Permission, log: Log) {
+        preferences[key] = value.name
+    }
+
+    fun getOptionGroups(): List<List<Permission>> = listOf(
+        listOf(
+            Permission.ALWAYS,
+            Permission.ASK,
+            Permission.NEVER,
+        ),
+    )
+}
+
+object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
+    val key = stringPreferencesKey("coordinate_format")
+    override val default = CoordinateFormat.DEC
+    val loading = default
+
+    override fun getValue(values: UserPreferencesValues) = values.coordinateFormat
+
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
+        try {
+            CoordinateFormat.valueOf(it)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    } ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: CoordinateFormat, log: Log) {
+        preferences[key] = value.name
+    }
+
+    fun getOptionGroups(): List<List<CoordinateFormat>> = listOf(
+        listOf(
+            CoordinateFormat.DEC,
+            CoordinateFormat.DEG_MIN_SEC,
+        ),
+    )
+}
+
+object AutomationPreference : OptionsPreference<Automation> {
+    val key = stringPreferencesKey("automation")
+    override val default = NoopAutomation
+    val loading = default
+
+    /**
+     * Instance of [Json] for serialization.
+     *
+     * It's configured in such a way that it allows deserializing an old string after new properties have been added to
+     * a class. So that we can update the [Automation] classes and users don't lose their preferences.
+     */
+    private val json = Json {
+        encodeDefaults = false
+        ignoreUnknownKeys = true
+    }
+
+    override fun getValue(values: UserPreferencesValues) = values.automation
+
+    override fun getValue(preferences: Preferences, log: Log) =
+        getValueOrNull(preferences, log)
+            ?: @Suppress("DEPRECATION") getOldValueOrNull(preferences, log)
+            // Silently ignore serialization errors, because they should never happen, because we test all automations
+            // in unit tests.
+            ?: default
+
+    /**
+     * Get [Automation] from [preferences] by deserializing a JSON stored in a single string key.
+     */
+    private fun getValueOrNull(preferences: Preferences, log: Log): Automation? {
+        val serializedString = preferences[key] ?: return NoopAutomation
+        return try {
+            json.decodeFromString<Automation>(serializedString)
+        } catch (tr: IllegalArgumentException) {
+            log.e(TAG, "Deserialization error", tr)
+            null
+        }
+    }
+
+    /**
+     * Get [Automation] from [preferences] by reading automation type and package name from two different string keys.
+     *
+     * This is an old way of storing automation in preferences, which we keep for backward compatibility. So that users
+     * of old app versions don't lose their automation preference after upgrading the app.
+     */
+    @Deprecated("Replaced with getValueOrNull")
+    private fun getOldValueOrNull(preferences: Preferences, log: Log): Automation? {
+        val type = preferences[key] ?: return NoopAutomation
+        val oldPackageNameKey = stringPreferencesKey("automation_package_name")
+        val packageName = preferences[oldPackageNameKey]
+        val serializedString = json.encodeToString(
+            @Suppress("DEPRECATION")
+            OldData(type = type, packageName = packageName)
+        )
+        return try {
+            json.decodeFromString<Automation>(serializedString)
+        } catch (tr: IllegalArgumentException) {
+            log.e(TAG, "Deserialization error", tr)
+            null
+        }
+    }
+
+    @Deprecated("Replaced with getValueOrNull")
+    @Serializable
+    private data class OldData(val type: String?, val packageName: String?)
+
+    override fun setValue(preferences: MutablePreferences, value: Automation, log: Log) {
+        val serializedString = try {
+            json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because they should never happen, because we test all automations
+            // in unit tests.
+            log.e(TAG, "Serialization error", tr)
+            return
+        }
+        preferences[key] = serializedString
+    }
+
+    fun getOptionGroups(
+        activities: List<AppActivity>,
+        appDetails: AppDetails,
+        hiddenApps: Set<String>?,
+        links: List<Link>,
+    ): List<List<Automation>> = listOfNotNull(
+        listOf(
+            NoopAutomation,
+        ),
+        listOf(
+            CopyCoordsDecAutomation,
+            CopyCoordsDegMinSecAutomation,
+            CopyNameAutomation,
+            CopyGeoUriAutomation,
+            ShareDisplayGeoUriAutomation,
+            ShareNavigationGoogleUriAutomation,
+            ShareStreetViewGoogleUriAutomation,
+            SavePointGpxAutomation,
+            SavePointToContactAutomation,
+        ),
+        listOf(
+            ShareRouteGpxAutomation,
+            SharePointsGpxAutomation,
+            SaveRouteGpxAutomation,
+            SavePointsGpxAutomation,
+        ),
+        activities
+            .groupBy { activity -> activity.packageName }
+            .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
+            .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
+            .flatMap { (_, activities) ->
+                activities
+                    .sorted()
+                    .flatMap { activity -> activity.toAutomations() }
+            }
+            .takeIf { it.isNotEmpty() },
+        links
+            .groupBy { it.groupOrName }
+            .toSortedMap()
+            .flatMap { (_, links) ->
+                listOf(
+                    *links.map { ShareLinkUriAutomation(it.uuid) }.toTypedArray(),
+                    *links.map { CopyLinkUriAutomation(it.uuid) }.toTypedArray(),
+                )
+            }
+            .takeIf { it.isNotEmpty() },
+    )
+
+    private fun AppActivity.toAutomations(): List<Automation> =
+        when (this) {
+            is FileActivity ->
+                when (fileType) {
+                    FileType.GPX -> listOf(
+                        OpenRouteGpxAutomation(packageName),
+                        OpenPointsGpxAutomation(packageName),
+                    )
+
+                    FileType.GPX_ONE_POINT -> listOf(
+                        OpenRouteOnePointGpxAutomation(packageName),
+                    )
+                }
+
+            is TextActivity -> listOf(
+                SendPointAutomation(packageName)
+            )
+
+            is UriActivity ->
+                when (uriScheme) {
+                    UriScheme.CARTES_IGN -> listOf(
+                        // Return empty list, because a Cartes IGN automation is not implemented, because we expect few
+                        // people would use it
+                    )
+
+                    UriScheme.GEO -> listOf(
+                        OpenDisplayGeoUriAutomation(packageName),
+                    )
+
+                    UriScheme.GOOGLE_NAVIGATION -> listOf(
+                        OpenNavigationGoogleUriAutomation(packageName),
+                    )
+
+                    UriScheme.GOOGLE_STREET_VIEW -> listOf(
+                        OpenStreetViewGoogleUriAutomation(packageName),
+                    )
+
+                    UriScheme.MAGIC_EARTH -> listOf(
+                        OpenDisplayMagicEarthUriAutomation(packageName),
+                        OpenNavigationMagicEarthUriAutomation(packageName),
+                    )
+
+                    UriScheme.UNKNOWN -> emptyList()
+                }
+        }
+
+    private const val TAG = "AutomationPreference"
+}
+
+object AutomationDelayPreference : DurationPreference {
+    override val key = stringPreferencesKey("automation_delay")
+    override val default = 5.seconds
+    val loading = default
+
+    override val minSec = 0
+    override val maxSec = 60
+
+    override fun getValue(values: UserPreferencesValues) = values.automationDelay
+}
+
+object CachedPurchasePreference : TextPreference<CachedPurchase?> {
+    override val key = stringPreferencesKey("cached_purchase")
+    override val default = null
+    val loading = default
+
+    override fun serialize(value: CachedPurchase?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<CachedPurchase?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.cachedPurchase
+
+    private const val TAG = "CachedPurchasePreference"
+}
+
+object CachedServerTokenPreference : TextPreference<CachedServerToken?> {
+    override val key = stringPreferencesKey("cached_server_token")
+    override val default = null
+    val loading = default
+
+    override fun serialize(value: CachedServerToken?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<CachedServerToken?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.cachedServerToken
+
+    private const val TAG = "CachedServerTokenPreference"
+}
+
+object DynamicColorPreference : OptionsPreference<Boolean> {
+    val key = stringPreferencesKey("dynamic_color")
+    override val default = false
+    val loading = default
+
+    override fun getValue(values: UserPreferencesValues) = values.dynamicColor
+
+    override fun getValue(preferences: Preferences, log: Log) =
+        preferences[key]?.toBooleanStrict() ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Boolean, log: Log) {
+        preferences[key] = value.toString()
+    }
+
+    fun getOptionGroups(): List<List<Boolean>> = listOf(
+        listOf(
+            true,
+            false,
+        ),
+    )
+
+    fun isAvailable(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+}
+
+object FinishPreference : OptionsPreference<Finish> {
+    val key = stringPreferencesKey("finish")
+    override val default = Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP
+    val loading = Finish.NEVER
+
+    override fun getValue(values: UserPreferencesValues) = values.finish
+
+    override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
+        try {
+            Finish.valueOf(it)
+        } catch (_: IllegalArgumentException) {
+            null
+        }
+    } ?: default
+
+    override fun setValue(preferences: MutablePreferences, value: Finish, log: Log) {
+        preferences[key] = value.name
+    }
+
+    fun getOptionGroups(): List<List<Finish>> = listOf(
+        listOf(
+            Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP,
+            Finish.AFTER_ACTION_SUCCEEDED,
+            Finish.NEVER,
+        ),
+    )
+}
+
+/**
+ * A set of strings stored as a JSON array.
+ */
+interface SetPreference : TextPreference<Set<String>?> {
+    override val key: Preferences.Key<String>
+    override val default: Set<String>?
+
+    override fun serialize(value: Set<String>?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<Set<String>?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    companion object {
+        private const val TAG = "SetPreference"
+    }
+}
+
+object DismissedHelpMessagesPreference : TextPreference<Set<HelpMessage>?> {
+    override val key = stringPreferencesKey("dismissed_help_messages")
+    override val default: Set<HelpMessage> = emptySet()
+    val loading = null
+
+    override fun serialize(value: Set<HelpMessage>?, log: Log) =
+        try {
+            Json.encodeToString(value)
+        } catch (tr: SerializationException) {
+            // Silently ignore serialization errors, because the value should always serialize
+            log.e(TAG, "Serialization error", tr)
+            ""
+        }
+
+    override fun deserialize(value: String?, log: Log) =
+        if (value != null) {
+            try {
+                Json.decodeFromString<Set<HelpMessage>?>(value)
+            } catch (tr: IllegalArgumentException) {
+                log.e(TAG, "Deserialization error", tr)
+                default
+            }
+        } else {
+            default
+        }
+
+    override fun getValue(values: UserPreferencesValues) = values.dismissedHelpMessages
+
+    private const val TAG = "DismissedHelpMessagePreference"
+}
+
+object HiddenAppsPreference : SetPreference {
+    override val key = stringPreferencesKey("hidden_apps")
+    override val default: Set<String> = emptySet()
+    val loading = null
+
+    override fun getValue(values: UserPreferencesValues) = values.hiddenApps
+
+    fun getOptions(activities: List<AppActivity>): Set<String> = activities.getPackageNames()
+}
+
+object ChangelogShownForVersionCodePreference : NullableIntPreference {
+    override val key = stringPreferencesKey("changelog_shown_for_version_code")
+    override val default = BuildConfig.VERSION_CODE
+    val loading = null
+
+    override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCode
+}
+
+data class UserPreferencesValues(
+    val automation: Automation = AutomationPreference.loading,
+    val automationDelay: Duration = AutomationDelayPreference.loading,
+    val cachedServerToken: CachedServerToken? = CachedServerTokenPreference.loading,
+    val cachedPurchase: CachedPurchase? = CachedPurchasePreference.loading,
+    val changelogShownForVersionCode: Int? = ChangelogShownForVersionCodePreference.loading,
+    val connectionPermission: Permission = ConnectionPermissionPreference.loading,
+    val coordinateFormat: CoordinateFormat = CoordinateFormatPreference.loading,
+    val dynamicColor: Boolean = DynamicColorPreference.loading,
+    val finish: Finish = FinishPreference.loading,
+    val hiddenApps: Set<String>? = HiddenAppsPreference.loading,
+    val dismissedHelpMessages: Set<HelpMessage>? = DismissedHelpMessagesPreference.loading,
+)

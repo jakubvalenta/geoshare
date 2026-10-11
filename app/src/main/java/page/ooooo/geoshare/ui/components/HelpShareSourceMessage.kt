@@ -24,20 +24,23 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.isMessagingApp
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.data.local.preferences.isDismissed
-import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.android.isMessagingApp
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.Action
-import page.ooooo.geoshare.lib.outputs.PointOutput
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.Geometries
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.outputs.Action
+import page.ooooo.geoshare.data.outputs.PointOutput
 import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
+import page.ooooo.geoshare.data.preferences.HelpMessage
+import page.ooooo.geoshare.data.preferences.isDismissed
+import page.ooooo.geoshare.ui.string.FormatArg
+import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 import page.ooooo.geoshare.ui.toOutputDetailsForAppsByCategory
 
 @Composable
@@ -105,6 +108,7 @@ fun HelpShareSourceMessage(
             ParagraphText(
                 annotatedStringResource(
                     R.string.help_share_source_text,
+                    defaultLinkStyles(),
                     FormatArg.InlineContent(shareIconId),
                     FormatArg.Text(stringResource(R.string.app_name)),
                 ),

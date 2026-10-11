@@ -32,19 +32,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.ui.string.FormatArg
+import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 
 @Composable
 fun HelpMessageCard(
@@ -110,11 +114,13 @@ fun HelpMessageCard(
                     actionText?.invoke()?.let { actionText ->
                         Text(
                             buildAnnotatedString {
-                                ClickableLink(
-                                    actionText,
-                                    styles = AnnotatedString.UnderlinedLinkStyles,
-                                    onClick = onAction,
-                                )
+                                withLink(
+                                    LinkAnnotation.Clickable(tag = "link", styles = defaultLinkStyles()) {
+                                        onAction()
+                                    }
+                                ) {
+                                    append(actionText)
+                                }
                             }
                         )
                     }
@@ -144,6 +150,7 @@ private fun DefaultPreview() {
                 ParagraphText(
                     annotatedStringResource(
                         R.string.help_share_source_text,
+                        defaultLinkStyles(),
                         FormatArg.InlineContent(shareIconId),
                         FormatArg.Text(stringResource(R.string.app_name)),
                     ),
@@ -185,6 +192,7 @@ private fun DarkPreview() {
                 ParagraphText(
                     annotatedStringResource(
                         R.string.help_share_source_text,
+                        defaultLinkStyles(),
                         FormatArg.InlineContent(shareIconId),
                         FormatArg.Text(stringResource(R.string.app_name)),
                     ),
@@ -227,6 +235,7 @@ private fun ErrorPreview() {
                 ParagraphText(
                     annotatedStringResource(
                         R.string.help_share_source_text,
+                        defaultLinkStyles(),
                         FormatArg.InlineContent(shareIconId),
                         FormatArg.Text(stringResource(R.string.app_name)),
                     ),
@@ -268,6 +277,7 @@ private fun TabletPreview() {
                 ParagraphText(
                     annotatedStringResource(
                         R.string.help_share_source_text,
+                        defaultLinkStyles(),
                         FormatArg.InlineContent(shareIconId),
                         FormatArg.Text(stringResource(R.string.app_name)),
                     ),

@@ -19,7 +19,7 @@ fun SheetSection(
 
     Column(modifier) {
         if (title != null) {
-            LabelLarge(
+            LargeLabel(
                 title,
                 Modifier
                     .padding(horizontal = 16.dp)

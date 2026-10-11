@@ -5,12 +5,12 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.engine.HttpClientEngine
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInputImpl
-import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsWebViewInput
-import page.ooooo.geoshare.lib.uri.UriQuote
+import page.ooooo.geoshare.data.inputs.GoogleMapsHtmlInput
+import page.ooooo.geoshare.data.inputs.GoogleMapsHtmlInputImpl
+import page.ooooo.geoshare.data.inputs.GoogleMapsUriInput
+import page.ooooo.geoshare.data.inputs.GoogleMapsWebViewInput
+import page.ooooo.geoshare.data.log.Log
+import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Singleton
 
 @Module

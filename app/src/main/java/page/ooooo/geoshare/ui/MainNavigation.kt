@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import page.ooooo.geoshare.lib.inputs.InputGroupId
+import page.ooooo.geoshare.data.inputs.InputGroupId
 
 @Serializable
 object AboutRoute

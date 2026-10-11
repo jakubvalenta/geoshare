@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import page.ooooo.geoshare.data.local.preferences.*
+import page.ooooo.geoshare.data.preferences.*
 import java.io.IOException
 import javax.inject.Inject
 

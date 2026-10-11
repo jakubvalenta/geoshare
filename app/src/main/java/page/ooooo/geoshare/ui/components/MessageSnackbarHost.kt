@@ -8,7 +8,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.data.message.Message
 
 class MessageSnackbarVisuals(message: Message) : SnackbarVisuals {
     override val message = message.text

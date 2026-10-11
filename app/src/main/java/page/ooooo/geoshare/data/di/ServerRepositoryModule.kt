@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
 import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.data.DefaultServerRepository
-import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.database.Server
-import page.ooooo.geoshare.data.local.database.ServerDao
-import page.ooooo.geoshare.data.local.database.AppDatabase
+import page.ooooo.geoshare.data.database.ServerAuthType
+import page.ooooo.geoshare.data.database.Server
+import page.ooooo.geoshare.data.database.ServerDao
+import page.ooooo.geoshare.data.database.AppDatabase
 import java.util.UUID
 import javax.inject.Singleton
 
@@ -142,7 +142,7 @@ val FakeGoogleMapsPlaceServer = Server(
 
 /**
  * Items for testing purposes. The actual items that the table is populated with are in
- * [page.ooooo.geoshare.data.local.database.InitialServers].
+ * [page.ooooo.geoshare.data.database.InitialServers].
  */
 val defaultFakeServers = listOf(
     FakeGeoShareGoogleMapsAddressServer,

@@ -1,9 +1,9 @@
 package page.ooooo.geoshare.tests
 
 import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.data.local.database.InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID
-import page.ooooo.geoshare.data.local.database.Server
-import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.database.Server
+import page.ooooo.geoshare.data.database.ServerAuthType
+import page.ooooo.geoshare.data.database.InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID
 import java.util.UUID
 
 object InitialServersTestDataImpl : InitialServersTestData {

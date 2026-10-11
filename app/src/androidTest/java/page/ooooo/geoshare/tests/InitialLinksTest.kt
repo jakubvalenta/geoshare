@@ -10,9 +10,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.data.local.database.AppDatabase
-import page.ooooo.geoshare.data.local.database.InitialLinks
-import page.ooooo.geoshare.data.local.database.InitialServersImpl
+import page.ooooo.geoshare.data.database.AppDatabase
+import page.ooooo.geoshare.data.database.InitialLinks
+import page.ooooo.geoshare.data.database.InitialServersImpl
 import java.io.IOException
 import kotlin.uuid.Uuid
 

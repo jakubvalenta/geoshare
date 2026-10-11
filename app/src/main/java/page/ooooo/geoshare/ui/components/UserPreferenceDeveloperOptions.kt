@@ -18,11 +18,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.CachedPurchasePreference
-import page.ooooo.geoshare.data.local.preferences.CachedServerTokenPreference
-import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
-import page.ooooo.geoshare.data.local.preferences.DismissedHelpMessagesPreference
-import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.CachedPurchasePreference
+import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
+import page.ooooo.geoshare.data.preferences.ChangelogShownForVersionCodePreference
+import page.ooooo.geoshare.data.preferences.DismissedHelpMessagesPreference
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 

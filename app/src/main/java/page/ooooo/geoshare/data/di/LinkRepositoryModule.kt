@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
 import page.ooooo.geoshare.data.DefaultLinkRepository
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.local.database.AppDatabase
-import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.database.LinkDao
-import page.ooooo.geoshare.lib.geo.Srs
-import page.ooooo.geoshare.data.local.database.LinkType
+import page.ooooo.geoshare.data.database.AppDatabase
+import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.database.LinkDao
+import page.ooooo.geoshare.data.geo.Srs
+import page.ooooo.geoshare.data.database.LinkType
 import java.util.UUID
 import javax.inject.Singleton
 
@@ -186,7 +186,7 @@ val FakeMagicEarthNavigationLink = Link(
 
 /**
  * Items for testing purposes. The actual items that the table is populated with are in
- * [page.ooooo.geoshare.data.local.database.InitialLinks].
+ * [page.ooooo.geoshare.data.database.InitialLinks].
  */
 val defaultFakeLinks = listOf(
     FakeOpenStreetMapDisplayLink,

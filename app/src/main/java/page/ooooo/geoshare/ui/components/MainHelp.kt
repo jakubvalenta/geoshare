@@ -18,9 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.inputs.Input
+import page.ooooo.geoshare.data.geo.NaivePoint
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.inputs.Input
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing

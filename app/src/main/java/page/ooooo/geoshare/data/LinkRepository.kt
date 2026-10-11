@@ -5,10 +5,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import page.ooooo.geoshare.data.di.ApplicationScope
-import page.ooooo.geoshare.data.local.database.AppDatabase
-import page.ooooo.geoshare.data.local.database.InitialLinks
-import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.database.LinkDao
+import page.ooooo.geoshare.data.database.AppDatabase
+import page.ooooo.geoshare.data.database.InitialLinks
+import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.database.LinkDao
 import java.util.UUID
 import javax.inject.Inject
 

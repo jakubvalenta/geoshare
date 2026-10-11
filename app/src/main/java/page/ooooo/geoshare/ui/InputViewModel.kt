@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.local.preferences.ChangelogShownForVersionCodePreference
-import page.ooooo.geoshare.lib.inputs.InputChangelogItem
-import page.ooooo.geoshare.lib.inputs.InputGroup
+import page.ooooo.geoshare.data.preferences.ChangelogShownForVersionCodePreference
+import page.ooooo.geoshare.data.inputs.InputChangelogItem
+import page.ooooo.geoshare.data.inputs.InputGroup
 import javax.inject.Inject
 
 @HiltViewModel

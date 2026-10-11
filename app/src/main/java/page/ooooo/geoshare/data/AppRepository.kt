@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import page.ooooo.geoshare.data.di.ApplicationScope
-import page.ooooo.geoshare.lib.android.AppActivity
-import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.getPackageNames
-import page.ooooo.geoshare.lib.android.queryActivities
-import page.ooooo.geoshare.lib.android.queryAppDetails
+import page.ooooo.geoshare.data.android.AppActivity
+import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.getPackageNames
+import page.ooooo.geoshare.data.android.queryActivities
+import page.ooooo.geoshare.data.android.queryAppDetails
 import javax.inject.Inject
 
 interface AppRepository {

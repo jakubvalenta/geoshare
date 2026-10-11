@@ -8,9 +8,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.data.local.database.InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID
-import page.ooooo.geoshare.data.local.database.Server
-import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.database.Server
+import page.ooooo.geoshare.data.database.ServerAuthType
+import page.ooooo.geoshare.data.database.InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class ServerBehaviorTest {

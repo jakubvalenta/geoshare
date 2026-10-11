@@ -6,11 +6,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.lib.geo.GCJ02MainlandChinaPoint
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.data.database.ServerAuthType
+import page.ooooo.geoshare.data.preferences.Permission
+import page.ooooo.geoshare.data.geo.GCJ02MainlandChinaPoint
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.TestServerParams
 import page.ooooo.geoshare.tests.configureServer

@@ -11,7 +11,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 
@@ -58,24 +57,5 @@ fun ParagraphText(
             lineBreak = LineBreak.Paragraph,
             hyphens = Hyphens.Auto,
         ),
-    )
-}
-
-@Composable
-fun ParagraphHtml(
-    text: String,
-    modifier: Modifier = Modifier,
-    color: Color = LocalContentColor.current,
-    fontStyle: FontStyle? = null,
-    fontWeight: FontWeight? = null,
-    style: TextStyle = LocalTextStyle.current,
-) {
-    ParagraphText(
-        AnnotatedString.fromHtml(text, linkStyles = AnnotatedString.DefaultLinkStyles),
-        modifier,
-        color = color,
-        fontStyle = fontStyle,
-        fontWeight = fontWeight,
-        style = style,
     )
 }

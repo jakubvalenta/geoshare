@@ -10,9 +10,9 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.lib.Log
-import page.ooooo.geoshare.lib.state.ConversionStateContext
-import page.ooooo.geoshare.lib.uri.UriQuote
+import page.ooooo.geoshare.data.log.Log
+import page.ooooo.geoshare.data.state.ConversionStateContext
+import page.ooooo.geoshare.data.uri.UriQuote
 
 /**
  * Injects [ConversionStateContext] into a view model.

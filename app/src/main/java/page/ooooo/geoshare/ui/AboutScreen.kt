@@ -32,25 +32,28 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.billing.BillingProduct
-import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.ui.components.ClickableLink
+import page.ooooo.geoshare.data.billing.BillingProduct
+import page.ooooo.geoshare.data.billing.BillingStatus
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.NavigationBackButton
-import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScaffoldAction
 import page.ooooo.geoshare.ui.components.StyledPaneScaffoldDefaults
 import page.ooooo.geoshare.ui.components.StyledSupportingPaneScaffold
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.theme.tertiaryLinkStyles
 
 @Composable
 fun AboutScreen(
@@ -158,16 +161,25 @@ private fun ColumnScope.AboutMainPane(
         style = MaterialTheme.typography.headlineSmall,
     )
     CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-        ParagraphHtml(
-            stringResource(
-                R.string.about_text,
-                appName,
-                stringResource(R.string.about_support_email),
+        ParagraphText(
+            AnnotatedString.fromHtml(
+                stringResource(
+                    R.string.about_text,
+                    appName,
+                    stringResource(R.string.about_support_email),
+                ),
+                tertiaryLinkStyles(),
             )
         )
         ParagraphText(
             buildAnnotatedString {
-                ClickableLink(stringResource(R.string.licenses), onClick = onNavigateToLicensesScreen)
+                withLink(
+                    LinkAnnotation.Clickable(tag = "link", styles = tertiaryLinkStyles()) {
+                        onNavigateToLicensesScreen()
+                    }
+                ) {
+                    append(stringResource(R.string.licenses))
+                }
             }
         )
         if (donationVisible) {

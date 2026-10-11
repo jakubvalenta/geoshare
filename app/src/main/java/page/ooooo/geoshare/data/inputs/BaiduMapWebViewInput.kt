@@ -1,0 +1,114 @@
+package page.ooooo.geoshare.data.inputs
+
+import android.content.res.Resources
+import android.webkit.WebSettings
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.log.Log
+import page.ooooo.geoshare.data.geo.BD09MCPoint
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class BaiduMapWebViewInput @Inject constructor(
+    private val log: Log,
+) : WebViewInput {
+    @Serializable
+    private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
+
+    override fun getName(resources: Resources) = resources.getString(R.string.input_baidu_map_web_view_name)
+    override val group = InputGroup.BAIDU_MAP
+
+    /**
+     * Extracts point from the page JavaScript state.
+     *
+     * It doesn't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
+     */
+    // language=JavaScript
+    override fun getUnsafeExtractionJavaScript() = """
+        () => {
+            function deepGet(obj, ...keys) {
+                return keys.reduce((acc, key) => {
+                    if (acc === null || acc === undefined) return undefined;
+                    return acc[key];
+                }, obj);
+            }
+
+            function findOverlays() {
+                const overlay = deepGet(window, '_indoorMgr', '_map', 'temp', 'infoWin', 'overlay');
+                if (overlay) {
+                    return [overlay];
+                }
+                const overlays = deepGet(window, '_indoorMgr', '_map', '_overlayArray');
+                if (Array.isArray(overlays)) {
+                    return overlays;
+                }
+                return undefined;
+            }
+
+            function findPoint(overlays) {
+                if (overlays) {
+                    for (const overlay of overlays) {
+                        const point = deepGet(overlay, 'point');
+                        if (point && point.lat && point.lng) {
+                            return point;
+                        }
+                    }
+                }
+                return undefined;
+            }
+
+            const overlays = findOverlays();
+            const point = findPoint(overlays);
+            if (point) {
+                const z = deepGet(window, '_appStateFromUrl', 'loc', 'z');
+                const name = deepGet(window, '_appStateFromUrl', 'wd', 0);
+                return JSON.stringify({ lat: point.lat, lon: point.lng, z, name });
+            }
+            return undefined;
+        };
+    """.trimIndent()
+
+    override fun parse(data: String, match: String, resources: Resources) = parseResult {
+        val json = Json {
+            explicitNulls = false
+        }
+        try {
+            json.decodeFromString<ExtractedPoint>(data)
+        } catch (tr: IllegalArgumentException) {
+            log.e(TAG, "Deserialization error", tr)
+            null
+        }?.run {
+            points = persistentListOf(BD09MCPoint(lat, lon, z, name, source = Source.JAVASCRIPT))
+        }
+    }
+
+    override fun extendWebSettings(settings: WebSettings) {
+        settings.domStorageEnabled = true
+        settings.userAgentString = DESKTOP_USER_AGENT
+    }
+
+    override fun shouldInterceptRequest(requestUrlString: String) =
+        // Assets
+        requestUrlString.endsWith(".css")
+            || requestUrlString.endsWith(".ico")
+            || (requestUrlString.endsWith(".png") && !requestUrlString.contains("/image/api/"))
+            || requestUrlString.endsWith("/static/common/images/new/loading")
+
+            // Map tiles
+            || requestUrlString.contains("bdimg.com/tile/")
+
+            // Tracking
+            || requestUrlString.contains("/alog.min.js")
+            || requestUrlString.contains("map.baidu.com/newmap_test/static/common/images/transparent.gif")
+
+    override fun toString() = TAG
+
+    private companion object {
+        private const val TAG = "BaiduMapWebViewInput"
+    }
+}

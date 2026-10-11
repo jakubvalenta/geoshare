@@ -22,20 +22,20 @@ import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.lib.android.AppActivity
-import page.ooooo.geoshare.lib.android.AppDetail
-import page.ooooo.geoshare.lib.android.AppDetails
-import page.ooooo.geoshare.lib.android.getPackageNames
-import page.ooooo.geoshare.lib.android.isMessagingApp
-import page.ooooo.geoshare.lib.android.queryActivitiesForUri
-import page.ooooo.geoshare.lib.android.queryAppDetails
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.outputs.CopyStringOutput
-import page.ooooo.geoshare.lib.outputs.Output
-import page.ooooo.geoshare.lib.outputs.PointOutput
-import page.ooooo.geoshare.lib.outputs.PointsOutput
-import page.ooooo.geoshare.lib.outputs.StringOutput
-import page.ooooo.geoshare.ui.components.IconDescriptor
+import page.ooooo.geoshare.data.android.AppActivity
+import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.getPackageNames
+import page.ooooo.geoshare.data.android.isMessagingApp
+import page.ooooo.geoshare.data.android.queryActivitiesForUri
+import page.ooooo.geoshare.data.android.queryAppDetails
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.outputs.CopyStringOutput
+import page.ooooo.geoshare.data.outputs.IconDescriptor
+import page.ooooo.geoshare.data.outputs.Output
+import page.ooooo.geoshare.data.outputs.PointOutput
+import page.ooooo.geoshare.data.outputs.PointsOutput
+import page.ooooo.geoshare.data.outputs.StringOutput
 import javax.inject.Inject
 
 data class OutputDetail<T : Output>(
