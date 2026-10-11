@@ -25,5 +25,5 @@ object InitialServersTestDataImpl : InitialServersTestData {
                 uuid = UUID.fromString("c5c215a1-c453-4de9-adb3-daecbd7dc876"),
             )
         )
-    }.sortedWith(compareBy<Server>{ it.name }.thenBy { it.description })
+    }.sortedWith(compareBy<Server> { it.name }.thenBy { it.description })
 }

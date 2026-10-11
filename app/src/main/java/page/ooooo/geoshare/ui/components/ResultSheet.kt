@@ -25,15 +25,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.di.defaultFakeLinks
-import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.PointOutput
 import page.ooooo.geoshare.data.outputs.PointsOutput

@@ -22,11 +22,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppRepository
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.android.getUriString
 import page.ooooo.geoshare.data.extensions.zipWithNextLastNull
 import page.ooooo.geoshare.data.geo.Point
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.ActionResult
 import page.ooooo.geoshare.data.outputs.LocationAction

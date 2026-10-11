@@ -13,8 +13,8 @@ import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.database.AppDatabase
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.LinkDao
-import page.ooooo.geoshare.data.geo.Srs
 import page.ooooo.geoshare.data.database.LinkType
+import page.ooooo.geoshare.data.geo.Srs
 import java.util.UUID
 import javax.inject.Singleton
 

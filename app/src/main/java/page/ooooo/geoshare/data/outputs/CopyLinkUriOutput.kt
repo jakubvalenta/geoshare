@@ -3,8 +3,8 @@ package page.ooooo.geoshare.data.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.formatters.UriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Point

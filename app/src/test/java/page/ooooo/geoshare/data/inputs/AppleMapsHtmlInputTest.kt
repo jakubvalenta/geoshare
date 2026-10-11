@@ -1,15 +1,14 @@
 package page.ooooo.geoshare.data.inputs
 
+import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
-
-import android.content.res.Resources
-import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.network.FakeFetchTools
 
 class AppleMapsHtmlInputTest : InputTest {

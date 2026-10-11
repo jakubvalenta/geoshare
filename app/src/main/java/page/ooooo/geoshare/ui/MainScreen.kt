@@ -77,12 +77,14 @@ import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.data.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.ActionContext
 import page.ooooo.geoshare.data.outputs.LocationAction
 import page.ooooo.geoshare.data.outputs.PointOutput
 import page.ooooo.geoshare.data.outputs.PointsOutput
+import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.preferences.shouldAppFinish
@@ -128,8 +130,6 @@ import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
-import page.ooooo.geoshare.data.preferences.HelpMessage
-import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import kotlin.time.ComparableTimeMark
@@ -453,6 +453,7 @@ private fun MainScreen(
                             )
                         }
                     }
+
                     else -> {
                         item(key = "result", contentType = "column") {
                             Column(
@@ -533,11 +534,11 @@ private fun MainScreen(
                                             unsafeUrl = conversionState.matchedInput.match,
                                             unsafeExtractionJavascript = conversionState.matchedInput.input.getUnsafeExtractionJavaScript(),
                                             pendingExtractionResult = conversionState.pendingData,
-                                            extendWebSettings = { conversionState.matchedInput.input.extendWebSettings(it) },
+                                            extendWebSettings = {
+                                                conversionState.matchedInput.input.extendWebSettings(it)
+                                            },
                                             shouldInterceptRequest = {
-                                                conversionState.matchedInput.input.shouldInterceptRequest(
-                                                    it
-                                                )
+                                                conversionState.matchedInput.input.shouldInterceptRequest(it)
                                             },
                                         )
                                         if (!BuildConfig.DEBUG) {

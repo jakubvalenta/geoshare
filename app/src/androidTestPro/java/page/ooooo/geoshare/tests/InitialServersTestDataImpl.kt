@@ -79,5 +79,5 @@ object InitialServersTestDataImpl : InitialServersTestData {
                 ),
             )
         }
-    }.sortedWith(compareBy<Server>{ it.name }.thenBy { it.description })
+    }.sortedWith(compareBy<Server> { it.name }.thenBy { it.description })
 }

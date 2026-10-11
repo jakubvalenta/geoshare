@@ -40,8 +40,8 @@ class HereWeGoUriInput @Inject constructor(
                 if (firstPart == "") {
                     Regex("""$LAT,$LON,$Z""").matchEntire(queryParams["map"]?.firstOrNull())
                         ?.toLatLonZPoint(Source.MAP_CENTER)?.let {
-                        points = persistentListOf(WGS84Point(it))
-                    }
+                            points = persistentListOf(WGS84Point(it))
+                        }
                 } else {
                     val secondPart = parts.getOrNull(1)
                     if (secondPart != null) {

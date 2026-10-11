@@ -34,9 +34,9 @@ import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.PointOutput
-import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.isDismissed
+import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
 import page.ooooo.geoshare.ui.string.FormatArg
 import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme

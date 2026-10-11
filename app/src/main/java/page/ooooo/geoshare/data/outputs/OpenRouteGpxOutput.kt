@@ -3,12 +3,12 @@ package page.ooooo.geoshare.data.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.formatters.GpxFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Points
+import page.ooooo.geoshare.data.log.Log
 import javax.inject.Inject
 
 class OpenRouteGpxOutput @Inject constructor(

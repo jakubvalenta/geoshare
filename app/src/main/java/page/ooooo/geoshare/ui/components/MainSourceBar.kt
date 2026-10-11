@@ -22,8 +22,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.inputs.MatchedInput
+import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.state.ConversionState
 import page.ooooo.geoshare.data.state.ConversionSucceeded
 import page.ooooo.geoshare.data.state.ExtendedStateLog

@@ -24,7 +24,7 @@ fun parseResult(block: ParseResultScope.() -> Unit): ParseResult =
     ParseResultScope().apply { this.block() }.build()
 
 suspend fun parseResultAsync(block: suspend ParseResultScope.() -> Unit): ParseResult =
-     ParseResultScope().apply { this.block() }.build()
+    ParseResultScope().apply { this.block() }.build()
 
 /**
  * Returns the newest result from a list sorted from newest to oldest. If the newest result doesn't have a zoom or name,

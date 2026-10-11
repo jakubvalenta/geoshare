@@ -5,13 +5,13 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.extensions.groupOrNull
 import page.ooooo.geoshare.data.extensions.toLonLatPoint
 import page.ooooo.geoshare.data.extensions.toLonLatZPoint
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.uri.Uri

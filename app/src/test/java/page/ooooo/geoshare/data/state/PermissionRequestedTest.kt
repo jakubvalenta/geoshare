@@ -9,13 +9,13 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
-import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.ParseResult
+import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.preferences.Permission
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 
 class PermissionRequestedTest {
     private val source = "https://maps.app.goo.gl/foo"

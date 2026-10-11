@@ -64,26 +64,27 @@ class YandexMapsHtmlInputTest : InputTest {
     }
 
     @Test
-    fun parse_containsCoordinatesInLLAndUriDoesNotContainParamLLButHostInLLIsDifferent_returnsPointWithName() = runTest {
-        assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    WGS84Point(name = "Запретный город", source = Source.HTML)
-                )
-            ),
-            input.parse(
-                "https://yandex.com/maps/org/zapretny_gorod/5867973238",
-                FakeFetchTools(
-                    // language=html
-                    """
+    fun parse_containsCoordinatesInLLAndUriDoesNotContainParamLLButHostInLLIsDifferent_returnsPointWithName() =
+        runTest {
+            assertEquals(
+                ParseResult.Success(
+                    persistentListOf(
+                        WGS84Point(name = "Запретный город", source = Source.HTML)
+                    )
+                ),
+                input.parse(
+                    "https://yandex.com/maps/org/zapretny_gorod/5867973238",
+                    FakeFetchTools(
+                        // language=html
+                        """
 <h1 class="orgpage-header-view__header" itemProp="name">Запретный город</h1>
 <a class="card-footer-view__link" href="https://yandex.com/tune/?retpath=https%3A%2F%2Fexample.com%2Fmaps%2Forg%2Fzapretny_gorod%2F5867973238%2F%3Fll%3D116.408914%252C39.915043%26z%3D13" target="_blank">Settings</a>
 <span itemProp="name">Second name must be ignored</span>
                     """.trimIndent()
-                )
-            ),
-        )
-    }
+                    )
+                ),
+            )
+        }
 
     @Test
     fun parse_containsCoordinatesInLLAndUriContainsParamLL_returnsPointWithName() = runTest {

@@ -230,7 +230,7 @@ class AutomationBehaviorTest {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val output = CopyGeoUriOutput(coordinateConverter)
-        onElement { viewIdResourceName == "geoShareResultChip_${output.id}"}.click()
+        onElement { viewIdResourceName == "geoShareResultChip_${output.id}" }.click()
 
         // Doesn't show automation counter
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareResultAutomationCounter" })

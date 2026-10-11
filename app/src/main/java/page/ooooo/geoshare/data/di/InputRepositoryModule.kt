@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.engine.mock.MockEngine
 import page.ooooo.geoshare.data.DefaultInputRepository
 import page.ooooo.geoshare.data.InputRepository
-import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.inputs.AmapShortLinkInput
 import page.ooooo.geoshare.data.inputs.AmapUriInput
 import page.ooooo.geoshare.data.inputs.AppleMapsHtmlInput
@@ -52,6 +51,7 @@ import page.ooooo.geoshare.data.inputs.YahooMapsWebViewInput
 import page.ooooo.geoshare.data.inputs.YandexMapsHtmlInput
 import page.ooooo.geoshare.data.inputs.YandexMapsShortLinkInput
 import page.ooooo.geoshare.data.inputs.YandexMapsUriInput
+import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.network.ServerHttpClientFactory
 import page.ooooo.geoshare.data.uri.FakeUriQuote
 import javax.inject.Singleton

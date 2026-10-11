@@ -6,9 +6,9 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.geo.BD09MCPoint
 import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import javax.inject.Inject
 import javax.inject.Singleton

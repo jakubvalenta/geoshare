@@ -10,10 +10,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
-import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.log.DefaultLog
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.inputs.BasicInput
 import page.ooooo.geoshare.data.inputs.BasicOfflineInput
@@ -24,8 +20,12 @@ import page.ooooo.geoshare.data.inputs.NoopInput
 import page.ooooo.geoshare.data.inputs.ParseResult
 import page.ooooo.geoshare.data.inputs.WebViewInput
 import page.ooooo.geoshare.data.inputs.merge
+import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.RecoverableNetworkException
 import page.ooooo.geoshare.data.network.UnrecoverableNetworkException
+import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.data.uri.UriQuote
 import java.net.MalformedURLException

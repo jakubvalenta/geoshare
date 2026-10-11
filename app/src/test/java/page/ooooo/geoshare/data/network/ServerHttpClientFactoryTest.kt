@@ -15,20 +15,14 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.data.network.SigningPurpose
-import page.ooooo.geoshare.data.network.base64Decode
-import page.ooooo.geoshare.data.network.base64Encode
-import page.ooooo.geoshare.data.network.buildSigningPayloadV1
-import page.ooooo.geoshare.data.network.fingerprint
-import page.ooooo.geoshare.data.network.verifySignature
-import page.ooooo.geoshare.data.di.FakeKeyStoreTools
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
 import page.ooooo.geoshare.data.database.Server
 import page.ooooo.geoshare.data.database.ServerAuthType
+import page.ooooo.geoshare.data.di.FakeKeyStoreTools
+import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.preferences.CachedServerToken
 import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.uri.FakeUriQuote
 import kotlin.random.Random
 

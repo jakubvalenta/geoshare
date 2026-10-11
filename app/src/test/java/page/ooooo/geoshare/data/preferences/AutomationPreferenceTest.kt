@@ -7,6 +7,14 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.FileActivity
+import page.ooooo.geoshare.data.android.FileType
+import page.ooooo.geoshare.data.android.MimeType
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.TextActivity
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.android.UriScheme
 import page.ooooo.geoshare.data.di.FakeAppleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeAppleMapsNavigationLink
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
@@ -18,15 +26,6 @@ import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapNavigationLink
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.log.FakeLog
-import page.ooooo.geoshare.data.android.AppDetail
-import page.ooooo.geoshare.data.android.FileActivity
-import page.ooooo.geoshare.data.android.FileType
-import page.ooooo.geoshare.data.android.MimeType
-import page.ooooo.geoshare.data.android.PackageNames
-import page.ooooo.geoshare.data.android.TextActivity
-import page.ooooo.geoshare.data.android.UriActivity
-import page.ooooo.geoshare.data.android.UriScheme
-import kotlin.collections.iterator
 
 class AutomationPreferenceTest {
     @Test

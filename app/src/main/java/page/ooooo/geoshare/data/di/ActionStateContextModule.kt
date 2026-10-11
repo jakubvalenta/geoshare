@@ -7,9 +7,9 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.billing.Billing
 import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.state.ActionStateContext
 
 @Module

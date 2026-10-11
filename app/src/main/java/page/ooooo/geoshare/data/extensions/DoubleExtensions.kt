@@ -1,7 +1,7 @@
 package page.ooooo.geoshare.data.extensions
 
 import java.math.RoundingMode
-import java.util.*
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sign

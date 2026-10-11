@@ -12,11 +12,24 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.LinkRepository
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.android.UriScheme
+import page.ooooo.geoshare.data.billing.BillingProduct
+import page.ooooo.geoshare.data.billing.BillingStatus
+import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.di.FakeBilling
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeLinkRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.FakeLog
+import page.ooooo.geoshare.data.outputs.CopyCoordsDecOutput
+import page.ooooo.geoshare.data.outputs.OpenDisplayGeoUriOutput
+import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.data.outputs.ShareLinkUriOutput
 import page.ooooo.geoshare.data.preferences.CachedPurchase
 import page.ooooo.geoshare.data.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.preferences.CopyCoordsDecAutomation
@@ -25,19 +38,6 @@ import page.ooooo.geoshare.data.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.log.FakeLog
-import page.ooooo.geoshare.data.android.PackageNames
-import page.ooooo.geoshare.data.android.UriActivity
-import page.ooooo.geoshare.data.android.UriScheme
-import page.ooooo.geoshare.data.billing.BillingProduct
-import page.ooooo.geoshare.data.billing.BillingStatus
-import page.ooooo.geoshare.data.geo.CoordinateConverter
-import page.ooooo.geoshare.data.geo.Source
-import page.ooooo.geoshare.data.geo.WGS84Point
-import page.ooooo.geoshare.data.outputs.CopyCoordsDecOutput
-import page.ooooo.geoshare.data.outputs.OpenDisplayGeoUriOutput
-import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
-import page.ooooo.geoshare.data.outputs.ShareLinkUriOutput
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -236,7 +236,7 @@ class AutomationRequestedTest {
             log = log,
             userPreferencesRepository = userPreferencesRepository,
         )
-        val state = AutomationRequested(points,  billingStatusTimeout = 3.seconds)
+        val state = AutomationRequested(points, billingStatusTimeout = 3.seconds)
         val res = async {
             state.transition(stateContext)
         }

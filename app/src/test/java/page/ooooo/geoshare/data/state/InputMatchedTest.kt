@@ -8,9 +8,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
-import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.BasicOfflineInput
@@ -20,7 +17,10 @@ import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.NoopInput
 import page.ooooo.geoshare.data.inputs.ParseResult
 import page.ooooo.geoshare.data.inputs.WebViewInput
+import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.network.FetchTools
+import page.ooooo.geoshare.data.preferences.Permission
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 
 class InputMatchedTest {
     private val log = FakeLog

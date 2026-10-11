@@ -15,9 +15,9 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.network.ContentConvertNetworkException
 import page.ooooo.geoshare.data.network.UnrecoverableNetworkException
 import kotlin.time.Clock

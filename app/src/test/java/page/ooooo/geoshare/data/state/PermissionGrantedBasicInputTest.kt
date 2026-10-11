@@ -16,9 +16,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.state.Attempt
-import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.BasicInput
@@ -27,11 +24,13 @@ import page.ooooo.geoshare.data.inputs.BasicOnlineInput
 import page.ooooo.geoshare.data.inputs.InputGroup
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.ParseResult
+import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.network.ConnectionClosedNetworkException
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.network.RecoverableNetworkException
 import page.ooooo.geoshare.data.network.ResponseNetworkException
 import page.ooooo.geoshare.data.network.SocketTimeoutNetworkException
+import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.uri.FakeUriQuote
 import java.io.EOFException
 import java.net.MalformedURLException

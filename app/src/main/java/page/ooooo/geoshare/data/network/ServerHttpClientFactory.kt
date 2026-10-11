@@ -23,13 +23,13 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.android.KeyStoreTools
 import page.ooooo.geoshare.data.database.Server
 import page.ooooo.geoshare.data.database.ServerAuthType
-import page.ooooo.geoshare.data.preferences.CachedServerToken
-import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.log.Log
-import page.ooooo.geoshare.data.android.KeyStoreTools
+import page.ooooo.geoshare.data.preferences.CachedServerToken
+import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
 import javax.inject.Inject
 
 class ServerHttpClientFactory @Inject constructor(
@@ -65,7 +65,7 @@ class ServerHttpClientFactory @Inject constructor(
     data class GoogleMapsResults(
         // Results are optional, because Google returns a JSON without the 'results' property when no coordinates are
         // found.
-        val results: List<GoogleMapsResult>? = null
+        val results: List<GoogleMapsResult>? = null,
     )
 
     fun createHttpClient(server: Server): HttpClient =

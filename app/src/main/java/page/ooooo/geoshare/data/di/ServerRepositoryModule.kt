@@ -8,12 +8,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.mapLatest
-import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.data.DefaultServerRepository
-import page.ooooo.geoshare.data.database.ServerAuthType
-import page.ooooo.geoshare.data.database.Server
-import page.ooooo.geoshare.data.database.ServerDao
+import page.ooooo.geoshare.data.ServerRepository
 import page.ooooo.geoshare.data.database.AppDatabase
+import page.ooooo.geoshare.data.database.Server
+import page.ooooo.geoshare.data.database.ServerAuthType
+import page.ooooo.geoshare.data.database.ServerDao
 import java.util.UUID
 import javax.inject.Singleton
 

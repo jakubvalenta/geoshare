@@ -4,10 +4,10 @@ import android.content.res.Resources
 import io.ktor.client.engine.HttpClientEngine
 import kotlinx.collections.immutable.toImmutableList
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.extensions.toLatLonPoint
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject

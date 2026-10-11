@@ -42,7 +42,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.android.UriActivity
 import page.ooooo.geoshare.data.android.UriScheme
@@ -51,6 +50,7 @@ import page.ooooo.geoshare.data.billing.BillingProduct
 import page.ooooo.geoshare.data.billing.BillingStatus
 import page.ooooo.geoshare.data.billing.CustomLinkFeature
 import page.ooooo.geoshare.data.billing.Feature
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.outputs.OpenDisplayGeoUriOutput

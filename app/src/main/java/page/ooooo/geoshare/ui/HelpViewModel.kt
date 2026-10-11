@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.preferences.HelpMessage
-import page.ooooo.geoshare.data.preferences.DismissedHelpMessagesPreference
 import page.ooooo.geoshare.data.message.Message
+import page.ooooo.geoshare.data.preferences.DismissedHelpMessagesPreference
+import page.ooooo.geoshare.data.preferences.HelpMessage
 import javax.inject.Inject
 
 @HiltViewModel

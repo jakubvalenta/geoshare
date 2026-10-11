@@ -5,10 +5,10 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.readLine
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.extensions.toLatLonPoint
 import page.ooooo.geoshare.data.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.uri.UriQuote

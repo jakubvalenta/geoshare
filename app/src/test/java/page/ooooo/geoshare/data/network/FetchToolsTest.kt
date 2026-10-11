@@ -123,13 +123,14 @@ class FetchToolsTest {
     }
 
     @Test
-    fun headLocationHeader_whenMatchHasNoScheme_makesHeadRequestToUrlWithHttpsSchemeAndReturnsLocationHeader() = runTest {
-        val match = "maps.google.com/redirects-to-absolute-url"
-        assertEquals(
-            "https://maps.google.com/redirects-to-absolute-url-location",
-            fetchTools.headLocationHeader(match, engine, log, uriQuote).toString()
-        )
-    }
+    fun headLocationHeader_whenMatchHasNoScheme_makesHeadRequestToUrlWithHttpsSchemeAndReturnsLocationHeader() =
+        runTest {
+            val match = "maps.google.com/redirects-to-absolute-url"
+            assertEquals(
+                "https://maps.google.com/redirects-to-absolute-url-location",
+                fetchTools.headLocationHeader(match, engine, log, uriQuote).toString()
+            )
+        }
 
     @Test
     fun headLocationHeader_whenHttpClientRespondsLocationHeaderAsRelativeUrl_returnsItAsAbsoluteUrl() = runTest {

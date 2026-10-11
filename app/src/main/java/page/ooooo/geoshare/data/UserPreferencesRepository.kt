@@ -9,7 +9,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import page.ooooo.geoshare.data.preferences.*
+import page.ooooo.geoshare.data.preferences.AutomationDelayPreference
+import page.ooooo.geoshare.data.preferences.AutomationPreference
+import page.ooooo.geoshare.data.preferences.CachedPurchasePreference
+import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
+import page.ooooo.geoshare.data.preferences.ChangelogShownForVersionCodePreference
+import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.preferences.CoordinateFormatPreference
+import page.ooooo.geoshare.data.preferences.DismissedHelpMessagesPreference
+import page.ooooo.geoshare.data.preferences.DynamicColorPreference
+import page.ooooo.geoshare.data.preferences.FinishPreference
+import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
+import page.ooooo.geoshare.data.preferences.UserPreference
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import java.io.IOException
 import javax.inject.Inject
 

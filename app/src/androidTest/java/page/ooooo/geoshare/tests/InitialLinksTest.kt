@@ -16,7 +16,7 @@ import page.ooooo.geoshare.data.database.InitialServersImpl
 import java.io.IOException
 import kotlin.uuid.Uuid
 
-class InitialLinksTest  {
+class InitialLinksTest {
     private val expectedItems = InitialLinksTestData.expectedItems
 
     @Test

@@ -35,21 +35,21 @@ class MapQuestInputBehaviorTest {
 
         // Place within Hong Kong
         testUri(
-            WGS84Point(22.254182,113.905181, source = Source.HTML),
+            WGS84Point(22.254182, 113.905181, source = Source.HTML),
             "https://www.mapquest.com/cn/tian-tan-buddha-big-buddha-526039166",
             grantConnectionPermission = true,
         )
 
         // Place within Taiwan
         testUri(
-            WGS84Point(24.998562,121.580986, source = Source.HTML),
+            WGS84Point(24.998562, 121.580986, source = Source.HTML),
             "https://www.mapquest.com/tw/taipei-zoo-524803950",
             grantConnectionPermission = true,
         )
 
         // Short link
         testUri(
-            WGS84Point(52.49002,13.38267, source = Source.HTML),
+            WGS84Point(52.49002, 13.38267, source = Source.HTML),
             "https://mapq.st/4s3jg1r",
             grantConnectionPermission = true,
         )

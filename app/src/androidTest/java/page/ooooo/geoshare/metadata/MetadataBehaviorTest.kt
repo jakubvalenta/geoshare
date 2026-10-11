@@ -9,6 +9,7 @@ import org.junit.Rule
 import org.junit.Test
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.tests.assertConversionSucceeds
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableDarkMode
@@ -18,7 +19,6 @@ import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
-import page.ooooo.geoshare.data.preferences.HelpMessage
 import tools.fastlane.screengrab.Screengrab
 import tools.fastlane.screengrab.UiAutomatorScreenshotStrategy
 import tools.fastlane.screengrab.locale.LocaleTestRule

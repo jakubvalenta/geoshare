@@ -50,10 +50,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeGoogleMapsStreetViewLink
+import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.LinkType
-import page.ooooo.geoshare.data.android.openUriInDefaultApp
+import page.ooooo.geoshare.data.di.FakeGoogleMapsStreetViewLink
 import page.ooooo.geoshare.data.formatters.UriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries

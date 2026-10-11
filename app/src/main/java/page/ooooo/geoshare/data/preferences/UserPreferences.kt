@@ -8,9 +8,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.data.database.Link
-import page.ooooo.geoshare.data.log.DefaultLog
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.android.AppActivity
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.FileActivity
@@ -20,6 +17,9 @@ import page.ooooo.geoshare.data.android.UriActivity
 import page.ooooo.geoshare.data.android.UriScheme
 import page.ooooo.geoshare.data.android.getPackageNames
 import page.ooooo.geoshare.data.android.sorted
+import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.log.Log
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit

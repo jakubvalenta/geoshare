@@ -45,7 +45,7 @@ class ActionRanTest {
     fun transition_whenAutomationIsFalseAndResultIsFailedAndOutputHasErrorText_returnsActionFailed() = runTest {
         val actionResult = ActionResult.FAILED
         assertEquals(
-            ActionFailed( output),
+            ActionFailed(output),
             ActionRan(action, actionResult, isAutomation = false).transition(actionStateContext),
         )
     }

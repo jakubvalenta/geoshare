@@ -4,7 +4,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.android.FileType
 import page.ooooo.geoshare.data.android.PackageNames
@@ -12,6 +11,7 @@ import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.geo.mockGeometries
+import page.ooooo.geoshare.data.log.FakeLog
 
 class OpenPointsGpxOutputTest {
     private val coordinateConverter = CoordinateConverter(mockGeometries)

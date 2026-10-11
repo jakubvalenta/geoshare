@@ -24,10 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.state.Attempt
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.network.ConnectTimeoutNetworkException
+import page.ooooo.geoshare.data.preferences.Permission
+import page.ooooo.geoshare.data.state.Attempt
 import page.ooooo.geoshare.data.state.ConversionState
 import page.ooooo.geoshare.data.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.ui.theme.AppTheme

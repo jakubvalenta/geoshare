@@ -15,11 +15,11 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.extensions.chunkedPairs
 import page.ooooo.geoshare.data.extensions.removeRepeated
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.network.configureLogging
 import page.ooooo.geoshare.data.network.rethrowExceptionsAsNetworkException

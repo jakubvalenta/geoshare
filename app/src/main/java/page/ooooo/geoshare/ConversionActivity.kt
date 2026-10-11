@@ -11,8 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import page.ooooo.geoshare.ui.BillingViewModel
-import page.ooooo.geoshare.ui.MainViewModel
 import page.ooooo.geoshare.ui.MainNavigation
+import page.ooooo.geoshare.ui.MainViewModel
 import page.ooooo.geoshare.ui.UserPreferenceViewModel
 import page.ooooo.geoshare.ui.theme.AppTheme
 

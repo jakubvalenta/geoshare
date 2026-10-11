@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.Billing
 import page.ooooo.geoshare.data.billing.BillingImpl
@@ -22,6 +21,7 @@ import page.ooooo.geoshare.data.billing.BillingProduct
 import page.ooooo.geoshare.data.billing.BillingStatus
 import page.ooooo.geoshare.data.billing.CustomLinkFeature
 import page.ooooo.geoshare.data.billing.Feature
+import page.ooooo.geoshare.data.message.Message
 import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours

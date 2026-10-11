@@ -27,7 +27,7 @@ class ActionFailedTest {
 
     @Test
     fun transition_whenExecutionIsNotCancelled_waitsAndReturnsActionCompleted() = runTest {
-        val state = ActionFailed( output)
+        val state = ActionFailed(output)
         val workDuration = testScheduler.timeSource.measureTime {
             assertEquals(
                 ActionCompleted(actionResult),

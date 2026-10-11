@@ -17,8 +17,8 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.LinkType
-import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.data.geo.Srs
+import page.ooooo.geoshare.data.message.Message
 import javax.inject.Inject
 
 @HiltViewModel

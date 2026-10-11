@@ -225,7 +225,10 @@ fun ResultCoordinates(
                                                 append(stringResource(R.string.conversion_succeeded_check_name_only_points))
                                                 append(" ")
                                                 withLink(
-                                                    LinkAnnotation.Clickable(tag = "link", styles = defaultLinkStyles()) {
+                                                    LinkAnnotation.Clickable(
+                                                        tag = "link",
+                                                        styles = defaultLinkStyles()
+                                                    ) {
                                                         onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
                                                     }
                                                 ) {

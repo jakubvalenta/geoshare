@@ -46,9 +46,9 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.android.isDefaultHandlerEnabled
 import page.ooooo.geoshare.data.android.openSettingsOpenByDefault
+import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.extensions.trimUrl
 import page.ooooo.geoshare.data.inputs.InputChangelogItem
 import page.ooooo.geoshare.data.inputs.InputGroup

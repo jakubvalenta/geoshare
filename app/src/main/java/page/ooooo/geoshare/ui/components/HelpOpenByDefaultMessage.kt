@@ -13,9 +13,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.isDismissed
+import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable

@@ -29,9 +29,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.database.Server
 import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.database.Server
 import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues

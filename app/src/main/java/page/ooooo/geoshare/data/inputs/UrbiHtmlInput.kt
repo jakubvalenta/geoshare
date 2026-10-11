@@ -4,8 +4,8 @@ import android.content.res.Resources
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.utils.io.readLine
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.extensions.groupOrNull
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject

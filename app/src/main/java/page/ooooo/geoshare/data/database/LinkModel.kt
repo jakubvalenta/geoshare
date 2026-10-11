@@ -13,12 +13,12 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.extensions.firstGraphemeOrNull
 import page.ooooo.geoshare.data.geo.Srs
 import page.ooooo.geoshare.data.outputs.CharacterIconDescriptor
 import page.ooooo.geoshare.data.outputs.IconDescriptor
 import page.ooooo.geoshare.data.outputs.ImageVectorIconDescriptor
 import page.ooooo.geoshare.data.outputs.ResourceIconDescriptor
-import page.ooooo.geoshare.data.extensions.firstGraphemeOrNull
 import java.util.UUID
 
 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")

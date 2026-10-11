@@ -12,10 +12,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import page.ooooo.geoshare.data.DefaultUserPreferencesRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.log.FakeLog
+import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.preferences.AutomationPreference
-import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.preferences.CachedPurchasePreference
+import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
@@ -29,8 +31,6 @@ import page.ooooo.geoshare.data.preferences.NoopAutomation
 import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.preferences.UserPreference
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues
-import page.ooooo.geoshare.data.log.FakeLog
-import page.ooooo.geoshare.data.log.Log
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 

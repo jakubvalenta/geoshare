@@ -60,7 +60,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.data.android.composeEmail
 import page.ooooo.geoshare.data.android.hasEmailApp
 import page.ooooo.geoshare.data.android.openUriInDefaultApp
@@ -73,6 +72,7 @@ import page.ooooo.geoshare.data.billing.FakeOneTimeOffer
 import page.ooooo.geoshare.data.billing.FakeSubscriptionOffer
 import page.ooooo.geoshare.data.billing.Feature
 import page.ooooo.geoshare.data.billing.Offer
+import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.ui.components.AnimatedMessage
 import page.ooooo.geoshare.ui.components.LargeButton
 import page.ooooo.geoshare.ui.components.MainHeadline
