@@ -12,6 +12,7 @@
 - HERE WeGo
 - Kagi Maps
 - Magic Earth
+- MapQuest
 - Maps.me
 - Mapy.com
 - OpenStreetMap
@@ -20,6 +21,7 @@
 - Plus Codes (только всемирные)
 - Urbi
 - Waze
+- Yahoo! Maps
 - Яндекс Карты
 - координаты
 
