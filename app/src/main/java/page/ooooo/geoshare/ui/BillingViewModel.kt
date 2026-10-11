@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.billing.Billing
-import page.ooooo.geoshare.lib.billing.BillingOffers
-import page.ooooo.geoshare.lib.billing.BillingProduct
-import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.billing.Feature
+import page.ooooo.geoshare.data.billing.Billing
+import page.ooooo.geoshare.data.billing.BillingOffers
+import page.ooooo.geoshare.data.billing.BillingProduct
+import page.ooooo.geoshare.data.billing.BillingStatus
+import page.ooooo.geoshare.data.billing.Feature
+import page.ooooo.geoshare.data.message.Message
 import javax.inject.Inject
 import kotlin.time.Duration
 

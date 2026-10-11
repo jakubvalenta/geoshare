@@ -34,9 +34,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.billing.BillingProduct
-import page.ooooo.geoshare.lib.billing.BillingStatus
-import page.ooooo.geoshare.lib.state.ConversionState
+import page.ooooo.geoshare.data.billing.BillingProduct
+import page.ooooo.geoshare.data.billing.BillingStatus
+import page.ooooo.geoshare.data.state.ConversionState
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme

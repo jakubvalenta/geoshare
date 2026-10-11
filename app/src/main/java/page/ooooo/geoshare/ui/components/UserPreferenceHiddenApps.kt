@@ -24,10 +24,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.di.getFakeAppDetails
-import page.ooooo.geoshare.data.local.preferences.HiddenAppsPreference
-import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
+import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
+import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.HiddenAppDetail
 import page.ooooo.geoshare.ui.HiddenAppsSize
 import page.ooooo.geoshare.ui.theme.AppTheme

@@ -32,32 +32,34 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.android.openSettingsOpenByDefault
-import page.ooooo.geoshare.lib.android.openSettingsOpenByDefaultForPackage
-import page.ooooo.geoshare.lib.android.openUriInDefaultApp
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.openSettingsOpenByDefault
+import page.ooooo.geoshare.data.android.openSettingsOpenByDefaultForPackage
+import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.ui.components.ExpandablePane
-import page.ooooo.geoshare.ui.components.FormatArg
 import page.ooooo.geoshare.ui.components.NavigationBackButton
-import page.ooooo.geoshare.ui.components.ParagraphHtml
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefault
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefaultMapApp
 import page.ooooo.geoshare.ui.components.TextList
 import page.ooooo.geoshare.ui.components.TextListBullet
 import page.ooooo.geoshare.ui.components.TextListItem
-import page.ooooo.geoshare.ui.components.annotatedStringResource
-import page.ooooo.geoshare.ui.components.styledArgsString
+import page.ooooo.geoshare.ui.string.FormatArg
+import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
+import page.ooooo.geoshare.ui.theme.tertiaryLinkStyles
 
 @Keep
 enum class FaqItemId {
@@ -170,6 +172,7 @@ private fun FaqScreen(
                 ParagraphText(
                     annotatedStringResource(
                         R.string.faq_how_text_4,
+                        tertiaryLinkStyles(),
                         FormatArg.Link(stringResource(R.string.faq_how_text_4_preferences_button)) {
                             onNavigateToUserPreferencesScreen(UserPreferenceGroupId.CONNECTION_PERMISSION)
                         },
@@ -201,6 +204,7 @@ private fun FaqScreen(
                 ParagraphText(
                     annotatedStringResource(
                         R.string.faq_privacy_text_server,
+                        tertiaryLinkStyles(),
                         FormatArg.Text(appName),
                         FormatArg.Text(appServerName),
                         FormatArg.Link(appServerName) {
@@ -260,10 +264,12 @@ private fun FaqScreen(
                         Text(stringResource(R.string.intro_open_by_default_app_button, appName))
                     }
                     ParagraphText(
-                        styledArgsString(
+                        annotatedStringResource(
                             R.string.intro_open_by_default_app_note_1,
-                            SpanStyle(fontWeight = FontWeight.Bold),
-                            "maps.app.goo.gl", "maps.google.com", "www.google.com",
+                            defaultLinkStyles(),
+                            *listOf("maps.app.goo.gl", "maps.google.com", "www.google.com")
+                                .map { FormatArg.Text(it, SpanStyle(fontWeight = FontWeight.Bold)) }
+                                .toTypedArray(),
                         )
                     )
                     ParagraphText(
@@ -331,7 +337,10 @@ private fun FaqFigure(
         verticalArrangement = Arrangement.spacedBy(spacing.tiny),
     ) {
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-            ParagraphHtml(captionHtml, Modifier.fillMaxWidth())
+            ParagraphText(
+                AnnotatedString.fromHtml(captionHtml, tertiaryLinkStyles()),
+                Modifier.fillMaxWidth(),
+            )
             content()
         }
     }

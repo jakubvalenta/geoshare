@@ -6,8 +6,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.tests.TestServer
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
@@ -24,6 +23,7 @@ import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
+import page.ooooo.geoshare.data.preferences.HelpMessage
 
 /**
  * Takes screenshots for documentation purposes, such as the Weblate translation service.

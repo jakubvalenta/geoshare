@@ -1,0 +1,36 @@
+package page.ooooo.geoshare.data.billing
+
+import android.app.Activity
+import android.content.Context
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.flow.StateFlow
+import page.ooooo.geoshare.data.message.Message
+import kotlin.time.Duration
+
+@Suppress("EmptyMethod")
+interface Billing {
+    val appNameResId: Int
+    val context: Context
+    val features: ImmutableList<Feature>
+    val products: ImmutableList<BillingProduct>
+    val refundableDuration: Duration
+
+    val message: StateFlow<Message?>
+    val status: StateFlow<BillingStatus>
+
+    fun startConnection()
+
+    fun endConnection()
+
+    suspend fun queryOffers(): BillingOffers
+
+    fun consumePurchases()
+
+    suspend fun launchBillingFlow(activity: Activity, offerToken: String)
+
+    fun manageProduct(activity: Activity, product: BillingProduct)
+
+    suspend fun showInAppMessages(activity: Activity)
+
+    fun dismissMessage()
+}

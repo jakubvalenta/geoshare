@@ -16,12 +16,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.local.preferences.CoordinateFormatPreference
-import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.data.formatters.CoordinateFormatter
+import page.ooooo.geoshare.data.geo.NaivePoint
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.preferences.CoordinateFormatPreference
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable

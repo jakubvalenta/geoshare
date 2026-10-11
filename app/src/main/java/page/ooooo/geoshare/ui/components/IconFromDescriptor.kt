@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.ui.components
 
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,25 +12,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-
-sealed interface IconDescriptor
-
-data class CharacterIconDescriptor(val text: String?) : IconDescriptor
-
-data class DrawableIconDescriptor(val drawable: Drawable) : IconDescriptor
-
-data class ImageVectorIconDescriptor(val imageVector: ImageVector) : IconDescriptor
-
-object PlaceholderIconDescriptor : IconDescriptor
-
-data class ResourceIconDescriptor(val id: Int) : IconDescriptor
-
-object SpacerIconDescriptor : IconDescriptor
+import page.ooooo.geoshare.data.outputs.CharacterIconDescriptor
+import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
+import page.ooooo.geoshare.data.outputs.IconDescriptor
+import page.ooooo.geoshare.data.outputs.ImageVectorIconDescriptor
+import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
+import page.ooooo.geoshare.data.outputs.ResourceIconDescriptor
+import page.ooooo.geoshare.data.outputs.SpacerIconDescriptor
 
 @Composable
 fun IconFromDescriptor(

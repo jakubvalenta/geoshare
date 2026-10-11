@@ -7,7 +7,7 @@ import org.junit.AfterClass
 import org.junit.Assume.assumeTrue
 import org.junit.BeforeClass
 import org.junit.Test
-import page.ooooo.geoshare.lib.android.PackageNames
+import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.confirmDialog
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode

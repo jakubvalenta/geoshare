@@ -1,37 +1,37 @@
 package page.ooooo.geoshare.data
 
 import page.ooooo.geoshare.BuildConfig
-import page.ooooo.geoshare.lib.inputs.AmapShortLinkInput
-import page.ooooo.geoshare.lib.inputs.AmapUriInput
-import page.ooooo.geoshare.lib.inputs.AppleMapsUriInput
-import page.ooooo.geoshare.lib.inputs.BaiduMapShortLinkInput
-import page.ooooo.geoshare.lib.inputs.BaiduMapUriInput
-import page.ooooo.geoshare.lib.inputs.CartesIGNUriInput
-import page.ooooo.geoshare.lib.inputs.CoordinateInput
-import page.ooooo.geoshare.lib.inputs.DebugUriInput
-import page.ooooo.geoshare.lib.inputs.GeoUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsShortLinkInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleNavigationUriInput
-import page.ooooo.geoshare.lib.inputs.GoogleSearchUriInput
-import page.ooooo.geoshare.lib.inputs.HereWeGoUriInput
-import page.ooooo.geoshare.lib.inputs.Input
-import page.ooooo.geoshare.lib.inputs.KagiMapsUriInput
-import page.ooooo.geoshare.lib.inputs.MagicEarthUriInput
-import page.ooooo.geoshare.lib.inputs.MapQuestHtmlInput
-import page.ooooo.geoshare.lib.inputs.MapQuestUriInput
-import page.ooooo.geoshare.lib.inputs.MapsMeUriInput
-import page.ooooo.geoshare.lib.inputs.MapyComShortLinkInput
-import page.ooooo.geoshare.lib.inputs.MapyComUriInput
-import page.ooooo.geoshare.lib.inputs.OpenStreetMapUriInput
-import page.ooooo.geoshare.lib.inputs.OsmAndUriInput
-import page.ooooo.geoshare.lib.inputs.PlusCodeInput
-import page.ooooo.geoshare.lib.inputs.UrbiUriInput
-import page.ooooo.geoshare.lib.inputs.WazeUriInput
-import page.ooooo.geoshare.lib.inputs.YahooMapsShortLinkInput
-import page.ooooo.geoshare.lib.inputs.YahooMapsUriInput
-import page.ooooo.geoshare.lib.inputs.YandexMapsShortLinkInput
-import page.ooooo.geoshare.lib.inputs.YandexMapsUriInput
+import page.ooooo.geoshare.data.inputs.AmapShortLinkInput
+import page.ooooo.geoshare.data.inputs.AmapUriInput
+import page.ooooo.geoshare.data.inputs.AppleMapsUriInput
+import page.ooooo.geoshare.data.inputs.BaiduMapShortLinkInput
+import page.ooooo.geoshare.data.inputs.BaiduMapUriInput
+import page.ooooo.geoshare.data.inputs.CartesIGNUriInput
+import page.ooooo.geoshare.data.inputs.CoordinateInput
+import page.ooooo.geoshare.data.inputs.DebugUriInput
+import page.ooooo.geoshare.data.inputs.GeoUriInput
+import page.ooooo.geoshare.data.inputs.GoogleMapsShortLinkInput
+import page.ooooo.geoshare.data.inputs.GoogleMapsUriInput
+import page.ooooo.geoshare.data.inputs.GoogleNavigationUriInput
+import page.ooooo.geoshare.data.inputs.GoogleSearchUriInput
+import page.ooooo.geoshare.data.inputs.HereWeGoUriInput
+import page.ooooo.geoshare.data.inputs.Input
+import page.ooooo.geoshare.data.inputs.KagiMapsUriInput
+import page.ooooo.geoshare.data.inputs.MagicEarthUriInput
+import page.ooooo.geoshare.data.inputs.MapQuestHtmlInput
+import page.ooooo.geoshare.data.inputs.MapQuestUriInput
+import page.ooooo.geoshare.data.inputs.MapsMeUriInput
+import page.ooooo.geoshare.data.inputs.MapyComShortLinkInput
+import page.ooooo.geoshare.data.inputs.MapyComUriInput
+import page.ooooo.geoshare.data.inputs.OpenStreetMapUriInput
+import page.ooooo.geoshare.data.inputs.OsmAndUriInput
+import page.ooooo.geoshare.data.inputs.PlusCodeInput
+import page.ooooo.geoshare.data.inputs.UrbiUriInput
+import page.ooooo.geoshare.data.inputs.WazeUriInput
+import page.ooooo.geoshare.data.inputs.YahooMapsShortLinkInput
+import page.ooooo.geoshare.data.inputs.YahooMapsUriInput
+import page.ooooo.geoshare.data.inputs.YandexMapsShortLinkInput
+import page.ooooo.geoshare.data.inputs.YandexMapsUriInput
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -70,7 +70,7 @@ interface InputRepository {
     /**
      * All [Input] objects.
      *
-     * Order matters, because when parsing a URI, [page.ooooo.geoshare.lib.state.ConversionState] will try the inputs in
+     * Order matters, because when parsing a URI, [page.ooooo.geoshare.data.state.ConversionState] will try the inputs in
      * order.
      */
     val all: List<Input>

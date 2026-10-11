@@ -84,7 +84,7 @@ fun SegmentedListLabel(
     paddingBottom: Dp = LocalSpacing.current.tiny,
     color: Color = MaterialTheme.colorScheme.primary,
 ) {
-    LabelLarge(
+    LargeLabel(
         text,
         modifier.padding(top = paddingTop, bottom = paddingBottom),
         color = color,

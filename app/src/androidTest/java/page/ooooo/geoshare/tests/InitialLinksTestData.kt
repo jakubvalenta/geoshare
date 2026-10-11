@@ -1,9 +1,9 @@
 package page.ooooo.geoshare.tests
 
-import page.ooooo.geoshare.data.local.database.InitialLinks
-import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.database.LinkType
-import page.ooooo.geoshare.lib.geo.Srs
+import page.ooooo.geoshare.data.database.InitialLinks
+import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.database.LinkType
+import page.ooooo.geoshare.data.geo.Srs
 import java.util.UUID
 
 object InitialLinksTestData {

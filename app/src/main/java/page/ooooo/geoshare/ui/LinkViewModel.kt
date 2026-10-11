@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.local.database.Link
-import page.ooooo.geoshare.data.local.database.LinkType
-import page.ooooo.geoshare.lib.Message
-import page.ooooo.geoshare.lib.geo.Srs
+import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.database.LinkType
+import page.ooooo.geoshare.data.geo.Srs
+import page.ooooo.geoshare.data.message.Message
 import javax.inject.Inject
 
 @HiltViewModel

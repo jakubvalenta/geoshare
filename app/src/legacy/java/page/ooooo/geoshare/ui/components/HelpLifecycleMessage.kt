@@ -12,13 +12,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.android.composeEmail
-import page.ooooo.geoshare.lib.android.openUriInDefaultApp
+import page.ooooo.geoshare.data.android.composeEmail
+import page.ooooo.geoshare.data.android.openUriInDefaultApp
+import page.ooooo.geoshare.ui.string.FormatArg
+import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 
 @Composable
 fun HelpLifecycleMessage(modifier: Modifier) {
@@ -49,7 +51,8 @@ fun HelpLifecycleMessage(modifier: Modifier) {
         ParagraphText(
             annotatedStringResource(
                 R.string.main_flavor_message_text_2,
-                FormatArg.Link(supportEmail, AnnotatedString.UnderlinedLinkStyles) {
+                defaultLinkStyles(),
+                FormatArg.Link(supportEmail) {
                     context.composeEmail(supportEmail)
                 },
             )

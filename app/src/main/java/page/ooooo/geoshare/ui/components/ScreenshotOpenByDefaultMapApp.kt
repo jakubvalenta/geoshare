@@ -14,7 +14,8 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.ui.theme.*
+import page.ooooo.geoshare.ui.theme.AppTheme
+import page.ooooo.geoshare.ui.theme.ScreenshotTheme
 
 @Composable
 fun ScreenshotOpenByDefaultMapApp() {

@@ -1,0 +1,77 @@
+package page.ooooo.geoshare.data.inputs
+
+import android.content.res.Resources
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import org.mockito.kotlin.mock
+import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.network.FakeFetchTools
+
+class WazeHtmlInputTest : InputTest {
+    override val resources: Resources = mock()
+    private val input = FakeInputRepository.wazeHtmlInput
+
+    @Test
+    fun parse_containsLatLngJSON_returnsPoint() = runTest {
+        assertEquals(
+            ParseResult.Success(persistentListOf(WGS84Point(43.64265563, -79.387202798, source = Source.JAVASCRIPT))),
+            input.parse(
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en">
+<script>
+{
+  "routing": {
+    "to": {
+      "address":"301 Front St W, Toronto, Ontario, Canada",
+      "latLng":{"lat":43.64265563,"lng":-79.387202798},
+      "title":"CN Tower"
+    }
+  },
+  "nearbyVenues": [
+    {
+      "name": "Toronto Zoo",
+      "latLng":{"lat":43.81809781005661,"lng":-79.18557484205378}
+    }
+  ]
+}
+</script>
+</html>"""
+                )
+            )
+        )
+    }
+
+    @Test
+    fun parse_containsInvalidDataCoordinates_returnsNoPoints() = runTest {
+        assertEquals(
+            ParseResult.Success(),
+            input.parse(
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en"><script>{"routing": {"to": {"address":"301 Front St W, Toronto, Ontario, Canada","latLng":{"lat":spam,"lng":spam},"title":"CN Tower"}}}}</script></html>"""
+                )
+            )
+        )
+    }
+
+    @Test
+    fun parse_doesNotContainCoordinates_returnsNoPoints() = runTest {
+        assertEquals(
+            ParseResult.Success(),
+            input.parse(
+                "fake match",
+                FakeFetchTools(
+                    // language=html
+                    """<html lang="en"></html>"""
+                )
+            )
+        )
+    }
+}

@@ -51,11 +51,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.database.Server
+import page.ooooo.geoshare.data.database.ServerAuthType
 import page.ooooo.geoshare.data.di.FakeGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.defaultFakeServers
-import page.ooooo.geoshare.data.local.database.Server
-import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost

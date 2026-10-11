@@ -8,17 +8,17 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.data.local.database.InitialLinks
-import page.ooooo.geoshare.data.local.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.local.preferences.Finish
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.CoordinateConverter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.Geometries
-import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.database.InitialLinks
+import page.ooooo.geoshare.data.formatters.CoordinateFormatter
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.GCJ02Point
+import page.ooooo.geoshare.data.geo.Geometries
+import page.ooooo.geoshare.data.geo.NaivePoint
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.preferences.Finish
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class UserPreferencesBehaviorTest {

@@ -1,0 +1,55 @@
+package page.ooooo.geoshare.data.outputs
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.openUriInDefaultApp
+import page.ooooo.geoshare.data.database.Link
+import page.ooooo.geoshare.data.formatters.UriFormatter
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.Point
+import page.ooooo.geoshare.data.uri.UriQuote
+import javax.inject.Inject
+
+class ShareLinkUriOutput @Inject constructor(
+    val link: Link,
+    private val coordinateConverter: CoordinateConverter,
+) : SharePointUriOutput {
+    override val id = "ShareLinkUriOutput(link.uuid=${link.uuid})"
+
+    override fun getUriString(value: Point, uriQuote: UriQuote) =
+        UriFormatter.formatUriString(
+            coordinateConverter.toSrs(value, link.srs),
+            link.coordsUriTemplate,
+            link.nameUriTemplate,
+            uriQuote = uriQuote,
+        )
+
+    override suspend fun execute(value: Point, actionContext: ActionContext) =
+        getUriString(value, actionContext.uriQuote)?.let { uriString ->
+            actionContext.context.openUriInDefaultApp(uriString)
+        }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
+
+    override fun isEnabled(value: Point, uriQuote: UriQuote) =
+        !getUriString(value, uriQuote).isNullOrEmpty()
+
+    @Composable
+    override fun label(appDetail: AppDetail?) =
+        stringResource(R.string.output_open_link, link.name)
+
+    override fun getMenuIcon(appDetail: AppDetail?) =
+        link.menuIcon
+
+    override fun getIcon(appDetail: AppDetail?) =
+        link.icon
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as ShareLinkUriOutput
+        return link == other.link
+    }
+
+    override fun hashCode() = link.hashCode()
+}

@@ -16,9 +16,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.ServerRepository
-import page.ooooo.geoshare.data.local.database.Server
-import page.ooooo.geoshare.data.local.database.ServerAuthType
-import page.ooooo.geoshare.lib.Message
+import page.ooooo.geoshare.data.database.Server
+import page.ooooo.geoshare.data.database.ServerAuthType
+import page.ooooo.geoshare.data.message.Message
 import javax.inject.Inject
 
 data class SelectedServers(

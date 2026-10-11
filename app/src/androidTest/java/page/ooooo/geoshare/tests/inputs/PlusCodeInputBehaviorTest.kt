@@ -2,9 +2,9 @@ package page.ooooo.geoshare.tests.inputs
 
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Test
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.data.geo.GCJ02Point
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.tests.testText
 import page.ooooo.geoshare.tests.testUri
 
