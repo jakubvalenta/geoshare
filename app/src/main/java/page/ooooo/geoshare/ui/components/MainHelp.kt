@@ -10,31 +10,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.MutableStateFlow
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.InputRepository
-import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.geo.NaivePoint
-import page.ooooo.geoshare.data.geo.WGS84Point
-import page.ooooo.geoshare.data.inputs.Input
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainHelp(
-    inputRepository: InputRepository,
+    onGenRandomUri: () -> String?,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
     message: (@Composable (paddingValues: PaddingValues) -> Unit)? = null,
 ) {
-    val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
     Column(
@@ -60,22 +53,10 @@ fun MainHelp(
             Text(stringResource(R.string.faq_title))
         }
         TextButton({
-            inputRepository
-                .all
-                .shuffled()
-                .firstNotNullOfOrNull { it as? Input.HasRandomUri }
-                ?.run {
-                    val randomPoint = WGS84Point(
-                        NaivePoint.genRandomPoint(
-                            name = resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place),
-                        )
-                    )
-                    genRandomUri(randomPoint)
-                }
-                ?.let { newSource ->
-                    onSetSource(newSource)
-                    onSetErrorMessageResId(null)
-                }
+            onGenRandomUri()?.let { newSource ->
+                onSetSource(newSource)
+                onSetErrorMessageResId(null)
+            }
         }) {
             Icon(
                 painterResource(R.drawable.ifl_24px),
@@ -95,7 +76,7 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             MainHelp(
-                inputRepository = FakeInputRepository,
+                onGenRandomUri = { null },
                 onNavigateToFaqScreen = {},
                 onNavigateToInputsScreen = {},
                 onSetErrorMessageResId = {},
@@ -111,7 +92,7 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             MainHelp(
-                inputRepository = FakeInputRepository,
+                onGenRandomUri = { null },
                 onNavigateToFaqScreen = {},
                 onNavigateToInputsScreen = {},
                 onSetErrorMessageResId = {},
@@ -127,7 +108,7 @@ private fun MessagePreview() {
     AppTheme {
         Surface {
             MainHelp(
-                inputRepository = FakeInputRepository,
+                onGenRandomUri = { null },
                 onNavigateToFaqScreen = {},
                 onNavigateToInputsScreen = {},
                 onSetErrorMessageResId = {},
@@ -153,7 +134,7 @@ private fun DarkMessagePreview() {
     AppTheme {
         Surface {
             MainHelp(
-                inputRepository = FakeInputRepository,
+                onGenRandomUri = { null },
                 onNavigateToFaqScreen = {},
                 onNavigateToInputsScreen = {},
                 onSetErrorMessageResId = {},

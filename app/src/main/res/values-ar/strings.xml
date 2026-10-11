@@ -18,7 +18,6 @@
     <string name="intro_settings_activity_not_found">فشل في فتح الإعدادات</string>
     <string name="main_input_uri_label">ألصق رابط خرائط هنا</string>
     <string name="main_input_uri_clear_content_description">امحُ</string>
-    <string name="main_input_uri_supporting_text">مثال: https://maps.app.goo.gl/… أو maps.apple.com/…</string>
     <string name="main_create_geo_uri">أظهر الإحداثيات</string>
     <string name="conversion_permission_common_grant">موافق</string>
     <string name="conversion_permission_common_deny">ألغِ</string>
