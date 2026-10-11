@@ -16,9 +16,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.ConnectionPermissionPreference
-import page.ooooo.geoshare.data.local.preferences.Permission
-import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
+import page.ooooo.geoshare.data.preferences.Permission
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable

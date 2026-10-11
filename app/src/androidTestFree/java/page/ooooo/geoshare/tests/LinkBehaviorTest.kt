@@ -11,8 +11,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import page.ooooo.geoshare.data.local.database.InitialLinks
-import page.ooooo.geoshare.data.local.database.Link
+import page.ooooo.geoshare.data.database.InitialLinks
+import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class LinkBehaviorTest {

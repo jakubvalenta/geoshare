@@ -16,8 +16,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
-import page.ooooo.geoshare.data.local.preferences.DynamicColorPreference
-import page.ooooo.geoshare.data.local.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.DynamicColorPreference
+import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable

@@ -7,8 +7,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.billing.Offer
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.billing.Offer
 import page.ooooo.geoshare.tests.assumeAppInstalled
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.disableSystemUIDemoMode

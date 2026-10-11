@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import page.ooooo.geoshare.lib.DefaultLog
-import page.ooooo.geoshare.lib.Log
+import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.log.Log
 import javax.inject.Singleton
 
 @Module

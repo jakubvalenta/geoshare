@@ -1,8 +1,8 @@
 package page.ooooo.geoshare.tests
 
-import page.ooooo.geoshare.data.local.database.InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID
-import page.ooooo.geoshare.data.local.database.Server
-import page.ooooo.geoshare.data.local.database.ServerAuthType
+import page.ooooo.geoshare.data.database.InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID
+import page.ooooo.geoshare.data.database.Server
+import page.ooooo.geoshare.data.database.ServerAuthType
 import java.util.UUID
 
 object InitialServersTestDataImpl : InitialServersTestData {
@@ -25,5 +25,5 @@ object InitialServersTestDataImpl : InitialServersTestData {
                 uuid = UUID.fromString("c5c215a1-c453-4de9-adb3-daecbd7dc876"),
             )
         )
-    }.sortedWith(compareBy<Server>{ it.name }.thenBy { it.description })
+    }.sortedWith(compareBy<Server> { it.name }.thenBy { it.description })
 }

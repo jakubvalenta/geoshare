@@ -4,9 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import page.ooooo.geoshare.lib.uri.UriQuote
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInput
-import page.ooooo.geoshare.lib.inputs.GoogleMapsHtmlInputImpl
+import page.ooooo.geoshare.data.uri.UriQuote
+import page.ooooo.geoshare.data.inputs.GoogleMapsHtmlInput
+import page.ooooo.geoshare.data.inputs.GoogleMapsHtmlInputImpl
 import javax.inject.Singleton
 
 @Module

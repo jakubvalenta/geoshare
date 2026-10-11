@@ -11,14 +11,14 @@ import kotlinx.coroutines.CoroutineScope
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.data.DefaultAppRepository
-import page.ooooo.geoshare.lib.android.AppDetail
-import page.ooooo.geoshare.lib.android.FileActivity
-import page.ooooo.geoshare.lib.android.FileType
-import page.ooooo.geoshare.lib.android.MimeType
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.android.TextActivity
-import page.ooooo.geoshare.lib.android.UriActivity
-import page.ooooo.geoshare.lib.android.UriScheme
+import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.FileActivity
+import page.ooooo.geoshare.data.android.FileType
+import page.ooooo.geoshare.data.android.MimeType
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.TextActivity
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.android.UriScheme
 import javax.inject.Singleton
 
 @Module

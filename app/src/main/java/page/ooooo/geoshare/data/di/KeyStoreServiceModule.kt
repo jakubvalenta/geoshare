@@ -4,9 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import page.ooooo.geoshare.lib.android.DefaultKeyStoreTools
-import page.ooooo.geoshare.lib.android.Key
-import page.ooooo.geoshare.lib.android.KeyStoreTools
+import page.ooooo.geoshare.data.android.DefaultKeyStoreTools
+import page.ooooo.geoshare.data.android.Key
+import page.ooooo.geoshare.data.android.KeyStoreTools
 import java.security.KeyPairGenerator
 import java.security.cert.CertificateFactory
 import java.security.spec.ECGenParameterSpec

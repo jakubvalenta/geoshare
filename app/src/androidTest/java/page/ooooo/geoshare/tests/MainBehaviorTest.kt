@@ -12,19 +12,19 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Assume.assumeTrue
 import org.junit.Test
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.lib.android.MimeType
-import page.ooooo.geoshare.lib.android.PackageNames
-import page.ooooo.geoshare.lib.android.TextActivity
-import page.ooooo.geoshare.lib.android.UriActivity
-import page.ooooo.geoshare.lib.android.UriScheme
-import page.ooooo.geoshare.lib.formatters.CoordinateFormatter
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.NaivePoint
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
-import page.ooooo.geoshare.lib.outputs.OpenUnknownUriOutput
-import page.ooooo.geoshare.lib.outputs.SendStringOutput
+import page.ooooo.geoshare.data.android.MimeType
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.TextActivity
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.android.UriScheme
+import page.ooooo.geoshare.data.formatters.CoordinateFormatter
+import page.ooooo.geoshare.data.geo.GCJ02Point
+import page.ooooo.geoshare.data.geo.NaivePoint
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.outputs.OpenUnknownUriOutput
+import page.ooooo.geoshare.data.outputs.SendStringOutput
+import page.ooooo.geoshare.data.preferences.HelpMessage
 import kotlin.time.Duration.Companion.seconds
 
 class MainBehaviorTest {

@@ -27,7 +27,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.lib.inputs.InputGroup
+import page.ooooo.geoshare.data.inputs.InputGroup
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 

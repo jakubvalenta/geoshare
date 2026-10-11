@@ -1,0 +1,53 @@
+package page.ooooo.geoshare.data.outputs
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.formatters.GeoUriFormatter
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.Point
+import page.ooooo.geoshare.data.uri.UriQuote
+import javax.inject.Inject
+
+/**
+ * Creates a geo: URI and opens it in [activity]. It's the most important of all outputs.
+ */
+class OpenDisplayGeoUriOutput @Inject constructor(
+    override val activity: UriActivity,
+    private val coordinateConverter: CoordinateConverter,
+) : OpenPointUriOutput {
+    override val id = "OpenDisplayGeoUriOutput(activity=$activity)"
+
+    override fun getUriString(value: Point, uriQuote: UriQuote) =
+        GeoUriFormatter.formatGeoUriString(
+            coordinateConverter.toSrs(value, PackageNames.getSrs(activity.packageName)),
+            PackageNames.getGeoUriFlavor(activity.packageName),
+            uriQuote,
+        )
+
+    @Composable
+    override fun label(appDetail: AppDetail?) =
+        stringResource(R.string.output_open_display)
+
+    override fun getMenuIcon(appDetail: AppDetail?) =
+        ResourceIconDescriptor(R.drawable.location_on_24px)
+
+    override fun getIcon(appDetail: AppDetail?) =
+        appDetail?.let { DrawableIconDescriptor(it.icon) }
+
+    @Composable
+    override fun automationLabel(appDetail: AppDetail?) =
+        stringResource(R.string.conversion_succeeded_open_app_display, appDetail?.label.orEmpty())
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as OpenDisplayGeoUriOutput
+        return activity == other.activity
+    }
+
+    override fun hashCode() = activity.hashCode()
+}

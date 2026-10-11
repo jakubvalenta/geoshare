@@ -5,8 +5,8 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.lib.geo.Source
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.tests.assumeDomainResolvable
 import page.ooooo.geoshare.tests.assumeHttpGetReturnsStatus
 import page.ooooo.geoshare.tests.testUri
@@ -24,13 +24,13 @@ class YahooMapsInputBehaviorTest : InputBehaviorTest {
         testUri(
             persistentListOf(
                 WGS84Point(
-                    35.04361,135.75926,
+                    35.04361, 135.75926,
                     z = 14.0,
                     name = "京都府京都市北区小山上総町",
                     source = Source.URI,
                 ),
                 WGS84Point(
-                    35.02924,135.76683,
+                    35.02924, 135.76683,
                     z = 14.0,
                     name = "京都府京都市上京区革堂内町",
                     source = Source.URI,
@@ -42,7 +42,7 @@ class YahooMapsInputBehaviorTest : InputBehaviorTest {
                     source = Source.URI,
                 ),
                 WGS84Point(
-                    35.01084,135.75962,
+                    35.01084, 135.75962,
                     z = 14.0,
                     name = "京都府京都市中京区虎屋町",
                     source = Source.URI,

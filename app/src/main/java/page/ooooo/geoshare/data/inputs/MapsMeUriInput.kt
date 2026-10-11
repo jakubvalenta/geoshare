@@ -1,0 +1,65 @@
+package page.ooooo.geoshare.data.inputs
+
+import android.content.res.Resources
+import kotlinx.collections.immutable.persistentListOf
+import page.ooooo.geoshare.data.extensions.groupOrNull
+import page.ooooo.geoshare.data.extensions.toScale
+import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.geo.decodeGe0Hash
+import page.ooooo.geoshare.data.uri.Uri
+import page.ooooo.geoshare.data.uri.UriQuote
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class MapsMeUriInput @Inject constructor(
+    val uriQuote: UriQuote,
+) : BasicOfflineInput, Input.HasPattern {
+    override fun getName(resources: Resources) = group.getName(resources)
+
+    override val group = InputGroup.MAPS_ME
+    override val changelog = persistentListOf(
+        InputChangelogItem.Url(25, "http://ge0.me/"),
+        InputChangelogItem.Url(25, "https://omaps.app/"),
+        InputChangelogItem.Url(25, "https://comaps.at/"),
+    )
+
+    override val pattern = Regex("""((?:(?:https?://)?(?:comaps\.at|ge0\.me|omaps\.app)|ge0:/)/$URI_REST)""")
+
+    override fun parse(match: String, resources: Resources) =
+        Uri.parse(match, uriQuote).run {
+            parseResult {
+                val name = (if (scheme == "ge0") pathParts.getOrNull(1) else pathParts.getOrNull(2))
+                    ?.let { Q_PATH_PATTERN.matchEntire(it) }
+                    ?.groupOrNull()
+                    ?.replace('_', ' ')
+
+                (if (scheme == "ge0") host else pathParts.getOrNull(1))
+                    ?.let { Regex(HASH).matchEntire(it)?.value }
+                    ?.let { hash -> decodeGe0Hash(hash) }
+                    ?.let {
+                        points = persistentListOf(
+                            WGS84Point(
+                                lat = it.lat?.toScale(7),
+                                lon = it.lon?.toScale(7),
+                                z = it.z,
+                                name = name,
+                                source = it.source,
+                            )
+                        )
+                        return@parseResult
+                    }
+
+                if (name != null) {
+                    points = persistentListOf(WGS84Point(name = name, source = Source.URI))
+                }
+            }
+        }
+
+    override fun toString() = "MapsMeUriInput"
+
+    private companion object {
+        private const val HASH = """[A-Za-z0-9\-_]{2,}"""
+    }
+}

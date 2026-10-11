@@ -19,11 +19,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.local.preferences.HelpMessage
-import page.ooooo.geoshare.data.local.preferences.isDismissed
-import page.ooooo.geoshare.lib.android.copy
-import page.ooooo.geoshare.lib.formatters.UriFormatter
-import page.ooooo.geoshare.lib.geo.WGS84Point
+import page.ooooo.geoshare.data.android.copy
+import page.ooooo.geoshare.data.formatters.UriFormatter
+import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.preferences.HelpMessage
+import page.ooooo.geoshare.data.preferences.isDismissed
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable

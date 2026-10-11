@@ -5,7 +5,7 @@ import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.lib.inputs.InputGroupId
+import page.ooooo.geoshare.data.inputs.InputGroupId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class InputsBehaviorTest {

@@ -1,0 +1,105 @@
+package page.ooooo.geoshare.data.billing
+
+import android.app.Activity
+import android.content.Context
+import androidx.annotation.StringRes
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.message.Message
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
+
+class BillingImpl(override val context: Context) : Billing {
+    @StringRes
+    override val appNameResId = R.string.app_name_pro
+    override val features = persistentListOf(AutomationFeature, CustomLinkFeature)
+    override val products = persistentListOf(
+        BillingProduct("demo_lifetime", BillingProduct.Type.ONE_TIME),
+        BillingProduct("demo_monthly", BillingProduct.Type.SUBSCRIPTION),
+    )
+    override val refundableDuration = 48.hours
+
+    private val offers = persistentListOf(
+        Offer("offer_one_time", "$19", Offer.Period.ONE_TIME, "demo_lifetime"),
+        Offer("offer_subscription", "$1.50", Offer.Period.MONTHLY, "demo_monthly"),
+    )
+
+    private val _status: MutableStateFlow<BillingStatus> = MutableStateFlow(BillingStatus.Loading)
+    override val status: StateFlow<BillingStatus> = _status.asStateFlow()
+
+    private val _message: MutableStateFlow<Message?> = MutableStateFlow(null)
+    override val message: StateFlow<Message?> = _message.asStateFlow()
+
+    override fun startConnection() {
+        _message.value = null
+        CoroutineScope(Dispatchers.Default).launch {
+            delay(2.seconds)
+            _status.value = BillingStatus.NotPurchased
+        }
+    }
+
+    override fun endConnection() {}
+
+    override suspend fun queryOffers(): BillingOffers = BillingOffers.Done(offers)
+
+    override fun consumePurchases() {
+        _status.value = BillingStatus.NotPurchased
+    }
+
+    override suspend fun launchBillingFlow(activity: Activity, offerToken: String) {
+        // Show an error message for a while
+        _message.value = Message("Example error", isError = true)
+        delay(3.seconds)
+
+        // Show pending message for a while
+        _message.value = null
+        val product = offers.firstOrNull { offer -> offer.token == offerToken }?.let { offer ->
+            products.firstOrNull { product -> product.id == offer.productId }
+        } ?: throw NotImplementedError()
+        _status.value = BillingStatus.Pending
+        delay(3.seconds)
+
+        // Purchase the product
+        _status.value = BillingStatus.Purchased(
+            product,
+            expired = false,
+            refundable = true,
+            token = "demo_purchased",
+        )
+    }
+
+    override fun manageProduct(activity: Activity, product: BillingProduct) {
+        _message.value = null
+        when (product.type) {
+            BillingProduct.Type.DONATION -> {}
+
+            BillingProduct.Type.ONE_TIME -> {
+                _status.value = BillingStatus.NotPurchased
+            }
+
+            BillingProduct.Type.SUBSCRIPTION -> {
+                val status = _status.value as? BillingStatus.Purchased
+                _status.value = if (status?.expired == false) {
+                    // If the status is not expired, make it expired
+                    status.copy(expired = true)
+                } else {
+                    // If the status is expired, make it not purchased
+                    BillingStatus.NotPurchased
+                }
+            }
+        }
+    }
+
+    override suspend fun showInAppMessages(activity: Activity) {}
+
+    override fun dismissMessage() {
+        _message.value = null
+    }
+}

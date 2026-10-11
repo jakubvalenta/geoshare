@@ -1,0 +1,26 @@
+package page.ooooo.geoshare.data.uri
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class UriQuoteTest {
+    private val uriQuote = FakeUriQuote
+
+    @Test
+    fun encode_encodesSpace() {
+        assertEquals("foo%20bar", uriQuote.encode("foo bar"))
+    }
+
+    @Test
+    fun encode_encodesPlus() {
+        assertEquals("foo%2Bbar", uriQuote.encode("foo+bar"))
+    }
+
+    @Test
+    fun encode_doesNotEncodeAllowedChars() {
+        assertEquals(
+            "foo%20bar,baz/spam=spam",
+            uriQuote.encode("foo bar,baz/spam=spam", allow = ",/="),
+        )
+    }
+}

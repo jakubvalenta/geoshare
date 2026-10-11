@@ -3,8 +3,8 @@ package page.ooooo.geoshare.tests
 import androidx.test.uiautomator.uiAutomator
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import page.ooooo.geoshare.lib.geo.GCJ02Point
-import page.ooooo.geoshare.lib.geo.Source
+import page.ooooo.geoshare.data.geo.GCJ02Point
+import page.ooooo.geoshare.data.geo.Source
 
 class MainPermissionFreeBehaviorTest {
     @Test

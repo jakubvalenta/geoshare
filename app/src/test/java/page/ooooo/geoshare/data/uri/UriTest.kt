@@ -1,0 +1,579 @@
+package page.ooooo.geoshare.data.uri
+
+import kotlinx.collections.immutable.persistentMapOf
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Test
+
+class UriTest {
+    private val uriQuote = FakeUriQuote
+
+    @Test
+    fun parse_empty() {
+        assertEquals(
+            Uri(
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_pathOnly() {
+        assertEquals(
+            Uri(
+                path = "foo",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("foo", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_pathOnlyWithEmptyScheme() {
+        assertEquals(
+            Uri(
+                path = "foo",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse(":foo", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_pathWithColon() {
+        assertEquals(
+            Uri(
+                path = "/foo/bar%3Abaz",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("/foo/bar:baz", uriQuote)
+        )
+        assertEquals(
+            Uri(
+                host = "foo",
+                path = "/bar:baz",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("foo/bar:baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_queryOnly() {
+        assertEquals(
+            Uri(
+                queryParams = listOf("baz" to "").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("?baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_fragmentOnly() {
+        assertEquals(
+            Uri(
+                fragment = "spam",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("#spam", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_hostAndPath() {
+        assertEquals(
+            Uri(
+                host = "foo",
+                path = "/bar",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("foo/bar", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_hostAndPathAndQuery() {
+        assertEquals(
+            Uri(
+                host = "foo",
+                path = "/bar",
+                queryParams = listOf("baz" to "").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("foo/bar?baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHost() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndEmptyHost() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndPath() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                path = "/bar",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo/bar", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndPathAndQuery() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                path = "/bar",
+                queryParams = listOf("baz" to "").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo/bar?baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndPathAndQueryAndFragment() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "osmand.net",
+                path = "/map",
+                queryParams = listOf("pin" to "52.51628,13.37771").toQueryParams(),
+                fragment = "12.5/-53.347932/-13.2347",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://osmand.net/map?pin=52.51628,13.37771#12.5/-53.347932/-13.2347", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndQueryWithSlash() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                queryParams = listOf("bar/baz" to "").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo?bar/baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndQueryWithMultipleValues() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                queryParams = listOf("bar" to "1", "bar" to "2").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo?bar=1&bar=2", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndFragmentWithQuestionMark() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                fragment = "bar?baz",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo#bar?baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndFragmentWithSlash() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                fragment = "bar/baz",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo#bar/baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndEmptyPath() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                path = "/",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo/", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndHostAndEmptyPathAndQuery() {
+        assertEquals(
+            Uri(
+                scheme = "https",
+                host = "foo",
+                path = "/",
+                queryParams = listOf("baz" to "").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("https://foo/?baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndPath() {
+        assertEquals(
+            Uri(
+                scheme = "geo",
+                path = "foo",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("geo:foo", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndNonhierarchicalHostAndPath() {
+        assertEquals(
+            Uri(
+                scheme = "geo",
+                host = "foo",
+                path = "/bar",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("geo:foo/bar", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndPathAndQuery() {
+        assertEquals(
+            Uri(
+                scheme = "geo",
+                path = "foo",
+                queryParams = listOf("baz" to "").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("geo:foo?baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_schemeAndPathAndFragment() {
+        assertEquals(
+            Uri(
+                scheme = "geo",
+                path = "foo",
+                fragment = "spam",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("geo:foo#spam", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_geoUri() {
+        assertEquals(
+            Uri(
+                scheme = "geo",
+                path = "50.123456,-120.123456",
+                queryParams = listOf("q" to "foo bar", "z" to "3.4").toQueryParams(),
+                uriQuote = uriQuote,
+            ),
+            Uri.parse("geo:50.123456,-120.123456?q=foo%20bar&z=3.4", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_queryParams_missingQuery_returnsEmptyMap() {
+        assertEquals(
+            Uri(queryParams = persistentMapOf(), uriQuote = uriQuote),
+            Uri.parse("?", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_queryParams_severalParameters_returnsMap() {
+        assertEquals(
+            Uri(queryParams = listOf("foo" to "bar", "baz" to "1").toQueryParams(), uriQuote = uriQuote),
+            Uri.parse("?foo=bar&baz=1", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_queryParams_urlEncodeParameter_returnsMapWithUrlDecodedValue() {
+        assertEquals(
+            Uri(queryParams = listOf("foo" to "bar baz").toQueryParams(), uriQuote = uriQuote),
+            Uri.parse("?foo=bar%20baz", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_queryParams_parameterWithoutValue_returnsMapWithEmptyStringsAsTheParameterValue() {
+        assertEquals(
+            Uri(queryParams = listOf("foo" to "bar", "spam" to "", "baz" to "1").toQueryParams(), uriQuote = uriQuote),
+            Uri.parse("?foo=bar&spam&baz=1", uriQuote)
+        )
+        assertEquals(
+            Uri(queryParams = listOf("foo" to "bar", "spam" to "", "baz" to "1").toQueryParams(), uriQuote = uriQuote),
+            Uri.parse("?foo=bar&spam=&baz=1", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_queryParams_parameterWithoutNameOrValue_returnsMapWithEmptyStringsAsTheParameterNameAndValue() {
+        assertEquals(
+            Uri(queryParams = listOf("foo" to "bar", "" to "", "baz" to "1").toQueryParams(), uriQuote = uriQuote),
+            Uri.parse("?foo=bar&=&baz=1", uriQuote)
+        )
+        assertEquals(
+            Uri(queryParams = listOf("foo" to "bar", "" to "", "baz" to "1").toQueryParams(), uriQuote = uriQuote),
+            Uri.parse("?foo=bar&&baz=1", uriQuote)
+        )
+    }
+
+    @Test
+    fun parse_doesNotDecodeSlashInPath() {
+        assertEquals(
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            Uri(
+                scheme = "https",
+                host = "www.google.com",
+                path = "/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120",
+                uriQuote = uriQuote,
+            ),
+            Uri.parse(
+                "https://www.google.com/maps/@48.8584,2.2945,3a,75y,90t/data=!3m8!1e1!3m6!1sAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE!2e10!3e11!6shttps:%2F%2Flh5.googleusercontent.com%2Fp%2FAF1QipP5ELjVeDJfzgBQBp5XM-HsNU0Ep1k_KgE%3Dw203-h100-k-no-pi-0-ya293.79999-ro-0-fo100!7i10240!8i5120",
+                uriQuote,
+            )
+        )
+    }
+
+    @Test
+    fun parse_whenUriStringIsInvalidUrl_returnsUri() {
+        assertEquals(
+            Uri(scheme = "https", host = "[invalid:ipv6]", path = "/", uriQuote = uriQuote),
+            Uri.parse("https://[invalid:ipv6]/", uriQuote)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasSchemeAndHost() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("https://www.example.com/my-path", uriQuote),
+            Uri.parse("https://www.example.com/my-path", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasMissingSchemeAndMissingHostAndRelativePathWithOnePart_returnsUrlWithDefaultSchemeAndHostAndPath() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("https://example.com/default/my-relative", uriQuote),
+            Uri.parse("my-relative", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasMissingSchemeAndMissingHostAndRelativePathWithMultipleParts_returnsUrlWithDefaultSchemeAndHostAndPath() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("https://example.com/default/my-relative/path", uriQuote),
+            Uri.parse("my-relative/path", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasMissingSchemeAndMissingHostAndAbsolutePath_returnsUrlWithDefaultSchemeAndHost() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("https://example.com/my-absolute/path", uriQuote),
+            Uri.parse("/my-absolute/path", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasRelativeScheme_returnsUrlWithDefaultScheme() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri("https", path = "//my-host.example.com/my-path", uriQuote = uriQuote),
+            Uri.parse("//my-host.example.com/my-path", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasHttpsSchemeAndHost_returnsUrlUnchanged() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("https://my-host", uriQuote),
+            Uri.parse("https://my-host", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasHttpsSchemeAndHostAndPath_returnsUrlUnchanged() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("https://my-host/my-path", uriQuote),
+            Uri.parse("https://my-host/my-path", uriQuote).toAbsoluteUri(baseUri)
+        )
+        assertEquals(
+            Uri.parse("https://my-host/my-long/path", uriQuote),
+            Uri.parse("https://my-host/my-long/path", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlHasFtpSchemeAndHost_returnUrlUnchanged() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("ftp://my-host", uriQuote),
+            Uri.parse("ftp://my-host", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toAbsoluteUri_inputUrlIsGeoUri_returnHttpsUri() {
+        val baseUri = Uri("https", "example.com", "/default", uriQuote = uriQuote)
+        assertEquals(
+            Uri.parse("https://example.com/default/1,2", uriQuote),
+            Uri.parse("geo:1,2", uriQuote).toAbsoluteUri(baseUri)
+        )
+    }
+
+    @Test
+    fun toString_formatsSchemeAndHostAndPath() {
+        for (uriString in listOf(
+            "",
+            "geo:",
+            "geo:foo",
+            "https://foo/bar",
+            "https://foo",
+            "foo/bar",
+            "foo",
+            "/foo/bar",
+            "/foo",
+        )) {
+            assertEquals(uriString, Uri.parse(uriString, uriQuote).toString())
+        }
+    }
+
+    @Test
+    fun toString_formatsQueryParams() {
+        assertEquals(
+            "?empty&foo=bar&1=2",
+            Uri(
+                queryParams = listOf("empty" to "", "foo" to "bar", "1" to "2").toQueryParams(),
+                uriQuote = uriQuote,
+            ).toString(),
+        )
+    }
+
+    @Test
+    fun toString_formatsQueryParamsWithMultipleValues() {
+        assertEquals(
+            "?bar=1&bar=2",
+            Uri(
+                queryParams = listOf("bar" to "1", "bar" to "2").toQueryParams(),
+                uriQuote = uriQuote,
+            ).toString(),
+        )
+    }
+
+    @Test
+    fun toString_encodesPath() {
+        val uriString =
+            "https://www.google.com/maps/place/Pozna%C5%84+Old+Town,+61-001+Pozna%C5%84,+Poland/data=12345?utm_source=mstt_1&entry=gps&coh=12345&g_ep=abcd#my-fragment"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
+    fun toString_encodesSlashInPath() {
+        val uriString =
+            "https://www.google.com/maps/place/Steak+no+Don/@34.59539,133.7567242,17z/data=!4m6!3m5!1s0x3551565394d96b57%3A0x1c9bdbc5990908bf!8m2!3d34.5945482!4d133.7583428!16s%2Fg%2F1thfc7pn?entry=tts&g_ep=EgoyMDI1MTEyMy4xIPu8ASoASAFQAw%3D%3D&skid=91023dbe-8ef3-4df9-a0ae-8be48dadb8ab"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
+    fun toString_doesNotEncodeCommaInQuery() {
+        val uriString = "geo:52.3675734,4.9041389?q=52.3675734%2C4.9041389"
+        assertEquals(
+            "geo:52.3675734,4.9041389?q=52.3675734,4.9041389",
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
+    fun toString_doesNotEncodeExclamationPointAndAtSignInPath() {
+        val uriString = "https://www.google.com/maps/@/data=!3m1!4b1!4m3!11m2!2sXXX!3e3?skid=foo&g_ep=bar&entry=tts"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
+    fun toString_doesNotEncodeAmpersandInPath() {
+        val uriString = "google.streetview:cbll=29.9774614,31.1329645"
+        assertEquals(
+            uriString,
+            Uri.parse(uriString, uriQuote).toString()
+        )
+    }
+
+    @Test
+    fun toUrl_addsHttpsSchemeIfNecessary() {
+        assertEquals("https://foo/bar", Uri.parse("https://foo/bar", uriQuote).toUrl().toString())
+        assertEquals("https://foo", Uri.parse("https://foo", uriQuote).toUrl().toString())
+        assertEquals("https://foo/bar", Uri.parse("foo/bar", uriQuote).toUrl().toString())
+        assertEquals("https://foo", Uri.parse("foo", uriQuote).toUrl().toString())
+        assertEquals("https://foo/bar", Uri.parse("/foo/bar", uriQuote).toUrl().toString())
+        assertEquals("https://foo", Uri.parse("/foo", uriQuote).toUrl().toString())
+    }
+
+    @Test
+    fun toUrl_uriHasNoHost_returnsNull() {
+        assertNull(Uri.parse("https://", uriQuote).toUrl())
+        assertNull(Uri.parse("https:", uriQuote).toUrl())
+        assertNull(Uri.parse("", uriQuote).toUrl())
+        assertNull(Uri.parse("/", uriQuote).toUrl())
+        assertNull(Uri.parse(":", uriQuote).toUrl())
+    }
+}
