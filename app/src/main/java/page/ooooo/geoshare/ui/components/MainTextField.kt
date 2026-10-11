@@ -2,6 +2,8 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import android.view.KeyEvent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -10,7 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +39,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun MainTextField(
     errorMessageResId: Int?,
+    placeholderUris: StateFlow<List<String>>,
     source: StateFlow<String>,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
@@ -45,68 +49,79 @@ fun MainTextField(
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
+    val placeholderUris by placeholderUris.collectAsStateWithLifecycle()
     val source by source.collectAsStateWithLifecycle()
 
-    OutlinedTextField(
-        value = source,
-        onValueChange = {
-            onSetSource(it)
-            onSetErrorMessageResId(null)
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = spacing.windowPadding)
-            .onPreviewKeyEvent { keyEvent ->
-                if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
-                    onSubmit()
-                    true
-                } else {
-                    false
-                }
-            }
-            .testTag("geoShareMainSourceTextField"),
-        label = {
-            Text(stringResource(R.string.main_input_uri_label))
-        },
-        trailingIcon = {
-            if (source.isNotEmpty()) {
-                IconButton({
-                    onSetSource("")
-                    onSetErrorMessageResId(null)
-                }) {
-                    Icon(
-                        Icons.Default.Clear,
-                        stringResource(R.string.main_input_uri_clear_content_description),
-                    )
-                }
-            } else {
-                IconButton({
-                    coroutineScope.launch {
-                        onSetSource(clipboard.paste())
-                        onSetErrorMessageResId(null)
+    Column(
+        Modifier.padding(horizontal = spacing.windowPadding),
+        verticalArrangement = Arrangement.spacedBy(spacing.tiny),
+    ) {
+        Text(
+            stringResource(R.string.main_input_uri_label),
+            Modifier.padding(start = 2.dp),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        AnimatedPlaceholderTextField(
+            value = source,
+            onValueChange = {
+                onSetSource(it)
+                onSetErrorMessageResId(null)
+            },
+            placeholders = placeholderUris,
+            modifier = Modifier
+                .fillMaxWidth()
+                .onPreviewKeyEvent { keyEvent ->
+                    if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_ENTER) {
+                        onSubmit()
+                        true
+                    } else {
+                        false
                     }
-                }) {
-                    Icon(
-                        painterResource(R.drawable.content_paste_24px),
-                        stringResource(R.string.main_input_uri_paste_content_description),
+                }
+                .testTag("geoShareMainSourceTextField"),
+            trailingIcon = {
+                if (source.isNotEmpty()) {
+                    IconButton({
+                        onSetSource("")
+                        onSetErrorMessageResId(null)
+                    }) {
+                        Icon(
+                            Icons.Default.Clear,
+                            stringResource(R.string.main_input_uri_clear_content_description),
+                        )
+                    }
+                } else {
+                    IconButton({
+                        coroutineScope.launch {
+                            onSetSource(clipboard.paste())
+                            onSetErrorMessageResId(null)
+                        }
+                    }) {
+                        Icon(
+                            painterResource(R.drawable.content_paste_24px),
+                            stringResource(R.string.main_input_uri_paste_content_description),
+                        )
+                    }
+                }
+            },
+            supportingText = errorMessageResId?.let { errorMessageResId ->
+                {
+                    Text(
+                        stringResource(errorMessageResId),
+                        Modifier.padding(top = spacing.extraTiny),
                     )
                 }
-            }
-        },
-        supportingText = {
-            Text(
-                stringResource(errorMessageResId ?: R.string.main_input_uri_supporting_text),
-                Modifier.padding(top = spacing.extraTiny),
-            )
-        },
-        isError = errorMessageResId != null,
-        keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done,
-        ),
-        keyboardActions = KeyboardActions(
-            onDone = { onSubmit() },
-        ),
-    )
+            },
+            isError = errorMessageResId != null,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { onSubmit() },
+            ),
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -116,6 +131,7 @@ private fun DefaultPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow(""),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -132,6 +148,7 @@ private fun DarkPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow(""),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -148,6 +165,7 @@ private fun FilledPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -164,6 +182,7 @@ private fun DarkFilledPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -180,6 +199,7 @@ private fun ErrorPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = R.string.conversion_failed_missing_url,
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -196,6 +216,7 @@ private fun DarkErrorPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = R.string.conversion_failed_missing_url,
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},

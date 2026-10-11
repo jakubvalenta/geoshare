@@ -6,6 +6,7 @@ import io.ktor.client.plugins.cookies.ConstantCookiesStorage
 import io.ktor.http.Cookie
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.data.network.FetchTools
@@ -19,7 +20,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
     val engine: HttpClientEngine,
     val log: Log,
     val uriQuote: UriQuote,
-) : BasicOnlineInput, Input.HasPattern {
+) : BasicOnlineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_short_link_name)
     override val group = InputGroup.GOOGLE_MAPS
     override val changelog = persistentListOf(
@@ -51,6 +52,8 @@ class GoogleMapsShortLinkInput @Inject constructor(
                 next = MatchedInput(googleMapsUriInput.get(), this@run.toString())
             }
         }
+
+    override fun genRandomUri(point: Point) = "https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8"
 
     override fun toString() = "GoogleMapsShortLinkInput"
 
