@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION", "DeprecatedCallableAddReplaceWith")
 
 package page.ooooo.geoshare.data.billing
 
