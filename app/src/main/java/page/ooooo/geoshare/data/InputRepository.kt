@@ -114,7 +114,7 @@ interface InputRepository {
             }
         }
 
-    fun genRandomUris(randomPoint: Point): List<String> =
+    fun genPlaceholderUris(randomPoint: Point): List<String> =
         listOf(
             googleMapsShortLinkInput,
             googleMapsUriInput,
@@ -122,8 +122,15 @@ interface InputRepository {
             *all
                 .filterIsInstance<Input.HasRandomUri>()
                 .shuffled()
-                .toTypedArray(),
-        ).mapNotNull { it.genRandomUri(randomPoint) }
+                .toTypedArray()
+        )
+            .mapNotNull { it.genRandomUri(randomPoint) }
+
+    fun genRandomUri(randomPoint: Point): String? =
+        all
+            .filterIsInstance<Input.HasRandomUri>()
+            .shuffled()
+            .firstNotNullOfOrNull { it.genRandomUri(randomPoint) }
 }
 
 @Singleton

@@ -39,7 +39,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun MainTextField(
     errorMessageResId: Int?,
-    randomUris: StateFlow<List<String>>,
+    placeholderUris: StateFlow<List<String>>,
     source: StateFlow<String>,
     onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
@@ -49,7 +49,7 @@ fun MainTextField(
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
-    val randomUris by randomUris.collectAsStateWithLifecycle()
+    val placeholderUris by placeholderUris.collectAsStateWithLifecycle()
     val source by source.collectAsStateWithLifecycle()
 
     Column(
@@ -68,7 +68,7 @@ fun MainTextField(
                 onSetSource(it)
                 onSetErrorMessageResId(null)
             },
-            placeholders = randomUris,
+            placeholders = placeholderUris,
             modifier = Modifier
                 .fillMaxWidth()
                 .onPreviewKeyEvent { keyEvent ->
@@ -131,7 +131,7 @@ private fun DefaultPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
-                randomUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow(""),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -148,7 +148,7 @@ private fun DarkPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
-                randomUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow(""),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -165,7 +165,7 @@ private fun FilledPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
-                randomUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -182,7 +182,7 @@ private fun DarkFilledPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = null,
-                randomUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -199,7 +199,7 @@ private fun ErrorPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = R.string.conversion_failed_missing_url,
-                randomUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
@@ -216,7 +216,7 @@ private fun DarkErrorPreview() {
         Surface {
             MainTextField(
                 errorMessageResId = R.string.conversion_failed_missing_url,
-                randomUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
+                placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetErrorMessageResId = {},
                 onSetSource = {},
