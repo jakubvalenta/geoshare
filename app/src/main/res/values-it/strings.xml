@@ -25,7 +25,6 @@
     <string name="conversion_permission_common_deny">Annulla</string>
     <string name="permission_do_not_ask">Non chiedermelo più</string>
     <string name="user_preferences_title">Preferenze</string>
-    <string name="main_input_uri_supporting_text">es. https://maps.app.goo.gl/… o maps.apple.com/…</string>
     <string name="intro_open_by_default_app_caption"><![CDATA[Poi vai in Impostazioni ➞ Apps ➞ %1$s ➞ <i>Apri come impostazione predefinita</i>, abilita l’apertura di link in questa app, e seleziona <i>Aggiungi link</i>.]]></string>
     <string name="intro_open_by_default_app_note">Se alcuni link sono in grigio, altre app Google sono impostate per aprirli in modo predefinito. Puoi trovare queste app e disattivare l’apertura dei collegamenti per loro, come abbiamo fatto per Google Maps.</string>
     <string name="about_text"><![CDATA[<p>%1$s è un’applicazione libera e open-source distribuita sotto la <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> o licenza successiva.</p><br><p>Puoi trovare il codice su <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, dove puoi anche <a href="https://github.com/jakubvalenta/geoshare/issues">segnalare problemi</a>.</p><br><p>Il tuo feedback è benvenuto. Puoi contattarmi all’indirizzo <a href="mailto:%2$s">%2$s</a>.</p>]]></string>

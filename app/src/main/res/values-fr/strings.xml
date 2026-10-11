@@ -11,7 +11,6 @@
     <string name="intro_nav_close">Fermer</string>
     <string name="intro_settings_activity_not_found">Échec de l’ouverture des paramètres</string>
     <string name="main_input_uri_clear_content_description">Effacer</string>
-    <string name="main_input_uri_supporting_text">par ex. https://maps.app.goo.gl/… ou maps.apple.com/…</string>
     <string name="main_create_geo_uri">Afficher les coordonnées</string>
     <string name="conversion_permission">Se connecter à %1$s ?</string>
     <string name="conversion_permission_common_grant">OK</string>
