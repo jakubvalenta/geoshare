@@ -70,6 +70,13 @@
 
                 <data android:mimeType="text/plain" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
             <!-- 2GIS / Urbi -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />
