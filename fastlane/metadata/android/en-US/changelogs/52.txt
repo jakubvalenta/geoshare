@@ -1,2 +1,2 @@
-- Add support for sharing selected text with the app.
-- Improved main text field example links.
+- Added support for sharing selected text with the app.
+- Improved main text field by adding animated examples.
