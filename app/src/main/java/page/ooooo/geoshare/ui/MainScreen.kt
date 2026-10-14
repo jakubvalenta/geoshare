@@ -627,7 +627,6 @@ private fun MainScreen(
                     MainSourceBar(
                         conversionState = conversionState,
                         logExpanded = logExpanded,
-                        source = source,
                         start = start,
                         stateLog = stateLog,
                         onSelectUri = onSelectUri,

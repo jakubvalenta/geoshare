@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,6 +21,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.data.extensions.trimUrl
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.state.ConversionState
@@ -39,7 +39,6 @@ import kotlin.time.TestTimeSource
 fun MainSourceBar(
     conversionState: ConversionState,
     logExpanded: Boolean,
-    source: StateFlow<String>,
     start: StateFlow<ComparableTimeMark?>,
     stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     onSelectUri: (uriString: String) -> Unit,
@@ -48,7 +47,6 @@ fun MainSourceBar(
     Row {
         MainSourceButton(
             conversionState = conversionState,
-            source = source,
             modifier = Modifier.weight(1f),
             onSelectUri = onSelectUri,
         )
@@ -64,22 +62,23 @@ fun MainSourceBar(
 @Composable
 private fun MainSourceButton(
     conversionState: ConversionState,
-    source: StateFlow<String>,
+    modifier: Modifier = Modifier,
+    onSelectUri: (uriString: String) -> Unit,
+) {
+    val source = (conversionState as? ConversionState.HasSource)?.source ?: return
+    val match = (conversionState as? ConversionState.HasMatchedInput)?.matchedInput?.match
+
+    MainSourceButton(source, match, modifier, onSelectUri)
+}
+
+@Composable
+private fun MainSourceButton(
+    source: String,
+    match: String?,
     modifier: Modifier = Modifier,
     onSelectUri: (uriString: String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
-
-    val source by source.collectAsStateWithLifecycle()
-    val match = remember(conversionState) {
-        when (conversionState) {
-            is ConversionState.HasMatchedInput -> conversionState.matchedInput.match
-            is ConversionState.HasSource -> conversionState.source
-            else -> ""
-        }
-            .replace('\n', ' ')
-            .removePrefix("https://")
-    }
 
     Button(
         { onSelectUri(source) },
@@ -91,7 +90,7 @@ private fun MainSourceButton(
         contentPadding = PaddingValues(horizontal = spacing.small),
     ) {
         Text(
-            match,
+            (match ?: source).replace('\n', ' ').trimUrl(),
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             style = MaterialTheme.typography.bodySmall,
@@ -170,7 +169,6 @@ private fun DefaultPreview() {
                     results = emptyMap(),
                 ),
                 logExpanded = false,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
                 onSelectUri = {},
@@ -195,7 +193,6 @@ private fun DarkPreview() {
                     results = emptyMap(),
                 ),
                 logExpanded = false,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
                 onSelectUri = {},
@@ -218,7 +215,6 @@ private fun ShortTimePreview() {
                     points = persistentListOf(),
                 ),
                 logExpanded = false,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
                 onSelectUri = {},
@@ -241,7 +237,6 @@ private fun DarkShortTimePreview() {
                     points = persistentListOf(),
                 ),
                 logExpanded = false,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
                 onSelectUri = {},
@@ -266,7 +261,6 @@ private fun ExpandedShortTimePreview() {
                     results = emptyMap(),
                 ),
                 logExpanded = true,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
                 onSelectUri = {},
@@ -291,7 +285,6 @@ private fun DarkExpandedShortTimePreview() {
                     results = emptyMap(),
                 ),
                 logExpanded = true,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
                 onSelectUri = {},
@@ -306,7 +299,11 @@ private fun DarkExpandedShortTimePreview() {
 private fun TextAndEmptyLogPreview() {
     AppTheme {
         Surface {
-            val source = "41°24′12.2″N 2°10′26.5″E"
+            val source = """
+                Vega de Tera Calle Barrio de Abajo
+                41.9966006N, 6.1223825W
+                https://mapy.com/s/deduduzeha
+            """.trimIndent()
             val timeSource = TestTimeSource()
             MainSourceBar(
                 conversionState = PermissionGrantedBasicInput(
@@ -316,7 +313,6 @@ private fun TextAndEmptyLogPreview() {
                     results = emptyMap(),
                 ),
                 logExpanded = false,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSelectUri = {},
@@ -331,7 +327,11 @@ private fun TextAndEmptyLogPreview() {
 private fun DarkSubmittedTextAndEmptyLogPreview() {
     AppTheme {
         Surface {
-            val source = "41°24′12.2″N 2°10′26.5″E"
+            val source = """
+                Vega de Tera Calle Barrio de Abajo
+                41.9966006N, 6.1223825W
+                https://mapy.com/s/deduduzeha
+            """.trimIndent()
             val timeSource = TestTimeSource()
             MainSourceBar(
                 conversionState = PermissionGrantedBasicInput(
@@ -341,7 +341,6 @@ private fun DarkSubmittedTextAndEmptyLogPreview() {
                     results = emptyMap(),
                 ),
                 logExpanded = false,
-                source = MutableStateFlow(source),
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
                 onSelectUri = {},
