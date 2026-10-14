@@ -37,8 +37,10 @@ class GeoUriInputBehaviorTest : InputBehaviorTest {
                 source = Source.URI
             ),
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "Organic Maps: geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)\n" +
-                "https://omaps.app/Umse5f0H8a/Nova_Iorque",
+            """
+               Organic Maps: geo:40.7127400,-74.0059965?z=9.0&q=40.7127400,-74.0059965(Nova%20Iorque)
+               https://omaps.app/Umse5f0H8a/Nova_Iorque
+            """.trimIndent()
         )
         testText(
             WGS84Point(52.0553846, -2.7151898, source = Source.URI),

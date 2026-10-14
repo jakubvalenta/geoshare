@@ -75,7 +75,7 @@ fun OneLineSheetListItem(
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     ) {
         Text(
-            headlineText,
+            headlineText.replace('\n', ' '),
             Modifier.testTag("geoShareSheetListItemHeadline"),
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,

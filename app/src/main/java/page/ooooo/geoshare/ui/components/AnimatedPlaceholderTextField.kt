@@ -93,6 +93,7 @@ fun AnimatedPlaceholderTextField(
     val placeholderTransition = remember(animationDurationMs) {
         slideInVertically(
             animationSpec = tween(animationDurationMs, easing = LinearEasing),
+
             initialOffsetY = { fullHeight -> 2 * fullHeight }
         ) togetherWith slideOutVertically(
             animationSpec = tween(animationDurationMs, easing = LinearEasing),
@@ -121,7 +122,7 @@ fun AnimatedPlaceholderTextField(
                 .clipToBounds(),
             enabled = enabled,
             textStyle = mergedTextStyle,
-            singleLine = true,
+            singleLine = false,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             interactionSource = interactionSource,
@@ -153,7 +154,7 @@ fun AnimatedPlaceholderTextField(
                         }
                     },
                     enabled = enabled,
-                    singleLine = true,
+                    singleLine = false,
                     visualTransformation = visualTransformation,
                     interactionSource = interactionSource,
                     isError = isError,

@@ -48,9 +48,11 @@ class MapsMeInputBehaviorTest : InputBehaviorTest {
         // Text
         testText(
             WGS84Point(51.0000004, -108.9999868, z = 4.0, name = "América do Norte", source = Source.HASH),
-            "América do Norte, Lancer, Saskatchewan, Canadá\n" +
-                "http://ge0.me/ApYSV0YTAl/América_do_Norte\n" +
-                "(51.000001, -108.999988)",
+            """
+                América do Norte, Lancer, Saskatchewan, Canadá
+                "http://ge0.me/ApYSV0YTAl/América_do_Norte
+                "(51.000001, -108.999988)
+            """.trimIndent(),
         )
     }
 }

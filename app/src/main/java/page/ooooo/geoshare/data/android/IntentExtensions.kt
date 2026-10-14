@@ -1,18 +1,30 @@
 package page.ooooo.geoshare.data.android
 
 import android.content.Intent
-import android.util.Log
+import page.ooooo.geoshare.data.log.DefaultLog
+import page.ooooo.geoshare.data.log.Log
 
 private const val TAG = "IntentExtensions"
 
-fun Intent.getUriString(): String? =
+fun Intent.getUriString(log: Log = DefaultLog): String? =
     when (action) {
-        Intent.ACTION_VIEW -> data?.toString()
-            .also { if (it == null) Log.w(TAG, "Missing intent data") }
+        Intent.ACTION_VIEW -> data?.toString() ?: run {
+            log.w(TAG, "Missing intent data")
+            null
+        }
 
-        Intent.ACTION_SEND -> getStringExtra(Intent.EXTRA_TEXT)
-            .also { if (it == null) Log.w(TAG, "Missing intent extra text") }
+        Intent.ACTION_SEND -> getStringExtra(Intent.EXTRA_TEXT) ?: run {
+            log.w(TAG, "Missing intent EXTRA_TEXT")
+            null
+        }
 
-        else -> null
-            .also { Log.w(TAG, "Unsupported intent action $action") }
+        Intent.ACTION_PROCESS_TEXT -> getStringExtra(Intent.EXTRA_PROCESS_TEXT) ?: run {
+            log.w(TAG, "Missing intent EXTRA_PROCESS_TEXT")
+            null
+        }
+
+        else -> {
+            log.w(TAG, "Unsupported intent action $action")
+            null
+        }
     }
