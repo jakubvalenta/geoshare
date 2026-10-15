@@ -993,7 +993,7 @@ object InitialLinks : InitialData {
                         "DISPLAY",
                         0,
                         0,
-                        ,
+                        0,
                         "https://api.map.baidu.com/marker?location={lat},{lon}&coord_type=wgs84&output=html",
                         "https://map.baidu.com/search/?querytype=s&wd={q}",
                         1792037087415,
