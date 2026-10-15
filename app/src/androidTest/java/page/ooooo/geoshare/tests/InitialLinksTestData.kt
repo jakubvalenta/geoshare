@@ -8,6 +8,15 @@ import java.util.UUID
 
 object InitialLinksTestData {
     val expectedItems = listOf(
+        // Amap
+        Link(
+            group = "Amap",
+            name = "Amap",
+            appEnabled = false,
+            coordsUriTemplate = "https://uri.amap.com/marker?position={lon},{lat}&coordinate=wgs84",
+            nameUriTemplate = "https://uri.amap.com/search?keyword={q}",
+            uuid = UUID.fromString(InitialLinks.AMAP_DISPLAY_UUID),
+        ),
         // Apple Maps
         Link(
             group = "Apple Maps",
@@ -25,6 +34,15 @@ object InitialLinksTestData {
             coordsUriTemplate = "https://maps.apple.com/?daddr={lat}%2C{lon}",
             nameUriTemplate = "https://maps.apple.com/?daddr={q}",
             uuid = UUID.fromString(InitialLinks.APPLE_MAPS_NAVIGATION_UUID),
+        ),
+        // Baidu Map
+        Link(
+            group = "Baidu Map",
+            name = "Baidu Map",
+            appEnabled = false,
+            coordsUriTemplate = "https://api.map.baidu.com/marker?location={lat},{lon}&coord_type=wgs84&output=html",
+            nameUriTemplate = "https://map.baidu.com/search/?querytype=s&wd={q}",
+            uuid = UUID.fromString(InitialLinks.BAIDU_MAP_DISPLAY_UUID),
         ),
         // Cartes.app
         Link(
