@@ -28,6 +28,23 @@ object InitialLinks : InitialData {
      */
     override fun restore(db: SupportSQLiteDatabase) {
         db.execSQL("DELETE FROM link")
+        // Amap
+        db.execSQL(
+            "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Amap",
+                "Amap",
+                "WGS84",
+                "DISPLAY",
+                0,
+                0,
+                0,
+                "https://uri.amap.com/marker?position={lon},{lat}&coordinate=wgs84",
+                "https://uri.amap.com/search?keyword={q}",
+                1792037087415,
+                Uuid.parse(AMAP_DISPLAY_UUID).toByteArray(),
+            )
+        )
         // Apple Maps
         db.execSQL(
             "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -59,6 +76,23 @@ object InitialLinks : InitialData {
                 "https://maps.apple.com/?daddr={q}",
                 1772395295367,
                 Uuid.parse(APPLE_MAPS_NAVIGATION_UUID).toByteArray(),
+            )
+        )
+        // Baidu Map
+        db.execSQL(
+            "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(
+                "Baidu Map",
+                "Baidu Map",
+                "WGS84",
+                "DISPLAY",
+                0,
+                0,
+                0,
+                "https://api.map.baidu.com/marker?location={lat},{lon}&coord_type=wgs84&output=html",
+                "https://map.baidu.com/search/?querytype=s&wd={q}",
+                1792037087415,
+                Uuid.parse(BAIDU_MAP_DISPLAY_UUID).toByteArray(),
             )
         )
         // Cartes.app
@@ -930,10 +964,50 @@ object InitialLinks : InitialData {
                 )
             }
         },
+        object : Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Insert Amap
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Amap",
+                        "Amap",
+                        "WGS84",
+                        "DISPLAY",
+                        0,
+                        0,
+                        0,
+                        "https://uri.amap.com/marker?position={lon},{lat}&coordinate=wgs84",
+                        "https://uri.amap.com/search?keyword={q}",
+                        1792037087415,
+                        Uuid.parse(AMAP_DISPLAY_UUID).toByteArray(),
+                    )
+                )
+                // Insert Baidu Map
+                db.execSQL(
+                    "INSERT OR REPLACE INTO link (`group`,`name`,`srs`,`type`,`appEnabled`,`chipEnabled`,`sheetEnabled`,`coordsUriTemplate`,`nameUriTemplate`,`createdAt`,`uuid`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    arrayOf<Any>(
+                        "Baidu Map",
+                        "Baidu Map",
+                        "WGS84",
+                        "DISPLAY",
+                        0,
+                        0,
+                        ,
+                        "https://api.map.baidu.com/marker?location={lat},{lon}&coord_type=wgs84&output=html",
+                        "https://map.baidu.com/search/?querytype=s&wd={q}",
+                        1792037087415,
+                        Uuid.parse(BAIDU_MAP_DISPLAY_UUID).toByteArray(),
+                    )
+                )
+            }
+        },
     )
 
+    const val AMAP_DISPLAY_UUID = "e9ac955a-c061-44aa-b972-b404ad48c60a"
     const val APPLE_MAPS_DISPLAY_UUID = "ce900ea1-2c5d-4641-82f3-a5429a68d603"
     const val APPLE_MAPS_NAVIGATION_UUID = "a5092c63-cf5c-4225-9059-e888ae12e215"
+    const val BAIDU_MAP_DISPLAY_UUID = "e879569b-a58c-4544-ae22-f5972364df61"
     const val CARTES_APP_SEARCH_UUID = "54ac6017-4988-40a5-86fe-63aac862fb20"
     const val GOOGLE_MAPS_DISPLAY_UUID = "7bd96da4-beba-4a30-9dbd-b437a49a1dc0"
     const val GOOGLE_MAPS_SEARCH_UUID = "bdd9982d-8441-41b6-81a5-abce959a09b3"
