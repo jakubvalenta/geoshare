@@ -47,6 +47,8 @@ map app.
 - Yandex Maps
 - coordinates
 
+GeoShare is not affiliated with or endorsed by any of the services mentioned.
+
 **Example use cases**
 
 When someone sends you a Google Maps link, but you prefer using OpenStreetMap,

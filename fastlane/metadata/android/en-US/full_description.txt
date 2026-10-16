@@ -25,6 +25,8 @@ Share a map link with GeoShare and the app will open it in another installed map
 - Yandex Maps
 - coordinates
 
+GeoShare is not affiliated with or endorsed by any of the services mentioned.
+
 <b>Example use cases</b>
 
 When someone sends you a Google Maps link, but you prefer using OpenStreetMap, you can quickly <b>open the same location</b> in OsmAnd or Organic Maps.
