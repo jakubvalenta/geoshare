@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.log.Log
@@ -281,8 +282,9 @@ class BillingImpl(
                     activity.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            "https://play.google.com/store/account/subscriptions?sku=%s&package=page.ooooo.geoshare".format(
-                                Uri.encode(product.id)
+                            "https://play.google.com/store/account/subscriptions?sku=%s&package=%s".format(
+                                Uri.encode(product.id),
+                                BuildConfig.APPLICATION_ID,
                             ).toUri(),
                         )
                     )
