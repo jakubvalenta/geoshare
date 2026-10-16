@@ -58,11 +58,11 @@ class YandexMapsHtmlInput @Inject constructor(
 
                 while (true) {
                     val line = data.readLine() ?: break
-                    ptPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
+                    ptPattern.find(line)?.toLonLatPoint(Source.HTML_NOT_SEMANTIC)?.let {
                         naivePoint = it
                         continue
                     }
-                    llPattern?.find(line)?.toLonLatZPoint(Source.HTML)?.let {
+                    llPattern?.find(line)?.toLonLatZPoint(Source.HTML_NOT_SEMANTIC)?.let {
                         naivePoint = it
                         continue
                     }
@@ -77,7 +77,7 @@ class YandexMapsHtmlInput @Inject constructor(
                 if (naivePoint != null) {
                     points = persistentListOf(WGS84Point(naivePoint, name = name))
                 } else if (name != null) {
-                    points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
+                    points = persistentListOf(WGS84Point(name = name, source = Source.HTML_NOT_SEMANTIC))
                 }
             }
         }

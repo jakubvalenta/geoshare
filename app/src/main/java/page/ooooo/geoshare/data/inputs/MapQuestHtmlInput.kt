@@ -38,7 +38,7 @@ class MapQuestHtmlInput @Inject constructor(
 
                 while (true) {
                     val line = data.readLine() ?: break
-                    latLonPattern.find(line)?.toLatLonPoint(source = Source.HTML)?.let {
+                    latLonPattern.find(line)?.toLatLonPoint(source = Source.HTML_NOT_SEMANTIC)?.let {
                         points = persistentListOf(GCJ02MainlandChinaPoint(it))
                         return@parseResultAsync
                     }

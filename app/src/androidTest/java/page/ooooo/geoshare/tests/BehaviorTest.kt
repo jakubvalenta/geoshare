@@ -279,10 +279,24 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
         onElement { viewIdResourceName == "geoShareResultLastPointSource_${expectedSource}" }
         if (!(accurate ?: lastPoint.isAccurate())) {
             onElement { viewIdResourceName == "geoShareResultCheckSRS" }
-        } else if (expectedSource == Source.JAVASCRIPT) {
-            onElement { viewIdResourceName == "geoShareResultCheckExperimental" }
-        } else if (expectedSource == Source.MAP_CENTER) {
-            onElement { viewIdResourceName == "geoShareResultCheckMapCenter" }
+        } else {
+            when (expectedSource) {
+                Source.HTML_NOT_SEMANTIC, Source.JAVASCRIPT_STATE ->
+                    onElement { viewIdResourceName == "geoShareResultCheckExperimental" }
+
+                Source.MAP_CENTER ->
+                    onElement { viewIdResourceName == "geoShareResultCheckMapCenter" }
+
+                Source.API,
+                Source.GENERATED,
+                Source.GPS_SENSOR,
+                Source.HASH,
+                Source.HTML_SEMANTIC,
+                Source.TEXT,
+                Source.URI,
+                    -> {
+                }
+            }
         }
     }
     if (expectedPoints.size > 1) {

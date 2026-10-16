@@ -55,17 +55,13 @@ class DataParsedTest {
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "2"
-                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
-                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult.Success(
-                    persistentListOf(
-                        WGS84Point(
-                            5.0,
-                            6.0,
-                            source = Source.JAVASCRIPT
-                        )
-                    )
-                ),
-                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult.Success(),
+                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML_SEMANTIC))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "3"
+                ) to ParseResult.Success(persistentListOf(WGS84Point(5.0, 6.0, source = Source.JAVASCRIPT_STATE))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "4"
+                ) to ParseResult.Success(),
                 matchedInput to ParseResult.Success(points),
             )
             val state = DataParsed(source, matchedInput, permission = null, results)
@@ -86,17 +82,13 @@ class DataParsedTest {
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "2"
-                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
-                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult.Success(
-                    persistentListOf(
-                        WGS84Point(
-                            5.0,
-                            6.0,
-                            source = Source.JAVASCRIPT
-                        )
-                    )
-                ),
-                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult.Success(),
+                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML_SEMANTIC))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "3"
+                ) to ParseResult.Success(persistentListOf(WGS84Point(5.0, 6.0, source = Source.JAVASCRIPT_STATE))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "4"
+                ) to ParseResult.Success(),
                 matchedInput to ParseResult.Success(points),
             )
             val state = DataParsed(source, matchedInput, permission = null, results)

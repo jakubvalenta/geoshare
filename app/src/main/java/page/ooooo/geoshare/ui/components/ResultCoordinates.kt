@@ -168,22 +168,36 @@ fun ResultCoordinates(
                         .padding(bottom = spacing.tiny)
                         .testTag("geoShareResultCheckSRS"),
                 )
-            } else if (lastPoint.source == Source.JAVASCRIPT) {
-                ResultCoordinatesCheck(
-                    stringResource(R.string.conversion_succeeded_check_experimental),
-                    Modifier
-                        .padding(horizontal = spacing.windowPadding)
-                        .padding(bottom = spacing.tiny)
-                        .testTag("geoShareResultCheckExperimental"),
-                )
-            } else if (lastPoint.source == Source.MAP_CENTER) {
-                ResultCoordinatesCheck(
-                    stringResource(R.string.conversion_succeeded_check_map_center),
-                    Modifier
-                        .padding(horizontal = spacing.windowPadding)
-                        .padding(bottom = spacing.tiny)
-                        .testTag("geoShareResultCheckMapCenter"),
-                )
+            } else {
+                when (lastPoint.source) {
+                    Source.HTML_NOT_SEMANTIC, Source.JAVASCRIPT_STATE ->
+                        ResultCoordinatesCheck(
+                            stringResource(R.string.conversion_succeeded_check_experimental),
+                            Modifier
+                                .padding(horizontal = spacing.windowPadding)
+                                .padding(bottom = spacing.tiny)
+                                .testTag("geoShareResultCheckExperimental"),
+                        )
+
+                    Source.MAP_CENTER ->
+                        ResultCoordinatesCheck(
+                            stringResource(R.string.conversion_succeeded_check_map_center),
+                            Modifier
+                                .padding(horizontal = spacing.windowPadding)
+                                .padding(bottom = spacing.tiny)
+                                .testTag("geoShareResultCheckMapCenter"),
+                        )
+
+                    Source.API,
+                    Source.GENERATED,
+                    Source.GPS_SENSOR,
+                    Source.HASH,
+                    Source.HTML_SEMANTIC,
+                    Source.TEXT,
+                    Source.URI,
+                        -> {
+                    }
+                }
             }
             ScrollableChips(
                 contentPadding = PaddingValues(

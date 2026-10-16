@@ -83,7 +83,7 @@ class BaiduMapWebViewInput @Inject constructor(
             log.e(TAG, "Deserialization error", tr)
             null
         }?.run {
-            points = persistentListOf(BD09MCPoint(lat, lon, z, name, source = Source.JAVASCRIPT))
+            points = persistentListOf(BD09MCPoint(lat, lon, z, name, source = Source.JAVASCRIPT_STATE))
         }
     }
 

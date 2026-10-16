@@ -91,7 +91,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
             log.e(TAG, "Deserialization error", tr)
             null
         }?.run {
-            points = map { GCJ02MainlandChinaPoint(it.lat, it.lon, source = Source.JAVASCRIPT) }
+            points = map { GCJ02MainlandChinaPoint(it.lat, it.lon, source = Source.JAVASCRIPT_STATE) }
                 .toImmutableList()
         }
     }

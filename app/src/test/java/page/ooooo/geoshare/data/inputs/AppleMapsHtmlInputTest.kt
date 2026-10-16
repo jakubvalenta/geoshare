@@ -18,7 +18,7 @@ class AppleMapsHtmlInputTest : InputTest {
     @Test
     fun parse_containsCoordinates_returnsPoint() = runTest {
         assertEquals(
-            ParseResult.Success(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML))),
+            ParseResult.Success(persistentListOf(WGS84Point(52.4735927, 13.4050798, source = Source.HTML_SEMANTIC))),
             input.parse(
                 "fake match",
                 FakeFetchTools(

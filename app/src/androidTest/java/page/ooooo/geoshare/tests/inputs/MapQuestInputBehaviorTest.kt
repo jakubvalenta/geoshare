@@ -28,28 +28,28 @@ class MapQuestInputBehaviorTest {
 
         // Place within Mainland China
         testUri(
-            GCJ02Point(39.91843414, 116.40497589, source = Source.HTML),
+            GCJ02Point(39.91843414, 116.40497589, source = Source.HTML_NOT_SEMANTIC),
             "https://www.mapquest.com/cn/manxin-mansion-tiananmen-forbidden-city-beijing-807001097",
             grantConnectionPermission = true,
         )
 
         // Place within Hong Kong
         testUri(
-            WGS84Point(22.254182, 113.905181, source = Source.HTML),
+            WGS84Point(22.254182, 113.905181, source = Source.HTML_NOT_SEMANTIC),
             "https://www.mapquest.com/cn/tian-tan-buddha-big-buddha-526039166",
             grantConnectionPermission = true,
         )
 
         // Place within Taiwan
         testUri(
-            WGS84Point(24.998562, 121.580986, source = Source.HTML),
+            WGS84Point(24.998562, 121.580986, source = Source.HTML_NOT_SEMANTIC),
             "https://www.mapquest.com/tw/taipei-zoo-524803950",
             grantConnectionPermission = true,
         )
 
         // Short link
         testUri(
-            WGS84Point(52.49002, 13.38267, source = Source.HTML),
+            WGS84Point(52.49002, 13.38267, source = Source.HTML_NOT_SEMANTIC),
             "https://mapq.st/4s3jg1r",
             grantConnectionPermission = true,
         )

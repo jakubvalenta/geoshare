@@ -49,7 +49,7 @@ class AppleMapsHtmlInput @Inject constructor(
                         lonPattern.find(line)?.doubleGroupOrNull()?.let { lon = it }
                     }
                     if (lat != null && lon != null) {
-                        points = persistentListOf(WGS84Point(lat, lon, source = Source.HTML))
+                        points = persistentListOf(WGS84Point(lat, lon, source = Source.HTML_SEMANTIC))
                         return@parseResultAsync
                     }
                 }

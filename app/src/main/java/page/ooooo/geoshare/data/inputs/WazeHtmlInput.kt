@@ -30,7 +30,7 @@ class WazeHtmlInput @Inject constructor(
 
                 while (true) {
                     val line = data.readLine() ?: break
-                    pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
+                    pattern.find(line)?.toLatLonPoint(Source.HTML_NOT_SEMANTIC)?.let {
                         points = persistentListOf(WGS84Point(it))
                         return@parseResultAsync
                     }

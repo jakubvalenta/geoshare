@@ -32,7 +32,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(44.4490541, 26.0888398, source = Source.JAVASCRIPT)
+                    GCJ02MainlandChinaPoint(44.4490541, 26.0888398, source = Source.HTML_NOT_SEMANTIC)
                 )
             ),
             input.parse(
@@ -59,7 +59,7 @@ class GoogleMapsHtmlInputImplTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(52.484201500000005, 13.416727700000001, source = Source.JAVASCRIPT)
+                    GCJ02MainlandChinaPoint(52.484201500000005, 13.416727700000001, source = Source.HTML_NOT_SEMANTIC)
                 )
             ),
             input.parse(
@@ -102,7 +102,7 @@ window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(43.7481, -79.6332, source = Source.HTML)
+                    GCJ02MainlandChinaPoint(43.7481, -79.6332, source = Source.HTML_NOT_SEMANTIC)
                 )
             ),
             @Suppress("HtmlUnknownTarget")
@@ -125,9 +125,9 @@ window.APP_INITIALIZATION_STATE=[[[2476371.7645101217, 4.9274546, 52.6901019],[0
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(59.147731699999994, 11.550661199999999, source = Source.JAVASCRIPT),
+                    GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(59.4154007, 11.659710599999999, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(59.147731699999994, 11.550661199999999, source = Source.HTML_NOT_SEMANTIC),
                 )
             ),
             input.parse(
@@ -152,7 +152,7 @@ window.APP_INITIALIZATION_STATE=[[[2503344.9559356705,5.2793702499999995,52.2129
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(5.5592846, -0.19743059999999998, source = Source.JAVASCRIPT)
+                    GCJ02MainlandChinaPoint(5.5592846, -0.19743059999999998, source = Source.HTML_NOT_SEMANTIC)
                 )
             ),
             input.parse(
@@ -174,15 +174,15 @@ window.APP_INITIALIZATION_STATE=[[[2503344.9559356705,5.2793702499999995,52.2129
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(52.49016, 13.434500000000071, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.49534999999999, 13.431890000000067, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.4901894, 13.433825899999988, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.4898201, 13.433602800000017, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.4960741, 13.435130399999935, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.4961778, 13.422070500000018, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.49514559999999, 13.423243800000023, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.497884, 13.429134, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(52.4957432, 13.43344819999993, source = Source.JAVASCRIPT),
+                    GCJ02MainlandChinaPoint(52.49016, 13.434500000000071, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.49534999999999, 13.431890000000067, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.4901894, 13.433825899999988, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.4898201, 13.433602800000017, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.4960741, 13.435130399999935, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.4961778, 13.422070500000018, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.49514559999999, 13.423243800000023, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.497884, 13.429134, source = Source.HTML_NOT_SEMANTIC),
+                    GCJ02MainlandChinaPoint(52.4957432, 13.43344819999993, source = Source.HTML_NOT_SEMANTIC),
                 )
             ),
             input.parse(
@@ -206,7 +206,7 @@ var _pageData ='["mf.map","XXX","YYY",null,[13.422070500000018,52.497884,13.4351
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.JAVASCRIPT)
+                    GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.HTML_NOT_SEMANTIC)
                 )
             ),
             input.parse(

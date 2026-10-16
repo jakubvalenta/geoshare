@@ -20,7 +20,7 @@ class MapQuestHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(39.91843414, 116.40497589, source = Source.HTML)
+                    GCJ02MainlandChinaPoint(39.91843414, 116.40497589, source = Source.HTML_NOT_SEMANTIC)
                 )
             ),
             input.parse(
