@@ -25,6 +25,8 @@
 - Yandex Maps
 - 坐标
 
+GeoShare与提及的任何服务均无附属关系，也未获得其背书。
+
 <b>示例用例</b>
 
 当有人向您发送 Google 地图链接，但您更喜欢使用 OpenStreetMap 时， 您可以在 OsmAnd 或 Organic Maps 中快速<b>打开同一位置</b>。
