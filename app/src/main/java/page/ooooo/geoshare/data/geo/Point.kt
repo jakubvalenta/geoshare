@@ -5,6 +5,16 @@ import com.lbt05.evil_transform.TransformUtil
 import page.ooooo.geoshare.data.extensions.toScale
 import page.ooooo.geoshare.data.extensions.toTrimmedString
 
+/**
+ * Point with spatial reference system (SRS) information.
+ *
+ * This is the main structure to represent geographical data. See its implementations such as [WGS84Point] and
+ * [GCJ02Point].
+ *
+ * Each point has a [source], which describes where the point was extracted from, e.g. map link URI, or HTML document;
+ * implementations must not set a default value in the constructor, so that when you create a point, you must
+ * consciously decide where you extracted it from.
+ */
 sealed interface Point {
     val lat: Double?
     val lon: Double?
