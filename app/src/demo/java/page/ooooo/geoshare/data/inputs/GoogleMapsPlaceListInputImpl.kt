@@ -7,7 +7,7 @@ import page.ooooo.geoshare.R
  * Not available in this build flavor.
  */
 object GoogleMapsPlaceListInputImpl : GoogleMapsPlaceListInput, BasicOfflineInput {
-    override val group = GOOGLEInputGroup_MAPS
+    override val group = GoogleMapsInputGroup
 
     override fun parse(match: String, resources: Resources): ParseResult =
         parseResult {

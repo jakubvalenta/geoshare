@@ -9,7 +9,7 @@ import page.ooooo.geoshare.R
  * It shows a warning.
  */
 object GoogleMapsPlaceListInputImpl : GoogleMapsPlaceListInput, BasicOfflineInput {
-    override val group = GOOGLEInputGroup_MAPS
+    override val group = GoogleMapsInputGroup
 
     override fun parse(match: String, resources: Resources) =
         parseResult {
