@@ -4,140 +4,66 @@ import android.content.res.Resources
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assume.assumeTrue
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.data.geo.Source
+import page.ooooo.geoshare.data.geo.WGS84Point
 
 class PlusCodeUriInputTest : InputTest {
     override val resources: Resources = mock()
-    private val input = FakeInputRepository.plusCodeInput
+    private val input = FakeInputRepository.plusCodeUriInput
 
     @Test
-    fun match_globalCode() {
+    fun match_globalPlusCode() {
         assertEquals(
-            @Suppress("GrazieInspectionRunner") "6GCRPR6C+24",
-            input.match(@Suppress("GrazieInspectionRunner") "6GCRPR6C+24")
-        )
-        assertEquals(
-            "796RWF8Q+WF",
-            input.match("796RWF8Q+WF"),
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "8FJ3HVHW%2B96",
+            "https://plus.codes/8FJ3HVHW%2B96",
             input.match("https://plus.codes/8FJ3HVHW%2B96"),
         )
         assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "8FJ3HVHW%2B96",
-            input.match("https://www.google.com/maps/place/8FJ3HVHW%2B96"),
+            "https://plus.codes/8FJ3HVHW%2B96",
+            input.match("https://plus.codes/8FJ3HVHW%2B96/"),
         )
         assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "8FJ3HVHW%2B96",
-            input.match("https://www.google.com/maps/place/8FJ3HVHW%2B96/@42.5784375,1.8955625,17z/"),
-        )
-    }
-
-    @Test
-    fun match_localCode() {
-        assumeTrue("Local Plus Codes are not implemented yet", false)
-        assertEquals("8F+GG", input.match("8F+GG"))
-        assertEquals("6C8F+GG", input.match("6C8F+GG"))
-        assertEquals("WF8Q+WF", input.match("WF8Q+WF"))
-        assertEquals("28WR+CW", input.match("28WR+CW"))
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "HVHW%2B96",
-            input.match("https://plus.codes/HVHW%2B96"),
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "HVHW%2B96",
-            input.match("https://www.google.com/maps/place/HVHW%2B96"),
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "HVHW%2B96",
-            input.match("https://www.google.com/maps/place/HVHW%2B96/@42.5784375,1.8955625,17z/"),
+            "https://plus.codes/8FJ3HVHW%2B96",
+            input.match("https://plus.codes/8FJ3HVHW%2B96/spam"),
         )
     }
 
     @Test
-    fun match_localCodeWithLocality() {
-        assumeTrue("Local Plus Codes are not implemented yet", false)
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde",
-            input.match(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde"),
-        )
-        assertEquals(
-            "28WR+CW Comstock Park, Michigan",
-            input.match("28WR+CW Comstock Park, Michigan"),
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France",
-            input.match("https://plus.codes/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France"),
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France",
-            input.match("https://www.google.com/maps/place/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France"),
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France",
-            input.match("https://www.google.com/maps/place/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France/@42.5784375,1.8955625,17z/"),
-        )
+    fun match_localPlusCode() {
+        // Local Plus Codes are not implemented yet
+        assertNull(input.match("https://plus.codes/HVHW%2B96"))
+        assertNull(input.match("https://plus.codes/HVHW%2B96/"))
+        assertNull(input.match("https://plus.codes/HVHW%2B96/spam"))
     }
 
     @Test
-    fun match_localCodeWithLocalitySeparatedByMultipleSpaces_returnsCodeWithoutLocality() {
-        assumeTrue("Local Plus Codes are not implemented yet", false)
-        assertEquals(
-            "WF8Q+WF",
-            input.match(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "WF8Q+WF  Praia, Cabo Verde")
-        )
-        assertEquals("28WR+CW", input.match("28WR+CW  Comstock Park, Michigan"))
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "HVHW%2B96",
-            input.match(
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                "https://plus.codes/HVHW%2B96  Angoustrine-Villeneuve-des-Escaldes, France"
-            ),
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "HVHW%2B96",
-            input.match(
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                "https://www.google.com/maps/place/HVHW%2B96  Angoustrine-Villeneuve-des-Escaldes, France"
-            ),
-        )
+    fun match_localPlusCodeWithLocality() {
+        // Local Plus Codes are not implemented yet
+        assertNull(input.match("https://plus.codes/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France"))
     }
 
     @Test
-    fun match_spaces() {
-        assumeTrue("Local Plus Codes are not implemented yet", false)
-        assertEquals(
-            "28WR+CW foobar",
-            input.match("28WR+CW foobar ")
-        )
-        assertEquals(
-            "28WR+CW foo bar",
-            input.match("28WR+CW foo bar ")
-        )
-        assertEquals(
-            "28WR+CW foo",
-            input.match("28WR+CW foo  bar")
-        )
-        assertEquals(
-            "28WR+CW foo",
-            input.match("28WR+CW foo\tbar")
-        )
-        assertEquals(
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-            "HVHW%2B96 Angoustrine-Villeneuve-des-Escaldes, France",
+    fun match_localPlusCodeWithLocalitySeparatedByOneSpace() {
+        // Local Plus Codes are not implemented yet
+        assertNull(
             input.match(
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                 "https://plus.codes/HVHW%2B96 Angoustrine-Villeneuve-des-Escaldes, France"
             ),
+        )
+    }
+
+    @Test
+    fun match_localPlusCodeWithLocalitySeparatedByMultipleSpaces() {
+        // Local Plus Codes are not implemented yet
+        assertNull(
+            input.match(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "https://plus.codes/HVHW%2B96  Angoustrine-Villeneuve-des-Escaldes, France"
+            )
         )
     }
 
@@ -147,91 +73,49 @@ class PlusCodeUriInputTest : InputTest {
     }
 
     @Test
-    fun parse_globalCode() = runTest {
+    fun parse_globalPlusCode() = runTest {
         assertEquals(
             ParseResult.Success(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(-1.289938, 36.820313, source = Source.HASH)
-                )
+                persistentListOf(WGS84Point(-1.289938, 36.820313, source = Source.HASH))
             ),
-            input.parse(@Suppress("GrazieInspectionRunner") "6GCRPR6C+24"),
+            input.parse("https://plus.codes/6GCRPR6C+24"),
         )
         assertEquals(
             ParseResult.Success(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(
-                        14.917313,
-                        -23.5113130,
-                        source = Source.HASH
-                    )
-                )
+                persistentListOf(WGS84Point(14.917313, -23.5113130, source = Source.HASH))
             ),
-            input.parse("796RWF8Q+WF"),
+            input.parse("https://plus.codes/796RWF8Q+WF"),
         )
     }
 
     @Test
-    fun parse_globalCodeUriEncoded() = runTest {
+    fun parse_globalPlusCodeUriEncoded() = runTest {
         assertEquals(
             ParseResult.Success(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(42.578438, 1.895563, source = Source.HASH)
-                )
+                persistentListOf(WGS84Point(42.578438, 1.895563, source = Source.HASH))
             ),
-            input.parse(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "8FJ3HVHW%2B96"),
+            input.parse("https://plus.codes/8FJ3HVHW%2B96"),
         )
     }
 
     @Test
-    fun parse_globalCodeWithinMainlandChina() = runTest {
-        assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(39.917312, 116.397078, source = Source.HASH)
-                )
-            ),
-            input.parse(@Suppress("GrazieInspectionRunner") "8PFRW98W+WRG"),
-        )
+    fun parse_localPlusCodeWithoutLocality_returnsNoPoints() = runTest {
+        assertEquals(ParseResult.Success(), input.parse("https://plus.codes/8F+GG"))
+        assertEquals(ParseResult.Success(), input.parse("https://plus.codes/6C8F+GG"))
+        assertEquals(ParseResult.Success(), input.parse("https://plus.codes/WF8Q+WF"))
+        assertEquals(ParseResult.Success(), input.parse("https://plus.codes/28WR+CW"))
     }
 
     @Test
-    fun parse_globalCodeWithinWesternJapan() = runTest {
+    fun parse_localPlusCodeWithLocality() = runTest {
+        // Local Plus Codes are not implemented yet
         assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(34.594538, 133.758328, source = Source.HASH)
-                )
-            ),
-            input.parse("8Q6MHQV5+R88"),
-        )
-    }
-
-    @Test
-    fun parse_localCodeWithoutLocality_returnsNoPoints() = runTest {
-        assertEquals(ParseResult.Success(), input.parse("8F+GG"))
-        assertEquals(ParseResult.Success(), input.parse("6C8F+GG"))
-        assertEquals(ParseResult.Success(), input.parse("WF8Q+WF"))
-        assertEquals(ParseResult.Success(), input.parse("28WR+CW"))
-    }
-
-    @Test
-    fun parse_localCodeWithLocality() = runTest {
-        assumeTrue("Local Plus Codes are not implemented yet", false)
-        assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(0.0, 0.0, source = Source.HASH)
-                )
-            ),
-            input.parse(@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "WF8Q+WF Praia, Cabo Verde"),
+            ParseResult.Success(),
+            input.parse("https://plus.codes/WF8Q+WF%20Praia,%20Cabo%20Verde"),
         )
         assertEquals(
-            ParseResult.Success(
-                persistentListOf(
-                    GCJ02MainlandChinaPoint(0.0, 0.0, source = Source.HASH)
-                )
-            ),
-            input.parse("28WR+CW Comstock Park, Michigan"),
+            ParseResult.Success(),
+            input.parse("https://plus.codes/28WR+CW%20Comstock%20Park,%20Michigan"),
         )
     }
 }

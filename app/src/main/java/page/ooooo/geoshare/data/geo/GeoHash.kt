@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.data.geo
 
-import com.google.openlocationcode.OpenLocationCode
 import page.ooooo.geoshare.data.extensions.toScale
 import kotlin.math.max
 import kotlin.math.pow
@@ -235,25 +234,3 @@ fun decodeMapyComGeoHash(
         }
     }
 }
-
-/**
- * See https://github.com/google/open-location-code
- */
-fun decodePlusCode(codeString: String): NaivePoint? =
-    try {
-        OpenLocationCode(codeString)
-    } catch (_: IllegalArgumentException) {
-        // Invalid code
-        null
-    }
-        ?.run {
-            if (isFull) {
-                // The code is full
-                this
-            } else {
-                // Complete the code using a geocoding service (not implemented yet)
-                null
-            }
-        }
-        ?.decode()
-        ?.run { NaivePoint(lat = centerLatitude, lon = centerLongitude, source = Source.HASH) }

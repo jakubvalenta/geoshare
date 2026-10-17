@@ -17,8 +17,8 @@ import javax.inject.Singleton
 
 @Singleton
 class YahooMapsUriInput @Inject constructor(
-    val yahooMapsWebViewInput: dagger.Lazy<YahooMapsWebViewInput>,
-    val uriQuote: UriQuote,
+    private val yahooMapsWebViewInput: dagger.Lazy<YahooMapsWebViewInput>,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.YAHOO_MAPS

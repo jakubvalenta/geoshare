@@ -12,9 +12,9 @@ import javax.inject.Singleton
 @Singleton
 class MapyComShortLinkInput @Inject constructor(
     private val mapyComUriInput: dagger.Lazy<MapyComUriInput>,
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_mapy_com_short_link_name)
     override val group = InputGroup.MAPY_COM

@@ -13,9 +13,9 @@ import javax.inject.Singleton
 @Singleton
 class AmapShortLinkInput @Inject constructor(
     private val amapUriInput: dagger.Lazy<AmapUriInput>,
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_amap_short_link_name)
     override val group = InputGroup.AMAP

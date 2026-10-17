@@ -25,7 +25,7 @@ import javax.inject.Singleton
 class WazeUriInput @Inject constructor(
     private val wazeApiInput: dagger.Lazy<WazeApiInput>,
     private val wazeHtmlInput: dagger.Lazy<WazeHtmlInput>,
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.WAZE

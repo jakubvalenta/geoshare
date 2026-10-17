@@ -9,10 +9,7 @@ import javax.inject.Singleton
 /**
  * Shows warning that Google Search URIs are not supported.
  */
-@Singleton
-class GoogleSearchUriInput @Inject constructor(
-    val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern {
+object GoogleSearchUriInput : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_search_name)
     override val group = InputGroup.GOOGLE_MAPS
 

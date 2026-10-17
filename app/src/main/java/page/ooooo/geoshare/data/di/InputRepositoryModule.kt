@@ -39,7 +39,8 @@ import page.ooooo.geoshare.data.inputs.MapyComUriInput
 import page.ooooo.geoshare.data.inputs.OpenStreetMapApiInput
 import page.ooooo.geoshare.data.inputs.OpenStreetMapUriInput
 import page.ooooo.geoshare.data.inputs.OsmAndUriInput
-import page.ooooo.geoshare.data.inputs.PlusCodeInput
+import page.ooooo.geoshare.data.inputs.PlusCodeTextInput
+import page.ooooo.geoshare.data.inputs.PlusCodeUriInput
 import page.ooooo.geoshare.data.inputs.UrbiHtmlInput
 import page.ooooo.geoshare.data.inputs.UrbiUriInput
 import page.ooooo.geoshare.data.inputs.WazeApiInput
@@ -70,12 +71,10 @@ object InputRepositoryModule {
         baiduMapShortLinkInput: BaiduMapShortLinkInput,
         baiduMapUriInput: BaiduMapUriInput,
         cartesIGNUriInput: CartesIGNUriInput,
-        debugUriInput: DebugUriInput,
         geoUriInput: GeoUriInput,
         googleMapsShortLinkInput: GoogleMapsShortLinkInput,
         googleMapsUriInput: GoogleMapsUriInput,
         googleNavigationUriInput: GoogleNavigationUriInput,
-        googleSearchUriInput: GoogleSearchUriInput,
         kagiMapsUriInput: KagiMapsUriInput,
         hereWeGoUriInput: HereWeGoUriInput,
         magicEarthUriInput: MagicEarthUriInput,
@@ -86,6 +85,7 @@ object InputRepositoryModule {
         mapyComUriInput: MapyComUriInput,
         openStreetMapUriInput: OpenStreetMapUriInput,
         osmAndUriInput: OsmAndUriInput,
+        plusCodeUriInput: PlusCodeUriInput,
         urbiUriInput: UrbiUriInput,
         wazeUriInput: WazeUriInput,
         yahooMapsShortLinkInput: YahooMapsShortLinkInput,
@@ -100,13 +100,13 @@ object InputRepositoryModule {
             baiduMapShortLinkInput,
             baiduMapUriInput,
             cartesIGNUriInput,
-            coordinateInput = CoordinateInput,
-            debugUriInput,
+            CoordinateInput,
+            DebugUriInput,
             geoUriInput,
             googleMapsShortLinkInput,
             googleMapsUriInput,
             googleNavigationUriInput,
-            googleSearchUriInput,
+            GoogleSearchUriInput,
             kagiMapsUriInput,
             hereWeGoUriInput,
             magicEarthUriInput,
@@ -117,7 +117,8 @@ object InputRepositoryModule {
             mapyComUriInput,
             openStreetMapUriInput,
             osmAndUriInput,
-            plusCodeInput = PlusCodeInput,
+            PlusCodeTextInput,
+            plusCodeUriInput,
             urbiUriInput,
             wazeUriInput,
             yahooMapsShortLinkInput,
@@ -175,9 +176,7 @@ object FakeInputRepository : InputRepository {
         uriQuote = uriQuote,
     )
     override val coordinateInput = CoordinateInput
-    override val debugUriInput = DebugUriInput(
-        uriQuote = uriQuote,
-    )
+    override val debugUriInput = DebugUriInput
     val debugWebViewInput = DebugWebViewInput
     override val geoUriInput = GeoUriInput(
         uriQuote = uriQuote,
@@ -217,9 +216,7 @@ object FakeInputRepository : InputRepository {
         googleMapsAddressApiInput = { googleMapsAddressApiInput },
         uriQuote = uriQuote,
     )
-    override val googleSearchUriInput = GoogleSearchUriInput(
-        uriQuote = uriQuote,
-    )
+    override val googleSearchUriInput = GoogleSearchUriInput
     override val hereWeGoUriInput = HereWeGoUriInput(
         uriQuote = uriQuote,
     )
@@ -263,7 +260,10 @@ object FakeInputRepository : InputRepository {
     override val osmAndUriInput = OsmAndUriInput(
         uriQuote = uriQuote,
     )
-    override val plusCodeInput = PlusCodeInput
+    override val plusCodeTextInput = PlusCodeTextInput
+    override val plusCodeUriInput = PlusCodeUriInput(
+        uriQuote = uriQuote,
+    )
     override val urbiUriInput = UrbiUriInput(
         urbiHtmlInput = { urbiHtmlInput },
         uriQuote = uriQuote,

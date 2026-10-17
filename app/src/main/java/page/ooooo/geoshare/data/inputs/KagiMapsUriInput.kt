@@ -20,8 +20,8 @@ import javax.inject.Singleton
 
 @Singleton
 class KagiMapsUriInput @Inject constructor(
-    val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
-    val uriQuote: UriQuote,
+    private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.KAGI_MAPS

@@ -51,7 +51,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
         )
 
         // Relation
-        testUri(
+        testUri( // FIXME
             persistentListOf(
                 WGS84Point(45.4772309, 9.2295862, source = Source.API),
                 WGS84Point(45.4772270, 9.2292124, source = Source.API),

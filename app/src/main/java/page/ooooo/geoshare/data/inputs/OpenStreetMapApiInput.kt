@@ -15,9 +15,9 @@ import javax.inject.Singleton
 
 @Singleton
 class OpenStreetMapApiInput @Inject constructor(
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_open_street_map_api_name)
     override val group = InputGroup.OPEN_STREET_MAP

@@ -10,10 +10,7 @@ import javax.inject.Singleton
  *
  * This input iss useful for WebView testing, because it doesn't make a request to a commercial website.
  */
-@Singleton
-class DebugUriInput @Inject constructor(
-    val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern {
+object DebugUriInput : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.DEBUG
 

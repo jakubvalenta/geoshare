@@ -781,6 +781,97 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
+    fun parse_globalPlusCode() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(GCJ02MainlandChinaPoint(-1.289938, 36.820313, source = Source.HASH))
+            ),
+            input.parse("https://www.google.com/maps/place/6GCRPR6C%2B24"),
+        )
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(GCJ02MainlandChinaPoint(42.578438, 1.895563, source = Source.HASH))
+            ),
+            input.parse("https://www.google.com/maps/place/8FJ3HVHW%2B96"),
+        )
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(GCJ02MainlandChinaPoint(42.578438, 1.895563, z = 17.0, source = Source.HASH))
+            ),
+            input.parse("https://www.google.com/maps/place/8FJ3HVHW%2B96/@42.5784375,1.8955625,17z/"),
+        )
+    }
+
+    @Test
+    fun parse_localPlusCode() = runTest {
+        // Local Plus Codes are not implemented yet
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "HVHW+96",
+                        source = Source.URI,
+                    )
+                ),
+                next = MatchedInput(
+                    FakeInputRepository.googleMapsAddressApiInput,
+                    "https://www.google.com/maps/place/HVHW%2B96"
+                ),
+            ),
+            input.parse("https://www.google.com/maps/place/HVHW%2B96"),
+        )
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        42.5784375, 1.8955625,
+                        z = 17.0,
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "HVHW+96",
+                        source = Source.MAP_CENTER,
+                    )
+                ),
+            ),
+            input.parse("https://www.google.com/maps/place/HVHW%2B96/@42.5784375,1.8955625,17z/"),
+        )
+    }
+
+    @Test
+    fun parse_localPlusCodeWithLocality() = runTest {
+        // Local Plus Codes are not implemented yet
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "HVHW+96 Angoustrine-Villeneuve-des-Escaldes, France",
+                        source = Source.URI,
+                    )
+                ),
+                next = MatchedInput(
+                    FakeInputRepository.googleMapsAddressApiInput,
+                    "https://www.google.com/maps/place/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France"
+                ),
+            ),
+            input.parse("https://www.google.com/maps/place/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France"),
+        )
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(
+                    GCJ02MainlandChinaPoint(
+                        42.5784375,
+                        1.8955625,
+                        z = 17.0,
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "HVHW+96 Angoustrine-Villeneuve-des-Escaldes, France",
+                        source = Source.MAP_CENTER,
+                    )
+                ),
+            ),
+            input.parse("https://www.google.com/maps/place/HVHW%2B96%20Angoustrine-Villeneuve-des-Escaldes,%20France/@42.5784375,1.8955625,17z/"),
+        )
+    }
+
+    @Test
     fun parse_streetView() = runTest {
         assertEquals(
             ParseResult.Success(persistentListOf(GCJ02MainlandChinaPoint(48.8584, 2.2945, source = Source.MAP_CENTER))),

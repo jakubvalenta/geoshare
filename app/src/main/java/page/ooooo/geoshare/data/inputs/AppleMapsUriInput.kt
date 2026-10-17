@@ -20,7 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class AppleMapsUriInput @Inject constructor(
     private val appleMapsHtmlInput: dagger.Lazy<AppleMapsHtmlInput>,
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.APPLE_MAPS

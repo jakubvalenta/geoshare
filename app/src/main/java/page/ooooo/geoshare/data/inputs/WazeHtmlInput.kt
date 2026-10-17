@@ -16,9 +16,9 @@ import javax.inject.Singleton
 
 @Singleton
 class WazeHtmlInput @Inject constructor(
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_waze_html_name)
     override val group = InputGroup.WAZE

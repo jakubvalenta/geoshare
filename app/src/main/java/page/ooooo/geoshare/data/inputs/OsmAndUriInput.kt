@@ -18,7 +18,7 @@ import javax.inject.Singleton
 
 @Singleton
 class OsmAndUriInput @Inject constructor(
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = InputGroup.OSM_AND

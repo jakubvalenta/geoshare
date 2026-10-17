@@ -21,9 +21,9 @@ import javax.inject.Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
     private val googleMapsWebViewInput: dagger.Lazy<GoogleMapsWebViewInput>,
-    val log: Log,
-    val engine: HttpClientEngine,
-    val uriQuote: UriQuote,
+    private val log: Log,
+    private val engine: HttpClientEngine,
+    private val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput, BasicOnlineInput {
     override val group = InputGroup.GOOGLE_MAPS
 
