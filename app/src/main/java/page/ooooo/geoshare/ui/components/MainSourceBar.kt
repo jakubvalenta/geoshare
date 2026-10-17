@@ -212,6 +212,7 @@ private fun ShortTimePreview() {
             MainSourceBar(
                 conversionState = ConversionSucceeded(
                     source = source,
+                    matchedInput = MatchedInput(FakeInputRepository.openStreetMapUriInput, source),
                     points = persistentListOf(),
                 ),
                 logExpanded = false,
@@ -234,6 +235,7 @@ private fun DarkShortTimePreview() {
             MainSourceBar(
                 conversionState = ConversionSucceeded(
                     source = source,
+                    matchedInput = MatchedInput(FakeInputRepository.openStreetMapUriInput, source),
                     points = persistentListOf(),
                 ),
                 logExpanded = false,
