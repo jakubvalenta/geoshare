@@ -2,7 +2,6 @@ package page.ooooo.geoshare.screenshots
 
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -21,8 +20,8 @@ import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.saveScreenshot
 import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
+import page.ooooo.geoshare.tests.waitForToastToDisappear
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Takes screenshots for documentation purposes, such as the Weblate translation service.
@@ -83,9 +82,7 @@ class ScreenshotsManagedDeviceDemoBehaviorTest {
         onElement { viewIdResourceName == "geoShareBillingOffer_${Offer.Period.MONTHLY}" }.click()
         onElement { viewIdResourceName == "geoShareBillingPurchaseButton" && isEnabled }.click()
         onElement { textAsString() == "Example error" }
-        runBlocking {
-            delay(3.seconds) // Wait for the error message to disappear
-        }
+        waitForToastToDisappear()
         onElement { viewIdResourceName == "geoShareBillingStatusPurchased" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/billing_purchased_subscription")
