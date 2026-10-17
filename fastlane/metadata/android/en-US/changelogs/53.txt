@@ -1,1 +1,2 @@
 - Added Amap and Baidu Map web maps.
+- Improved result screen by showing attribution.
