@@ -46,7 +46,12 @@ class YandexMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    WGS84Point(39.915043, 116.408914, name = "Запретный город", z = 13.0, source = Source.HTML_NOT_SEMANTIC)
+                    WGS84Point(
+                        39.915043, 116.408914,
+                        name = "Запретный город",
+                        z = 13.0,
+                        source = Source.HTML_NOT_SEMANTIC,
+                    )
                 )
             ),
             input.parse(

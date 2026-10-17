@@ -1,9 +1,6 @@
 package page.ooooo.geoshare.data.inputs
 
 import android.content.res.Resources
-import page.ooooo.geoshare.data.uri.UriQuote
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Loads example.com in a WebView.

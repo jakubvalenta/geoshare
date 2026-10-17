@@ -18,7 +18,9 @@ class WazeHtmlInputTest : InputTest {
     @Test
     fun parse_containsLatLngJSON_returnsPoint() = runTest {
         assertEquals(
-            ParseResult.Success(persistentListOf(WGS84Point(43.64265563, -79.387202798, source = Source.HTML_NOT_SEMANTIC))),
+            ParseResult.Success(
+                persistentListOf(WGS84Point(43.64265563, -79.387202798, source = Source.HTML_NOT_SEMANTIC))
+            ),
             input.parse(
                 "fake match",
                 FakeFetchTools(

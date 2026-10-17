@@ -251,8 +251,8 @@ object GoogleMapsUriParser {
                             mutableNaivePoints.add(it.copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6)))
                         }
                     }
-                // Name or Local Plus Code (not supported)
-                // /{name}
+                    // Name or Local Plus Code (not supported)
+                    // /{name}
                     ?: mutableNaivePoints.add(NaivePoint(z = z, name = part, source = Source.URI))
             }
         }
