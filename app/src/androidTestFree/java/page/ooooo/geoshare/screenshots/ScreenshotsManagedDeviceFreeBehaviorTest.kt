@@ -151,7 +151,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
 
         // Help - Message - Open by default
         shareUri()
-        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object exception
         onElementOrScrollToElement(scrollableElement = { onMainScrollablePane() }) {
             viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
         }

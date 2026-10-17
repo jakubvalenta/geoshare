@@ -5,8 +5,6 @@ import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -105,12 +103,8 @@ class LinkBehaviorTest {
         // Does not show link
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareLinkListItem_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" })
 
-        // Wait for the toast message to disappear, because it covers the restore button
-        runBlocking {
-            delay(TOAST_TIMEOUT)
-        }
-
         // Restore initial links
+        waitForToastToDisappear() // Wait for the toast message to disappear, because it covers the restore button
         onElement { viewIdResourceName == "geoShareLinkListPane" }.scrollToBottom()
         onElement { viewIdResourceName == "geoShareLinkRestoreInitialButton" }.click()
         onElement { viewIdResourceName == "geoShareLinkRestoreInitialDialog" }.dismissDialog()

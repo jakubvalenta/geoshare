@@ -4,8 +4,6 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.data.database.InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID
@@ -39,12 +37,8 @@ class ServerBehaviorTest {
         fillServerForm(server)
         saveServerForm()
 
-        // Wait for the toast message to disappear
-        runBlocking {
-            delay(TOAST_TIMEOUT)
-        }
-
         // Shows the new server
+        waitForToastToDisappear() // Wait for the toast message to disappear, because it covers the server list
         quickWaitForStableInActiveWindow() // Wait for the lazy list to render
         onElement { viewIdResourceName == "geoShareServerListPane" }
             .scrollToElement(Direction.DOWN, 3_000) { textAsString() == server.name }
@@ -77,12 +71,8 @@ class ServerBehaviorTest {
         fillServerForm(server)
         saveServerForm()
 
-        // Wait for the toast message to disappear
-        runBlocking {
-            delay(TOAST_TIMEOUT)
-        }
-
         // Shows the updated server
+        waitForToastToDisappear()
         onElement { viewIdResourceName == "geoShareServerListPane" }
             .scrollToElement(Direction.DOWN) { textAsString() == "Google Maps Geocode Address edited" }
         onElement { viewIdResourceName == "geoShareServerListPane" }
@@ -109,12 +99,8 @@ class ServerBehaviorTest {
         // Does not show the server anymore
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareServerListItem_$GOOGLE_MAPS_GEOCODE_ADDRESS_UUID" })
 
-        // Wait for the toast message to disappear, because it covers the restore button
-        runBlocking {
-            delay(TOAST_TIMEOUT)
-        }
-
         // Restore initial servers
+        waitForToastToDisappear() // Wait for the toast message to disappear, because it covers the restore button
         onElement { viewIdResourceName == "geoShareServerListPane" }.scrollToBottom()
         onElement { viewIdResourceName == "geoShareServerRestoreInitialButton" }.click()
         onElement { viewIdResourceName == "geoShareServerRestoreInitialDialog" }.dismissDialog()

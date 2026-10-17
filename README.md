@@ -262,15 +262,17 @@ fastlane metadata
     SCREENGRAB_DEVICE_TYPE=phone fastlane screenshots
     ```
 
-4. Repeat the process for a small tablet:
+4. Repeat the process for emulator `Nexus 7` in portrait orientation:
 
-    - Emulator: `Nexus 7` (portrait orientation)
-    - Command: `SCREENGRAB_DEVICE_TYPE=sevenInch fastlane screenshots`
+    ```shell
+    SCREENGRAB_DEVICE_TYPE=sevenInch fastlane screenshots
+    ```
 
-5. Repeat the process for a medium tablet:
+5. Repeat the process for emulator `Medium Tablet` in landscape orientation:
 
-    - Emulator: `Medium Tablet` (landscape orientation)
-    - Command: `SCREENGRAB_DEVICE_TYPE=tenInch fastlane screenshots`
+    ```shell
+    SCREENGRAB_DEVICE_TYPE=tenInch fastlane screenshots
+    ```
 
 6. Then install `optipng` and optimize all the screenshot PNG files:
 

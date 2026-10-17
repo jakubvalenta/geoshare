@@ -77,7 +77,6 @@ class MockLocationScope(val locationManager: LocationManager, val mockProviderNa
 }
 
 const val ELEMENT_DOES_NOT_EXIST_TIMEOUT = 500L
-val TOAST_TIMEOUT = 5.seconds
 const val MAX_ATTEMPTS = 10
 val NETWORK_TIMEOUT = (1..MAX_ATTEMPTS).fold(CONNECT_TIMEOUT + REQUEST_TIMEOUT) { acc, curr ->
     acc + calcExponentialBackoffMillis(curr) + CONNECT_TIMEOUT + REQUEST_TIMEOUT
@@ -97,6 +96,12 @@ fun UiAutomatorTestScope.waitForAppToBeVisible(
 
 fun UiAutomatorTestScope.quickWaitForStableInActiveWindow() {
     waitForStableInActiveWindow(stableTimeoutMs = 1_000, stableIntervalMs = 100, requireStableScreenshot = false)
+}
+
+fun waitForToastToDisappear() {
+    runBlocking {
+        delay(5.seconds)
+    }
 }
 
 fun UiObject2.confirmDialog() {
@@ -996,11 +1001,6 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
             fillServerForm(testServer.server)
             saveServerForm()
 
-            // Wait for the insert toast to disappear, because it covers the radio buttons
-            runBlocking {
-                delay(TOAST_TIMEOUT)
-            }
-
             // Go back to server preferences
             onElement { viewIdResourceName == "geoShareBack" }.click()
 
@@ -1008,6 +1008,7 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
             onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" }.apply {
                 scrollToTop()
                 quickWaitForStableInActiveWindow()
+                waitForToastToDisappear() // Wait for the toast message to disappear, because it covers the radio buttons
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_address_${testServer.server.name}" }.click()
                 scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareUserPreferenceServer_google_maps_place_${testServer.server.name}" }.click()
             }
