@@ -497,18 +497,14 @@ private fun MainScreen(
                                         )
                                         if (helpLifecycleMessage != null) {
                                             helpLifecycleMessage(
-                                                Modifier
-                                                    .padding(horizontal = spacing.windowPadding)
-                                                    .padding(top = spacing.small)
+                                                Modifier.padding(top = spacing.small)
                                             )
                                         } else {
                                             HelpShareSourceMessage(
                                                 dismissedHelpMessages = dismissedHelpMessages,
                                                 outputsForAppsByCategory = outputsForAppsByCategory,
                                                 sourceComesFromIntent = sourceComesFromIntent,
-                                                modifier = Modifier
-                                                    .padding(horizontal = spacing.windowPadding)
-                                                    .padding(top = spacing.small),
+                                                modifier = Modifier.padding(top = spacing.small),
                                                 onDismissHelpMessage = onDismissHelpMessage,
                                                 onExecute = onExecute,
                                             )
