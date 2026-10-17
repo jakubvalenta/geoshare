@@ -20,7 +20,8 @@ import page.ooooo.geoshare.data.database.ServerAuthType
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.Srs
 import page.ooooo.geoshare.data.geo.WGS84Point
-import page.ooooo.geoshare.data.inputs.InputGroupId
+import page.ooooo.geoshare.data.inputs.AppleMapsInputGroup
+import page.ooooo.geoshare.data.inputs.CoordinatesInputGroup
 import page.ooooo.geoshare.data.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.preferences.CopyNameAutomation
@@ -550,14 +551,14 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         saveScreenshot("main_strings/supported_maps_all_page_2")
 
         // Supported maps - Detail - Coordinates
-        onElement { viewIdResourceName == "geoShareInputListAll_${InputGroupId.COORDINATES}" }.click()
+        onElement { viewIdResourceName == "geoShareInputListAll_${CoordinatesInputGroup.id}" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/supported_maps_detail_coordinates")
         goBackToElement { viewIdResourceName == "geoShareInputListPane" }
 
         // Supported maps - Detail
         onElement { viewIdResourceName == "geoShareInputListPane" }
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareInputListAll_${InputGroupId.APPLE_MAPS}" }
+            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareInputListAll_${AppleMapsInputGroup.id}" }
             .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/supported_maps_detail")
