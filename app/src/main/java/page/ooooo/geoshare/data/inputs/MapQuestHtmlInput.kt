@@ -22,7 +22,7 @@ class MapQuestHtmlInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_map_quest_html_name)
-    override val group = InputGroup.MAP_QUEST
+    override val group = MapQuestInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(

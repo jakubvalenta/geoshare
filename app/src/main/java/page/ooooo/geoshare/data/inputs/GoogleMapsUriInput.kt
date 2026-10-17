@@ -25,7 +25,7 @@ class GoogleMapsUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(5, "https://maps.google.com"),
         InputChangelogItem.Url(5, "https://google.com/maps"),

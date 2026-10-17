@@ -54,6 +54,7 @@
     <string name="conversion_succeeded_save_gpx_succeeded">Saved GPX file</string>
     <string name="conversion_succeeded_share">Share</string>
     <string name="conversion_succeeded_skip">Copy original link</string>
+    <string name="copyright" translatable="false">© %1$s</string>
     <string name="donation_button">Donate on Ko-fi</string>
     <string name="donation_description">Does this app save you time?</string>
     <string name="help_open_by_default_action">Learn more in FAQ</string>
@@ -301,6 +302,7 @@
     <string name="links_update">Edit web map</string>
     <string name="network_exception_connect_exception">Connection refused</string>
     <string name="network_exception_connect_timeout">Connect timeout</string>
+    <string name="network_exception_content_convert">Invalid response content</string>
     <string name="network_exception_eof">Connection closed</string>
     <string name="network_exception_request_timeout">Request timeout</string>
     <string name="network_exception_response_error">Response error %1$d</string>
@@ -374,5 +376,4 @@
     <string name="user_preferences_section_output">Output</string>
     <string name="user_preferences_server_edit">Edit servers</string>
     <string name="yes">Yes</string>
-    <string name="network_exception_content_convert">Invalid response content</string>
 </resources>

@@ -19,7 +19,7 @@ class UrbiHtmlInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_urbi_html_name)
-    override val group = InputGroup.URBI
+    override val group = UrbiInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->

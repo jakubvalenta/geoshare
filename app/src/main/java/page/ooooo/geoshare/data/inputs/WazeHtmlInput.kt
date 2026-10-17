@@ -21,7 +21,7 @@ class WazeHtmlInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_waze_html_name)
-    override val group = InputGroup.WAZE
+    override val group = WazeInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->

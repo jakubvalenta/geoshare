@@ -18,8 +18,8 @@ import page.ooooo.geoshare.data.geo.WGS84Point
  * See https://plus.codes/
  */
 object PlusCodeTextInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
-    override fun getName(resources: Resources) = group.getName(resources) // TODO Check duplicate name on Inputs screen
-    override val group = InputGroup.PLUS_CODE
+    override fun getName(resources: Resources) = group.getName(resources)
+    override val group = PlusCodeInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Text(39) {
             stringResource(

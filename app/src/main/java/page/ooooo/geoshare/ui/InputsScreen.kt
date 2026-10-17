@@ -50,9 +50,10 @@ import page.ooooo.geoshare.data.android.isDefaultHandlerEnabled
 import page.ooooo.geoshare.data.android.openSettingsOpenByDefault
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.extensions.trimUrl
+import page.ooooo.geoshare.data.inputs.GeoUriInputGroup
 import page.ooooo.geoshare.data.inputs.InputChangelogItem
 import page.ooooo.geoshare.data.inputs.InputGroup
-import page.ooooo.geoshare.data.inputs.InputGroupId
+import page.ooooo.geoshare.data.inputs.OpenStreetMapInputGroup
 import page.ooooo.geoshare.ui.components.InputsSettingsButton
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
@@ -65,7 +66,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun InputsScreen(
-    initialGroupId: InputGroupId?,
+    initialGroupId: String?,
     onBack: () -> Unit = {},
     viewModel: InputViewModel = hiltViewModel(),
 ) {
@@ -86,7 +87,7 @@ fun InputsScreen(
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 private fun InputsScreen(
-    initialGroupId: InputGroupId?,
+    initialGroupId: String?,
     allChangelogsByGroup: Map<InputGroup, ImmutableList<InputChangelogItem>>,
     recentChangelogsByGroup: Map<InputGroup, ImmutableList<InputChangelogItem>>,
     onBack: () -> Unit,
@@ -163,12 +164,12 @@ private fun InputsScreen(
 
 @Composable
 private fun InputsListPane(
-    currentGroupId: InputGroupId?,
+    currentGroupId: String?,
     allChangelogsByGroup: Map<InputGroup, ImmutableList<InputChangelogItem>>,
     recentChangelogsByGroup: Map<InputGroup, ImmutableList<InputChangelogItem>>,
     wide: Boolean,
     onBack: () -> Unit,
-    onNavigateToGroup: (id: InputGroupId) -> Unit,
+    onNavigateToGroup: (id: String) -> Unit,
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -268,7 +269,7 @@ private fun getChangelogDetails(
 
 @Composable
 private fun InputsDetailPane(
-    currentGroupId: InputGroupId?,
+    currentGroupId: String?,
     allChangelogsByGroup: Map<InputGroup, ImmutableList<InputChangelogItem>>,
     wide: Boolean,
     onBack: () -> Unit,
@@ -499,7 +500,7 @@ private fun OpenStreetMapPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialGroupId = InputGroupId.OPEN_STREET_MAP,
+                    initialGroupId = OpenStreetMapInputGroup.id,
                     allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
@@ -518,7 +519,7 @@ private fun DarkOpenStreetMapPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialGroupId = InputGroupId.OPEN_STREET_MAP,
+                    initialGroupId = OpenStreetMapInputGroup.id,
                     allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
@@ -537,7 +538,7 @@ private fun TabletOpenStreetMapPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialGroupId = InputGroupId.OPEN_STREET_MAP,
+                    initialGroupId = OpenStreetMapInputGroup.id,
                     allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
@@ -556,7 +557,7 @@ private fun GeoUriPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialGroupId = InputGroupId.GEO_URI,
+                    initialGroupId = OpenStreetMapInputGroup.id,
                     allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
@@ -575,7 +576,7 @@ private fun DarkGeoUriPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialGroupId = InputGroupId.GEO_URI,
+                    initialGroupId = GeoUriInputGroup.id,
                     allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }
@@ -594,7 +595,7 @@ private fun TabletGeoUriPreview() {
         Surface {
             Column {
                 InputsScreen(
-                    initialGroupId = InputGroupId.GEO_URI,
+                    initialGroupId = GeoUriInputGroup.id,
                     allChangelogsByGroup = fakeAllChangelogsByGroup,
                     recentChangelogsByGroup = fakeAllChangelogsByGroup.filterValues { changelog ->
                         changelog.any { it.addedInVersionCode > 25 }

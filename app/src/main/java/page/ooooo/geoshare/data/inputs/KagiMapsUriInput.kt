@@ -24,7 +24,7 @@ class KagiMapsUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.KAGI_MAPS
+    override val group = KagiMapsInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(51, "https://kagi.com/maps"),
     )

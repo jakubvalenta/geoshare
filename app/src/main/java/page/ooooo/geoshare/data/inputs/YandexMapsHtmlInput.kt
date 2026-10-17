@@ -26,7 +26,7 @@ class YandexMapsHtmlInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_yandex_html_name)
-    override val group = InputGroup.YANDEX_MAPS
+    override val group = YandexMapsInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(

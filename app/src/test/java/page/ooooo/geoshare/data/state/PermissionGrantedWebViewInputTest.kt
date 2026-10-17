@@ -23,7 +23,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
-import page.ooooo.geoshare.data.inputs.InputGroup
+import page.ooooo.geoshare.data.inputs.DebugInputGroup
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.ParseResult
 import page.ooooo.geoshare.data.inputs.WebViewInput
@@ -44,7 +44,7 @@ class PermissionGrantedWebViewInputTest {
     private val source = "https://maps.google.com/foo"
     private val input = object : WebViewInput {
         override fun getName(resources: Resources) = "Test Input"
-        override val group = InputGroup.DEBUG
+        override val group = DebugInputGroup
 
         override val timeout = 7.seconds
 
@@ -109,7 +109,7 @@ class PermissionGrantedWebViewInputTest {
         runTest {
             val input = object : WebViewInput {
                 override fun getName(resources: Resources) = "Test Input"
-                override val group = InputGroup.DEBUG
+                override val group = DebugInputGroup
 
                 @Suppress("SameReturnValue")
                 override fun getUnsafeExtractionJavaScript() = "undefined"
@@ -280,7 +280,7 @@ class PermissionGrantedWebViewInputTest {
     fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
         val input = object : WebViewInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override val timeout = 7.seconds
 

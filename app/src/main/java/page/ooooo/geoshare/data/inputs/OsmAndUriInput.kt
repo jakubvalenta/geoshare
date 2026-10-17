@@ -21,7 +21,7 @@ class OsmAndUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.OSM_AND
+    override val group = OsmAndInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://osmand.net/map"),
     )

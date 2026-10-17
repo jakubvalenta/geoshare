@@ -8,6 +8,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.FakeInputRepository
+import page.ooooo.geoshare.data.inputs.BasicInput
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.data.state.Attempt
@@ -168,19 +169,21 @@ class MainViewModelTest {
 
     @Test
     fun toExtendedLog_whenThereAreItemsWithoutDescription_returnsOnlyItemsWithDescription() {
+        val matchedInput = MatchedInput<BasicInput>(FakeInputRepository.debugUriInput, source)
         val firstState = SourceReceived(
             source = source,
         )
         val firstStart = timeSource.markNow()
         val secondState = PermissionGrantedBasicInput(
             source = source,
-            matchedInput = MatchedInput(FakeInputRepository.debugUriInput, source),
+            matchedInput = matchedInput,
             permission = null,
             results = emptyMap(),
         )
         val secondStart = timeSource.markNow()
         val thirdState = ConversionSucceeded(
             source = source,
+            matchedInput = matchedInput,
             points = persistentListOf(),
         )
         val thirdStart = timeSource.markNow()

@@ -27,7 +27,7 @@ import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.inputs.InputGroup
+import page.ooooo.geoshare.data.inputs.GoogleMapsInputGroup
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -83,7 +83,7 @@ private fun DefaultPreview() {
             PermissionDialog(
                 title = stringResource(
                     R.string.conversion_permission,
-                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                    GoogleMapsInputGroup.getName(LocalResources.current),
                 ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
@@ -116,7 +116,7 @@ private fun DarkPreview() {
             PermissionDialog(
                 title = stringResource(
                     R.string.conversion_permission,
-                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                    GoogleMapsInputGroup.getName(LocalResources.current),
                 ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
@@ -149,7 +149,7 @@ private fun ParseHtmlPermissionPreview() {
             PermissionDialog(
                 title = stringResource(
                     R.string.conversion_permission,
-                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                    GoogleMapsInputGroup.getName(LocalResources.current),
                 ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
@@ -184,7 +184,7 @@ private fun DarkParseHtmlPermissionPreview() {
             PermissionDialog(
                 title = stringResource(
                     R.string.conversion_permission,
-                    InputGroup.GOOGLE_MAPS.getName(LocalResources.current),
+                    GoogleMapsInputGroup.getName(LocalResources.current),
                 ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),

@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,7 +56,11 @@ import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
+import page.ooooo.geoshare.data.inputs.GeoUriInputGroup
+import page.ooooo.geoshare.data.inputs.GoogleMapsInputGroup
+import page.ooooo.geoshare.data.inputs.HereWeGoInputGroup
 import page.ooooo.geoshare.data.inputs.InputGroup
+import page.ooooo.geoshare.data.inputs.OpenStreetMapInputGroup
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.PointOutput
@@ -85,7 +88,6 @@ fun ResultCoordinates(
     initialExpanded: Boolean = false,
 ) {
     val lastPoint = points.lastOrNull() ?: return
-    val resources = LocalResources.current
     val spacing = LocalSpacing.current
 
     val outputsForPointChips by outputsForPointChips.collectAsStateWithLifecycle()
@@ -209,15 +211,6 @@ fun ResultCoordinates(
                         )
                     }
                 }
-                if (inputGroup.attribution) {
-                    Text(
-                        "Source: %s".format(inputGroup.getName(resources)), // TODO
-                        Modifier
-                            .padding(horizontal = spacing.windowPadding)
-                            .padding(top = spacing.extraTiny, bottom = spacing.tiny),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
                 ScrollableChips(
                     contentPadding = PaddingValues(
                         start = spacing.windowPadding,
@@ -239,7 +232,7 @@ fun ResultCoordinates(
                         }
                     }
                 }
-                points.takeIf { points.size > 1 }?.let { points ->
+                if (points.size > 1) {
                     Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
                         Column(Modifier.padding(top = spacing.small)) {
                             if (points.any { !it.hasCoordinates() }) {
@@ -312,6 +305,18 @@ fun ResultCoordinates(
                 }
             }
         }
+        if (inputGroup is InputGroup.HasAttribution) {
+            Column(
+                Modifier
+                    .align(Alignment.End)
+                    .padding(horizontal = spacing.windowPadding)
+                    .padding(top = spacing.extraTiny)
+            ) {
+                CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodySmall) {
+                    inputGroup.Attribution()
+                }
+            }
+        }
     }
 }
 
@@ -366,7 +371,7 @@ private fun DefaultPreview() {
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GEO_URI,
+                inputGroup = GeoUriInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -399,7 +404,7 @@ private fun DarkPreview() {
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GEO_URI,
+                inputGroup = GeoUriInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -432,7 +437,7 @@ private fun NameOnlyPreview() {
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = OpenStreetMapInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -465,7 +470,7 @@ private fun DarkNameOnlyPreview() {
             ResultCoordinates(
                 points = persistentListOf(WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI)),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = OpenStreetMapInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -505,7 +510,7 @@ private fun PointsPreview() {
                     ),
                 ),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = GoogleMapsInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -545,7 +550,7 @@ private fun DarkPointsPreview() {
                     ),
                 ),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = GoogleMapsInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -586,7 +591,7 @@ private fun PointsExpandedPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                 ),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = HereWeGoInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -628,7 +633,7 @@ private fun DarkPointsExpandedPreview() {
                     WGS84Point(NaivePoint.genRandomPoint()),
                 ),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = HereWeGoInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -666,7 +671,7 @@ private fun CoordinateFormatPreview() {
                     WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = GoogleMapsInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),
@@ -708,7 +713,7 @@ private fun DarkCoordinateFormatPreview() {
                     WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
                 coordinateConverter = coordinateConverter,
-                inputGroup = InputGroup.GOOGLE_MAPS,
+                inputGroup = GoogleMapsInputGroup,
                 outputsForPointChips = MutableStateFlow(
                     outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
                 ),

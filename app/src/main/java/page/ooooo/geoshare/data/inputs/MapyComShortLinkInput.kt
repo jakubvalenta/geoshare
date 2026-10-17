@@ -17,7 +17,7 @@ class MapyComShortLinkInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_mapy_com_short_link_name)
-    override val group = InputGroup.MAPY_COM
+    override val group = MapyComInputGroup
 
     override val pattern = Regex("""((?:https?://)?(?:www\.)?mapy\.[a-z]{2,3}/s/\S+)""")
 

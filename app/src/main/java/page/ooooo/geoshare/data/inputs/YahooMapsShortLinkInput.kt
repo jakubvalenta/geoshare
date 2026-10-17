@@ -18,7 +18,7 @@ class YahooMapsShortLinkInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_yahoo_maps_short_link_name)
-    override val group = InputGroup.YAHOO_MAPS
+    override val group = YahooMapsInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(51, "https://yahoo.jp"),
     )

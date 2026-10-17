@@ -25,7 +25,7 @@ class GeoUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.GEO_URI
+    override val group = GeoUriInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Text(3) {
             stringResource(

@@ -21,7 +21,7 @@ import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.BasicInput
 import page.ooooo.geoshare.data.inputs.BasicOfflineInput
 import page.ooooo.geoshare.data.inputs.BasicOnlineInput
-import page.ooooo.geoshare.data.inputs.InputGroup
+import page.ooooo.geoshare.data.inputs.DebugInputGroup
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.ParseResult
 import page.ooooo.geoshare.data.log.FakeLog
@@ -43,7 +43,7 @@ class PermissionGrantedBasicInputTest {
     private val source = "https://maps.google.com/foo"
     private val input = object : BasicOfflineInput {
         override fun getName(resources: Resources) = "Test Input"
-        override val group = InputGroup.DEBUG
+        override val group = DebugInputGroup
 
         override fun parse(match: String, resources: Resources) =
             result
@@ -104,7 +104,7 @@ class PermissionGrantedBasicInputTest {
     fun transition_whenInputParseSucceedsAndResultIsOnlineSuccess_returnsDataParsed() = runTest {
         val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 result
@@ -135,7 +135,7 @@ class PermissionGrantedBasicInputTest {
         runTest {
             val input = object : BasicOfflineInput {
                 override fun getName(resources: Resources) = "Test Input"
-                override val group = InputGroup.DEBUG
+                override val group = DebugInputGroup
 
                 override fun parse(match: String, resources: Resources) =
                     ParseResult.Warning(
@@ -166,7 +166,7 @@ class PermissionGrantedBasicInputTest {
     fun transition_whenInputParseThrowsCancellationException_returnsConversionFailed() = runTest {
         val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw CancellationException()
@@ -191,7 +191,7 @@ class PermissionGrantedBasicInputTest {
     fun transition_whenInputParseThrowsMalformedURLException_returnsConversionFailed() = runTest {
         val input = object : BasicOfflineInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override fun parse(match: String, resources: Resources) =
                 throw MalformedURLException()
@@ -220,7 +220,7 @@ class PermissionGrantedBasicInputTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
         val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw cause
@@ -256,7 +256,7 @@ class PermissionGrantedBasicInputTest {
         val cause = SocketTimeoutNetworkException(SocketTimeoutException())
         val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw cause
@@ -293,7 +293,7 @@ class PermissionGrantedBasicInputTest {
         runTest {
             val input = object : BasicOfflineInput {
                 override fun getName(resources: Resources) = "Test Input"
-                override val group = InputGroup.DEBUG
+                override val group = DebugInputGroup
 
                 override fun parse(match: String, resources: Resources) =
                     throw NotImplementedError()
@@ -337,7 +337,7 @@ class PermissionGrantedBasicInputTest {
         val cause = ResponseNetworkException(response, Exception())
         val input = object : BasicOnlineInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
                 throw cause

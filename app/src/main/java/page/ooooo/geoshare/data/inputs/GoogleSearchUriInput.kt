@@ -8,7 +8,7 @@ import page.ooooo.geoshare.R
  */
 object GoogleSearchUriInput : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_search_name)
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
 
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www\.)?google.com/(?:search|share)$URI_REST|share\.google[/?#]$URI_REST))""")

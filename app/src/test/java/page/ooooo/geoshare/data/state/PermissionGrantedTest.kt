@@ -10,7 +10,7 @@ import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.BasicInput
-import page.ooooo.geoshare.data.inputs.InputGroup
+import page.ooooo.geoshare.data.inputs.DebugInputGroup
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.NoopInput
 import page.ooooo.geoshare.data.inputs.ParseResult
@@ -40,7 +40,7 @@ class PermissionGrantedTest {
     fun transition_whenInputIsWebViewInput_returnsPermissionGrantedWebViewInput() = runTest {
         val input = object : WebViewInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             @Suppress("SameReturnValue")
             override fun getUnsafeExtractionJavaScript() = "undefined"
@@ -63,7 +63,7 @@ class PermissionGrantedTest {
     fun transition_whenInputIsNoopInput_returnsDataParsed() = runTest {
         val input = object : NoopInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
         }
         val matchedInput = MatchedInput<NoopInput>(input, source)
         val state = PermissionGranted(source, matchedInput, permission, results)

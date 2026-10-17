@@ -25,7 +25,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
     private val engine: HttpClientEngine,
     private val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput, BasicOnlineInput {
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
         fetchTools.getBodyAsChannel(

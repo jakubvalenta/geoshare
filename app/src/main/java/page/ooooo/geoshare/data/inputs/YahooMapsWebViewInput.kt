@@ -21,7 +21,7 @@ class YahooMapsWebViewInput @Inject constructor(
     private data class ExtractedPoint(val lat: Double, val lon: Double)
 
     override fun getName(resources: Resources) = resources.getString(R.string.input_yahoo_maps_web_view_name)
-    override val group = InputGroup.YAHOO_MAPS
+    override val group = YahooMapsInputGroup
 
     /**
      * Extracts point from the page URL after the page JavaScript has changed the URL.

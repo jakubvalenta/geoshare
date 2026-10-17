@@ -12,7 +12,7 @@ import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.BasicOfflineInput
 import page.ooooo.geoshare.data.inputs.BasicOnlineInput
-import page.ooooo.geoshare.data.inputs.InputGroup
+import page.ooooo.geoshare.data.inputs.DebugInputGroup
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.NoopInput
 import page.ooooo.geoshare.data.inputs.ParseResult
@@ -27,7 +27,7 @@ class InputMatchedTest {
     private val source = "https://maps.app.goo.gl/foo"
     private val input = object : BasicOnlineInput {
         override fun getName(resources: Resources) = "Test Input"
-        override val group = InputGroup.DEBUG
+        override val group = DebugInputGroup
 
         override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult {
             throw NotImplementedError()
@@ -146,7 +146,7 @@ class InputMatchedTest {
     fun transition_whenInputIsNoopInput_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
         val input = object : NoopInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
         }
         val matchedInput = MatchedInput(input, source)
         val userPreferencesRepository = FakeUserPreferencesRepository(
@@ -168,7 +168,7 @@ class InputMatchedTest {
     fun transition_whenInputIsBasicOfflineInput_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
         val input = object : BasicOfflineInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override fun parse(match: String, resources: Resources): ParseResult {
                 throw NotImplementedError()
@@ -194,7 +194,7 @@ class InputMatchedTest {
     fun transition_whenInputIsWebViewInputAndPermissionIsNever_returnsPermissionDenied() = runTest {
         val input = object : WebViewInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             @Suppress("SameReturnValue")
             override fun getUnsafeExtractionJavaScript() = "undefined"
@@ -223,7 +223,7 @@ class InputMatchedTest {
     fun transition_whenInputIsNoopInputAndWebViewInputAndPermissionIsNever_returnsPermissionDenied() = runTest {
         val input = object : NoopInput, WebViewInput {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             @Suppress("SameReturnValue")
             override fun getUnsafeExtractionJavaScript() = "undefined"

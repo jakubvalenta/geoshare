@@ -53,7 +53,7 @@ class WazeApiInput @Inject constructor(
     )
 
     override fun getName(resources: Resources) = resources.getString(R.string.input_waze_api_name)
-    override val group = InputGroup.WAZE
+    override val group = WazeInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         HttpClient(engine) {

@@ -22,7 +22,7 @@ class MagicEarthUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.MAGIC_EARTH
+    override val group = MagicEarthInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://magicearth.com/"),
     )

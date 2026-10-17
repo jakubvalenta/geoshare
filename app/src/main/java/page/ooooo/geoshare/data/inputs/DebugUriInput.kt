@@ -9,7 +9,7 @@ import android.content.res.Resources
  */
 object DebugUriInput : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.DEBUG
+    override val group = DebugInputGroup
 
     override val pattern = Regex("""((?:https?://)?(?:www\.)?example\.com(?:/\S+|$))""")
 

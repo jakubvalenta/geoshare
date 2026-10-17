@@ -1,173 +1,242 @@
 package page.ooooo.geoshare.data.inputs
 
 import android.content.res.Resources
-import androidx.annotation.Keep
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.unit.LayoutDirection
 import page.ooooo.geoshare.R
-
-@Keep
-enum class InputGroupId {
-    AMAP,
-    APPLE_MAPS,
-    BAIDU_MAP,
-    CARTES_IGN,
-    COORDINATES,
-    DEBUG,
-    GEO_URI,
-    GOOGLE_MAPS,
-    GOOGLE_NAVIGATION_URI,
-    KAGI_MAPS,
-    HERE_WEGO,
-    MAGIC_EARTH,
-    MAPS_ME,
-    MAPY_COM,
-    MAP_QUEST,
-    OPEN_STREET_MAP,
-    OSM_AND,
-    PLUS_CODE,
-    URBI,
-    WAZE,
-    YAHOO_MAPS,
-    YANDEX_MAPS,
-}
+import page.ooooo.geoshare.data.android.openUriInDefaultApp
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
+import java.util.Calendar
 
 interface InputGroup {
-    val id: InputGroupId
-    val attribution: Boolean
+    val id: String
+
     fun getName(resources: Resources): String
 
-    companion object {
-        val AMAP = object : InputGroup {
-            override val id = InputGroupId.AMAP
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_amap_name)
-        }
-        val APPLE_MAPS = object : InputGroup {
-            override val id = InputGroupId.APPLE_MAPS
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_apple_maps_name)
-        }
-        val BAIDU_MAP = object : InputGroup {
-            override val id = InputGroupId.BAIDU_MAP
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_baidu_map_name)
-        }
-        val CARTES_IGN = object : InputGroup {
-            override val id = InputGroupId.CARTES_IGN
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_cartes_ign_name)
-        }
-        val COORDINATES = object : InputGroup {
-            override val id = InputGroupId.COORDINATES
-            override val attribution = false
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_coordinates_name)
-        }
-        val DEBUG = object : InputGroup {
-            override val id = InputGroupId.DEBUG
-            override val attribution = true
-            override fun getName(resources: Resources) = "Debug Input"
-        }
-        val GEO_URI = object : InputGroup {
-            override val id = InputGroupId.GEO_URI
-            override val attribution = false
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_geo_name)
-        }
-        val GOOGLE_MAPS = object : InputGroup {
-            override val id = InputGroupId.GOOGLE_MAPS
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_google_maps_name)
-        }
-        val GOOGLE_NAVIGATION_URI =
-            object : InputGroup {
-                override val id = InputGroupId.GOOGLE_NAVIGATION_URI
-                override val attribution = false
-                override fun getName(resources: Resources) =
-                    resources.getString(R.string.converter_google_navigation_uri_name)
-            }
-        val HERE_WEGO = object : InputGroup {
-            override val id = InputGroupId.HERE_WEGO
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_here_wego_name)
-        }
-        val KAGI_MAPS =
-            object : InputGroup {
-                override val id = InputGroupId.KAGI_MAPS
-                override val attribution = true
-                override fun getName(resources: Resources) =
-                    resources.getString(R.string.input_kagi_maps_name)
-            }
-        val MAGIC_EARTH = object : InputGroup {
-            override val id = InputGroupId.MAGIC_EARTH
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_magic_earth_name)
-        }
-        val MAPS_ME = object : InputGroup {
-            override val id = InputGroupId.MAPS_ME
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_ge0_name)
-        }
-        val MAPY_COM = object : InputGroup {
-            override val id = InputGroupId.MAPY_COM
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_mapy_com_name)
-        }
-        val MAP_QUEST = object : InputGroup {
-            override val id = InputGroupId.MAP_QUEST
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.input_map_quest_name)
-        }
-        val OPEN_STREET_MAP = object : InputGroup {
-            override val id = InputGroupId.OPEN_STREET_MAP
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_open_street_map_name)
-        }
-        val OSM_AND = object : InputGroup {
-            override val id = InputGroupId.OSM_AND
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_osm_and_name)
-        }
-        val PLUS_CODE = object : InputGroup {
-            override val id = InputGroupId.PLUS_CODE
-            override val attribution = false
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_plus_code_name)
-        }
-        val URBI = object : InputGroup {
-            override val id = InputGroupId.URBI
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_urbi_name)
-        }
-        val WAZE = object : InputGroup {
-            override val id = InputGroupId.WAZE
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_waze_name)
-        }
-        val YAHOO_MAPS = object : InputGroup {
-            override val id = InputGroupId.YAHOO_MAPS
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.input_yahoo_maps_name)
-        }
-        val YANDEX_MAPS = object : InputGroup {
-            override val id = InputGroupId.YANDEX_MAPS
-            override val attribution = true
-            override fun getName(resources: Resources) =
-                resources.getString(R.string.converter_yandex_maps_name)
+    interface HasAttribution {
+        fun getName(resources: Resources): String
+
+        @Composable
+        fun Attribution() {
+            val layoutDirection = LocalLayoutDirection.current
+            val resources = LocalResources.current
+            Text(
+                resources.getString(R.string.copyright, getName(resources)),
+                style = LocalTextStyle.current.copy(
+                    // Don't detect layout direction from content, because it can fail due to the group name being in LTR
+                    textDirection = if (layoutDirection == LayoutDirection.Rtl) TextDirection.Rtl else TextDirection.Ltr
+                ),
+            )
         }
     }
+
+    companion object {
+        val currentYear by lazy {
+            // Use Calendar to support API < 26
+            Calendar.getInstance().get(Calendar.YEAR)
+        }
+    }
+}
+
+object AmapInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "Amap"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_amap_name)
+}
+
+object AppleMapsInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "AppleMaps"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_apple_maps_name)
+}
+
+object BaiduMapInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "BaiduMap"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_baidu_map_name)
+}
+
+object CartesIGNInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "CartesIGN"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_cartes_ign_name)
+}
+
+object CoordinatesInputGroup : InputGroup {
+    override val id = "Coordinates"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_coordinates_name)
+}
+
+object DebugInputGroup : InputGroup {
+    override val id = "Debug"
+
+    override fun getName(resources: Resources) = "Debug Input"
+}
+
+object GeoUriInputGroup : InputGroup {
+    override val id = "GeoUri"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_geo_name)
+}
+
+object GoogleMapsInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "GoogleMaps"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_google_maps_name)
+
+    @Composable
+    override fun Attribution() {
+        // See https://developers.google.com/maps/documentation/places/web-service/policies
+        Text(
+            "Google Maps", // Must not be translated
+            color = if (isSystemInDarkTheme()) Color.White else Color(0xFF1F1F1F),
+        )
+    }
+}
+
+object GoogleNavigationUriInputGroup : InputGroup {
+    override val id = "GoogleNavigationUri"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_google_navigation_uri_name)
+}
+
+object HereWeGoInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "HereWego"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_here_wego_name)
+
+    @Composable
+    override fun Attribution() {
+        // See https://docs.here.com/map-rendering/docs/required-copyright-notice-vector-tile-api
+        Text(
+            "© ${InputGroup.currentYear} HERE" // Must not be translated
+        )
+    }
+}
+
+object KagiMapsInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "Kagi Maps"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.input_kagi_maps_name)
+}
+
+object MagicEarthInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "Magic Earth"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_magic_earth_name)
+}
+
+object MapsMeInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "MapsMe"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_ge0_name)
+
+    @Composable
+    override fun Attribution() = OpenStreetMapInputGroup.Attribution()
+}
+
+object MapyComInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "MapyCom"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_mapy_com_name)
+}
+
+object MapQuestInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "MapQuest"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.input_map_quest_name)
+}
+
+object OpenStreetMapInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "OpenStreetMap"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_open_street_map_name)
+
+    @Composable
+    override fun Attribution() {
+        // See https://www.openstreetmap.org/copyright
+        val context = LocalContext.current
+        Text(buildAnnotatedString {
+            append("Map data from ") // Probably shouldn't be translated
+            withLink(
+                LinkAnnotation.Clickable(tag = "link", styles = defaultLinkStyles()) {
+                    context.openUriInDefaultApp("https://www.openstreetmap.org/copyright")
+                }
+            ) {
+                append("OpenStreetMap") // Must not be translated
+            }
+        })
+    }
+}
+
+object OsmAndInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "OsmAnd"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_osm_and_name)
+
+    @Composable
+    override fun Attribution() = OpenStreetMapInputGroup.Attribution()
+}
+
+object PlusCodeInputGroup : InputGroup {
+    override val id = "PlusCode"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_plus_code_name)
+}
+
+object UrbiInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "Urbi"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_urbi_name)
+}
+
+object WazeInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "Waze"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_waze_name)
+}
+
+object YahooMapsInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "YahooMaps"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.input_yahoo_maps_name)
+}
+
+object YandexMapsInputGroup : InputGroup, InputGroup.HasAttribution {
+    override val id = "YandexMaps"
+
+    override fun getName(resources: Resources) =
+        resources.getString(R.string.converter_yandex_maps_name)
 }

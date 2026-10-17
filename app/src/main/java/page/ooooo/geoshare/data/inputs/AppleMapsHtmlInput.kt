@@ -22,7 +22,7 @@ class AppleMapsHtmlInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_apple_maps_html_name)
-    override val group = InputGroup.APPLE_MAPS
+    override val group = AppleMapsInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(

@@ -38,7 +38,7 @@ class DataParsedTest {
         )
         val state = DataParsed(source, matchedInput, permission = null, results)
         assertEquals(
-            ConversionSucceeded(source, points),
+            ConversionSucceeded(source, matchedInput, points),
             state.transition(stateContext),
         )
     }
@@ -66,7 +66,7 @@ class DataParsedTest {
             )
             val state = DataParsed(source, matchedInput, permission = null, results)
             assertEquals(
-                ConversionSucceeded(source, points),
+                ConversionSucceeded(source, matchedInput, points),
                 state.transition(stateContext),
             )
         }
@@ -95,6 +95,7 @@ class DataParsedTest {
             assertEquals(
                 ConversionSucceeded(
                     source,
+                    matchedInput,
                     persistentListOf(
                         WGS84Point(1.0, 2.0, z = 3.14, name = "bar", source = Source.GENERATED)
                     ),
@@ -141,7 +142,7 @@ class DataParsedTest {
         val results: Results = mapOf(matchedInput to ParseResult.Success(points))
         val state = DataParsed(source, matchedInput, permission = null, results)
         assertEquals(
-            ConversionSucceeded(source, points),
+            ConversionSucceeded(source, matchedInput, points),
             state.transition(stateContext),
         )
     }
@@ -238,7 +239,7 @@ class DataParsedTest {
         )
         val state = DataParsed(source, matchedInput, permission = null, results)
         assertEquals(
-            ConversionSucceeded(source, oldPoints),
+            ConversionSucceeded(source, matchedInput, oldPoints),
             state.transition(stateContext),
         )
     }
@@ -255,7 +256,7 @@ class DataParsedTest {
             )
             val state = DataParsed(source, matchedInput, permission = null, results)
             assertEquals(
-                ConversionSucceeded(source, oldPoints),
+                ConversionSucceeded(source, matchedInput, oldPoints),
                 state.transition(stateContext),
             )
         }

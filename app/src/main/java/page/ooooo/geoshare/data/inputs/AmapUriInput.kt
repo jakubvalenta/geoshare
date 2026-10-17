@@ -20,7 +20,7 @@ class AmapUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.AMAP
+    override val group = AmapInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(27, "https://wb.amap.com/"),
     )

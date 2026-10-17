@@ -9,7 +9,7 @@ import page.ooooo.geoshare.data.geo.WGS84Point
  * @see DebugUriInput
  */
 object DebugWebViewInput : WebViewInput {
-    override val group = InputGroup.DEBUG
+    override val group = DebugInputGroup
     override fun getName(resources: Resources) = "Debug Input (WebView)"
 
     // language=JavaScript

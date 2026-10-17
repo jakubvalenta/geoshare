@@ -21,7 +21,7 @@ class YandexMapsUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.YANDEX_MAPS
+    override val group = YandexMapsInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://ya.ru/maps"),
         InputChangelogItem.Url(22, "https://yandex.az/maps"),

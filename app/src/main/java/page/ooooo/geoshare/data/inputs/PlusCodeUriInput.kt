@@ -23,7 +23,7 @@ class PlusCodeUriInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.PLUS_CODE
+    override val group = PlusCodeInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(39, "https://plus.codes"),
     )
