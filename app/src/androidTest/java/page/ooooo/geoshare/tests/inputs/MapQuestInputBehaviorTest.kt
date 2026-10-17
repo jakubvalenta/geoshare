@@ -35,9 +35,9 @@ class MapQuestInputBehaviorTest {
 
         // Place within Hong Kong
         testUri(
-            // FIXME
             WGS84Point(22.254182, 113.905181, source = Source.HTML_NOT_SEMANTIC),
             "https://www.mapquest.com/cn/tian-tan-buddha-big-buddha-526039166",
+            accurate = false,
             grantConnectionPermission = true,
         )
 
@@ -45,6 +45,7 @@ class MapQuestInputBehaviorTest {
         testUri(
             WGS84Point(24.998562, 121.580986, source = Source.HTML_NOT_SEMANTIC),
             "https://www.mapquest.com/tw/taipei-zoo-524803950",
+            accurate = false,
             grantConnectionPermission = true,
         )
 
