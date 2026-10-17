@@ -15,6 +15,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -316,16 +317,18 @@ fun ResultCoordinates(
 
 @Composable
 private fun ResultCoordinatesCheck(modifier: Modifier = Modifier, block: @Composable () -> Unit) {
-    Row(modifier) {
-        Icon(
-            painterResource(R.drawable.warning_24px),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 6.dp)
-                .requiredSize(16.dp),
-        )
-        CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelMedium) {
-            block()
+    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.error) {
+        Row(modifier) {
+            Icon(
+                painterResource(R.drawable.warning_24px),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .requiredSize(16.dp),
+            )
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.labelMedium) {
+                block()
+            }
         }
     }
 }
