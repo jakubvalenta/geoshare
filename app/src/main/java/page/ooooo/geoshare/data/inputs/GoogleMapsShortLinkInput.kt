@@ -17,12 +17,12 @@ import javax.inject.Singleton
 @Singleton
 class GoogleMapsShortLinkInput @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_short_link_name)
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(10, "https://g.co/kgs"),
         InputChangelogItem.Url(5, "https://app.goo.gl/maps"),

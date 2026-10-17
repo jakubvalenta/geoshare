@@ -67,7 +67,7 @@ class WazeInputBehaviorTest : InputBehaviorTest {
 
         // Place id
         testUri(
-            WGS84Point(52.000425474, 4.372739102, source = Source.JAVASCRIPT),
+            WGS84Point(52.000425474, 4.372739102, source = Source.HTML_NOT_SEMANTIC),
             "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020",
             grantConnectionPermission = true,
         )

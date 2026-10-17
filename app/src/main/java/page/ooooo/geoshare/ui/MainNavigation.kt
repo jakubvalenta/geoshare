@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import page.ooooo.geoshare.data.inputs.InputGroupId
 
 @Serializable
 object AboutRoute
@@ -21,7 +20,7 @@ object BillingRoute
 data class FaqRoute(val itemId: FaqItemId? = null)
 
 @Serializable
-data class InputsRoute(val groupId: InputGroupId? = null)
+data class InputsRoute(val groupId: String? = null)
 
 @Serializable
 object LicensesRoute

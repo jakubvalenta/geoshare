@@ -14,14 +14,14 @@ class GoogleMapsPlaceListInputBehaviorTest : InputBehaviorTest {
         if (htmlParsingSupported) {
             testUri(
                 persistentListOf(
-                    WGS84Point(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
-                    WGS84Point(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
-                    WGS84Point(59.3443991, 11.672637, source = Source.JAVASCRIPT),
-                    WGS84Point(59.2557409, 11.5857853, source = Source.JAVASCRIPT),
-                    WGS84Point(59.1579458, 11.7337507, source = Source.JAVASCRIPT),
-                    WGS84Point(59.229344899999994, 11.6892173, source = Source.JAVASCRIPT),
-                    WGS84Point(59.2999243, 11.6587237, source = Source.JAVASCRIPT),
-                    WGS84Point(59.147731699999994, 11.550661199999999, source = Source.JAVASCRIPT),
+                    WGS84Point(59.1293656, 11.4585672, source = Source.JAVASCRIPT_STATE),
+                    WGS84Point(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT_STATE),
+                    WGS84Point(59.3443991, 11.672637, source = Source.JAVASCRIPT_STATE),
+                    WGS84Point(59.2557409, 11.5857853, source = Source.JAVASCRIPT_STATE),
+                    WGS84Point(59.1579458, 11.7337507, source = Source.JAVASCRIPT_STATE),
+                    WGS84Point(59.229344899999994, 11.6892173, source = Source.JAVASCRIPT_STATE),
+                    WGS84Point(59.2999243, 11.6587237, source = Source.JAVASCRIPT_STATE),
+                    WGS84Point(59.147731699999994, 11.550661199999999, source = Source.JAVASCRIPT_STATE),
                 ),
                 "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg",
                 grantConnectionPermission = true,

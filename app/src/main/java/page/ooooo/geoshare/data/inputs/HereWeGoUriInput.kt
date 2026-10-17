@@ -19,10 +19,10 @@ import kotlin.io.encoding.Base64
 
 @Singleton
 class HereWeGoUriInput @Inject constructor(
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.HERE_WEGO
+    override val group = HereWeGoInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://share.here.com/l/"),
         InputChangelogItem.Url(20, "https://share.here.com/p/"),

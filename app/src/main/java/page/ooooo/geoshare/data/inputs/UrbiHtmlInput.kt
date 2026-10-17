@@ -14,12 +14,12 @@ import javax.inject.Singleton
 @Singleton
 class UrbiHtmlInput @Inject constructor(
     private val urbiUriInput: dagger.Lazy<UrbiUriInput>,
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_urbi_html_name)
-    override val group = InputGroup.URBI
+    override val group = UrbiInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->

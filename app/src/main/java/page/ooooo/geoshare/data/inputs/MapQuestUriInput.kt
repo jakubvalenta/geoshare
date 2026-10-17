@@ -11,11 +11,11 @@ import javax.inject.Singleton
 
 @Singleton
 class MapQuestUriInput @Inject constructor(
-    val mapQuestHtmlInput: dagger.Lazy<MapQuestHtmlInput>,
-    val uriQuote: UriQuote,
+    private val mapQuestHtmlInput: dagger.Lazy<MapQuestHtmlInput>,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.MAP_QUEST
+    override val group = MapQuestInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(51, "https://mapq.st"),
         InputChangelogItem.Url(51, "https://www.mapquest.com"),

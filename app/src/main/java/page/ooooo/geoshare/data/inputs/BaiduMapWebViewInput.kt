@@ -21,7 +21,7 @@ class BaiduMapWebViewInput @Inject constructor(
     private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
 
     override fun getName(resources: Resources) = resources.getString(R.string.input_baidu_map_web_view_name)
-    override val group = InputGroup.BAIDU_MAP
+    override val group = BaiduMapInputGroup
 
     /**
      * Extracts point from the page JavaScript state.
@@ -83,7 +83,7 @@ class BaiduMapWebViewInput @Inject constructor(
             log.e(TAG, "Deserialization error", tr)
             null
         }?.run {
-            points = persistentListOf(BD09MCPoint(lat, lon, z, name, source = Source.JAVASCRIPT))
+            points = persistentListOf(BD09MCPoint(lat, lon, z, name, source = Source.JAVASCRIPT_STATE))
         }
     }
 

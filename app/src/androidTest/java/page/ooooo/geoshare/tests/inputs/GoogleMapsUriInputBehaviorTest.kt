@@ -106,5 +106,11 @@ class GoogleMapsUriInputBehaviorTest : InputBehaviorTest {
             WGS84Point(52.5067296, 13.2599309, source = Source.MAP_CENTER),
             "https://www.google.com/maps?center=52.5067296,13.2599309",
         )
+
+        // Global Plus Code within mainland China
+        testUri(
+            GCJ02Point(39.917312, 116.397078, source = Source.HASH),
+            "https://www.google.com/maps/place/8PFRW98W%2BWRG",
+        )
     }
 }

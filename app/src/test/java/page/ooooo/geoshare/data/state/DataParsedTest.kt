@@ -38,7 +38,7 @@ class DataParsedTest {
         )
         val state = DataParsed(source, matchedInput, permission = null, results)
         assertEquals(
-            ConversionSucceeded(source, points),
+            ConversionSucceeded(source, matchedInput, points),
             state.transition(stateContext),
         )
     }
@@ -55,22 +55,18 @@ class DataParsedTest {
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "2"
-                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
-                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult.Success(
-                    persistentListOf(
-                        WGS84Point(
-                            5.0,
-                            6.0,
-                            source = Source.JAVASCRIPT
-                        )
-                    )
-                ),
-                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult.Success(),
+                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML_SEMANTIC))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "3"
+                ) to ParseResult.Success(persistentListOf(WGS84Point(5.0, 6.0, source = Source.JAVASCRIPT_STATE))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "4"
+                ) to ParseResult.Success(),
                 matchedInput to ParseResult.Success(points),
             )
             val state = DataParsed(source, matchedInput, permission = null, results)
             assertEquals(
-                ConversionSucceeded(source, points),
+                ConversionSucceeded(source, matchedInput, points),
                 state.transition(stateContext),
             )
         }
@@ -86,23 +82,20 @@ class DataParsedTest {
                 MatchedInput(
                     FakeInputRepository.debugUriInput,
                     "2"
-                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML))),
-                MatchedInput(FakeInputRepository.debugUriInput, "3") to ParseResult.Success(
-                    persistentListOf(
-                        WGS84Point(
-                            5.0,
-                            6.0,
-                            source = Source.JAVASCRIPT
-                        )
-                    )
-                ),
-                MatchedInput(FakeInputRepository.debugUriInput, "4") to ParseResult.Success(),
+                ) to ParseResult.Success(persistentListOf(WGS84Point(z = 3.14, source = Source.HTML_SEMANTIC))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "3"
+                ) to ParseResult.Success(persistentListOf(WGS84Point(5.0, 6.0, source = Source.JAVASCRIPT_STATE))),
+                MatchedInput(
+                    FakeInputRepository.debugUriInput, "4"
+                ) to ParseResult.Success(),
                 matchedInput to ParseResult.Success(points),
             )
             val state = DataParsed(source, matchedInput, permission = null, results)
             assertEquals(
                 ConversionSucceeded(
                     source,
+                    matchedInput,
                     persistentListOf(
                         WGS84Point(1.0, 2.0, z = 3.14, name = "bar", source = Source.GENERATED)
                     ),
@@ -149,7 +142,7 @@ class DataParsedTest {
         val results: Results = mapOf(matchedInput to ParseResult.Success(points))
         val state = DataParsed(source, matchedInput, permission = null, results)
         assertEquals(
-            ConversionSucceeded(source, points),
+            ConversionSucceeded(source, matchedInput, points),
             state.transition(stateContext),
         )
     }
@@ -246,7 +239,7 @@ class DataParsedTest {
         )
         val state = DataParsed(source, matchedInput, permission = null, results)
         assertEquals(
-            ConversionSucceeded(source, oldPoints),
+            ConversionSucceeded(source, matchedInput, oldPoints),
             state.transition(stateContext),
         )
     }
@@ -263,7 +256,7 @@ class DataParsedTest {
             )
             val state = DataParsed(source, matchedInput, permission = null, results)
             assertEquals(
-                ConversionSucceeded(source, oldPoints),
+                ConversionSucceeded(source, matchedInput, oldPoints),
                 state.transition(stateContext),
             )
         }

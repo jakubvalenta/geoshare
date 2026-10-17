@@ -23,7 +23,7 @@ class YandexMapsHtmlInputTest : InputTest {
                     WGS84Point(
                         55.882227, 37.566898,
                         name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Keramichesky Drive",
-                        source = Source.HTML,
+                        source = Source.HTML_NOT_SEMANTIC,
                     )
                 )
             ),
@@ -46,7 +46,12 @@ class YandexMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    WGS84Point(39.915043, 116.408914, name = "Запретный город", z = 13.0, source = Source.HTML)
+                    WGS84Point(
+                        39.915043, 116.408914,
+                        name = "Запретный город",
+                        z = 13.0,
+                        source = Source.HTML_NOT_SEMANTIC,
+                    )
                 )
             ),
             input.parse(
@@ -69,7 +74,7 @@ class YandexMapsHtmlInputTest : InputTest {
             assertEquals(
                 ParseResult.Success(
                     persistentListOf(
-                        WGS84Point(name = "Запретный город", source = Source.HTML)
+                        WGS84Point(name = "Запретный город", source = Source.HTML_NOT_SEMANTIC)
                     )
                 ),
                 input.parse(
@@ -91,7 +96,7 @@ class YandexMapsHtmlInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    WGS84Point(name = "Запретный город", source = Source.HTML)
+                    WGS84Point(name = "Запретный город", source = Source.HTML_NOT_SEMANTIC)
                 )
             ),
             input.parse(

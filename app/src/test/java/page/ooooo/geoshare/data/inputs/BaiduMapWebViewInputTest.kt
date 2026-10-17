@@ -23,7 +23,7 @@ class BaiduMapWebViewInputTest : InputTest {
                         3315902.2199999997, 13502918.375,
                         3.14,
                         name = "黄岩客运中心",
-                        source = Source.JAVASCRIPT,
+                        source = Source.JAVASCRIPT_STATE,
                     )
                 )
             ),
@@ -45,7 +45,7 @@ class BaiduMapWebViewInputTest : InputTest {
                 persistentListOf(
                     BD09MCPoint(
                         3315902.2199999997, 13502918.375,
-                        source = Source.JAVASCRIPT,
+                        source = Source.JAVASCRIPT_STATE,
                     )
                 )
             ),
@@ -65,7 +65,7 @@ class BaiduMapWebViewInputTest : InputTest {
                 persistentListOf(
                     BD09MCPoint(
                         3315902.2199999997,
-                        source = Source.JAVASCRIPT,
+                        source = Source.JAVASCRIPT_STATE,
                     )
                 )
             ),
@@ -82,7 +82,7 @@ class BaiduMapWebViewInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    BD09MCPoint(source = Source.JAVASCRIPT)
+                    BD09MCPoint(source = Source.JAVASCRIPT_STATE)
                 )
             ),
             input.parse(

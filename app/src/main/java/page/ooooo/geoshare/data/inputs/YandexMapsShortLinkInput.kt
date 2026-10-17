@@ -12,12 +12,12 @@ import javax.inject.Singleton
 @Singleton
 class YandexMapsShortLinkInput @Inject constructor(
     private val yandexMapsUriInput: dagger.Lazy<YandexMapsUriInput>,
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_yandex_short_link_name)
-    override val group = InputGroup.YANDEX_MAPS
+    override val group = YandexMapsInputGroup
 
     override val pattern = Regex("""((?:https?://)?yandex(?:\.[a-z]{2,3})?\.[a-z]{2,3}/maps/-/\S+)""")
 

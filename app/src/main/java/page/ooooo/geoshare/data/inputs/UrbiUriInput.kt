@@ -24,10 +24,10 @@ import javax.inject.Singleton
 @Singleton
 class UrbiUriInput @Inject constructor(
     private val urbiHtmlInput: dagger.Lazy<UrbiHtmlInput>,
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.URBI
+    override val group = UrbiInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(27, "https://2gis.ae/"),
         InputChangelogItem.Url(27, "https://2gis.am/"),

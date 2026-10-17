@@ -14,11 +14,11 @@ import javax.inject.Singleton
 
 @Singleton
 class MapsMeUriInput @Inject constructor(
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
 
-    override val group = InputGroup.MAPS_ME
+    override val group = MapsMeInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(25, "http://ge0.me/"),
         InputChangelogItem.Url(25, "https://omaps.app/"),

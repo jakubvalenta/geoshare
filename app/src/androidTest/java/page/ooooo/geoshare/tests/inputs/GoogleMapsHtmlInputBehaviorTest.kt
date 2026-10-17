@@ -56,7 +56,7 @@ class GoogleMapsHtmlInputBehaviorTest : InputBehaviorTest {
 
         // Google Search
         testUri(
-            WGS84Point(27.765028, -15.600889, source = Source.JAVASCRIPT),
+            WGS84Point(27.765028, -15.600889, source = Source.HTML_NOT_SEMANTIC),
             "https://g.co/kgs/91UYXud",
             grantConnectionPermission = true,
         )

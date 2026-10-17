@@ -9,6 +9,7 @@ import page.ooooo.geoshare.data.extensions.toLatLonPoint
 import page.ooooo.geoshare.data.extensions.toLatLonZPoint
 import page.ooooo.geoshare.data.extensions.toLonLatPoint
 import page.ooooo.geoshare.data.extensions.toNamePoint
+import page.ooooo.geoshare.data.extensions.toScale
 import page.ooooo.geoshare.data.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Points
@@ -243,9 +244,15 @@ object GoogleMapsUriParser {
                 pointPattern.matchEntire(part)?.toLatLonPoint(Source.URI)?.let {
                     mutableNaivePoints.add(it.copy(z = z))
                 }
-                // Name or Plus Code
-                // /{name}
+                // Global Plus Code
                 // https://www.google.com/maps/place/{code}
+                    ?: PlusCodeParser.globalCodePattern.matchEntire(part)?.let { m ->
+                        PlusCodeParser.decodePlusCode(m.value)?.let {
+                            mutableNaivePoints.add(it.copy(lat = it.lat?.toScale(6), lon = it.lon?.toScale(6)))
+                        }
+                    }
+                    // Name or Local Plus Code (not supported)
+                    // /{name}
                     ?: mutableNaivePoints.add(NaivePoint(z = z, name = part, source = Source.URI))
             }
         }

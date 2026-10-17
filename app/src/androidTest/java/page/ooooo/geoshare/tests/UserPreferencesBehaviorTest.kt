@@ -205,7 +205,7 @@ class UserPreferencesBehaviorTest {
         shareUri()
 
         // Hide an app
-        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object exception
         scrollToAppIcon(PackageNames.OSMAND_PLUS).longClick()
         hideApp()
 

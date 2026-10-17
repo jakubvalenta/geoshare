@@ -16,12 +16,12 @@ import javax.inject.Singleton
 
 @Singleton
 class WazeHtmlInput @Inject constructor(
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_waze_html_name)
-    override val group = InputGroup.WAZE
+    override val group = WazeInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(match, engine, log, uriQuote) { data ->
@@ -30,7 +30,7 @@ class WazeHtmlInput @Inject constructor(
 
                 while (true) {
                     val line = data.readLine() ?: break
-                    pattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
+                    pattern.find(line)?.toLatLonPoint(Source.HTML_NOT_SEMANTIC)?.let {
                         points = persistentListOf(WGS84Point(it))
                         return@parseResultAsync
                     }

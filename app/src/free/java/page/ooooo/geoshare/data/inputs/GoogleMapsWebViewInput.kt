@@ -12,7 +12,7 @@ class GoogleMapsWebViewInput @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
 ) : WebViewInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_web_view_name)
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
 
     /**
      * Extracts the URL of the page after the page JavaScript has changed the URL.

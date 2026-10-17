@@ -21,11 +21,11 @@ import javax.inject.Singleton
 class GoogleMapsHtmlInputImpl @Inject constructor(
     private val googleMapsUriInput: dagger.Lazy<GoogleMapsUriInput>,
     private val googleMapsWebViewInput: dagger.Lazy<GoogleMapsWebViewInput>,
-    val log: Log,
-    val engine: HttpClientEngine,
-    val uriQuote: UriQuote,
+    private val log: Log,
+    private val engine: HttpClientEngine,
+    private val uriQuote: UriQuote,
 ) : GoogleMapsHtmlInput, BasicOnlineInput {
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools): ParseResult =
         fetchTools.getBodyAsChannel(
@@ -59,7 +59,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
                     if (
                         mutableNaivePoints.addAll(
                             directionsPreviewPattern.findAll(line)
-                                .mapNotNull { m -> m.toLatLonPoint(Source.HTML) }
+                                .mapNotNull { m -> m.toLatLonPoint(Source.HTML_NOT_SEMANTIC) }
                         )
                     ) {
                         log.d(TAG, "Directions preview pattern matched line $line")
@@ -69,13 +69,13 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
                     if (
                         mutableNaivePoints.addAll(
                             pointPattern.findAll(line)
-                                .mapNotNull { m -> m.toLatLonPoint(Source.JAVASCRIPT) }
+                                .mapNotNull { m -> m.toLatLonPoint(Source.HTML_NOT_SEMANTIC) }
                         )
                     ) {
                         log.d(TAG, "Point pattern matched line $line")
                     }
                     if (defaultNaivePoint == null) {
-                        defaultPointLinkPattern.find(line)?.toLatLonPoint(Source.JAVASCRIPT)?.let {
+                        defaultPointLinkPattern.find(line)?.toLatLonPoint(Source.HTML_NOT_SEMANTIC)?.let {
                             log.d(TAG, "Default point pattern 1 matched line $line")
                             defaultNaivePoint = it
                         }
@@ -85,7 +85,7 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
                         // "Berlin - Germany", then it seems that the APP_INITIALIZATION_STATE doesn't contain correct
                         // coordinates. It contains coordinates of the IP address that the HTTP request came from. So let's
                         // ignore these coordinates.
-                        defaultPointAppInitStatePattern.find(line)?.toLonLatPoint(Source.JAVASCRIPT)?.let {
+                        defaultPointAppInitStatePattern.find(line)?.toLonLatPoint(Source.HTML_NOT_SEMANTIC)?.let {
                             log.d(TAG, "Default point pattern 2 matched line $line")
                             defaultNaivePoint = it
                         }

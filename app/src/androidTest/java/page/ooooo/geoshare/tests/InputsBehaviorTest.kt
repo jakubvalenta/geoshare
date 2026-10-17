@@ -5,7 +5,11 @@ import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertNull
 import org.junit.Test
-import page.ooooo.geoshare.data.inputs.InputGroupId
+import page.ooooo.geoshare.data.inputs.AmapInputGroup
+import page.ooooo.geoshare.data.inputs.AppleMapsInputGroup
+import page.ooooo.geoshare.data.inputs.HereWeGoInputGroup
+import page.ooooo.geoshare.data.inputs.MagicEarthInputGroup
+import page.ooooo.geoshare.data.inputs.MapyComInputGroup
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class InputsBehaviorTest {
@@ -22,11 +26,11 @@ class InputsBehaviorTest {
         goToInputList()
 
         // Does not show recently added input groups
-        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputListRecent_${InputGroupId.MAPY_COM}" })
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareInputListRecent_${MapyComInputGroup.id}" })
 
         // Shows all input groups
-        onElement { viewIdResourceName == "geoShareInputListAll_${InputGroupId.AMAP}" }
-        onElement { viewIdResourceName == "geoShareInputListAll_${InputGroupId.APPLE_MAPS}" }
+        onElement { viewIdResourceName == "geoShareInputListAll_${AmapInputGroup.id}" }
+        onElement { viewIdResourceName == "geoShareInputListAll_${AppleMapsInputGroup.id}" }
 
         // Go to main screen
         goBackToMainForm()
@@ -46,10 +50,10 @@ class InputsBehaviorTest {
         // Shows input groups added since version 19
         onElement { viewIdResourceName == "geoShareInputListPane" }.apply {
             scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareInputListRecent_${InputGroupId.HERE_WEGO}"
+                viewIdResourceName == "geoShareInputListRecent_${HereWeGoInputGroup.id}"
             }
             scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareInputListRecent_${InputGroupId.MAGIC_EARTH}"
+                viewIdResourceName == "geoShareInputListRecent_${MagicEarthInputGroup.id}"
             }
         }
     }

@@ -59,6 +59,7 @@ interface ConversionState : State<ConversionStateContext> {
     }
 
     interface HasResult {
+        val matchedInput: MatchedInput<*>
         val points: Points
     }
 
@@ -394,7 +395,7 @@ data class DataParsed(
                 stateContext.log.i(
                     TAG, "Extracted coordinates $points from $matchedInput"
                 )
-                ConversionSucceeded(source, points)
+                ConversionSucceeded(source, matchedInput, points)
             } else if (next != null) {
                 if (next in results) {
                     stateContext.log.w(
@@ -415,7 +416,7 @@ data class DataParsed(
                 stateContext.log.i(
                     TAG, "Extracted point with name $points from $matchedInput"
                 )
-                ConversionSucceeded(source, points)
+                ConversionSucceeded(source, matchedInput, points)
             } else if (permission == Permission.NEVER) {
                 stateContext.log.i(
                     TAG, "Failed to extract point from $matchedInput, because permission was denied"
@@ -445,6 +446,7 @@ data class DataParsed(
 
 data class ConversionSucceeded(
     override val source: String,
+    override val matchedInput: MatchedInput<*>,
     override val points: Points,
 ) : ConversionState, ConversionState.HasSource, ConversionState.HasResult {
     override fun toString() = "ConversionSucceeded(source=$source, points=$points)"

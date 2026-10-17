@@ -23,7 +23,7 @@ class MainPermissionBehaviorTest {
 
         // Shows precise location
         assertConversionSucceeds(
-            WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
+            WGS84Point(52.4737758, 13.4373898, source = Source.HTML_SEMANTIC),
         )
 
         // Share a short link with the app again
@@ -48,7 +48,7 @@ class MainPermissionBehaviorTest {
 
         // Shows precise location
         assertConversionSucceeds(
-            WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
+            WGS84Point(52.4737758, 13.4373898, source = Source.HTML_SEMANTIC),
         )
 
         // Share a short link with the app again
@@ -57,7 +57,7 @@ class MainPermissionBehaviorTest {
 
         // Shows precise location again
         assertConversionSucceeds(
-            WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
+            WGS84Point(52.4737758, 13.4373898, source = Source.HTML_SEMANTIC),
         )
     }
 
@@ -140,7 +140,7 @@ class MainPermissionBehaviorTest {
             grantConnectionPermission()
 
             // Shows precise location
-            assertConversionSucceeds(WGS84Point(52.4697882, 13.4257989, source = Source.HTML))
+            assertConversionSucceeds(WGS84Point(52.4697882, 13.4257989, source = Source.HTML_SEMANTIC))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I849C144AAC7A794F&_provider=9902")
@@ -164,14 +164,14 @@ class MainPermissionBehaviorTest {
             grantConnectionPermission(doNotAsk = true)
 
             // Shows precise location
-            assertConversionSucceeds(WGS84Point(52.4778665, 13.426398, source = Source.HTML))
+            assertConversionSucceeds(WGS84Point(52.4778665, 13.426398, source = Source.HTML_SEMANTIC))
 
             // Share another Apple Maps place link with the app
             shareUri("https://maps.apple.com/place?place-id=I6E0F00362159B5EC&_provider=9902")
             quickWaitForStableInActiveWindow()
 
             // Shows precise location again
-            assertConversionSucceeds(WGS84Point(52.4820815, 13.4338421, source = Source.HTML))
+            assertConversionSucceeds(WGS84Point(52.4820815, 13.4338421, source = Source.HTML_SEMANTIC))
         }
 
     @Test

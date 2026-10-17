@@ -18,7 +18,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
     @Serializable
     private data class ExtractedPoint(val lat: Double?, val lon: Double?)
 
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
 
     /**
      * Extracts point from the page JavaScript state.
@@ -91,7 +91,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
             log.e(TAG, "Deserialization error", tr)
             null
         }?.run {
-            points = map { GCJ02MainlandChinaPoint(it.lat, it.lon, source = Source.JAVASCRIPT) }
+            points = map { GCJ02MainlandChinaPoint(it.lat, it.lon, source = Source.JAVASCRIPT_STATE) }
                 .toImmutableList()
         }
     }

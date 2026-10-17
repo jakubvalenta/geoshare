@@ -21,12 +21,12 @@ import javax.inject.Singleton
 
 @Singleton
 class YandexMapsHtmlInput @Inject constructor(
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_yandex_html_name)
-    override val group = InputGroup.YANDEX_MAPS
+    override val group = YandexMapsInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(
@@ -58,11 +58,11 @@ class YandexMapsHtmlInput @Inject constructor(
 
                 while (true) {
                     val line = data.readLine() ?: break
-                    ptPattern.find(line)?.toLonLatPoint(Source.HTML)?.let {
+                    ptPattern.find(line)?.toLonLatPoint(Source.HTML_NOT_SEMANTIC)?.let {
                         naivePoint = it
                         continue
                     }
-                    llPattern?.find(line)?.toLonLatZPoint(Source.HTML)?.let {
+                    llPattern?.find(line)?.toLonLatZPoint(Source.HTML_NOT_SEMANTIC)?.let {
                         naivePoint = it
                         continue
                     }
@@ -77,7 +77,7 @@ class YandexMapsHtmlInput @Inject constructor(
                 if (naivePoint != null) {
                     points = persistentListOf(WGS84Point(naivePoint, name = name))
                 } else if (name != null) {
-                    points = persistentListOf(WGS84Point(name = name, source = Source.HTML))
+                    points = persistentListOf(WGS84Point(name = name, source = Source.HTML_NOT_SEMANTIC))
                 }
             }
         }

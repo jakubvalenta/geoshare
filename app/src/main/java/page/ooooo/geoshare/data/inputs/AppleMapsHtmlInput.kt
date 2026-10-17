@@ -17,12 +17,12 @@ import javax.inject.Singleton
 
 @Singleton
 class AppleMapsHtmlInput @Inject constructor(
-    val engine: HttpClientEngine,
-    val log: Log,
-    val uriQuote: UriQuote,
+    private val engine: HttpClientEngine,
+    private val log: Log,
+    private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_apple_maps_html_name)
-    override val group = InputGroup.APPLE_MAPS
+    override val group = AppleMapsInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         fetchTools.getBodyAsChannel(
@@ -49,7 +49,7 @@ class AppleMapsHtmlInput @Inject constructor(
                         lonPattern.find(line)?.doubleGroupOrNull()?.let { lon = it }
                     }
                     if (lat != null && lon != null) {
-                        points = persistentListOf(WGS84Point(lat, lon, source = Source.HTML))
+                        points = persistentListOf(WGS84Point(lat, lon, source = Source.HTML_SEMANTIC))
                         return@parseResultAsync
                     }
                 }

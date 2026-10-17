@@ -32,7 +32,7 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
 
         // Short link
         testUri(
-            WGS84Point(50.106526, 8.662158, source = Source.HTML),
+            WGS84Point(50.106526, 8.662158, source = Source.HTML_NOT_SEMANTIC),
             "https://yandex.com/maps/-/CLAvMI18",
             grantConnectionPermission = true,
         )
@@ -42,7 +42,7 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
             WGS84Point(
                 55.882227, 37.566898,
                 name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Keramichesky Drive",
-                source = Source.HTML,
+                source = Source.HTML_NOT_SEMANTIC,
             ),
             "https://yandex.ru/maps/213/moscow/geo/keramicheskiy_proyezd/8062907/",
             grantConnectionPermission = true,
@@ -54,7 +54,7 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
                 39.915043, 116.408914,
                 z = 13.0,
                 name = "Запретный город",
-                source = Source.HTML,
+                source = Source.HTML_NOT_SEMANTIC,
             ),
             "https://yandex.com/maps/org/zapretny_gorod/5867973238",
             grantConnectionPermission = true,
@@ -64,7 +64,7 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
         testUri(
             WGS84Point(
                 name = "Запретный город",
-                source = Source.HTML,
+                source = Source.HTML_NOT_SEMANTIC,
             ),
             "https://yandex.com/maps/org/zapretny_gorod/5867973238/?ll=116.096354%2C40.045755&z=13",
             grantConnectionPermission = true,

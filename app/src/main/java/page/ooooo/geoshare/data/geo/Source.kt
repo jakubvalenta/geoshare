@@ -2,7 +2,7 @@ package page.ooooo.geoshare.data.geo
 
 enum class Source {
     /**
-     * Example: JSON
+     * Example: JSON response from a third-party API
      */
     API,
 
@@ -22,27 +22,32 @@ enum class Source {
     HASH,
 
     /**
-     * Example: META tag
+     * Example: DIV tag, SCRIPT tag
      */
-    HTML,
+    HTML_NOT_SEMANTIC,
 
     /**
-     * Example: SCRIPT tag
+     * Example: META tag, HTML5 data attribute
      */
-    JAVASCRIPT,
+    HTML_SEMANTIC,
 
     /**
-     * Example: URI path '/@{lat},{lon}', URI query param 'center'
+     * Example: a property of the Window object
+     */
+    JAVASCRIPT_STATE,
+
+    /**
+     * Example: URI path "/@{lat},{lon}", URI query param "center"
      */
     MAP_CENTER,
 
     /**
-     * Example: string '{deg} {min} {sec} N, {deg} {min} {sec} E'
+     * Example: string "{deg} {min} {sec} N, {deg} {min} {sec} E"
      */
     TEXT,
 
     /**
-     * Example: URI query param 'll', URI query param 'q'
+     * Example: URI query parameters "lat", "lon", and "q"
      */
     URI,
 }

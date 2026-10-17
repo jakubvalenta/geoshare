@@ -26,7 +26,8 @@ import page.ooooo.geoshare.data.inputs.MapyComShortLinkInput
 import page.ooooo.geoshare.data.inputs.MapyComUriInput
 import page.ooooo.geoshare.data.inputs.OpenStreetMapUriInput
 import page.ooooo.geoshare.data.inputs.OsmAndUriInput
-import page.ooooo.geoshare.data.inputs.PlusCodeInput
+import page.ooooo.geoshare.data.inputs.PlusCodeTextInput
+import page.ooooo.geoshare.data.inputs.PlusCodeUriInput
 import page.ooooo.geoshare.data.inputs.UrbiUriInput
 import page.ooooo.geoshare.data.inputs.WazeUriInput
 import page.ooooo.geoshare.data.inputs.YahooMapsShortLinkInput
@@ -60,7 +61,8 @@ interface InputRepository {
     val mapyComUriInput: MapyComUriInput
     val openStreetMapUriInput: OpenStreetMapUriInput
     val osmAndUriInput: OsmAndUriInput
-    val plusCodeInput: PlusCodeInput
+    val plusCodeTextInput: PlusCodeTextInput
+    val plusCodeUriInput: PlusCodeUriInput
     val urbiUriInput: UrbiUriInput
     val wazeUriInput: WazeUriInput
     val yahooMapsShortLinkInput: YahooMapsShortLinkInput
@@ -77,7 +79,6 @@ interface InputRepository {
     val all: List<Input>
         get() = listOf(
             geoUriInput,
-            plusCodeInput,
             googleMapsShortLinkInput,
             googleSearchUriInput,
             googleMapsUriInput,
@@ -98,6 +99,8 @@ interface InputRepository {
             mapyComUriInput,
             openStreetMapUriInput,
             osmAndUriInput,
+            plusCodeTextInput,
+            plusCodeUriInput,
             urbiUriInput,
             wazeUriInput,
             yahooMapsShortLinkInput,
@@ -158,7 +161,8 @@ class DefaultInputRepository @Inject constructor(
     override val mapyComUriInput: MapyComUriInput,
     override val openStreetMapUriInput: OpenStreetMapUriInput,
     override val osmAndUriInput: OsmAndUriInput,
-    override val plusCodeInput: PlusCodeInput,
+    override val plusCodeTextInput: PlusCodeTextInput,
+    override val plusCodeUriInput: PlusCodeUriInput,
     override val urbiUriInput: UrbiUriInput,
     override val wazeUriInput: WazeUriInput,
     override val yahooMapsShortLinkInput: YahooMapsShortLinkInput,

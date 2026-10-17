@@ -92,19 +92,19 @@ class AppleMapsInputBehaviorTest : InputBehaviorTest {
 
         // Place id
         testUri(
-            WGS84Point(52.4735927, 13.4050798, source = Source.HTML),
+            WGS84Point(52.4735927, 13.4050798, source = Source.HTML_SEMANTIC),
             "https://maps.apple.com/place?place-id=I3B04EDEB21D5F86&_provider=9902",
             grantConnectionPermission = true,
         )
         testUri(
-            WGS84Point(52.4618234, 13.4010092, source = Source.HTML),
+            WGS84Point(52.4618234, 13.4010092, source = Source.HTML_SEMANTIC),
             "https://maps.apple.com/place?auid=17017496253231963769&lsp=7618",
             grantConnectionPermission = true,
         )
 
         // Short link
         testUri(
-            WGS84Point(52.4737758, 13.4373898, source = Source.HTML),
+            WGS84Point(52.4737758, 13.4373898, source = Source.HTML_SEMANTIC),
             "https://maps.apple/p/7E-Brjrk_THN14",
             grantConnectionPermission = true,
         )

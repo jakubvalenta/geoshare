@@ -21,9 +21,9 @@ class GoogleMapsPlaceListInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT),
-                    GCJ02MainlandChinaPoint(59.3443991, 11.672637, source = Source.JAVASCRIPT),
+                    GCJ02MainlandChinaPoint(59.1293656, 11.4585672, source = Source.JAVASCRIPT_STATE),
+                    GCJ02MainlandChinaPoint(59.4154007, 11.659710599999999, source = Source.JAVASCRIPT_STATE),
+                    GCJ02MainlandChinaPoint(59.3443991, 11.672637, source = Source.JAVASCRIPT_STATE),
                 )
             ),
             input.parse(
@@ -41,7 +41,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(59.1293656, source = Source.JAVASCRIPT),
+                    GCJ02MainlandChinaPoint(59.1293656, source = Source.JAVASCRIPT_STATE),
                 )
             ),
             input.parse(
@@ -57,7 +57,7 @@ class GoogleMapsPlaceListInputTest : InputTest {
         assertEquals(
             ParseResult.Success(
                 persistentListOf(
-                    GCJ02MainlandChinaPoint(source = Source.JAVASCRIPT),
+                    GCJ02MainlandChinaPoint(source = Source.JAVASCRIPT_STATE),
                 )
             ),
             input.parse(

@@ -2,19 +2,13 @@ package page.ooooo.geoshare.data.inputs
 
 import android.content.res.Resources
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.uri.UriQuote
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Shows warning that Google Search URIs are not supported.
  */
-@Singleton
-class GoogleSearchUriInput @Inject constructor(
-    val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern {
+object GoogleSearchUriInput : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_search_name)
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
 
     override val pattern =
         Regex("""((?:https?://)?(?:(?:www\.)?google.com/(?:search|share)$URI_REST|share\.google[/?#]$URI_REST))""")

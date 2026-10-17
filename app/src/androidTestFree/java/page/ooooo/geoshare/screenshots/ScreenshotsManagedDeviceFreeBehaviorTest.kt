@@ -7,7 +7,6 @@ import androidx.test.uiautomator.onElement
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.BeforeClass
@@ -21,7 +20,8 @@ import page.ooooo.geoshare.data.database.ServerAuthType
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.Srs
 import page.ooooo.geoshare.data.geo.WGS84Point
-import page.ooooo.geoshare.data.inputs.InputGroupId
+import page.ooooo.geoshare.data.inputs.AppleMapsInputGroup
+import page.ooooo.geoshare.data.inputs.CoordinatesInputGroup
 import page.ooooo.geoshare.data.preferences.CopyCoordsDecAutomation
 import page.ooooo.geoshare.data.preferences.CopyLinkUriAutomation
 import page.ooooo.geoshare.data.preferences.CopyNameAutomation
@@ -65,11 +65,11 @@ import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.submitMainForm
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
+import page.ooooo.geoshare.tests.waitForToastToDisappear
 import page.ooooo.geoshare.tests.withNetworkOff
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import java.util.UUID
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Takes screenshots for documentation purposes, such as the Weblate translation service.
@@ -151,7 +151,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
 
         // Help - Message - Open by default
         shareUri()
-        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object error
+        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object exception
         onElementOrScrollToElement(scrollableElement = { onMainScrollablePane() }) {
             viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
         }
@@ -359,9 +359,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_app_hidden")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        waitForToastToDisappear()
 
         // Conversion - Result - Share
         scrollToShareItem().longClick()
@@ -553,14 +551,14 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         saveScreenshot("main_strings/supported_maps_all_page_2")
 
         // Supported maps - Detail - Coordinates
-        onElement { viewIdResourceName == "geoShareInputListAll_${InputGroupId.COORDINATES}" }.click()
+        onElement { viewIdResourceName == "geoShareInputListAll_${CoordinatesInputGroup.id}" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/supported_maps_detail_coordinates")
         goBackToElement { viewIdResourceName == "geoShareInputListPane" }
 
         // Supported maps - Detail
         onElement { viewIdResourceName == "geoShareInputListPane" }
-            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareInputListAll_${InputGroupId.APPLE_MAPS}" }
+            .scrollToElement(Direction.UP) { viewIdResourceName == "geoShareInputListAll_${AppleMapsInputGroup.id}" }
             .click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/supported_maps_detail")
@@ -577,9 +575,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareAppHide" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_web_map_hidden")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        waitForToastToDisappear()
 
         // Web maps - List
         goToUserPreferencesDetail(UserPreferenceGroupId.LINKS)
@@ -619,9 +615,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         saveLinkForm()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/web_maps_message_insert")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        waitForToastToDisappear()
 
         // Web maps - Detail - Page 1
         onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
@@ -655,9 +649,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         saveLinkForm()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/web_maps_message_update")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        waitForToastToDisappear()
 
         // Web maps - Delete dialog
         onElement { viewIdResourceName == "geoShareLinkListItemMenu_${InitialLinks.APPLE_MAPS_NAVIGATION_UUID}" }.click()
@@ -789,9 +781,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareServerRestoreInitialDialog" }.confirmDialog()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_message_reset")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        waitForToastToDisappear()
 
         // Servers - Insert - API Key
         onElement { viewIdResourceName == "geoShareServerListPane" }
@@ -820,9 +810,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         saveServerForm()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_message_insert")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        waitForToastToDisappear()
 
         // Servers - Update
         onElement { viewIdResourceName == "geoShareServerListItem_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()
@@ -844,9 +832,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         saveServerForm()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/servers_message_update")
-        runBlocking {
-            delay(3.seconds) // Wait for the message to disappear
-        }
+        waitForToastToDisappear()
 
         // Servers - Delete - Dialog
         onElement { viewIdResourceName == "geoShareServerListItem_${InitialServersImpl.GOOGLE_MAPS_GEOCODE_ADDRESS_UUID}" }.click()

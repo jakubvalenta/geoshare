@@ -12,11 +12,6 @@ import javax.inject.Singleton
 /**
  * Handles Google Maps full URIs.
  *
- * If the URI contains a Plus Code, e.g. https://www.google.com/maps/place/8FJ3HVHW%2B96, it doesn't process the code
- * but only puts it in the point name. The reason is that Plus Codes are handled by [PlusCodeInput], which has higher
- * priority in [page.ooooo.geoshare.data.InputRepository], so Google Maps URIs containing Plus Codes should never reach
- * [GoogleMapsUriInput].
- *
  * It the URI is a Google Search URI, e.g. https://www.google.com/search..., it returns no points. The reason is that
  * Google Search URIs are handled by [GoogleSearchUriInput], which has higher priority in
  * [page.ooooo.geoshare.data.InputRepository], so Google Search URIs should never reach [GoogleMapsUriInput].
@@ -27,10 +22,10 @@ class GoogleMapsUriInput @Inject constructor(
     private val googleMapsHtmlInput: dagger.Lazy<GoogleMapsHtmlInput>,
     private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(5, "https://maps.google.com"),
         InputChangelogItem.Url(5, "https://google.com/maps"),

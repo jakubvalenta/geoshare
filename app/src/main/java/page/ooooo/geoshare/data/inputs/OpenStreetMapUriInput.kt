@@ -19,10 +19,10 @@ import javax.inject.Singleton
 @Singleton
 class OpenStreetMapUriInput @Inject constructor(
     private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.OPEN_STREET_MAP
+    override val group = OpenStreetMapInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(20, "https://www.openstreetmap.org/"),
         InputChangelogItem.Url(31, "https://www.openstreetmap.org/directions"),

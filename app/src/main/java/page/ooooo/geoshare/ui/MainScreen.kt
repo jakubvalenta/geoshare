@@ -484,6 +484,7 @@ private fun MainScreen(
                                         ResultCoordinates(
                                             points = conversionState.points,
                                             coordinateConverter = coordinateConverter,
+                                            inputGroup = conversionState.matchedInput.input.group,
                                             outputsForPointChips = outputsForPointChips,
                                             outputsForPointsChips = outputsForPointsChips,
                                             userPreferencesValues = userPreferencesValues,
@@ -496,18 +497,14 @@ private fun MainScreen(
                                         )
                                         if (helpLifecycleMessage != null) {
                                             helpLifecycleMessage(
-                                                Modifier
-                                                    .padding(horizontal = spacing.windowPadding)
-                                                    .padding(top = spacing.small)
+                                                Modifier.padding(top = spacing.tiny)
                                             )
                                         } else {
                                             HelpShareSourceMessage(
                                                 dismissedHelpMessages = dismissedHelpMessages,
                                                 outputsForAppsByCategory = outputsForAppsByCategory,
                                                 sourceComesFromIntent = sourceComesFromIntent,
-                                                modifier = Modifier
-                                                    .padding(horizontal = spacing.windowPadding)
-                                                    .padding(top = spacing.small),
+                                                modifier = Modifier.padding(top = spacing.tiny),
                                                 onDismissHelpMessage = onDismissHelpMessage,
                                                 onExecute = onExecute,
                                             )
@@ -1019,6 +1016,7 @@ private fun SucceededPreview() {
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -1126,6 +1124,7 @@ private fun DarkSucceededPreview() {
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -1233,6 +1232,7 @@ private fun SmallSucceededPreview() {
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -1339,6 +1339,7 @@ private fun TabletSucceededPreview() {
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(
@@ -1998,9 +1999,7 @@ private fun TabletLoadingIndicatorPreview() {
         MainScreen(
             conversionState = PermissionGrantedBasicInput(
                 source = source,
-                matchedInput = MatchedInput(
-                    FakeInputRepository.googleMapsShortLinkInput, "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
-                ),
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
@@ -2161,7 +2160,7 @@ private fun DarkWebViewPreview() {
         MainScreen(
             conversionState = PermissionGrantedWebViewInput(
                 source = source,
-                matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
+                matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, source),
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
@@ -2238,14 +2237,13 @@ private fun TabletWebViewPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val currentState = PermissionGrantedWebViewInput(
-            source = source,
-            matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, "https://www.example.com/"),
-            permission = Permission.ALWAYS,
-            results = emptyMap(),
-        )
         MainScreen(
-            conversionState = currentState,
+            conversionState = PermissionGrantedWebViewInput(
+                source = source,
+                matchedInput = MatchedInput(FakeInputRepository.debugWebViewInput, source),
+                permission = Permission.ALWAYS,
+                results = emptyMap(),
+            ),
             actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
@@ -2319,12 +2317,12 @@ private fun EmptyPreview() {
         val coordinateConverter = CoordinateConverter(geometries)
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val currentState = ConversionSucceeded(
-            source = source,
-            points = persistentListOf(),
-        )
         MainScreen(
-            conversionState = currentState,
+            conversionState = ConversionSucceeded(
+                source = source,
+                matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
+                points = persistentListOf(),
+            ),
             actionState = ActionState.Initial,
             actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,

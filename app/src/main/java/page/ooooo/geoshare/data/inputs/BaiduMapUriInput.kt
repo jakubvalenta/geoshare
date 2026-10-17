@@ -19,10 +19,10 @@ import javax.inject.Singleton
 @Singleton
 class BaiduMapUriInput @Inject constructor(
     private val baiduMapWebViewInput: dagger.Lazy<BaiduMapWebViewInput>,
-    val uriQuote: UriQuote,
+    private val uriQuote: UriQuote,
 ) : BasicOfflineInput, Input.HasPattern {
     override fun getName(resources: Resources) = group.getName(resources)
-    override val group = InputGroup.BAIDU_MAP
+    override val group = BaiduMapInputGroup
     override val changelog = persistentListOf(
         InputChangelogItem.Url(33, "https://map.baidu.com"),
     )

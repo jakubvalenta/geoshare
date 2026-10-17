@@ -10,7 +10,7 @@ class InputHasPatternTest {
     fun match_returnsFirstRegexGroup() {
         val input = object : BasicOfflineInput, Input.HasPattern {
             override fun getName(resources: Resources) = "Test Input"
-            override val group = InputGroup.DEBUG
+            override val group = DebugInputGroup
 
             override val pattern = Regex("""(foo)""")
 

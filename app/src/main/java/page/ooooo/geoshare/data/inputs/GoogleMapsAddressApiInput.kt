@@ -29,7 +29,7 @@ class GoogleMapsAddressApiInput @Inject constructor(
     private val uriQuote: UriQuote,
 ) : BasicOnlineInput {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_address_api_name)
-    override val group = InputGroup.GOOGLE_MAPS
+    override val group = GoogleMapsInputGroup
 
     override suspend fun parse(match: String, resources: Resources, fetchTools: FetchTools) =
         parseResultAsync {
