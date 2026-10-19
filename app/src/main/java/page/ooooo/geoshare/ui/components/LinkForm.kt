@@ -22,7 +22,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -190,36 +189,34 @@ fun LinkForm(
             WGS84Point.Kilimanjaro to stringResource(R.string.links_form_test_world),
             WGS84Point.ForbiddenCity to stringResource(R.string.links_form_test_china),
         ).let { testPointsWithName ->
-            Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-                ScrollableChips(contentPadding = PaddingValues(horizontal = LocalSpacing.current.windowPadding)) {
-                    testPointsWithName.forEach { (point, name) ->
-                        SuggestionChip(
-                            onClick = {
-                                UriFormatter.formatUriString(
-                                    coordinateConverter.toSrs(point, srs).copy(name = name),
-                                    coordsUriTemplate,
-                                    nameUriTemplate,
-                                )?.let {
-                                    context.openUriInDefaultApp(it)
-                                }
-                            },
-                            label = {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(name)
-                                    Icon(
-                                        painterResource(R.drawable.arrow_outward_24px),
-                                        contentDescription = null,
-                                        Modifier.size(16.dp),
-                                    )
-                                }
-                            },
-                            enabled = enabled,
-                            contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
-                        )
-                    }
+            ScrollableChips(Modifier.padding(top = spacing.tiny)) {
+                testPointsWithName.forEach { (point, name) ->
+                    StyledChip(
+                        onClick = {
+                            UriFormatter.formatUriString(
+                                coordinateConverter.toSrs(point, srs).copy(name = name),
+                                coordsUriTemplate,
+                                nameUriTemplate,
+                            )?.let {
+                                context.openUriInDefaultApp(it)
+                            }
+                        },
+                        label = {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(name)
+                                Icon(
+                                    painterResource(R.drawable.arrow_outward_24px),
+                                    contentDescription = null,
+                                    Modifier.size(16.dp),
+                                )
+                            }
+                        },
+                        enabled = enabled,
+                        contentPadding = PaddingValues(start = 8.dp, end = 2.dp),
+                    )
                 }
             }
         }
@@ -295,9 +292,9 @@ fun LinkForm(
                     color = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
                     // Row prevents the chip from filling the whole container width
-                    Row(Modifier.padding(horizontal = spacing.small)) {
+                    Row(Modifier.padding(horizontal = spacing.small, vertical = spacing.tiny)) {
                         StyledChip(
-                            label = copyOutput.label(null),
+                            label = { Text(copyOutput.label(null)) },
                             modifier = Modifier.widthIn(min = 150.dp),
                             icon = {
                                 IconFromDescriptor(

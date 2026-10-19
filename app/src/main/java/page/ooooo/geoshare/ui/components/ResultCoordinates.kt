@@ -3,10 +3,9 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -155,7 +154,10 @@ fun ResultCoordinates(
             }
         }
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
-            Column {
+            Column(
+                Modifier.padding(vertical = spacing.windowPadding),
+                verticalArrangement = Arrangement.spacedBy(spacing.small),
+            ) {
                 Row(
                     Modifier
                         .fillMaxWidth()
@@ -164,7 +166,7 @@ fun ResultCoordinates(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom,
                 ) {
-                    Column(Modifier.weight(1f)) {
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
                         Text(
                             points.lastOrNull()?.cleanName?.takeIf { it.isNotEmpty() }
                                 ?: if (points.size > 1) {
@@ -172,9 +174,7 @@ fun ResultCoordinates(
                                 } else {
                                     stringResource(R.string.conversion_succeeded_title)
                                 },
-                            Modifier
-                                .padding(top = spacing.small, bottom = spacing.tiny)
-                                .testTag("geoShareResultLastPointName"),
+                            Modifier.testTag("geoShareResultLastPointName"),
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 3,
                             style = MaterialTheme.typography.headlineSmall,
@@ -191,9 +191,7 @@ fun ResultCoordinates(
                                             coordinateConverter.toWGS84(lastPoint)
                                         )
                                     },
-                                    Modifier
-                                        .padding(vertical = spacing.tiny)
-                                        .testTag("geoShareResultLastPointCoordinates"),
+                                    Modifier.testTag("geoShareResultLastPointCoordinates"),
                                     style = MaterialTheme.typography.bodyLarge,
                                 )
                             }
@@ -202,7 +200,7 @@ fun ResultCoordinates(
                     IconButton(
                         { onSelect(points.size - 1) },
                         Modifier
-                            .offset(y = 4.dp)
+                            .height(28.dp) // Set height to adjust default vertical padding
                             .testTag("geoShareResultLastPointMenu")
                     ) {
                         Icon(
@@ -211,93 +209,87 @@ fun ResultCoordinates(
                         )
                     }
                 }
-                ScrollableChips(
-                    contentPadding = PaddingValues(
-                        start = spacing.windowPadding,
-                        end = spacing.windowPadding,
-                        bottom = spacing.tiny,
-                    ),
-                ) {
+                ScrollableChips {
                     outputsForPointChips.forEach { outputDetail ->
                         key(outputDetail.output.id) {
                             StyledChip(
-                                label = outputDetail.label(),
+                                onClick = { onExecute(outputDetail.output.toAction(lastPoint)) },
+                                label = { Text(outputDetail.label()) },
                                 modifier = Modifier.testTag("geoShareResultChip_${outputDetail.output.id}"),
                                 icon = outputDetail.icon?.let {
                                     { IconFromDescriptor(it, contentDescription = null) }
                                 },
-                            ) {
-                                onExecute(outputDetail.output.toAction(lastPoint))
-                            }
+                            )
                         }
                     }
                 }
-                if (points.size > 1) {
-                    Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
-                        Column(Modifier.padding(top = spacing.small)) {
-                            if (points.any { !it.hasCoordinates() }) {
-                                ResultCoordinatesCheck(
-                                    buildAnnotatedString {
-                                        append(stringResource(R.string.conversion_succeeded_check_name_only_points))
-                                        append(" ")
-                                        withLink(
-                                            LinkAnnotation.Clickable(
-                                                tag = "link",
-                                                styles = defaultLinkStyles()
-                                            ) {
-                                                onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
-                                            }
+            }
+            if (points.size > 1) {
+                Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh) {
+                    Column(
+                        Modifier.padding(vertical = spacing.windowPadding),
+                        verticalArrangement = Arrangement.spacedBy(spacing.small),
+                    ) {
+                        if (points.any { !it.hasCoordinates() }) {
+                            ResultCoordinatesCheck(
+                                buildAnnotatedString {
+                                    append(stringResource(R.string.conversion_succeeded_check_name_only_points))
+                                    append(" ")
+                                    withLink(
+                                        LinkAnnotation.Clickable(
+                                            tag = "link",
+                                            styles = defaultLinkStyles()
                                         ) {
-                                            append(stringResource(R.string.faq_title))
+                                            onNavigateToFaqScreen(FaqItemId.NAME_ONLY)
                                         }
-                                    },
-                                    Modifier
-                                        .padding(horizontal = spacing.windowPadding)
-                                        .padding(bottom = spacing.small)
-                                        .testTag("geoShareResultCheckNameOnlyPoints"),
-                                )
-                            }
-                            ExpandablePane(
-                                expanded = expanded,
-                                onSetExpanded = { expanded = it },
-                                title = {
-                                    Text(
-                                        stringResource(R.string.conversion_succeeded_point_all, points.size),
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .testTag("geoShareResultPointsHeadline"),
-                                    )
-                                },
-                                modifier = Modifier
-                                    .padding(horizontal = spacing.windowPadding)
-                                    .testTag("geoShareResultPoints"),
-                            ) {
-                                Column(Modifier.padding(top = spacing.tiny)) {
-                                    points.forEachIndexed { index, point ->
-                                        ResultPoint(
-                                            point = point,
-                                            index = index,
-                                            coordinateFormat = userPreferencesValues.coordinateFormat,
-                                            coordinateConverter = coordinateConverter,
-                                            onSelect = { onSelect(index) },
-                                        )
-                                        HorizontalDivider()
+                                    ) {
+                                        append(stringResource(R.string.faq_title))
                                     }
+                                },
+                                Modifier
+                                    .padding(horizontal = spacing.windowPadding)
+                                    .testTag("geoShareResultCheckNameOnlyPoints"),
+                            )
+                        }
+                        ExpandablePane(
+                            expanded = expanded,
+                            onSetExpanded = { expanded = it },
+                            title = {
+                                Text(
+                                    stringResource(R.string.conversion_succeeded_point_all, points.size),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .testTag("geoShareResultPointsHeadline"),
+                                )
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = spacing.windowPadding)
+                                .testTag("geoShareResultPoints"),
+                        ) {
+                            Column(Modifier.padding(top = spacing.tiny)) {
+                                points.forEachIndexed { index, point ->
+                                    ResultPoint(
+                                        point = point,
+                                        index = index,
+                                        coordinateFormat = userPreferencesValues.coordinateFormat,
+                                        coordinateConverter = coordinateConverter,
+                                        onSelect = { onSelect(index) },
+                                    )
+                                    HorizontalDivider()
                                 }
                             }
-                            ScrollableChips(Modifier.testTag("geoShareResultPointsChips")) {
-                                outputsForPointsChips.forEach { outputDetail ->
-                                    key(outputDetail.output.id) {
-                                        StyledChip(
-                                            label = outputDetail.label(),
-                                            icon = outputDetail.icon?.let {
-                                                { IconFromDescriptor(it, contentDescription = null) }
-                                            },
-                                        ) {
-                                            onExecute(outputDetail.output.toAction(points))
-                                        }
-                                    }
+                        }
+                        ScrollableChips(Modifier.testTag("geoShareResultPointsChips")) {
+                            outputsForPointsChips.forEach { outputDetail ->
+                                key(outputDetail.output.id) {
+                                    StyledChip(
+                                        onClick = { onExecute(outputDetail.output.toAction(points)) },
+                                        label = { Text(outputDetail.label()) },
+                                        icon = outputDetail.icon?.let {
+                                            { IconFromDescriptor(it, contentDescription = null) }
+                                        },
+                                    )
                                 }
                             }
                         }

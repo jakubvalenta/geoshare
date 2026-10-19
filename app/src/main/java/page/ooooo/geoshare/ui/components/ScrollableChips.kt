@@ -3,7 +3,6 @@ package page.ooooo.geoshare.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -13,6 +12,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -23,16 +23,14 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun ScrollableChips(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(
-        horizontal = LocalSpacing.current.windowPadding,
-        vertical = LocalSpacing.current.tiny,
-    ),
     horizontalSpacing: Dp = LocalSpacing.current.small,
     content: @Composable RowScope.() -> Unit,
 ) {
+    val spacing = LocalSpacing.current
+
     Row(modifier.horizontalScroll(rememberScrollState())) {
         Row(
-            Modifier.padding(contentPadding),
+            Modifier.padding(horizontal = spacing.windowPadding),
             horizontalArrangement = Arrangement.spacedBy(horizontalSpacing),
         ) {
             content()
@@ -51,19 +49,19 @@ private fun DefaultPreview() {
         ) {
             ScrollableChips {
                 StyledChip(
-                    "My first chip",
+                    onClick = {},
+                    label = { Text("My first chip") },
                     icon = {
                         Icon(Icons.Default.Refresh, null)
                     },
-                    onClick = {},
                 )
                 StyledChip(
-                    "My second chip",
                     onClick = {},
+                    label = { Text("My second chip") },
                 )
                 StyledChip(
-                    "My third chip",
                     onClick = {},
+                    label = { Text("My third chip") },
                 )
             }
         }
@@ -79,19 +77,19 @@ private fun DarkPreview() {
         ) {
             ScrollableChips {
                 StyledChip(
-                    "My first chip",
+                    onClick = {},
+                    label = { Text("My first chip") },
                     icon = {
                         Icon(Icons.Default.Refresh, null)
                     },
-                    onClick = {},
                 )
                 StyledChip(
-                    "My second chip",
                     onClick = {},
+                    label = { Text("My second chip") },
                 )
                 StyledChip(
-                    "My third chip",
                     onClick = {},
+                    label = { Text("My third chip") },
                 )
             }
         }
@@ -107,19 +105,19 @@ private fun ErrorPreview() {
         ) {
             ScrollableChips {
                 StyledChip(
-                    "My first chip",
+                    onClick = {},
+                    label = { Text("My first chip") },
                     icon = {
                         Icon(Icons.Default.Refresh, null)
                     },
-                    onClick = {},
                 )
                 StyledChip(
-                    "My second chip",
                     onClick = {},
+                    label = { Text("My second chip") },
                 )
                 StyledChip(
-                    "My third chip",
                     onClick = {},
+                    label = { Text("My third chip") },
                 )
             }
         }
@@ -135,19 +133,19 @@ private fun DarkErrorPreview() {
         ) {
             ScrollableChips {
                 StyledChip(
-                    "My first chip",
+                    onClick = {},
+                    label = { Text("My first chip") },
                     icon = {
                         Icon(Icons.Default.Refresh, null)
                     },
-                    onClick = {},
                 )
                 StyledChip(
-                    "My second chip",
                     onClick = {},
+                    label = { Text("My second chip") },
                 )
                 StyledChip(
-                    "My third chip",
                     onClick = {},
+                    label = { Text("My third chip") },
                 )
             }
         }

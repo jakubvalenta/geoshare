@@ -44,12 +44,15 @@ fun ResultError(
             },
         )
     ) {
-        Column(Modifier.fillMaxWidth()) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = spacing.windowPadding),
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
+        ) {
             Text(
                 stringResource(R.string.conversion_error_title),
-                Modifier
-                    .padding(horizontal = spacing.windowPadding)
-                    .padding(top = spacing.small, bottom = spacing.small),
+                Modifier.padding(horizontal = spacing.windowPadding),
                 style = MaterialTheme.typography.headlineSmall,
             )
             SelectionContainer {
@@ -73,27 +76,27 @@ fun ResultError(
             ScrollableChips {
                 if (!conversionState.warning) {
                     StyledChip(
-                        stringResource(R.string.conversion_error_retry),
+                        onClick = onRetry,
+                        label = { Text(stringResource(R.string.conversion_error_retry)) },
                         icon = {
                             Icon(Icons.Default.Refresh, null)
                         },
-                        onClick = onRetry,
                     )
                     val uriHandler = LocalUriHandler.current
                     StyledChip(
-                        stringResource(R.string.conversion_error_report),
-                    ) {
-                        uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
-                    }
+                        onClick = {
+                            uriHandler.openUri("https://github.com/jakubvalenta/geoshare/issues/new?template=1-bug-map-link.yml")
+                        },
+                        label = { Text(stringResource(R.string.conversion_error_report)) },
+                    )
                 }
                 StyledChip(
-                    stringResource(R.string.inputs_title),
+                    onClick = onNavigateToInputsScreen,
+                    label = { Text(stringResource(R.string.inputs_title)) },
                     icon = {
                         Icon(painterResource(R.drawable.map_24px), null)
                     },
-                ) {
-                    onNavigateToInputsScreen()
-                }
+                )
             }
         }
     }
