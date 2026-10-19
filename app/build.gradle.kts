@@ -42,7 +42,6 @@ android {
                 "tr",
                 "uk",
                 "zh-rCN",
-                "zh-rTW",
             )
         }
 
