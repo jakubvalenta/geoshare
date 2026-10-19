@@ -34,7 +34,7 @@ class YandexMapsHtmlInput @Inject constructor(
             engine,
             log,
             uriQuote,
-            // Set a custom user agent, so that Yandex Maps returns an HTML with the '...ll%3D...' value.
+            // Set a desktop user agent, so that Yandex Maps returns an HTML with the '...ll%3D...' value.
             userAgent = DESKTOP_USER_AGENT,
         ) { data ->
             parseResultAsync {

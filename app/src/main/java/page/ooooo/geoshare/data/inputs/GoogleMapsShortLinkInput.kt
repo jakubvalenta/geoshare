@@ -8,7 +8,6 @@ import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.log.Log
-import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject
@@ -39,7 +38,6 @@ class GoogleMapsShortLinkInput @Inject constructor(
             log,
             uriQuote,
             cookies = COOKIES,
-            userAgent = USER_AGENT,
         ).run {
             parseResult {
                 // Google Maps Go
@@ -71,9 +69,5 @@ class GoogleMapsShortLinkInput @Inject constructor(
                 domain = "www.google.com",
             ),
         )
-
-        // Set custom User-Agent, so that we don't receive Google Lite HTML, which doesn't contain coordinates in
-        // case of Google Maps or maps link in case of Google Search.
-        const val USER_AGENT = DESKTOP_USER_AGENT
     }
 }
