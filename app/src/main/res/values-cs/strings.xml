@@ -267,7 +267,7 @@
     <string name="server_invalid">Zadat přihlašovací údaje</string>
     <string name="server_list_description">Pokud je povoleno připojení k mapové službě, %1$s používá API servery k převodu určitých odkazů na souřadnice. Zvolte, zda chcete používat oficiální servery s vlastními přihlašovacími údaji, proxy servery, nebo žádné.</string>
     <string name="server_list_google_maps_address_title">Adresy v Google Mapách</string>
-    <string name="server_list_google_maps_none_description">Získat souřadnice z HTML (experimentální)</string>
+    <string name="server_list_none_html">Získat souřadnice z HTML (experimentální)</string>
     <string name="server_list_google_maps_place_title">ID míst v Google Mapách</string>
     <string name="server_list_none">Nepoužívat API server</string>
     <string name="server_list_search_none_description">Vyhledávání nebude dostupné</string>

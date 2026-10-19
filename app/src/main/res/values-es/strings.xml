@@ -276,7 +276,7 @@
     <string name="server_invalid">Establecer credenciales</string>
     <string name="server_list_description">Cuando se permite la conexión al servicio de mapas, %1$s utiliza servidores API para convertir determinados enlaces en coordenadas. Elija si desea utilizar servidores oficiales con sus propias credenciales, servidores proxy o ninguno.</string>
     <string name="server_list_google_maps_address_title">Direcciones de Google Maps</string>
-    <string name="server_list_google_maps_none_description">Coordenadas de extracto desde HTML (experimental)</string>
+    <string name="server_list_none_html">Coordenadas de extracto desde HTML (experimental)</string>
     <string name="server_list_google_maps_place_title">Ids del lugar Google Maps</string>
     <string name="server_list_none">No utilizar API del servidor</string>
     <string name="server_list_search_none_description">La búsqueda no estará disponible</string>

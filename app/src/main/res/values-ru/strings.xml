@@ -269,7 +269,7 @@
     <string name="server_insert">Добавить сервер</string>
     <string name="server_list_description">Если подключение к картографическому сервису разрешено, %1$s использует API серверов для преобразования определённых ссылок в координаты. Выберите, использовать ли официальные серверы с вашими собственными учётными данными, прокси-серверы или не использовать ничего.</string>
     <string name="server_list_google_maps_address_title">Адреса Google Карт</string>
-    <string name="server_list_google_maps_none_description">Извлекать координаты из HTML (экспериментально)</string>
+    <string name="server_list_none_html">Извлекать координаты из HTML (экспериментально)</string>
     <string name="server_list_google_maps_place_title">Идентификаторы мест в Google Картах</string>
     <string name="server_list_none">Не использовать API сервера</string>
     <string name="server_list_search_none_description">Поиск будет недоступен</string>

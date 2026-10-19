@@ -260,7 +260,7 @@
     <string name="server_challenge_url">挑战 URL</string>
     <string name="server_delete_text">服务器“%1$s”将被永久删除。</string>
     <string name="server_list_google_maps_address_title">Google 地图地址</string>
-    <string name="server_list_google_maps_none_description">从 HTML 中提取坐标（实验）</string>
+    <string name="server_list_none_html">从 HTML 中提取坐标（实验）</string>
     <string name="server_list_google_maps_place_title">Google 地图地点 ID</string>
     <string name="server_list_none">不使用 API 服务器</string>
     <string name="faq_how_text_2_item_api">或者该地图服务的 API，</string>

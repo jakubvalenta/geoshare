@@ -250,7 +250,7 @@
     <string name="server_insert">Sunucu ekle</string>
     <string name="server_invalid">Kimlik bilgilerini ayarla</string>
     <string name="server_list_google_maps_address_title">Google Haritalar adresleri</string>
-    <string name="server_list_google_maps_none_description">HTML’den koordinatları çıkart (deneysel)</string>
+    <string name="server_list_none_html">HTML’den koordinatları çıkart (deneysel)</string>
     <string name="server_list_google_maps_place_title">Google Haritalar yer kimlikleri</string>
     <string name="server_list_none">API sunucusu kullanma</string>
     <string name="server_list_search_none_description">Arama kullanılamayacak</string>

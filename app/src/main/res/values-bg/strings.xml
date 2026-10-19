@@ -254,7 +254,7 @@
     <string name="server_invalid">Задаване на идентификационни данни</string>
     <string name="server_list_description">Когато е разрешена връзка с картографска услуга, %1$s използва API сървъри, за да преобразува определени връзки в координати. Изберете дали да използвате официални сървъри със собствени идентификационни данни, прокси сървъри или никакви.</string>
     <string name="server_list_google_maps_address_title">Адреси в Google Карти</string>
-    <string name="server_list_google_maps_none_description">Извличане на координати от HTML (експериментално)</string>
+    <string name="server_list_none_html">Извличане на координати от HTML (експериментално)</string>
     <string name="server_list_google_maps_place_title">Идентификатори на места в Google Карти</string>
     <string name="server_list_none">Не използвайте API сървър</string>
     <string name="server_list_search_none_description">Търсенето няма да е достъпно</string>

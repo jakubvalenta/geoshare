@@ -284,7 +284,7 @@
     <string name="server_invalid">عيِّن بيانات الاعتماد</string>
     <string name="server_list_description">عندما يُسمح بالاتصال بخدمة الخرائط، يستخدم %1$s خوادم API لتحويل روابط معينة إلى إحداثيات. اختر ما إذا كنت تريد استخدام الخوادم الرسمية باستخدام بيانات اعتمادك الخاصة، أو خوادم وسيط، أو عدم استخدام أي منها.</string>
     <string name="server_list_google_maps_address_title">عناوين خرائط Google</string>
-    <string name="server_list_google_maps_none_description">استخرِج الإحداثيات من HTML (تجريبي)</string>
+    <string name="server_list_none_html">استخرِج الإحداثيات من HTML (تجريبي)</string>
     <string name="server_list_google_maps_place_title">معرّفات المواقع في خرائط Google</string>
     <string name="server_list_none">لا تستخدم خادم API</string>
     <string name="server_list_search_none_description">لن تكون ميزة البحث متاحة</string>

@@ -95,11 +95,11 @@ width="270">](./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png)
 
 GeoShare converts map links (e.g. https://maps.app.goo.gl/…) into geo: links
 that can be opened by other map apps. To create a geo: link, geographic
-coordinates are required. GeoShare extracts them from the map URL.
+coordinates are required. GeoShare reads them from the map URL.
 
 However, not all map URLs include coordinates. In such cases, GeoShare will
 **prompt you for permission to connect to the map service (Google Maps, Apple
-Maps etc.)** and retrieve the coordinates from:
+Maps, etc.)** and read the coordinates from:
 
 - either HTTP headers, e.g.
   `Location: https://google.com/maps/@40.78,-73.96,19z`
@@ -118,7 +118,7 @@ asking (the default), go to the app’s preferences.
 
 ### Failed to find coordinates, using a place name
 
-GeoShare is able to extract only a place name, e.g. “Mount Kilimanjaro”, from
+GeoShare is able to read only a place name, e.g. “Mount Kilimanjaro”, from
 certain map links. When you open this location in another map app, it might show
 a different place than the original link, because several places with the same
 name might exist.

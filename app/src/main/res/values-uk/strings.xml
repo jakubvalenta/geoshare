@@ -268,7 +268,7 @@
     <string name="server_invalid">Указати облікові дані</string>
     <string name="server_list_description">Якщо з’єднання до мапографічного сервісу дозволено, %1$s використовує API-сервери для перетворення певних посилань у координати. Виберіть, чи використовувати офіційні сервери з вашими власними обліковими даними, проксі-серверами чи не використовувати їх взагалі.</string>
     <string name="server_list_google_maps_address_title">Адреси Google Maps</string>
-    <string name="server_list_google_maps_none_description">Витягнути координати із HTML (експериментальна функція)</string>
+    <string name="server_list_none_html">Витягнути координати із HTML (експериментальна функція)</string>
     <string name="server_list_google_maps_place_title">Ідентифікатори місць у Google Maps</string>
     <string name="server_list_none">Не використовувати API-сервер</string>
     <string name="server_list_search_none_description">Пошук буде недоступний</string>

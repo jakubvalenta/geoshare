@@ -29,7 +29,7 @@
     <string name="conversion_connecting">Connecting to %1$s…</string>
     <string name="conversion_permission">Connect to %1$s?</string>
     <string name="conversion_processing">Processing link of type %1$s</string>
-    <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
+    <string name="conversion_succeeded_check_experimental">Location might be inaccurate, because the support for this map link is experimental.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
     <string name="conversion_succeeded_check_name_only">Failed to find coordinates, using a place name.</string>
     <string name="conversion_succeeded_check_name_only_points">Failed to find coordinates for some points.</string>
@@ -207,8 +207,8 @@
     <string name="permission_do_not_ask">Don’t ask me again</string>
     <string name="faq_title">FAQ</string>
     <string name="faq_how_headline">How it works</string>
-    <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s extracts them from the map URL.</string>
-    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from:</string>
+    <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s read them from the map URL.</string>
+    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and read the coordinates from:</string>
     <string name="faq_how_text_2_item_api">or the API of the map service,</string>
     <string name="faq_how_text_2_item_api_example" translatable="false">GET https://geocode.googleapis.com/v4/geocode/address/…</string>
     <string name="faq_how_text_2_item_http">either HTTP headers,</string>
@@ -222,7 +222,7 @@
     <string name="faq_location_permission_headline">Location permission</string>
     <string name="faq_location_permission_text">%1$s asks for location permission when launching the TomTom navigation and when sharing a GPX route, because in these cases the app needs to create a GPX route that starts at your current location. The location information is discarded immediately after the creation of the route.</string>
     <string name="faq_name_only_title">Failed to find coordinates, using a place name</string>
-    <string name="faq_name_only_text_1">%1$s is able to extract only a place name, e.g. “Mount Kilimanjaro”, from certain map links. When you open this location in another map app, it might show a different place than the original link, because several places with the same name might exist.</string>
+    <string name="faq_name_only_text_1">%1$s is able to read only a place name, e.g. “Mount Kilimanjaro”, from certain map links. When you open this location in another map app, it might show a different place than the original link, because several places with the same name might exist.</string>
     <string name="faq_name_only_text_2">Points identified only by name are not included in GPX routes.</string>
     <string name="faq_open_by_default_headline">How to always open links in %1$s</string>
     <string name="faq_privacy_headline">Privacy considerations</string>
@@ -332,9 +332,9 @@
     <string name="server_invalid">Set credentials</string>
     <string name="server_list_description">When map service connection is allowed, %1$s uses API servers to convert certain links to coordinates. Choose whether to use official servers with your own credentials, proxy servers, or none.</string>
     <string name="server_list_google_maps_address_title">Google Maps addresses</string>
-    <string name="server_list_google_maps_none_description">Extract coordinates from HTML (experimental)</string>
     <string name="server_list_google_maps_place_title">Google Maps place ids</string>
     <string name="server_list_none">Don’t use API server</string>
+    <string name="server_list_none_html">Read coordinates from HTML (experimental)</string>
     <string name="server_list_search_none_description">Search will not be available</string>
     <string name="server_list_search_title">Search</string>
     <string name="server_list_title">API servers</string>
