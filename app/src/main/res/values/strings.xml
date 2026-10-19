@@ -75,7 +75,6 @@
     <string name="input_google_maps_place_api_name" translatable="false">Google Maps (place API)</string>
     <string name="input_google_maps_place_list_name" translatable="false">Google Maps (place list)</string>
     <string name="input_google_maps_short_link_name" translatable="false">Google Maps (short link)</string>
-    <string name="input_google_maps_web_view_name" translatable="false">Google Maps (WebView)</string>
     <string name="input_google_search_name" translatable="false">Google Search</string>
     <string name="input_kagi_maps_name">Kagi Maps</string>
     <string name="input_kagi_maps_warning_account">Links with place ids are not supported, because they require a Kagi account.</string>

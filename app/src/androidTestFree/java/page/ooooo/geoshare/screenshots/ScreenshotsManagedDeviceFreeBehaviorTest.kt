@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.screenshots
 
+import android.view.inputmethod.InputMethodManager
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
 import androidx.test.uiautomator.UiObject2
@@ -47,7 +49,6 @@ import page.ooooo.geoshare.tests.goBackToMainForm
 import page.ooooo.geoshare.tests.goToInputList
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.grantConnectionPermission
-import page.ooooo.geoshare.tests.hideKeyboard
 import page.ooooo.geoshare.tests.launchApplication
 import page.ooooo.geoshare.tests.longScrollSheet
 import page.ooooo.geoshare.tests.onElementOrScrollToElement
@@ -857,4 +858,19 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         onElementOrScrollToElement(scrollableElement = { onMainScrollablePane() }) {
             viewIdResourceName == "geoShareAppShare"
         }
+
+    private fun isKeyboardOpen(): Boolean {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
+        return inputMethodManager.isAcceptingText()
+    }
+
+    private fun UiAutomatorTestScope.hideKeyboard() {
+        if (isKeyboardOpen()) {
+            device.executeShellCommand(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "input keyevent 111"
+            )
+        }
+    }
 }
