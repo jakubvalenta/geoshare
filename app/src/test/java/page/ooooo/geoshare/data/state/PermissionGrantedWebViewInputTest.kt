@@ -49,7 +49,7 @@ class PermissionGrantedWebViewInputTest {
         override val timeout = 7.seconds
 
         @Suppress("SameReturnValue")
-        override fun getUnsafeExtractionJavaScript() = "undefined"
+        override fun getUnsafeClientJavaScript() = "undefined"
 
         override fun parse(data: String, match: String, resources: Resources) =
             result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
@@ -112,7 +112,7 @@ class PermissionGrantedWebViewInputTest {
                 override val group = DebugInputGroup
 
                 @Suppress("SameReturnValue")
-                override fun getUnsafeExtractionJavaScript() = "undefined"
+                override fun getUnsafeClientJavaScript() = "undefined"
 
                 override fun parse(data: String, match: String, resources: Resources) =
                     ParseResult.Warning(
@@ -285,7 +285,7 @@ class PermissionGrantedWebViewInputTest {
             override val timeout = 7.seconds
 
             @Suppress("SameReturnValue")
-            override fun getUnsafeExtractionJavaScript() = "undefined"
+            override fun getUnsafeClientJavaScript() = "undefined"
 
             override fun parse(data: String, match: String, resources: Resources) =
                 throw CancellationException()

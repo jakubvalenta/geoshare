@@ -531,8 +531,8 @@ private fun MainScreen(
                                     ) {
                                         ConversionWebView(
                                             unsafeUrl = conversionState.matchedInput.match,
-                                            unsafeExtractionJavascript = conversionState.matchedInput.input.getUnsafeExtractionJavaScript(),
-                                            pendingExtractionResult = conversionState.pendingData,
+                                            unsafeClientJavascript = conversionState.matchedInput.input.getUnsafeClientJavaScript(),
+                                            pendingResult = conversionState.pendingData,
                                             extendWebSettings = {
                                                 conversionState.matchedInput.input.extendWebSettings(it)
                                             },

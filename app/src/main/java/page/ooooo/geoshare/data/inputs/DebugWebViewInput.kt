@@ -13,7 +13,7 @@ object DebugWebViewInput : WebViewInput {
     override fun getName(resources: Resources) = "Debug Input (WebView)"
 
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript() = """
+    override fun getUnsafeClientJavaScript() = """
         () => location.href;
     """.trimIndent()
 

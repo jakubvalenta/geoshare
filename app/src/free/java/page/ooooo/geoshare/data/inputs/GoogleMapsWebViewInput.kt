@@ -15,7 +15,7 @@ class GoogleMapsWebViewInput @Inject constructor(
     override val group = GoogleMapsInputGroup
 
     /**
-     * Extracts the URL of the page after the page JavaScript has changed the URL.
+     * Reads the URL of the page after the page JavaScript has changed the URL.
      *
      * It waits for a while after a URL change and returns the URL only if no further URL change happens. The reaason is
      * that the first URL change often doesn't lead to the final coordinates.
@@ -28,7 +28,7 @@ class GoogleMapsWebViewInput @Inject constructor(
      * - The URL is unlikely to be in another format such as `/?ll={lat},{lon}`
      */
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript() = """
+    override fun getUnsafeClientJavaScript() = """
         () => {
             if (window.__hrefWithCoordinates !== location.href) {
                 if (location.href.includes("/@") || location.href.includes("!2d") || location.href.includes("!4d")) {

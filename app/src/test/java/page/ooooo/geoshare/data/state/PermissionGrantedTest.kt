@@ -43,7 +43,7 @@ class PermissionGrantedTest {
             override val group = DebugInputGroup
 
             @Suppress("SameReturnValue")
-            override fun getUnsafeExtractionJavaScript() = "undefined"
+            override fun getUnsafeClientJavaScript() = "undefined"
 
             override fun parse(data: String, match: String, resources: Resources): ParseResult {
                 throw NotImplementedError()

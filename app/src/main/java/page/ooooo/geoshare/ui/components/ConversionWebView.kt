@@ -40,13 +40,13 @@ private const val TAG = "ConversionWebView"
 @Composable
 fun ConversionWebView(
     unsafeUrl: String,
-    unsafeExtractionJavascript: String,
-    pendingExtractionResult: CompletableDeferred<String>,
+    unsafeClientJavascript: String,
+    pendingResult: CompletableDeferred<String>,
     extendWebSettings: (settings: WebSettings) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
     sizePx: Size = Size(1080 - 2f, 1920f - 277f),
-    extractionInterval: Duration = 500.milliseconds,
+    readInterval: Duration = 500.milliseconds,
 ) {
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -71,7 +71,7 @@ fun ConversionWebView(
 
     LaunchedEffect(safeUrl) {
         if (safeUrl == null) {
-            pendingExtractionResult.completeExceptionally(IllegalStateException("Page blocked"))
+            pendingResult.completeExceptionally(IllegalStateException("Page blocked"))
         }
     }
 
@@ -131,16 +131,16 @@ fun ConversionWebView(
                     object {
                         @Suppress("unused")
                         @JavascriptInterface
-                        fun onExtractSuccess(extractionResult: String) {
-                            Log.d(TAG, "Extracted $extractionResult")
-                            pendingExtractionResult.complete(extractionResult)
+                        fun onSuccess(result: String) {
+                            Log.d(TAG, "Client JavaScript succeeded $result")
+                            pendingResult.complete(result)
                         }
 
                         @Suppress("unused")
                         @JavascriptInterface
-                        fun onExtractFailure() {
-                            Log.w(TAG, "Extraction failed")
-                            pendingExtractionResult.completeExceptionally(WebViewNetworkException())
+                        fun onFailure() {
+                            Log.w(TAG, "Client JavaScript failed")
+                            pendingResult.completeExceptionally(WebViewNetworkException())
                         }
                     },
                     JAVA_SCRIPT_INTERFACE_NAME,
@@ -148,7 +148,7 @@ fun ConversionWebView(
 
                 webViewClient = object : WebViewClient() {
                     /**
-                     * Runs extraction repeatedly every [extractionInterval]
+                     * Runs client JavaScript repeatedly every [readInterval]
                      */
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
@@ -157,28 +157,28 @@ fun ConversionWebView(
                             // language=JavaScript
                             """
                                 (() => {
-                                    const extract = $unsafeExtractionJavascript;
-                                    function extractAndCallback() {
+                                    const read = $unsafeClientJavascript;
+                                    function readAndCallback() {
                                         try {
                                             switch (location.protocol) {
                                                 case 'about:':
                                                     // Try again if the page is about:blank
                                                     break;
                                                 case 'chrome-error:':
-                                                    $JAVA_SCRIPT_INTERFACE_NAME.onExtractFailure();
+                                                    $JAVA_SCRIPT_INTERFACE_NAME.onFailure();
                                                     break;
                                                 default:
-                                                    const extractionResult = extract();
-                                                    if (extractionResult !== null && extractionResult !== undefined) {
-                                                        $JAVA_SCRIPT_INTERFACE_NAME.onExtractSuccess(extractionResult);
+                                                    const result = read();
+                                                    if (result !== null && result !== undefined) {
+                                                        $JAVA_SCRIPT_INTERFACE_NAME.onSuccess(result);
                                                     }
                                             }
                                         } catch (ex) {
-                                            console.error("Extraction exception", ex);
+                                            console.error("Client JavaScript exception", ex);
                                         }
                                     }
-                                    extractAndCallback();
-                                    setInterval(extractAndCallback, ${extractionInterval.inWholeMilliseconds});
+                                    readAndCallback();
+                                    setInterval(readAndCallback, ${readInterval.inWholeMilliseconds});
                                 })();
                             """.trimIndent(),
                             null,

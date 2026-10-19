@@ -46,13 +46,17 @@ interface BasicOnlineInput : BasicInput {
 }
 
 /**
- * Input that expects the caller to render a WebView with a match as the page URL, call [getUnsafeExtractionJavaScript]
- * to get JavaScript that extracts data from the WebView, and then call [parse] with the extracted data.
+ * Input that expects the caller to render a WebView with a match as the page URL, call [getUnsafeClientJavaScript]
+ * to get JavaScript that reads data from the page, and then call [parse] with the read data.
  */
 interface WebViewInput : Input {
     val timeout: Duration get() = 60.seconds
 
-    fun getUnsafeExtractionJavaScript(): String
+    /**
+     * Returns JavaScript code that will be executed on the page. It is considered unsafe, because it can lead to syntax
+     * errors or injection.
+     */
+    fun getUnsafeClientJavaScript(): String
 
     fun parse(data: String, match: String, resources: Resources): ParseResult
 
