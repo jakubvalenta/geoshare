@@ -9,11 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
@@ -122,159 +124,180 @@ private fun FaqScreen(
         val appName = stringResource(R.string.app_name)
         val appServerName = stringResource(R.string.app_server_name)
         val appServerUrl = stringResource(R.string.app_server_url)
-        Column(
+        LazyColumn(
             Modifier
+                .widthIn(max = 600.dp)
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
                 .testTag("geoShareFaqPane"),
-            verticalArrangement = Arrangement.spacedBy(spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
         ) {
-            FaqItem(
-                itemId = FaqItemId.HOW_IT_WORKS,
-                expandedItemId = expandedItemId,
-                onSetExpandedItemId = { expandedItemId = it },
-                title = stringResource(R.string.faq_how_headline),
-                modifier = Modifier.padding(top = spacing.small),
-            ) {
-                ParagraphText(
-                    stringResource(R.string.faq_how_text_1, appName)
-                )
-                ParagraphText(
-                    stringResource(R.string.faq_how_text_2, appName)
-                )
-                TextList(verticalSpace = spacing.tiny) {
-                    listOf(
-                        R.string.faq_how_text_2_item_http to R.string.faq_how_text_2_item_http_example,
-                        R.string.faq_how_text_2_item_html to R.string.faq_how_text_2_item_html_example,
-                        R.string.faq_how_text_2_item_api to R.string.faq_how_text_2_item_api_example,
-                        R.string.faq_how_text_2_item_web to null,
-                    ).forEach { (textResId, exampleResId) ->
-                        TextListItem(bullet = { TextListBullet() }) {
-                            Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)) {
-                                Text(stringResource(textResId))
-                                exampleResId?.let { exampleResId ->
-                                    Text(
-                                        stringResource(R.string.example, stringResource(exampleResId)),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontStyle = FontStyle.Italic,
-                                        style = MaterialTheme.typography.bodySmall,
-                                    )
+            item(key = "how_it_works", contentType = "faq_item") {
+                FaqItem(
+                    itemId = FaqItemId.HOW_IT_WORKS,
+                    expandedItemId = expandedItemId,
+                    onSetExpandedItemId = { expandedItemId = it },
+                    title = stringResource(R.string.faq_how_headline),
+                    modifier = Modifier.padding(top = spacing.small),
+                ) {
+                    ParagraphText(
+                        stringResource(R.string.faq_how_text_1, appName)
+                    )
+                    ParagraphText(
+                        stringResource(R.string.faq_how_text_2, appName)
+                    )
+                    TextList(verticalSpace = spacing.tiny) {
+                        listOf(
+                            R.string.faq_how_text_2_item_http to R.string.faq_how_text_2_item_http_example,
+                            R.string.faq_how_text_2_item_html to R.string.faq_how_text_2_item_html_example,
+                            R.string.faq_how_text_2_item_api to R.string.faq_how_text_2_item_api_example,
+                            R.string.faq_how_text_2_item_web to null,
+                        ).forEach { (textResId, exampleResId) ->
+                            TextListItem(bullet = { TextListBullet() }) {
+                                Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)) {
+                                    Text(stringResource(textResId))
+                                    exampleResId?.let { exampleResId ->
+                                        Text(
+                                            stringResource(R.string.example, stringResource(exampleResId)),
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontStyle = FontStyle.Italic,
+                                            style = MaterialTheme.typography.bodySmall,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                ParagraphText(
-                    stringResource(R.string.faq_how_text_3, appName)
-                )
-                ParagraphText(
-                    annotatedStringResource(
-                        R.string.faq_how_text_4,
-                        tertiaryLinkStyles(),
-                        FormatArg.Link(stringResource(R.string.faq_how_text_4_preferences_button)) {
-                            onNavigateToUserPreferencesScreen(UserPreferenceGroupId.CONNECTION_PERMISSION)
-                        },
+                    ParagraphText(
+                        stringResource(R.string.faq_how_text_3, appName)
                     )
-                )
-            }
-            FaqItem(
-                itemId = FaqItemId.NAME_ONLY,
-                expandedItemId = expandedItemId,
-                onSetExpandedItemId = { expandedItemId = it },
-                title = stringResource(R.string.faq_name_only_title),
-            ) {
-                ParagraphText(
-                    stringResource(R.string.faq_name_only_text_1, appName)
-                )
-                ParagraphText(
-                    stringResource(R.string.faq_name_only_text_2)
-                )
-            }
-            FaqItem(
-                itemId = FaqItemId.PRIVACY,
-                expandedItemId = expandedItemId,
-                onSetExpandedItemId = { expandedItemId = it },
-                title = stringResource(R.string.faq_privacy_headline),
-            ) {
-                ParagraphText(
-                    stringResource(R.string.faq_privacy_text, appName)
-                )
-                ParagraphText(
-                    annotatedStringResource(
-                        R.string.faq_privacy_text_server,
-                        tertiaryLinkStyles(),
-                        FormatArg.Text(appName),
-                        FormatArg.Text(appServerName),
-                        FormatArg.Link(appServerName) {
-                            context.openUriInDefaultApp(appServerUrl)
-                        },
-                    )
-                )
-                ParagraphText(
-                    stringResource(R.string.faq_privacy_text_html, appName)
-                )
-            }
-            FaqItem(
-                itemId = FaqItemId.LOCATION_PERMISSION,
-                expandedItemId = expandedItemId,
-                onSetExpandedItemId = { expandedItemId = it },
-                title = stringResource(R.string.faq_location_permission_headline),
-            ) {
-                ParagraphText(
-                    stringResource(R.string.faq_location_permission_text, appName)
-                )
-            }
-            FaqItem(
-                itemId = FaqItemId.OPEN_BY_DEFAULT,
-                expandedItemId = expandedItemId,
-                onSetExpandedItemId = { expandedItemId = it },
-                title = stringResource(R.string.faq_open_by_default_headline, appName),
-            ) {
-                FaqFigure(
-                    stringResource(R.string.intro_open_by_default_google_maps_caption),
-                ) {
-                    ScreenshotOpenByDefaultMapApp()
-                    Button(
-                        {
-                            onShowOpenByDefaultSettingsForPackage(PackageNames.GOOGLE_MAPS)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        ),
-                    ) {
-                        Text(stringResource(R.string.intro_open_by_default_google_maps_button))
-                    }
-                }
-                FaqFigure(
-                    stringResource(R.string.intro_open_by_default_app_caption, appName),
-                ) {
-                    ScreenshotOpenByDefault()
-                    FilledTonalButton(
-                        {
-                            onShowOpenByDefaultSettings()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                        ),
-                    ) {
-                        Text(stringResource(R.string.intro_open_by_default_app_button, appName))
-                    }
                     ParagraphText(
                         annotatedStringResource(
-                            R.string.intro_open_by_default_app_note_1,
-                            defaultLinkStyles(),
-                            *listOf("maps.app.goo.gl", "maps.google.com", "www.google.com")
-                                .map { FormatArg.Text(it, SpanStyle(fontWeight = FontWeight.Bold)) }
-                                .toTypedArray(),
+                            R.string.faq_how_text_4,
+                            tertiaryLinkStyles(),
+                            FormatArg.Link(stringResource(R.string.faq_how_text_4_preferences_button)) {
+                                onNavigateToUserPreferencesScreen(UserPreferenceGroupId.CONNECTION_PERMISSION)
+                            },
+                        )
+                    )
+                }
+            }
+            item(key = "how_it_works_divider", contentType = "faq_divider") {
+                FaqDivider()
+            }
+            item(key = "name_only", contentType = "faq_item") {
+                FaqItem(
+                    itemId = FaqItemId.NAME_ONLY,
+                    expandedItemId = expandedItemId,
+                    onSetExpandedItemId = { expandedItemId = it },
+                    title = stringResource(R.string.faq_name_only_title),
+                ) {
+                    ParagraphText(
+                        stringResource(R.string.faq_name_only_text_1, appName)
+                    )
+                    ParagraphText(
+                        stringResource(R.string.faq_name_only_text_2)
+                    )
+                }
+            }
+            item(key = "name_only_divider", contentType = "faq_divider") {
+                FaqDivider()
+            }
+            item(key = "privacy", contentType = "faq_item") {
+                FaqItem(
+                    itemId = FaqItemId.PRIVACY,
+                    expandedItemId = expandedItemId,
+                    onSetExpandedItemId = { expandedItemId = it },
+                    title = stringResource(R.string.faq_privacy_headline),
+                ) {
+                    ParagraphText(
+                        stringResource(R.string.faq_privacy_text, appName)
+                    )
+                    ParagraphText(
+                        annotatedStringResource(
+                            R.string.faq_privacy_text_server,
+                            tertiaryLinkStyles(),
+                            FormatArg.Text(appName),
+                            FormatArg.Text(appServerName),
+                            FormatArg.Link(appServerName) {
+                                context.openUriInDefaultApp(appServerUrl)
+                            },
                         )
                     )
                     ParagraphText(
-                        stringResource(R.string.intro_open_by_default_app_note)
+                        stringResource(R.string.faq_privacy_text_html, appName)
                     )
+                }
+            }
+            item(key = "privacy_divider", contentType = "faq_divider") {
+                FaqDivider()
+            }
+            item(key = "location_permission", contentType = "faq_item") {
+                FaqItem(
+                    itemId = FaqItemId.LOCATION_PERMISSION,
+                    expandedItemId = expandedItemId,
+                    onSetExpandedItemId = { expandedItemId = it },
+                    title = stringResource(R.string.faq_location_permission_headline),
+                ) {
+                    ParagraphText(
+                        stringResource(R.string.faq_location_permission_text, appName)
+                    )
+                }
+            }
+            item(key = "location_permission_divider", contentType = "faq_divider") {
+                FaqDivider()
+            }
+            item(key = "open_by_default", contentType = "faq_item") {
+                FaqItem(
+                    itemId = FaqItemId.OPEN_BY_DEFAULT,
+                    expandedItemId = expandedItemId,
+                    onSetExpandedItemId = { expandedItemId = it },
+                    title = stringResource(R.string.faq_open_by_default_headline, appName),
+                ) {
+                    FaqFigure(
+                        stringResource(R.string.intro_open_by_default_google_maps_caption),
+                    ) {
+                        ScreenshotOpenByDefaultMapApp()
+                        Button(
+                            {
+                                onShowOpenByDefaultSettingsForPackage(PackageNames.GOOGLE_MAPS)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            ),
+                        ) {
+                            Text(stringResource(R.string.intro_open_by_default_google_maps_button))
+                        }
+                    }
+                    FaqFigure(
+                        stringResource(R.string.intro_open_by_default_app_caption, appName),
+                    ) {
+                        ScreenshotOpenByDefault()
+                        FilledTonalButton(
+                            {
+                                onShowOpenByDefaultSettings()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                            ),
+                        ) {
+                            Text(stringResource(R.string.intro_open_by_default_app_button, appName))
+                        }
+                        ParagraphText(
+                            annotatedStringResource(
+                                R.string.intro_open_by_default_app_note_1,
+                                defaultLinkStyles(),
+                                *listOf("maps.app.goo.gl", "maps.google.com", "www.google.com")
+                                    .map { FormatArg.Text(it, SpanStyle(fontWeight = FontWeight.Bold)) }
+                                    .toTypedArray(),
+                            )
+                        )
+                        ParagraphText(
+                            stringResource(R.string.intro_open_by_default_app_note)
+                        )
+                    }
                 }
             }
         }
@@ -326,11 +349,19 @@ private fun FaqItem(
 }
 
 @Composable
+private fun FaqDivider() {
+    val spacing = LocalSpacing.current
+
+    HorizontalDivider(Modifier.padding(horizontal = spacing.windowPadding))
+}
+
+@Composable
 private fun FaqFigure(
     captionHtml: String,
     content: @Composable () -> Unit = {},
 ) {
     val spacing = LocalSpacing.current
+
     Column(
         Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -362,6 +393,17 @@ private fun DefaultPreview() {
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkPreview() {
+    AppTheme {
+        FaqScreen(
+            onBack = {},
+            onNavigateToUserPreferencesScreen = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, device = Devices.TABLET)
+@Composable
+private fun TabletPreview() {
     AppTheme {
         FaqScreen(
             onBack = {},
