@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -39,41 +37,25 @@ private const val TAG = "ConversionWebView"
 
 @Composable
 fun ConversionWebView(
-    unsafeUrl: String,
-    unsafeClientJavascript: String,
+    url: String,
+    allowedUrlPattern: Regex,
     pendingResult: CompletableDeferred<String>,
+    unsafeClientJavascript: String,
     extendWebSettings: (settings: WebSettings) -> Unit,
     shouldInterceptRequest: (requestUrlString: String) -> Boolean,
     // Set window size minus a common browser chrome size, so the numbers seem real, in case a web page checks
     sizePx: Size = Size(1080 - 2f, 1920f - 277f),
     readInterval: Duration = 500.milliseconds,
 ) {
+    // As an extra layer of security, allow only specific URLs to be loaded in the WebView
+    if (!allowedUrlPattern.matches(url)) {
+        pendingResult.completeExceptionally(IllegalStateException("Page blocked"))
+        return
+    }
+
     val context = LocalContext.current
     val density = LocalDensity.current
     val size = with(density) { sizePx.toDpSize() }
-
-    // As an extra layer of security, allow only specific URLs to be loaded in the WebView. These URLs should be more
-    // strict than the patterns in Input (for example only HTTPS should be allowed) and any change to these patterns
-    // should be reviewed thoroughly.
-    val allowedUrlPatterns = listOf(
-        // language=regexp
-        """https://(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+""",
-        // language=regexp
-        """https://map\.baidu\.com[/?#]\S+""",
-        // language=regexp
-        """https://map\.yahoo\.co\.jp[/?#]\S+""",
-        // language=regexp
-        """https://www\.example\.com[/?#]\S+""",
-    )
-    val safeUrl = remember(unsafeUrl) {
-        unsafeUrl.takeIf { allowedUrlPatterns.any { pattern -> Regex(pattern).matches(unsafeUrl) } }
-    }
-
-    LaunchedEffect(safeUrl) {
-        if (safeUrl == null) {
-            pendingResult.completeExceptionally(IllegalStateException("Page blocked"))
-        }
-    }
 
     // Render a placeholder in Preview, because WebView is not supported there
     val isPreview = LocalInspectionMode.current
@@ -84,7 +66,7 @@ fun ConversionWebView(
                 .background(Color(0x80FFFFFF)),
             contentAlignment = Alignment.Center,
         ) {
-            Text("WebView: $unsafeUrl")
+            Text("WebView: $url")
         }
         return
     }
@@ -201,16 +183,14 @@ fun ConversionWebView(
                     }
                 }
 
-                if (safeUrl != null) {
-                    loadUrl(safeUrl)
-                }
+                loadUrl(url)
             }
         },
         modifier = Modifier.requiredSize(size),
         update = { webView ->
             webView.apply {
-                if (safeUrl != null && url != safeUrl) {
-                    loadUrl(safeUrl)
+                if (this.url != url) {
+                    loadUrl(url)
                 }
             }
         },
@@ -232,7 +212,7 @@ fun ConversionWebView(
                 // Neutralize callbacks before any teardown
                 webViewClient = WebViewClient()
                 webChromeClient = null
-                removeJavascriptInterface("Android")
+                removeJavascriptInterface(JAVA_SCRIPT_INTERFACE_NAME)
 
                 onPause()
                 removeAllViews()

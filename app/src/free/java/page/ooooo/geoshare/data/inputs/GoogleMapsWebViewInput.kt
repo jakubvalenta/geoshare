@@ -14,6 +14,8 @@ class GoogleMapsWebViewInput @Inject constructor(
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_web_view_name)
     override val group = GoogleMapsInputGroup
 
+    override val allowedUrlPattern = Companion.allowedUrlPattern
+
     /**
      * Reads the URL of the page after the page JavaScript has changed the URL.
      *
@@ -28,7 +30,7 @@ class GoogleMapsWebViewInput @Inject constructor(
      * - The URL is unlikely to be in another format such as `/?ll={lat},{lon}`
      */
     // language=JavaScript
-    override fun getUnsafeClientJavaScript() = """
+    override val unsafeClientJavaScript = """
         () => {
             if (window.__hrefWithCoordinates !== location.href) {
                 if (location.href.includes("/@") || location.href.includes("!2d") || location.href.includes("!4d")) {
@@ -57,6 +59,10 @@ class GoogleMapsWebViewInput @Inject constructor(
     override fun toString() = "GoogleMapsWebViewInput"
 
     companion object {
+        val allowedUrlPattern by lazy {
+            Regex("""https://(?:www|maps)\.google(?:\.[a-z]{2,3})?\.[a-z]{2,3}[/?#]\S+""")
+        }
+
         /**
          * Set custom user agent to prevent:
          *

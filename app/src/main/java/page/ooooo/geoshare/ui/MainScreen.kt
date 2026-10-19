@@ -530,9 +530,10 @@ private fun MainScreen(
                                             .clipToBounds()
                                     ) {
                                         ConversionWebView(
-                                            unsafeUrl = conversionState.matchedInput.match,
-                                            unsafeClientJavascript = conversionState.matchedInput.input.getUnsafeClientJavaScript(),
+                                            url = conversionState.matchedInput.match,
+                                            allowedUrlPattern = conversionState.matchedInput.input.allowedUrlPattern,
                                             pendingResult = conversionState.pendingData,
+                                            unsafeClientJavascript = conversionState.matchedInput.input.unsafeClientJavaScript,
                                             extendWebSettings = {
                                                 conversionState.matchedInput.input.extendWebSettings(it)
                                             },

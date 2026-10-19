@@ -23,6 +23,10 @@ class YahooMapsWebViewInput @Inject constructor(
     override fun getName(resources: Resources) = resources.getString(R.string.input_yahoo_maps_web_view_name)
     override val group = YahooMapsInputGroup
 
+    override val allowedUrlPattern by lazy {
+        Regex("""https://map\.yahoo\.co\.jp[/?#]\S+""")
+    }
+
     /**
      * Reads point from the page URL after the page JavaScript has changed the URL.
      *
@@ -30,7 +34,7 @@ class YahooMapsWebViewInput @Inject constructor(
      * different, then it returns the point.
      */
     // language=JavaScript
-    override fun getUnsafeClientJavaScript() = """
+    override val unsafeClientJavaScript = """
         () => {
             const queryParams = new URLSearchParams(location.search);
             const lat = parseFloat(queryParams.get("lat"));

@@ -288,7 +288,7 @@ data class PermissionGrantedBasicInput(
  * When this state is the current state, the UI should:
  *
  * 1. Load [matchedInput]'s match as a page URL in a WebView.
- * 2. Get JavaScript code using [WebViewInput.getUnsafeClientJavaScript] and call it periodically.
+ * 2. Call [WebViewInput.unsafeClientJavaScript] on the page periodically.
  * 3. As soon as the result of the client JavaScript is not undefined, complete [pendingData].
  *
  * When it fails, it retries up to [maxAttempts] times. Retrying is done by recursively transitioning this state while

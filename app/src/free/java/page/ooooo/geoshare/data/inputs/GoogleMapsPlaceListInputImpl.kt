@@ -20,6 +20,8 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
 
     override val group = GoogleMapsInputGroup
 
+    override val allowedUrlPattern = GoogleMapsWebViewInput.allowedUrlPattern
+
     /**
      * Reads point from the page JavaScript state.
      *
@@ -41,7 +43,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
      * ```
      */
     // language=JavaScript
-    override fun getUnsafeClientJavaScript() = $$"""
+    override val unsafeClientJavaScript = $$"""
         () => {
             function findPointsInAppInitState(obj) {
                 const MAX_PRECISION = 17;

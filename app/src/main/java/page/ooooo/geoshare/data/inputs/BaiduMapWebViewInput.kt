@@ -23,13 +23,17 @@ class BaiduMapWebViewInput @Inject constructor(
     override fun getName(resources: Resources) = resources.getString(R.string.input_baidu_map_web_view_name)
     override val group = BaiduMapInputGroup
 
+    override val allowedUrlPattern by lazy {
+        Regex("""https://map\.baidu\.com[/?#]\S+""")
+    }
+
     /**
      * Reads point from the page JavaScript state.
      *
      * It doesn't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
      */
     // language=JavaScript
-    override fun getUnsafeClientJavaScript() = """
+    override val unsafeClientJavaScript = """
         () => {
             function deepGet(obj, ...keys) {
                 return keys.reduce((acc, key) => {

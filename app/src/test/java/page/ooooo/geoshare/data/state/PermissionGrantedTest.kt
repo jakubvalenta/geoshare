@@ -42,8 +42,10 @@ class PermissionGrantedTest {
             override fun getName(resources: Resources) = "Test Input"
             override val group = DebugInputGroup
 
+            override val allowedUrlPattern = Regex("")
+
             @Suppress("SameReturnValue")
-            override fun getUnsafeClientJavaScript() = "undefined"
+            override val unsafeClientJavaScript = "undefined"
 
             override fun parse(data: String, match: String, resources: Resources): ParseResult {
                 throw NotImplementedError()
