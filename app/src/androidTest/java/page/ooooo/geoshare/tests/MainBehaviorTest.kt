@@ -37,10 +37,9 @@ class MainBehaviorTest {
         waitForAppToBeVisible()
 
         // Enter text in the main form and submit it
-        testText(
-            WGS84Point(45.4786785, 9.2473799, source = Source.URI),
-            "geo:45.4786785,9.2473799",
-        )
+        val point = WGS84Point(NaivePoint.genRandomPoint().copy(source = Source.URI))
+        setMainInput(point)
+        submitMainForm()
 
         // Tap the Google Maps icon
         scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()
@@ -53,7 +52,7 @@ class MainBehaviorTest {
         waitForAppToBeVisible()
 
         // Shows result screen, because the app didn't finish
-        onElement { viewIdResourceName == "geoShareResultAutomationButton" }
+        assertConversionSucceeds(point)
     }
 
     @Test
@@ -351,7 +350,7 @@ class MainBehaviorTest {
     @Test
     fun whenPointIsShared_allowsSavingPointToContact() = uiAutomator {
         // Share a random point with the app
-        val point = WGS84Point(NaivePoint.genRandomPoint())
+        val point = WGS84Point(NaivePoint.genRandomPoint().copy(source = Source.URI))
         shareUri(point)
 
         // Open sheet and tap Save to contact
@@ -379,49 +378,63 @@ class MainBehaviorTest {
     }
 
     @Test
+    fun whenLinkIsSharedAndCurrentScreenIsNotMainScreen_navigatesToMainScreen() = uiAutomator {
+        // Share a URI with the app
+        val firstPoint = WGS84Point(NaivePoint.genRandomPoint().copy(source = Source.URI))
+        shareUri(firstPoint)
+
+        // Shows result
+        assertConversionSucceeds(firstPoint)
+
+        // Go to about screen
+        onElement { viewIdResourceName == "geoShareMainMenuButton" }.click()
+        onElement { viewIdResourceName == "geoShareMainMenuAbout" }.click()
+
+        // Share another URI with the app
+        val secondPoint = WGS84Point(NaivePoint.genRandomPoint().copy(source = Source.URI))
+        shareUri(secondPoint)
+
+        // Shows result
+        assertConversionSucceeds(secondPoint)
+    }
+
+    @Test
     fun whenLaunched_showsHelpMessagesAndAllowsDismissingThem() = uiAutomator {
         // Launch app
         launchApplication()
         waitForAppToBeVisible()
 
-        // Help message WELCOME is visible
-        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
-
         // Dismiss help message WELCOME
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
-        quickWaitForStableInActiveWindow() // Wait for help message exit animation
+        waitForHelpMessageToDisappear()
         assertNull(
-            onElementOrNull(1_000) {
+            onElementOrNull(500) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}"
             }
         )
 
         // Share a URI with the app
         shareUri()
-
-        // Help message OPEN_BY_DEFAULT is visible
-        quickWaitForStableInActiveWindow() // Wait for the result to render, to prevent stale object exception
-        onMainScrollablePane().scrollToBottom()
-        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
+        quickWaitForStableInActiveWindow() // Wait to prevent clicking a non-clickable element
 
         // Help message SHARE_SOURCE is not visible
-        onMainScrollablePane().scrollToTop()
         assertNull(
-            onElementOrNull(1_000) {
+            onElementOrNull(500) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}"
             }
         )
 
-        // Dismiss help message OPEN_BY_DEFAULT
+        // Dismiss help message OPEN_BY_DEFAULT is visible
         onMainScrollablePane().scrollToBottom()
+        quickWaitForStableInActiveWindow() // Wait to prevent clicking a non-clickable element
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
-        quickWaitForStableInActiveWindow() // Wait for help message exit animation
+        waitForHelpMessageToDisappear()
         assertNull(
-            onElementOrNull(1_000) {
+            onElementOrNull(500) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
             }
         )
@@ -430,13 +443,11 @@ class MainBehaviorTest {
         goBackToMainForm()
         setMainInput()
         submitMainForm()
-
-        // Help message SHARE_SOURCE is visible
-        onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
+        quickWaitForStableInActiveWindow() // Wait to prevent clicking a non-clickable element
 
         // Help message OPEN_BY_DEFAULT is not visible
         assertNull(
-            onElementOrNull(1_000) {
+            onElementOrNull(500) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}"
             }
         )
@@ -445,9 +456,9 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
-        quickWaitForStableInActiveWindow() // Wait for help message exit animation
+        waitForHelpMessageToDisappear()
         assertNull(
-            onElementOrNull(1_000) {
+            onElementOrNull(500) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}"
             }
         )
