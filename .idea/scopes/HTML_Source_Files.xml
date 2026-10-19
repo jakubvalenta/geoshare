@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="HTML Source Files" pattern="file:*.html&amp;&amp;!file[GeoShare]:README.html&amp;&amp;!file[GeoShare]:fastlane/*/screenshots.html" />
+</component>
