@@ -24,6 +24,7 @@ import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.data.preferences.HelpMessage
+import page.ooooo.geoshare.tests.waitForHelpMessageToDisappear
 
 /**
  * Takes screenshots for documentation purposes, such as the Weblate translation service.
@@ -76,7 +77,7 @@ class ScreenshotsManagedDeviceProBehaviorTest {
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
-        quickWaitForStableInActiveWindow() // Wait for help message exit animation
+        waitForHelpMessageToDisappear()
         saveScreenshot("main_strings/conversion_result_check_name_only")
 
         // Conversion - Check - Points name only

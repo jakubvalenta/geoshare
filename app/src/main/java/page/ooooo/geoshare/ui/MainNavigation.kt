@@ -3,7 +3,10 @@ package page.ooooo.geoshare.ui
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -46,13 +49,13 @@ fun MainNavigation(
     onFinish: () -> Unit = {},
 ) {
     val navController = rememberNavController()
-    val source = mainViewModel.source
+    val source by mainViewModel.source.collectAsStateWithLifecycle()
 
     /**
      * Go to main screen if we're on another screen and a new map link has been shared with the app.
      */
     LaunchedEffect(source) {
-        if (navController.currentBackStackEntry != MainRoute) {
+        if (navController.currentBackStackEntry?.destination?.hasRoute<MainRoute>() == false) {
             Log.d(TAG, "Navigating to main screen")
             navController.navigate(MainRoute)
         }

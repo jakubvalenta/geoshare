@@ -23,6 +23,7 @@ import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
 import page.ooooo.geoshare.tests.scrollToAppIcon
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
+import page.ooooo.geoshare.tests.waitForHelpMessageToDisappear
 import page.ooooo.geoshare.tests.waitForToastToDisappear
 import tools.fastlane.screengrab.Screengrab
 import tools.fastlane.screengrab.UiAutomatorScreenshotStrategy
@@ -64,7 +65,7 @@ class MetadataBehaviorTest {
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.WELCOME}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
-        quickWaitForStableInActiveWindow() // Wait for help message exit animation
+        waitForHelpMessageToDisappear()
         Screengrab.screenshot("1")
 
         // Connection permission dialog
@@ -78,7 +79,7 @@ class MetadataBehaviorTest {
         onElement { viewIdResourceName == "geoShareHelpMessage_${HelpMessage.OPEN_BY_DEFAULT}" }
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
-        quickWaitForStableInActiveWindow() // Wait for help message exit animation
+        waitForHelpMessageToDisappear()
         // Hide the Google Maps app
         if (isAppInstalled(PackageNames.GOOGLE_MAPS)) {
             scrollToAppIcon(PackageNames.GOOGLE_MAPS).longClick()

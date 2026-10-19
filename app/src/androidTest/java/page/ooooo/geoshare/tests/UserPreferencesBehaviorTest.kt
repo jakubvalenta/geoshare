@@ -8,11 +8,11 @@ import androidx.test.uiautomator.uiAutomator
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.database.InitialLinks
 import page.ooooo.geoshare.data.formatters.CoordinateFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
-import page.ooooo.geoshare.data.geo.GCJ02Point
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Source
@@ -23,7 +23,7 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class UserPreferencesBehaviorTest {
     @Test
-    fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormat() = uiAutomator {
+    fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormatInWGS84() = uiAutomator { // FIXME
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
@@ -32,18 +32,15 @@ class UserPreferencesBehaviorTest {
         launchApplication()
         waitForAppToBeVisible()
 
-        // Share a URI with the app
-        shareUri("geo:52.5067296,13.2599309")
+        // Share a GCJ-02 URI with the app
+        val gcj02Point = coordinateConverter.toGCJ02(WGS84Point.ForbiddenCity)
+        shareUri("https://maps.google.com/?q=${gcj02Point.lat},${gcj02Point.lon}")
 
-        // Shows coordinates in the decimal degrees format
+        // Shows WGS 84 coordinates in the decimal degrees format
         onElement {
             if (viewIdResourceName == "geoShareResultLastPointCoordinates") {
                 assertEquals(
-                    CoordinateFormatter.formatDecCoords(
-                        coordinateConverter.toWGS84(
-                            GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
-                        )
-                    ),
+                    CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(gcj02Point)),
                     textAsString(),
                 )
                 true
@@ -56,16 +53,12 @@ class UserPreferencesBehaviorTest {
         goToUserPreferencesDetail(UserPreferenceGroupId.COORDINATE_FORMAT)
         onElement { viewIdResourceName == "geoShareUserPreferenceCoordinateFormat_${CoordinateFormat.DEG_MIN_SEC}" }.click()
 
-        // Shows coordinates in the degrees, minutes, seconds format
+        // Shows WGS 84 coordinates in the degrees, minutes, seconds format
         val coordinates = goBackToElement(
             2_000 // Increase timeout to prevent coordinate element not found on tablet
         ) { viewIdResourceName == "geoShareResultLastPointCoordinates" }
         assertEquals(
-            CoordinateFormatter.formatDegMinSecCoords(
-                coordinateConverter.toWGS84(
-                    GCJ02Point(52.5067296, 13.2599309, source = Source.MAP_CENTER)
-                )
-            ),
+            CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(gcj02Point)),
             coordinates.text,
         )
     }
@@ -73,14 +66,11 @@ class UserPreferencesBehaviorTest {
     @Test
     fun whenFinishIsAfterActionSucceeded_appClosesItselfAfterCopyingCoordinates() = uiAutomator {
         // Share a unique URI with the app
-        val point = WGS84Point(NaivePoint.genRandomPoint())
+        val point = WGS84Point(NaivePoint.genRandomPoint().copy(source = Source.URI))
         shareUri(point)
 
-        // Shows result coordinates
-        onElement {
-            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
-                textAsString() == CoordinateFormatter.formatDecCoords(point)
-        }
+        // App is visible and shows result
+        assertConversionSucceeds(point)
 
         // Copy coordinates
         onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
@@ -96,11 +86,8 @@ class UserPreferencesBehaviorTest {
         }
         quickWaitForStableInActiveWindow()
 
-        // App still shows coordinates
-        onElement {
-            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
-                textAsString() == CoordinateFormatter.formatDecCoords(point)
-        }
+        // App is visible and shows result
+        assertConversionSucceeds(point)
 
         // Set finish preference to Always
         goToUserPreferencesDetail(UserPreferenceGroupId.FINISH)
@@ -124,12 +111,7 @@ class UserPreferencesBehaviorTest {
         quickWaitForStableInActiveWindow()
 
         // App is not visible
-        assertNull(
-            onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
-                viewIdResourceName == "geoShareResultLastPointCoordinates" &&
-                    textAsString() == CoordinateFormatter.formatDecCoords(point)
-            }
-        )
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { packageName == BuildConfig.APPLICATION_ID })
     }
 
     @Test
@@ -137,14 +119,11 @@ class UserPreferencesBehaviorTest {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a unique URI with the app
-        val point = WGS84Point(NaivePoint.genRandomPoint())
+        val point = WGS84Point(NaivePoint.genRandomPoint().copy(source = Source.URI))
         shareUri(point)
 
-        // Shows result coordinates
-        onElement {
-            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
-                textAsString() == CoordinateFormatter.formatDecCoords(point)
-        }
+        // App is visible and shows result
+        assertConversionSucceeds(point)
 
         // Open Google Maps
         scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()
@@ -158,12 +137,7 @@ class UserPreferencesBehaviorTest {
         pressBack()
 
         // App is not visible
-        assertNull(
-            onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) {
-                viewIdResourceName == "geoShareResultLastPointCoordinates" &&
-                    textAsString() == CoordinateFormatter.formatDecCoords(point)
-            }
-        )
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { packageName == BuildConfig.APPLICATION_ID })
 
         // Share the URI with the app again
         shareUri(point)
@@ -186,11 +160,8 @@ class UserPreferencesBehaviorTest {
         quickWaitForStableInActiveWindow()
         pressBack()
 
-        // App is visible and still shows the result
-        onElement {
-            viewIdResourceName == "geoShareResultLastPointCoordinates" &&
-                textAsString() == CoordinateFormatter.formatDecCoords(point)
-        }
+        // App is visible and shows result
+        assertConversionSucceeds(point)
     }
 
     @Test

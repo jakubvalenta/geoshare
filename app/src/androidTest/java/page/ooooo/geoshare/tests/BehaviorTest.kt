@@ -98,6 +98,12 @@ fun UiAutomatorTestScope.quickWaitForStableInActiveWindow() {
     waitForStableInActiveWindow(stableTimeoutMs = 1_000, stableIntervalMs = 100, requireStableScreenshot = false)
 }
 
+fun waitForHelpMessageToDisappear() {
+    runBlocking {
+        delay(1.1.seconds)
+    }
+}
+
 fun waitForToastToDisappear() {
     runBlocking {
         delay(5.seconds)
@@ -226,6 +232,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     val geometries = Geometries(context)
     val coordinateConverter = CoordinateConverter(geometries)
 
+    // Card
     onElement(timeoutMs) {
         when (viewIdResourceName) {
             "geoShareResultLastPointName" -> true
@@ -234,6 +241,8 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
         }
     }
     val lastPoint = expectedPoints.lastOrNull() ?: return
+
+    // Name
     lastPoint.cleanName.let { expectedName ->
         val expectedNames = if (!expectedName.isNullOrEmpty()) {
             setOf(expectedName) + fallbackNames
@@ -254,6 +263,8 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
             }
         }
     }
+
+    // Coordinates
     if (lastPoint.hasCoordinates()) {
         val expectedCoordinatesOptions = CoordinateFormat.entries.map { coordinateFormat ->
             when (coordinateFormat) {
@@ -277,33 +288,37 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
                 false
             }
         }
-    } else {
-        onElement { viewIdResourceName == "geoShareResultCheckNameOnly" }
     }
-    lastPoint.source.let { expectedSource ->
-        onElement { viewIdResourceName == "geoShareResultLastPointSource_${expectedSource}" }
-        if (!(accurate ?: lastPoint.isAccurate())) {
-            onElement { viewIdResourceName == "geoShareResultCheckSRS" }
-        } else {
-            when (expectedSource) {
-                Source.HTML_NOT_SEMANTIC, Source.JAVASCRIPT_STATE ->
-                    onElement { viewIdResourceName == "geoShareResultCheckExperimental" }
 
-                Source.MAP_CENTER ->
-                    onElement { viewIdResourceName == "geoShareResultCheckMapCenter" }
+    // Checks
+    if (!lastPoint.hasCoordinates()) {
+        onElement { viewIdResourceName == "geoShareResultCheckNameOnly" }
+    } else if (!(accurate ?: lastPoint.isAccurate())) {
+        onElement { viewIdResourceName == "geoShareResultCheckSRS" }
+    } else {
+        when (lastPoint.source) {
+            Source.HTML_NOT_SEMANTIC, Source.JAVASCRIPT_STATE ->
+                onElement { viewIdResourceName == "geoShareResultCheckExperimental" }
 
-                Source.API,
-                Source.GENERATED,
-                Source.GPS_SENSOR,
-                Source.HASH,
-                Source.HTML_SEMANTIC,
-                Source.TEXT,
-                Source.URI,
-                    -> {
-                }
+            Source.MAP_CENTER ->
+                onElement { viewIdResourceName == "geoShareResultCheckMapCenter" }
+
+            Source.API,
+            Source.GENERATED,
+            Source.GPS_SENSOR,
+            Source.HASH,
+            Source.HTML_SEMANTIC,
+            Source.TEXT,
+            Source.URI,
+                -> {
             }
         }
     }
+
+    // Source
+    onElement { viewIdResourceName == "geoShareResultLastPointSource_${lastPoint.source}" }
+
+    // All points
     if (expectedPoints.size > 1) {
         // Notice that we don't test the coordinates of the points but only their number
         val expectedPointsNumber = "(${expectedPoints.size})"
