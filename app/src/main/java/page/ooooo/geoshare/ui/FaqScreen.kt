@@ -35,7 +35,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.Hyphens
@@ -49,13 +48,11 @@ import page.ooooo.geoshare.data.android.openSettingsOpenByDefault
 import page.ooooo.geoshare.data.android.openSettingsOpenByDefaultForPackage
 import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.ui.components.ExpandablePane
+import page.ooooo.geoshare.ui.components.FaqHowItWorksText
 import page.ooooo.geoshare.ui.components.NavigationBackButton
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefault
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefaultMapApp
-import page.ooooo.geoshare.ui.components.TextList
-import page.ooooo.geoshare.ui.components.TextListBullet
-import page.ooooo.geoshare.ui.components.TextListItem
 import page.ooooo.geoshare.ui.string.FormatArg
 import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -140,46 +137,7 @@ private fun FaqScreen(
                     title = stringResource(R.string.faq_how_headline),
                     modifier = Modifier.padding(top = spacing.small),
                 ) {
-                    ParagraphText(
-                        stringResource(R.string.faq_how_text_1, appName)
-                    )
-                    ParagraphText(
-                        stringResource(R.string.faq_how_text_2, appName)
-                    )
-                    TextList(verticalSpace = spacing.tiny) {
-                        listOf(
-                            R.string.faq_how_text_2_item_http to R.string.faq_how_text_2_item_http_example,
-                            R.string.faq_how_text_2_item_html to R.string.faq_how_text_2_item_html_example,
-                            R.string.faq_how_text_2_item_api to R.string.faq_how_text_2_item_api_example,
-                            R.string.faq_how_text_2_item_web to null,
-                        ).forEach { (textResId, exampleResId) ->
-                            TextListItem(bullet = { TextListBullet() }) {
-                                Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny / 2)) {
-                                    Text(stringResource(textResId))
-                                    exampleResId?.let { exampleResId ->
-                                        Text(
-                                            stringResource(R.string.example, stringResource(exampleResId)),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontStyle = FontStyle.Italic,
-                                            style = MaterialTheme.typography.bodySmall,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    ParagraphText(
-                        stringResource(R.string.faq_how_text_3, appName)
-                    )
-                    ParagraphText(
-                        annotatedStringResource(
-                            R.string.faq_how_text_4,
-                            tertiaryLinkStyles(),
-                            FormatArg.Link(stringResource(R.string.faq_how_text_4_preferences_button)) {
-                                onNavigateToUserPreferencesScreen(UserPreferenceGroupId.CONNECTION_PERMISSION)
-                            },
-                        )
-                    )
+                    FaqHowItWorksText(onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen)
                 }
             }
             item(key = "how_it_works_divider", contentType = "faq_divider") {

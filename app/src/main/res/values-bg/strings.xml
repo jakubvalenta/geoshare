@@ -136,9 +136,8 @@
     <string name="faq_how_headline">Как работи</string>
     <string name="faq_how_text_1">%1$s преобразува връзките към картите в geo: връзки, които могат да се отварят от други приложения за карти. За да се създаде гео: връзка, са необходими географски координати. %1$s ги извлича от URL адреса на картата.</string>
     <string name="faq_how_text_2">Въпреки това, не всички URL адреси на картите съдържат координати. В такива случаи %1$s ще ви поиска разрешение да се свържете с картата (Google Maps, Apple Maps и др.) и да получите координатите от:</string>
-    <string name="faq_how_text_2_item_http">или HTTP заглавия,</string>
-    <string name="faq_how_text_2_item_html">или HTML документ,</string>
-    <string name="faq_how_text_2_item_web">или на живо уеб страница, включваща JavaScript.</string>
+    <string name="faq_how_text_2_item_http">или HTTP заглавия</string>
+    <string name="faq_how_text_2_item_html">или HTML документ</string>
     <string name="faq_how_text_3">Ако не разрешите свързването с картографската услуга, %1$s създава geo: връзка с име на място вместо координати или спира, в зависимост от конкретната връзка.</string>
     <string name="faq_how_text_4">За да разрешите или откажете постоянно свързване с картографската услуга, вместо винаги да питате (по подразбиране), отидете в %1$s на приложението.</string>
     <string name="faq_how_text_4_preferences_button">предпочитания</string>
@@ -236,7 +235,7 @@
     <string name="output_send">Изпрати точка</string>
     <string name="output_send_via">Изпрати точка чрез %1$s</string>
     <string name="conversion_failed_reason_exception">Неизвестно изключение</string>
-    <string name="faq_how_text_2_item_api">или API на картографската услуга,</string>
+    <string name="faq_how_text_2_item_api">или API на картографската услуга</string>
     <string name="faq_privacy_text_server">За някои връзки към карти, %1$s извиква отдалечен сървър, %3$s с отворен код. След това този сървър извиква API на картографската услуга (напр. API на Google Maps). %2$s не пази лог файлове на връзки към карти. За да приложи ограничаване на скоростта, той съхранява публичен ключ, който идентифицира вашето устройство и отделно вашия IP адрес за ограничено време.</string>
     <string name="faq_privacy_text_html">За някои връзки към карти, %1$s зарежда активната уеб страница на картографската услуга и изпълнява нейния JavaScript. Това се случва в ограничена среда, която блокира скриптове за проследяване и не съхранява „бисквитки“.</string>
     <string name="conversion_failed_unsupported_source_place_list">Списъците с места не се поддържат</string>

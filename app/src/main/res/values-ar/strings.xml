@@ -160,9 +160,8 @@
     <string name="faq_how_headline">كيف يعمل</string>
     <string name="faq_how_text_1">يقوم %1$s بتحويل روابط الخرائط إلى روابط geo: يمكن فتحها بواسطة تطبيقات الخرائط الأخرى. لإنشاء رابط geo:، يلزم توفّر إحداثيات جغرافية، حيث يستخرجها %1$s من عنوان URL الخاص بالخريطة.</string>
     <string name="faq_how_text_2">ومع ذلك، لا تتضمن جميع عناوين URL للخرائط إحداثيات. في مثل هذه الحالات، سيطلب منك %1$s الإذن للاتصال بخدمة الخرائط (خرائط Google، أو خرائط Apple، إلخ) واسترداد الإحداثيات من:</string>
-    <string name="faq_how_text_2_item_http">إما ترويسات HTTP،</string>
-    <string name="faq_how_text_2_item_html">أو مستند HTML،</string>
-    <string name="faq_how_text_2_item_web">أو صفحة الويب المباشرة بما في ذلك جافا سكريبت.</string>
+    <string name="faq_how_text_2_item_http">إما ترويسات HTTP</string>
+    <string name="faq_how_text_2_item_html">أو مستند HTML</string>
     <string name="faq_how_text_3">إذا لم تسمح بالاتصال بخدمة الخرائط، فسيقوم %1$s بإنشاء رابط geo: باستخدام اسم المكان بدلاً من الإحداثيات، أو سيتوقف عن العمل، وذلك حسب الرابط المعني.</string>
     <string name="faq_how_text_4">للسماح بالاتصال بخدمة الخرائط أو رفضه بشكل دائم بدلاً من السؤال في كل مرة (الخيار الافتراضي)، انتقل إلى %1$s الخاص بالتطبيق.</string>
     <string name="faq_how_text_4_preferences_button">التفضيلات</string>
@@ -266,7 +265,7 @@
     <string name="output_send">أرسل نقطة</string>
     <string name="output_send_via">أرسل نقطة عبر %1$s</string>
     <string name="conversion_failed_reason_exception">استثناء غير معروف</string>
-    <string name="faq_how_text_2_item_api">أو واجهة برمجة التطبيقات (API) لخدمة الخرائط،</string>
+    <string name="faq_how_text_2_item_api">أو واجهة برمجة التطبيقات (API) لخدمة الخرائط</string>
     <string name="faq_privacy_text_server">بالنسبة لبعض روابط الخرائط، يقوم %1$s بالاتصال بخادم بعيد، %3$s المفتوح المصدر. ثم يقوم هذا الخادم بالاتصال API خدمة الخرائط (مثل API خرائط Google). لا يحتفظ %2$s بسجلات لروابط الخرائط. ولتطبيق الحد الأقصى لعدد الطلبات، يقوم بتخزين مفتاح عام يحدد جهازك وعنوان IP الخاص بك بشكل منفصل لفترة محدودة.</string>
     <string name="faq_privacy_text_html">بالنسبة لبعض روابط الخرائط، يقوم %1$s بتحميل صفحة الويب المباشرة لخدمة الخرائط وتنفيذ جافا سكريبت الخاصة بها. ويحدث ذلك في بيئة مقيدة، تعمل على حظر نصوص التتبع ولا تقوم بتخزين ملفات تعريف الارتباط.</string>
     <string name="conversion_failed_unsupported_source_place_list">قوائم المواقع غير مدعومة</string>

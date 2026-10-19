@@ -118,9 +118,8 @@
     <string name="conversion_automation_save_gpx_succeeded">GPX otomatik olarak kaydedildi</string>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Şu nedenden dolayı %2$d denemeden %1$d’i başarısız oldu: %3$s</string>
     <string name="faq_how_headline">Nasıl çalışır</string>
-    <string name="faq_how_text_2_item_http">HTTP başlıkları,</string>
-    <string name="faq_how_text_2_item_html">HTML belgesi,</string>
-    <string name="faq_how_text_2_item_web">ya da JavaScript içeren canlı web sayfası.</string>
+    <string name="faq_how_text_2_item_http">HTTP başlıkları</string>
+    <string name="faq_how_text_2_item_html">HTML belgesi</string>
     <string name="faq_how_text_4_preferences_button">tercihler</string>
     <string name="faq_location_permission_headline">Konum izni</string>
     <string name="faq_privacy_headline">Gizlilik hususları</string>
@@ -236,7 +235,7 @@
     <string name="conversion_failed_reason_exception">Bilinmeyen istisna</string>
     <string name="output_save_to_contact_failed">Nokta rehbere kaydedilemedi</string>
     <string name="output_save_to_contact_automation_failed">Nokta otomatik olarak rehbere kaydedilemedi</string>
-    <string name="faq_how_text_2_item_api">harita servisinin API’si,</string>
+    <string name="faq_how_text_2_item_api">harita servisinin API’si</string>
     <string name="conversion_failed_unsupported_source_place_list">Yer listeleri desteklenmiyor</string>
     <string name="network_exception_connect_exception">Bağlantı reddedildi</string>
     <string name="network_exception_unauthorized">Yetkisiz</string>

@@ -134,9 +134,8 @@
     <string name="faq_how_headline">Como funciona</string>
     <string name="faq_how_text_1">O %1$s converte links de mapa em links geo: que podem ser abertos por qualquer apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O %1$s extrai elas da URL de mapa.</string>
     <string name="faq_how_text_2">Entretanto, nem todos as URLs de mapa incluem coordenadas. Nesses casos, o %1$s te pedirá para conectar ao mapa (Google Maps, Apple Maps, etc.) e obter as coordenadas de:</string>
-    <string name="faq_how_text_2_item_http">cabeçalhos HTTP,</string>
-    <string name="faq_how_text_2_item_html">documento HTML,</string>
-    <string name="faq_how_text_2_item_web">ou da página ativa incluindo JavaScript.</string>
+    <string name="faq_how_text_2_item_http">cabeçalhos HTTP</string>
+    <string name="faq_how_text_2_item_html">documento HTML</string>
     <string name="faq_how_text_3">Se não permitir a conexão ao mapa, então o %1$s criará um link geo: com o nome do lugar em vez das coordenadas, ou ele será interrompido, dependendo do link.</string>
     <string name="faq_how_text_4">Para sempre permitir ou bloquear a conexão com o mapa, em vez de sempre perguntar (o padrão), vá às %1$s do app.</string>
     <string name="faq_how_text_4_preferences_button">preferências</string>
@@ -243,7 +242,7 @@
     <string name="output_send">Enviar ponto</string>
     <string name="output_send_via">Enviar ponto via %1$s</string>
     <string name="conversion_failed_reason_exception">Exceção desconhecida</string>
-    <string name="faq_how_text_2_item_api">ou a API do mapa,</string>
+    <string name="faq_how_text_2_item_api">ou a API do mapa</string>
     <string name="faq_privacy_text_server">Para alguns links de mapa, o %1$s fala com um servidor remoto, o %3$s que é de código aberto. E então, esse servidor fala com a API do mapa (como a API do Google Maps). O %2$s não mantém registros dos links de mapa. Para aplicar uma taxa de limite, ele guarda uma chave pública que identifica seu dispositivo, e separadamente seu endereço IP por um tempo limitado.</string>
     <string name="faq_privacy_text_html">Para alguns links de mapa, o %1$s carrega a página viva do mapa e executa JavaScript. Isto ocorre em um ambiente restrito, que bloqueia scripts de rastreamento e não armazena cookies.</string>
     <string name="conversion_failed_unsupported_source_place_list">Listas de lugares não são suportadas</string>
