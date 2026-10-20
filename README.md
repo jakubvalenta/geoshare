@@ -243,11 +243,40 @@ json_key_file("path/to/play-store-credentials.json")
 package_name("page.ooooo.geoshare.pro")
 ```
 
-### Updating Google Play metadata
+### Updating F-Droid and Google Play listings
+
+To update F-Droid store listing, run:
+
+```shell
+./gradlew copyEnabledMetadata
+```
+
+To update Google Play listing, run:
 
 ```shell
 fastlane metadata
 ```
+
+### Enabling translations
+
+New translations must be explicitly enabled, so that the app is only translated
+into a language once the translation is complete, and not when the translation
+is still in progress.
+
+To enable a new translation, edit:
+
+1. `app/build.gradle.kts`: the `localeFilters` list
+2. `app/build.gradle.kts`: the `copyEnabledMetadata` task
+3. `app/src/main/res/xml/locales_config.xml`
+
+Notice that to publish only the enabled translation to F-Droid and Google Play
+listings, metadata files are stored in `fastlane/metadata_src` and only the
+enabled ones are copied to `fastlane/metadata`.
+
+This means that `fastlane/metadata_src` is the source of truth, and you must not
+edit the files in `fastlane/metadata`. To change which translations are copied
+to `fastlane/metadata`, edit the `copyEnabledMetadata` task in
+`app/build.gradle.kts`.
 
 ### Taking screenshots for F-Droid and Google Play listing
 
