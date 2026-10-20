@@ -17,7 +17,7 @@
     <string name="conversion_permission">Spojit se se službou %1$s?</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Zrušit</string>
-    <string name="conversion_permission_common_text"><![CDATA[Odkaz <tt>%1$s</tt> neobsahuje souřadnice. %2$s se musí spojit s danou mapovou službou, aby je získal.]]></string>
+    <string name="conversion_permission_common_text">Odkaz %1$s neobsahuje souřadnice. %2$s se musí spojit s danou mapovou službou, aby je získal.</string>
     <string name="about_title">O aplikaci</string>
     <string name="about_app_icon_content_description">Ikona aplikace</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

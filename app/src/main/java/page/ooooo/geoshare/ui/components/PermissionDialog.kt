@@ -22,14 +22,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Preview
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.extensions.truncateMiddle
 import page.ooooo.geoshare.data.inputs.GoogleMapsInputGroup
+import page.ooooo.geoshare.ui.string.FormatArg
+import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 
 @Composable
 fun PermissionDialog(
@@ -91,13 +97,13 @@ private fun DefaultPreview() {
                 onDismissRequest = {},
             ) {
                 val appName = stringResource(R.string.app_name)
-                val uriString =
+                val match =
                     "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
                 Text(
                     AnnotatedString.fromHtml(
                         stringResource(
                             R.string.conversion_permission_common_text,
-                            uriString,
+                            match,
                             appName,
                         )
                     ),
@@ -124,15 +130,17 @@ private fun DarkPreview() {
                 onDismissRequest = {},
             ) {
                 val appName = stringResource(R.string.app_name)
-                val uriString =
+                val match =
                     "https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg?g_ep=CAISDTYuMTE5LjEuNjYwNTAYASC33wEqbCw5NDIyNDgxOSw5NDIyNzI0NSw5NDIyNzI0Niw0NzA3MTcwNCw5NDIwNjE2Niw0NzA2OTUwOCw5NDIxNDE3Miw5NDIxODY0MSw5NDIwMzAxOSw0NzA4NDMwNCw5NDIwODQ1OCw5NDIwODQ0N0ICREU%3D&g_st=isi"
                 Text(
-                    AnnotatedString.fromHtml(
-                        stringResource(
-                            R.string.conversion_permission_common_text,
-                            uriString,
-                            appName,
-                        )
+                    annotatedStringResource(
+                        R.string.conversion_permission_common_text,
+                        textLinkStyles = defaultLinkStyles(),
+                        FormatArg.Text(
+                            match.truncateMiddle(),
+                            style = SpanStyle(fontFamily = FontFamily.Monospace),
+                        ),
+                        FormatArg.Text(appName),
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
                 )
@@ -160,14 +168,16 @@ private fun ParseHtmlPermissionPreview() {
                     .testTag("geoShareConnectionPermissionDialog"),
             ) {
                 val appName = stringResource(R.string.app_name)
-                val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+                val match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
                 Text(
-                    AnnotatedString.fromHtml(
-                        stringResource(
-                            R.string.conversion_permission_common_text,
-                            uriString,
-                            appName,
-                        )
+                    annotatedStringResource(
+                        R.string.conversion_permission_common_text,
+                        textLinkStyles = defaultLinkStyles(),
+                        FormatArg.Text(
+                            match.truncateMiddle(),
+                            style = SpanStyle(fontFamily = FontFamily.Monospace),
+                        ),
+                        FormatArg.Text(appName),
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
                 )
@@ -195,14 +205,16 @@ private fun DarkParseHtmlPermissionPreview() {
                     .testTag("geoShareConnectionPermissionDialog"),
             ) {
                 val appName = stringResource(R.string.app_name)
-                val uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+                val match = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
                 Text(
-                    AnnotatedString.fromHtml(
-                        stringResource(
-                            R.string.conversion_permission_common_text,
-                            uriString,
-                            appName,
-                        )
+                    annotatedStringResource(
+                        R.string.conversion_permission_common_text,
+                        textLinkStyles = defaultLinkStyles(),
+                        FormatArg.Text(
+                            match.truncateMiddle(),
+                            style = SpanStyle(fontFamily = FontFamily.Monospace),
+                        ),
+                        FormatArg.Text(appName),
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
                 )

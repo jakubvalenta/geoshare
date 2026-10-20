@@ -8,7 +8,7 @@
     <string name="main_create_geo_uri">Koordinaten anzeigen</string>
     <string name="conversion_permission">Mit %1$s verbinden?</string>
     <string name="conversion_permission_common_deny">Abbrechen</string>
-    <string name="conversion_permission_common_text"><![CDATA[Der Link <tt>%1$s</tt> enthält keine Koordinaten. %2$s muss sich mit dem Kartendienst verbinden, um sie zu erhalten.]]></string>
+    <string name="conversion_permission_common_text">Der Link %1$s enthält keine Koordinaten. %2$s muss sich mit dem Kartendienst verbinden, um sie zu erhalten.</string>
     <string name="conversion_succeeded_apps_headline">Öffnen mit</string>
     <string name="nav_back_content_description">Zurück zur Startseite</string>
     <string name="main_input_uri_label">Füge hier einen Kartenlink ein</string>

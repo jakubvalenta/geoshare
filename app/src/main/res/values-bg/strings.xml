@@ -17,7 +17,7 @@
     <string name="intro_settings_activity_not_found">Неуспешно отваряне на настройките</string>
     <string name="conversion_permission_common_deny">Отказ</string>
     <string name="conversion_error_report">Докладване на проблем</string>
-    <string name="conversion_permission_common_text"><![CDATA[Връзката <tt>%1$s</tt> не съдържа координати. %2$s трябва да се свърже с картографската услуга, за да ги получи.]]></string>
+    <string name="conversion_permission_common_text">Връзката %1$s не съдържа координати. %2$s трябва да се свърже с картографската услуга, за да ги получи.</string>
     <string name="user_preferences_connection_title">Връзка с картографска услуга</string>
     <string name="yes">Да</string>
     <string name="user_preferences_connection_option_ask">Попитай, преди да се свържеш</string>

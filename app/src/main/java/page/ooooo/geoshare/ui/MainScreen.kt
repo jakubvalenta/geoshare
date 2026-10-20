@@ -38,7 +38,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
@@ -129,8 +131,11 @@ import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
+import page.ooooo.geoshare.ui.string.FormatArg
+import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
+import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 import kotlin.time.ComparableTimeMark
 import kotlin.time.TestTimeSource
 
@@ -692,12 +697,14 @@ private fun MainScreen(
             ) {
                 val appName = stringResource(R.string.app_name)
                 Text(
-                    AnnotatedString.fromHtml(
-                        stringResource(
-                            R.string.conversion_permission_common_text,
+                    annotatedStringResource(
+                        R.string.conversion_permission_common_text,
+                        textLinkStyles = defaultLinkStyles(),
+                        FormatArg.Text(
                             conversionState.matchedInput.match.truncateMiddle(),
-                            appName,
-                        )
+                            style = SpanStyle(fontFamily = FontFamily.Monospace),
+                        ),
+                        FormatArg.Text(appName),
                     ),
                     style = TextStyle(lineBreak = LineBreak.Paragraph),
                 )

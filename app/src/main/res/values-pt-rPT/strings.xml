@@ -33,7 +33,7 @@
     <string name="conversion_loading_indicator_cancel">Cancelar</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
-    <string name="conversion_permission_common_text"><![CDATA[A ligação <tt>%1$s</tt> não contém coordenadas. O %2$s precisa conectar ao mapa para obtê-las.]]></string>
+    <string name="conversion_permission_common_text">A ligação %1$s não contém coordenadas. O %2$s precisa conectar ao mapa para obtê-las.</string>
     <string name="about_title">Sobre</string>
     <string name="about_app_icon_content_description">Ícone da app</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>

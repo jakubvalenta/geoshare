@@ -20,7 +20,7 @@
     <string name="faq_title">FAQ</string>
     <string name="about_title">O aplikacji</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
-    <string name="conversion_permission_common_text"><![CDATA[Link <tt>%1$s</tt> nie zawiera współrzędnych ani nazwy miejsca. %2$s musi połączyć się z Google, aby uzyskać informacje.]]></string>
+    <string name="conversion_permission_common_text">Link %1$s nie zawiera współrzędnych ani nazwy miejsca. %2$s musi połączyć się z Google, aby uzyskać informacje.</string>
     <string name="conversion_error_report">zgłoś problem</string>
     <string name="user_preferences_title">Ustawienia</string>
     <string name="intro_open_by_default_app_note">Jeśli niektóre linki są wyszarzone, inne aplikacje Google są domyślnie ustawione do ich otwierania. Możesz znaleźć te aplikacje i wyłączyć dla nich otwieranie linków, tak jak zrobiliśmy to w przypadku Map Google</string>

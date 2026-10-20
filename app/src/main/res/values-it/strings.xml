@@ -9,7 +9,7 @@
     <string name="intro_settings_activity_not_found">Impossibile aprire le impostazioni</string>
     <string name="main_input_uri_label">Incolla qui un link della mappa</string>
     <string name="main_create_geo_uri">Mostra coordinate</string>
-    <string name="conversion_permission_common_text"><![CDATA[Il link <tt>%1$s</tt> non contiene coordinate o nomi di luoghi. %2$s deve connettersi a Google per ottenere le informazioni.]]></string>
+    <string name="conversion_permission_common_text">Il link %1$s non contiene coordinate o nomi di luoghi. %2$s deve connettersi a Google per ottenere le informazioni.</string>
     <string name="about_title">Info su</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
     <string name="user_preferences_connection_title">Consenti la connessione a Google?</string>

@@ -30,7 +30,7 @@
     <string name="nav_back_content_description">Volver a la pantalla principal</string>
     <string name="intro_open_by_default_app_note">Si algunos enlaces aparecen en gris, otras aplicaciones de mapa están fijados para abrirlos por defecto. Puede encontrar estas apps y apagar la apertura de tales enlaces, como se hizo en Google Maps.</string>
     <string name="intro_settings_activity_not_found">Error al abrir ajustes</string>
-    <string name="conversion_permission_common_text"><![CDATA[El enlace <tt>%1$s</tt> no contiene coordenadas. %2$s necesita conectar al servicio de mapas para obtenerlos.]]></string>
+    <string name="conversion_permission_common_text">El enlace %1$s no contiene coordenadas. %2$s necesita conectar al servicio de mapas para obtenerlos.</string>
     <string name="main_input_uri_clear_content_description">Vaciar</string>
     <string name="about_text"><![CDATA[<p>%1$s es una aplicación libre y de código abierto distribuido bajo la licencia <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> o superior.</p><br><p>Puede encontrar el código por <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, donde puede también<a href="https://github.com/jakubvalenta/geoshare/issues">reportar incidentes</a>.</p><br><p>Sus comentarios son bienvenidos. Puede contactarme vía <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_title">¿Permitir conectarse al servicio de mapas (Google, Apple, etc.)?</string>
