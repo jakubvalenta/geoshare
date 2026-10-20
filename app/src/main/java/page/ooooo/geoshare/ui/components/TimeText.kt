@@ -16,7 +16,7 @@ import kotlin.time.DurationUnit
 
 @Composable
 fun ElapsedTimeText(start: ComparableTimeMark) {
-    var elapsedTime by remember { mutableStateOf(start.elapsedNow()) }
+    var elapsedTime by remember(start) { mutableStateOf(start.elapsedNow()) }
 
     LaunchedEffect(start) {
         while (true) {

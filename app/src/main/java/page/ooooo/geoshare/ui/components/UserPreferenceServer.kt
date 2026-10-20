@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -80,7 +79,7 @@ fun UserPreferenceServerControls(
 
     val selectedServers by selectedServers.collectAsStateWithLifecycle()
     val servers by servers.collectAsStateWithLifecycle()
-    val optionGroups = remember(servers) { listOf(listOf(null) + servers) }
+    val optionGroups = listOf(listOf(null) + servers)
 
     UserPreferenceControls(
         titleResId = R.string.server_list_title,

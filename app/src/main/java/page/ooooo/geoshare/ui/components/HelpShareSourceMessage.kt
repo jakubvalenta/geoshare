@@ -9,7 +9,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -87,7 +86,7 @@ fun HelpShareSourceMessage(
 
         val helpMessage = HelpMessage.SHARE_SOURCE
         val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
-        val visible = remember(dismissedHelpMessages) { !helpMessage.isDismissed(dismissedHelpMessages) }
+        val visible = !helpMessage.isDismissed(dismissedHelpMessages)
 
         HelpMessageCard(
             title = { Text(stringResource(R.string.help_share_source_title)) },

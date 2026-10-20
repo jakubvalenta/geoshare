@@ -20,7 +20,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -150,9 +149,9 @@ fun <T> LazyListScope.userPreferenceTextControl(
     suffix: (@Composable () -> String)? = null,
 ) {
     item(key, contentType = "text_field") {
-        val value = remember(userPreference, values) { userPreference.getValue(values) }
+        val value = userPreference.getValue(values)
         var inputValue by retain { mutableStateOf(userPreference.serialize(value)) }
-        val isValid = remember(userPreference, inputValue) { userPreference.isValid(inputValue) }
+        val isValid = userPreference.isValid(inputValue)
 
         TextField(
             value = inputValue,

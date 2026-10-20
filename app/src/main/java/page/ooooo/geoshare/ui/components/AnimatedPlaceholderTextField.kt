@@ -87,13 +87,10 @@ fun AnimatedPlaceholderTextField(
         colors.placeholderColor(enabled, isError, isFocused)
     }
 
-    val animationDurationMs = remember(placeholderAnimationDuration) {
-        placeholderAnimationDuration.toInt(DurationUnit.MILLISECONDS)
-    }
+    val animationDurationMs = placeholderAnimationDuration.toInt(DurationUnit.MILLISECONDS)
     val placeholderTransition = remember(animationDurationMs) {
         slideInVertically(
             animationSpec = tween(animationDurationMs, easing = LinearEasing),
-
             initialOffsetY = { fullHeight -> 2 * fullHeight }
         ) togetherWith slideOutVertically(
             animationSpec = tween(animationDurationMs, easing = LinearEasing),
