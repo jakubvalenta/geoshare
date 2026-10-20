@@ -9,9 +9,9 @@
     <string name="conversion_permission">Свързване с %1$s?</string>
     <string name="conversion_permission_common_grant">Добре</string>
     <string name="nav_back_content_description">Връщане към основния екран</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Първо отидете на Настройки ➞ Приложения ➞ Карти ➞ <i>Отваряне по подразбиране</i> и изключете отварянето на връзки в това приложение.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Първо отидете на Настройки ➞ Приложения ➞ Карти ➞ %1$s и изключете отварянето на връзки в това приложение.</string>
     <string name="intro_open_by_default_app_button">Отворете настройките на %1$s</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[След това отидете на Настройки ➞ Приложения ➞ %1$s ➞ <i>Отваряне по подразбиране</i>, включете отварянето на връзки в това приложение и докоснете <i>Добавяне на връзки</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">След това отидете на Настройки ➞ Приложения ➞ %1$s ➞ %2$s, включете отварянето на връзки в това приложение и докоснете %3$s.</string>
     <string name="intro_open_by_default_app_note">Ако някои връзки са сиви, други приложения за карти са настроени да ги отварят по подразбиране. Можете да намерите тези приложения и да изключите отварянето на връзки за тях, както направихме за Google Maps. Проверете също приложенията, инсталирани в личното пространство, ако използвате тази функция на Android.</string>
     <string name="intro_nav_close">Затвори</string>
     <string name="intro_settings_activity_not_found">Неуспешно отваряне на настройките</string>
@@ -45,6 +45,7 @@
         <item quantity="other">%1$d поддържани връзки</item>
     </plurals>
     <string name="open_by_default">Отваряне по подразбиране</string>
+    <string name="open_by_default_add_links">Добавяне на връзки</string>
     <string name="conversion_failed_unsupported_service">Неподдържана услуга за карти</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Карти</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставен маркер</string>

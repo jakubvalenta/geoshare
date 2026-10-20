@@ -14,6 +14,7 @@
     <string name="intro_open_by_default_app_button">Открыть настройки %1$s</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">В вашем браузере</string>
     <string name="open_by_default">Открывать по умолчанию</string>
+    <string name="open_by_default_add_links">Добавить ссылки</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d поддерживаемая ссылка</item>
         <item quantity="few">%1$d поддерживаемые ссылки</item>
@@ -24,7 +25,7 @@
     <string name="intro_settings_activity_not_found">Не удалось открыть настройки</string>
     <string name="main_input_uri_label">Вставьте сюда ссылку на карту</string>
     <string name="intro_open_by_default_google_maps_content_description">Снимок экрана настроек Google Maps «Открыть по умолчанию»</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Затем перейдите в настройки ➞ приложения ➞ %1$s ➞ <i>Открывать по умолчанию</i>, включите открытие ссылок в этом приложении и нажмите <i>Добавить ссылки</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">Затем перейдите в настройки ➞ приложения ➞ %1$s ➞ %2$s, включите открытие ссылок в этом приложении и нажмите %3$s.</string>
     <string name="conversion_permission">Подключиться к %1$s?</string>
     <string name="conversion_permission_common_grant">Хорошо</string>
     <string name="conversion_permission_common_deny">Отмена</string>
@@ -40,7 +41,7 @@
     <string name="copying_finished">Скопировано в буфер обмена</string>
     <string name="conversion_failed_unsupported_service">Неподдерживаемый картографический сервис</string>
     <string name="conversion_succeeded_apps_not_found">Никакое приложение для карты не установлено</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Сначала, перейдите в настройки ➞ приложения ➞ карты ➞ <i>Открывать по умолчанию</i> и отключите открытие ссылок в этом приложении.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Сначала, перейдите в настройки ➞ приложения ➞ карты ➞ %1$s и отключите открытие ссылок в этом приложении.</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="about_title">О приложении</string>

@@ -35,8 +35,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.tooling.preview.Devices
@@ -213,7 +213,14 @@ private fun FaqScreen(
                     title = stringResource(R.string.faq_open_by_default_headline, appName),
                 ) {
                     FaqFigure(
-                        stringResource(R.string.intro_open_by_default_google_maps_caption),
+                        annotatedStringResource(
+                            R.string.intro_open_by_default_google_maps_caption,
+                            textLinkStyles = tertiaryLinkStyles(),
+                            FormatArg.Text(
+                                stringResource(R.string.open_by_default),
+                                style = SpanStyle(fontStyle = FontStyle.Italic),
+                            ),
+                        )
                     ) {
                         ScreenshotOpenByDefaultMapApp()
                         Button(
@@ -229,7 +236,19 @@ private fun FaqScreen(
                         }
                     }
                     FaqFigure(
-                        stringResource(R.string.intro_open_by_default_app_caption, appName),
+                        annotatedStringResource(
+                            R.string.intro_open_by_default_app_caption,
+                            textLinkStyles = tertiaryLinkStyles(),
+                            FormatArg.Text(appName),
+                            FormatArg.Text(
+                                stringResource(R.string.open_by_default),
+                                style = SpanStyle(fontStyle = FontStyle.Italic),
+                            ),
+                            FormatArg.Text(
+                                stringResource(R.string.open_by_default_add_links),
+                                style = SpanStyle(fontStyle = FontStyle.Italic),
+                            ),
+                        )
                     ) {
                         ScreenshotOpenByDefault()
                         FilledTonalButton(
@@ -314,10 +333,7 @@ private fun FaqDivider() {
 }
 
 @Composable
-private fun FaqFigure(
-    captionHtml: String,
-    content: @Composable () -> Unit = {},
-) {
+private fun FaqFigure(text: AnnotatedString, content: @Composable () -> Unit = {}) {
     val spacing = LocalSpacing.current
 
     Column(
@@ -326,10 +342,7 @@ private fun FaqFigure(
         verticalArrangement = Arrangement.spacedBy(spacing.tiny),
     ) {
         CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.bodyMedium) {
-            ParagraphText(
-                AnnotatedString.fromHtml(captionHtml, tertiaryLinkStyles()),
-                Modifier.fillMaxWidth(),
-            )
+            ParagraphText(text, Modifier.fillMaxWidth())
             content()
         }
     }

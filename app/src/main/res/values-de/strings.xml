@@ -15,8 +15,8 @@
     <string name="intro_nav_close">Schließen</string>
     <string name="intro_settings_activity_not_found">Einstellung öffnen fehlgeschlagen</string>
     <string name="intro_open_by_default_google_maps_content_description">Bildschirmfoto von Google Maps Standardmäßig öffnen Einstellung</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Erstens öffne ➞ Apps ➞ Maps ➞ <i>Standardmäßig öffnen</i> und schalte das Öffnen von Links für diese App aus.]]></string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Dann öffne die Einstellungen ➞ Apps ➞ %1$s ➞ <i>Standardmäßig öffnen</i>, schalte das Öffnen von Links für <i>In der App</i> ein, und drücke <i>Links hinzufügen</i>.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Erstens öffne ➞ Apps ➞ Maps ➞ %1$s und schalte das Öffnen von Links für diese App aus.</string>
+    <string name="intro_open_by_default_app_caption">Dann öffne die Einstellungen ➞ Apps ➞ %1$s ➞ %2$s, schalte das Öffnen von Links für In der App ein, und drücke %3$s.</string>
     <string name="conversion_permission_common_grant">Okay</string>
     <string name="conversion_error_report">Problem melden</string>
     <string name="conversion_error_retry">Erneut versuchen</string>
@@ -39,6 +39,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">In der App</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">In deinem Browser</string>
     <string name="open_by_default">Standardmäßig öffnen</string>
+    <string name="open_by_default_add_links">Links hinzufügen</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d unterstützter Link</item>
         <item quantity="other">%1$d unterstützte Links</item>

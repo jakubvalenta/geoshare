@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="nav_menu_content_description">Menu</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Nejdřív jděte do Nastavení ➞ Aplikace ➞ Mapy ➞ <i>Otevírání ve výchozím nastavení</i> a vypněte otevírání odkazů v této aplikaci.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Nejdřív jděte do Nastavení ➞ Aplikace ➞ Mapy ➞ %1$s a vypněte otevírání odkazů v této aplikaci.</string>
     <string name="intro_open_by_default_google_maps_content_description">Snímek obrazovky nastavení Otevírání ve výchozím nastavení pro aplikaci Google Mapy</string>
     <string name="intro_open_by_default_google_maps_button">Otevřít nastavení Google Map</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Pak jděte do Nastavení ➞ Aplikace ➞ %1$s ➞ <i>Otevírání ve výchozím nastavení</i>, zapněte otevírání odkazů v této aplikace a klepněte na <i>Přidat odkazy</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">Pak jděte do Nastavení ➞ Aplikace ➞ %1$s ➞ %2$s, zapněte otevírání odkazů v této aplikace a klepněte na %3$s.</string>
     <string name="intro_open_by_default_app_button">Otevřít nastavení %1$s</string>
     <string name="intro_open_by_default_app_note">Pokud některé odkazy nejdou zaškrtnout, jsou jiné mapové aplikace nastavené, aby tyto odkazy otevíraly. Můžete tyto aplikace najít a změnit u nich otevírání ve výchozím nastavení, jako jsme to udělali pro Google Mapy. Zkontrolujte také aplikace nainstalované v soukromém prostoru, pokud tuto funkci Androidu používáte.</string>
     <string name="intro_nav_close">Zavřít</string>
@@ -49,6 +49,7 @@
     <string name="intro_open_by_default_app_screenshot_add">Přidat</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">V aplikaci</string>
     <string name="open_by_default">Otevírání ve výchozím nastavení</string>
+    <string name="open_by_default_add_links">Přidat odkazy</string>
     <string name="conversion_failed_unsupported_service">Nepodporovaná mapová služba</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Mapy</string>
     <string name="conversion_connecting">Spojování se službou %1$s…</string>

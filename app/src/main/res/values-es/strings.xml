@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="main_input_uri_label">Pegue aquí un enlace de mapa</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Luego vaya a Ajustes ➞ Aplicaciones ➞ %1$s ➞ <i>Abrir por defecto</i>, active la apertura de enlaces en esta aplicación, y pulse <i>Añadir enlaces</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">Luego vaya a Ajustes ➞ Aplicaciones ➞ %1$s ➞ %2$s, active la apertura de enlaces en esta aplicación, y pulse %3$s.</string>
     <string name="nav_menu_content_description">Menú</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="intro_open_by_default_app_button">Abrir ajustes de %1$s</string>
     <string name="user_preferences_connection_description">Para soportar enlaces cortos de mapas, y para obtener coordenadas de la página web del servicio de mapas cuando el enlace no las contiene, %1$s puede conectarse al servicio de mapas. Puedes encontrar más información en la pantalla de preguntas frecuentes (FAQ).</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primero, vaya a Ajustes ➞ Aplicaciones ➞ Mapas ➞ <i>Abrir por defecto</i> y apaga la apertura de enlaces en esta aplicación.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Primero, vaya a Ajustes ➞ Aplicaciones ➞ Mapas ➞ %1$s y apaga la apertura de enlaces en esta aplicación.</string>
     <string name="intro_open_by_default_google_maps_content_description">Captura de pantalla de la configuración predeterminada de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Abrir los ajustes de Google Maps</string>
     <string name="intro_nav_close">Cerrar</string>
@@ -42,6 +42,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">En la aplicación</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">En tu navegador</string>
     <string name="open_by_default">Abrir por defecto</string>
+    <string name="open_by_default_add_links">Añadir enlaces</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d enlace soportado</item>
         <item quantity="many">%1$d enlaces soportados</item>

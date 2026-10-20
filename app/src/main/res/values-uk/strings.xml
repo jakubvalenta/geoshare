@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Спершу, перейдіть в Налаштування ➞ Програми ➞ Карти ➞ <i>Відкривати по стандарту</i> й вимкніть відкриття посилань в цьому застосунку.]]></string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Потім перейдіть в Налаштування ➞ Програми ➞ %1$s ➞ <i>Відкривати по стандарту</i>, ввімкніть відкриття посилань в цьому застосунку й натисніть <i>Додати посилання</i>.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Спершу, перейдіть в Налаштування ➞ Програми ➞ Карти ➞ %1$s й вимкніть відкриття посилань в цьому застосунку.</string>
+    <string name="intro_open_by_default_app_caption">Потім перейдіть в Налаштування ➞ Програми ➞ %1$s ➞ %2$s, ввімкніть відкриття посилань в цьому застосунку й натисніть %3$s.</string>
     <string name="intro_open_by_default_app_note">Якщо деякі посилання позначені сірим кольором, це означає, що типово їх відкривають інші застосунки Google. Ви можете знайти їх і вимкнути відкриття посилань для них, як зробили з Google Maps. Також перевірте застосунки, встановлені в приватному просторі, якщо ви користуєтеся цією функцією Android.</string>
     <string name="intro_settings_activity_not_found">Не вдалося відкрити налаштування</string>
     <string name="conversion_error_report">Повідомити про проблему</string>
@@ -42,6 +42,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">Оберіть спосіб відкриття вебпосилань для цього застосунку</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">У застосунку</string>
     <string name="open_by_default">Відкрити по стандарту</string>
+    <string name="open_by_default_add_links">Додати посилання</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d підтримуване посилання</item>
         <item quantity="few">%1$d підтримувані посилання</item>
