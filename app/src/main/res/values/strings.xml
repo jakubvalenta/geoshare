@@ -209,7 +209,7 @@
     <string name="faq_how_headline">How it works</string>
     <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s read them from the map URL.</string>
     <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and read the coordinates from:</string>
-    <string name="faq_how_text_2_item_api">or the API of the map service</string>
+    <string name="faq_how_text_2_item_api">or the API of the map service (directly or via %1$s proxy server)</string>
     <string name="faq_how_text_2_item_api_example" translatable="false">GET https://geocode.googleapis.com/v4/geocode/address/…</string>
     <string name="faq_how_text_2_item_http">either HTTP headers</string>
     <string name="faq_how_text_2_item_http_example" translatable="false">Location: https://google.com/maps/@40.78,-73.96,19z</string>
