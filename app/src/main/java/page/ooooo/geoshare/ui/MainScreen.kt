@@ -60,7 +60,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.android.getLocation
 import page.ooooo.geoshare.data.android.hasLocationPermission
-import page.ooooo.geoshare.data.android.isMessagingApp
 import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.BillingProduct
 import page.ooooo.geoshare.data.billing.BillingStatus
@@ -75,6 +74,7 @@ import page.ooooo.geoshare.data.extensions.truncateMiddle
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.NaivePoint
+import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.log.DefaultLog
@@ -126,8 +126,9 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
+import page.ooooo.geoshare.ui.components.ResultCopySheet
 import page.ooooo.geoshare.ui.components.ResultError
-import page.ooooo.geoshare.ui.components.ResultSheet
+import page.ooooo.geoshare.ui.components.ResultSaveSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
@@ -269,14 +270,14 @@ fun MainScreen(
         coordinateConverter = outputViewModel.coordinateConverter,
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
         linkMessage = linkViewModel.message,
-        outputsForAppsByCategory = outputViewModel.outputsForAppsByCategory,
+        outputsForApps = outputViewModel.outputsForApps,
         outputsForLinks = outputViewModel.outputsForLinks,
         outputsForPoint = outputViewModel.outputsForPoint,
         outputsForPointChips = outputViewModel.outputsForPointChips,
         outputsForPoints = outputViewModel.outputsForPoints,
         outputsForPointsChips = outputViewModel.outputsForPointsChips,
         outputsForSharing = outputViewModel.outputsForSharing,
-        outputsForUriByCategory = outputViewModel.outputsForUriByCategory,
+        outputsForUri = outputViewModel.outputsForUri,
         placeholderUris = inputViewModel.placeholderUris,
         selectedUri = outputViewModel.selectedUri,
         start = mainViewModel.conversionStart,
@@ -347,14 +348,14 @@ private fun MainScreen(
     coordinateConverter: CoordinateConverter,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     linkMessage: StateFlow<Message?>,
-    outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory>,
+    outputsForApps: StateFlow<OutputDetailsForApps>,
     outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
-    outputsForPoint: StateFlow<List<OutputDetail<PointOutput>>>,
+    outputsForPoint: StateFlow<OutputDetailsForPoint>,
     outputsForPointChips: StateFlow<List<OutputDetail<PointOutput>>>,
-    outputsForPoints: StateFlow<List<OutputDetail<PointsOutput>>>,
+    outputsForPoints: StateFlow<OutputDetailsForPoints>,
     outputsForPointsChips: StateFlow<List<OutputDetail<PointsOutput>>>,
     outputsForSharing: StateFlow<OutputDetailsForSharing?>,
-    outputsForUriByCategory: StateFlow<OutputDetailsForUriByCategory>,
+    outputsForUri: StateFlow<OutputDetailsForUri?>,
     placeholderUris: StateFlow<List<String>>,
     selectedUri: StateFlow<String?>,
     source: StateFlow<String>,
@@ -396,7 +397,8 @@ private fun MainScreen(
 
     var errorMessageResId by retain { mutableStateOf<Int?>(null) }
     var logExpanded by retain { mutableStateOf(false) }
-    var selectedPointIndex by retain { mutableStateOf<Int?>(null) }
+    var selectedPointToCopy by retain { mutableStateOf<Point?>(null) }
+    var selectedPointToSave by retain { mutableStateOf<Point?>(null) }
     val selectedUri by selectedUri.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -495,9 +497,9 @@ private fun MainScreen(
                                             userPreferencesValues = userPreferencesValues,
                                             onExecute = onExecute,
                                             onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                            onSelect = { index ->
+                                            onSelectPointToCopy = { index ->
                                                 onCancelAction()
-                                                selectedPointIndex = index
+                                                selectedPointToCopy = index
                                             },
                                         )
                                         if (helpLifecycleMessage != null) {
@@ -507,7 +509,7 @@ private fun MainScreen(
                                         } else {
                                             HelpShareSourceMessage(
                                                 dismissedHelpMessages = dismissedHelpMessages,
-                                                outputsForAppsByCategory = outputsForAppsByCategory,
+                                                outputsForApps = outputsForApps,
                                                 sourceComesFromIntent = sourceComesFromIntent,
                                                 modifier = Modifier.padding(top = spacing.tiny),
                                                 onDismissHelpMessage = onDismissHelpMessage,
@@ -589,7 +591,7 @@ private fun MainScreen(
                     {
                         item(key = "result_apps", contentType = "result_apps") {
                             ResultApps(
-                                outputsForAppsByCategory = outputsForAppsByCategory,
+                                outputsForApps = outputsForApps,
                                 outputsForLinks = outputsForLinks,
                                 outputsForSharing = outputsForSharing,
                                 points = conversionState.points,
@@ -660,7 +662,7 @@ private fun MainScreen(
 
     selectedUri?.let { uriString ->
         ConversionUriSheet(
-            outputsForUriByCategory = outputsForUriByCategory,
+            outputsForUri = outputsForUri,
             uriString = uriString,
             onDismissRequest = { onSelectUri(null) },
             onExecute = onExecute,
@@ -668,14 +670,24 @@ private fun MainScreen(
     }
 
     if (conversionState is ConversionState.HasResult) {
-        selectedPointIndex?.let { index ->
-            ResultSheet(
+        selectedPointToCopy?.let {
+            ResultCopySheet(
+                point = it,
+                pointIndex = null, // TODO
+                outputsForPoint = outputsForPoint,
+                onExecute = onExecute,
+                onDismissRequest = { selectedPointToCopy = null },
+            )
+        }
+        selectedPointToSave?.let {
+            ResultSaveSheet(
+                point = it,
                 points = conversionState.points,
-                selectedPointIndex = index,
+                pointIndex = null, // TODO
                 outputsForPoint = outputsForPoint,
                 outputsForPoints = outputsForPoints,
                 onExecute = onExecute,
-                onSelectPointIndex = { selectedPointIndex = it },
+                onDismissRequest = { selectedPointToSave = null },
             )
         }
     }
@@ -757,18 +769,14 @@ private fun DefaultPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(""),
@@ -824,18 +832,14 @@ private fun DarkPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(""),
@@ -891,18 +895,14 @@ private fun SmallPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(""),
@@ -958,18 +958,14 @@ private fun TabletPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(""),
@@ -1050,34 +1046,24 @@ private fun SucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                fakeActivities
-                    .partition { !it.isMessagingApp() }
-                    .let { (mapAppActivities, messagingAppActivities) ->
-                        Pair(
-                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                        )
-                    }
-                    .toOutputDetailsForAppsByCategory(appDetails)
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(
                 outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
             ),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
                 outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
             ),
             outputsForSharing = MutableStateFlow(
                 outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
             ),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1158,34 +1144,24 @@ private fun DarkSucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                fakeActivities
-                    .partition { !it.isMessagingApp() }
-                    .let { (mapAppActivities, messagingAppActivities) ->
-                        Pair(
-                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                        )
-                    }
-                    .toOutputDetailsForAppsByCategory(appDetails)
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(
                 outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
             ),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
                 outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
             ),
             outputsForSharing = MutableStateFlow(
                 outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
             ),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1265,34 +1241,24 @@ private fun SmallSucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                fakeActivities
-                    .partition { !it.isMessagingApp() }
-                    .let { (mapAppActivities, messagingAppActivities) ->
-                        Pair(
-                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                        )
-                    }
-                    .toOutputDetailsForAppsByCategory(appDetails)
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(
                 outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
             ),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
                 outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
             ),
             outputsForSharing = MutableStateFlow(
                 outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
             ),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1373,34 +1339,24 @@ private fun TabletSucceededPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                fakeActivities
-                    .partition { !it.isMessagingApp() }
-                    .let { (mapAppActivities, messagingAppActivities) ->
-                        Pair(
-                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                        )
-                    }
-                    .toOutputDetailsForAppsByCategory(appDetails)
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(
                 outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
             ),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
                 outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
             ),
             outputsForSharing = MutableStateFlow(
                 outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
             ),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1467,18 +1423,14 @@ private fun ErrorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1545,18 +1497,14 @@ private fun DarkErrorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1623,18 +1571,14 @@ private fun TabletErrorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1702,18 +1646,14 @@ private fun WarningPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1781,18 +1721,14 @@ private fun DarkWarningPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1864,18 +1800,14 @@ private fun LoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -1947,18 +1879,14 @@ private fun DarkLoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -2028,18 +1956,14 @@ private fun TabletLoadingIndicatorPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -2108,18 +2032,14 @@ private fun WebViewPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -2188,18 +2108,14 @@ private fun DarkWebViewPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -2268,18 +2184,14 @@ private fun TabletWebViewPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),
@@ -2347,18 +2259,14 @@ private fun EmptyPreview() {
             coordinateConverter = coordinateConverter,
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForAppsByCategory = MutableStateFlow(
-                OutputDetailsForAppsByCategory(mapApps = emptyList(), messagingApps = emptyList())
-            ),
+            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(emptyList()),
+            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(emptyList()),
+            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
-            outputsForUriByCategory = MutableStateFlow(
-                OutputDetailsForUriByCategory(copy = emptyList(), open = emptyList())
-            ),
+            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             selectedUri = MutableStateFlow(null),
             source = MutableStateFlow(source),

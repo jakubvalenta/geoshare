@@ -44,7 +44,6 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.PackageNames
-import page.ooooo.geoshare.data.android.isMessagingApp
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
@@ -59,18 +58,18 @@ import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
 import page.ooooo.geoshare.data.outputs.toAction
 import page.ooooo.geoshare.ui.OutputDetailsForApp
-import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.OutputDetailsForApps
 import page.ooooo.geoshare.ui.OutputDetailsForLink
 import page.ooooo.geoshare.ui.OutputDetailsForSharing
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import page.ooooo.geoshare.ui.toOutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.toOutputDetailsForApps
 import page.ooooo.geoshare.ui.toOutputDetailsForLinks
 import page.ooooo.geoshare.ui.toOutputDetailsForSharing
 
 @Composable
 fun ResultApps(
-    outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory>,
+    outputsForApps: StateFlow<OutputDetailsForApps>,
     outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
     outputsForSharing: StateFlow<OutputDetailsForSharing?>,
     points: Points,
@@ -89,7 +88,7 @@ fun ResultApps(
     val lastPoint = points.lastOrNull() ?: return
     val spacing = LocalSpacing.current
 
-    val outputsForAppsByCategory by outputsForAppsByCategory.collectAsStateWithLifecycle()
+    val outputsForApps by outputsForApps.collectAsStateWithLifecycle()
     val outputsForLinks by outputsForLinks.collectAsStateWithLifecycle()
     val outputsForSharing by outputsForSharing.collectAsStateWithLifecycle()
     val source by source.collectAsStateWithLifecycle()
@@ -101,7 +100,7 @@ fun ResultApps(
             modifier = Modifier.padding(horizontal = gridHorizontalPadding),
             horizontalSpacing = horizontalSpacing,
         ) { itemWidth ->
-            outputsForAppsByCategory.mapApps
+            outputsForApps.maps
                 .forEach { outputsForApp ->
                     key(outputsForApp.packageName) {
                         ResultAppsAppIcon(
@@ -118,29 +117,27 @@ fun ResultApps(
                 }
             // Share item
             outputsForSharing?.let { outputsForSharing ->
-                key(outputsForSharing.defaultOutputDetail.output.id) {
-                    ResultAppsShareIcon(
-                        lastPoint = lastPoint,
-                        outputsForSharing = outputsForSharing,
-                        points = points,
-                        iconSize = iconSize,
-                        source = source,
-                        width = itemWidth,
-                        onExecute = onExecute,
-                    )
-                }
+                ResultAppsShareIcon(
+                    lastPoint = lastPoint,
+                    outputsForSharing = outputsForSharing,
+                    points = points,
+                    iconSize = iconSize,
+                    source = source,
+                    width = itemWidth,
+                    onExecute = onExecute,
+                )
             }
         }
 
         // Messaging apps
-        if (outputsForAppsByCategory.messagingApps.isNotEmpty()) {
+        if (outputsForApps.messaging.isNotEmpty()) {
             ResultAppsHeadline(stringResource(R.string.output_send))
             EvenlySpacedGrid(
                 minItemWidth,
                 modifier = Modifier.padding(horizontal = gridHorizontalPadding),
                 horizontalSpacing = horizontalSpacing,
             ) { itemWidth ->
-                outputsForAppsByCategory.messagingApps
+                outputsForApps.messaging
                     .forEach { outputsForApp ->
                         key(outputsForApp.packageName) {
                             ResultAppsAppIcon(
@@ -284,7 +281,7 @@ private fun ResultAppsShareIcon(
             AppMenu(
                 expanded = expanded,
                 lastPoint = lastPoint,
-                outputDetails = outputsForSharing.outputDetails,
+                outputDetails = outputsForSharing.open,
                 points = points,
                 source = source,
                 onDismissRequest = onDismissRequest,
@@ -292,7 +289,7 @@ private fun ResultAppsShareIcon(
                 onHide = null,
             )
         },
-        onClick = { onExecute(outputsForSharing.defaultOutputDetail.output.toAction(lastPoint, points, source)) },
+        onClick = { onExecute(outputsForSharing.default.output.toAction(lastPoint, points, source)) },
         modifier = Modifier
             .width(width)
             .testTag("geoShareAppShare"),
@@ -303,8 +300,8 @@ private fun ResultAppsShareIcon(
             shape = CircleShape,
         ) {
             IconFromDescriptor(
-                outputsForSharing.defaultOutputDetail.icon ?: PlaceholderIconDescriptor,
-                contentDescription = outputsForSharing.defaultOutputDetail.label(),
+                outputsForSharing.default.icon ?: PlaceholderIconDescriptor,
+                contentDescription = outputsForSharing.default.label(),
                 size = 24.dp,
             )
         }
@@ -370,16 +367,8 @@ private fun DefaultPreview() {
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
-                outputsForAppsByCategory = MutableStateFlow(
-                    fakeActivities
-                        .partition { !it.isMessagingApp() }
-                        .let { (mapAppActivities, messagingAppActivities) ->
-                            Pair(
-                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                            )
-                        }
-                        .toOutputDetailsForAppsByCategory(appDetails)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
@@ -413,16 +402,8 @@ private fun DarkPreview() {
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
-                outputsForAppsByCategory = MutableStateFlow(
-                    fakeActivities
-                        .partition { !it.isMessagingApp() }
-                        .let { (mapAppActivities, messagingAppActivities) ->
-                            Pair(
-                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                            )
-                        }
-                        .toOutputDetailsForAppsByCategory(appDetails)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
@@ -456,16 +437,8 @@ private fun SmallPreview() {
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
-                outputsForAppsByCategory = MutableStateFlow(
-                    fakeActivities
-                        .partition { !it.isMessagingApp() }
-                        .let { (mapAppActivities, messagingAppActivities) ->
-                            Pair(
-                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                            )
-                        }
-                        .toOutputDetailsForAppsByCategory(appDetails)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
@@ -499,16 +472,8 @@ private fun TabletPreview() {
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
-                outputsForAppsByCategory = MutableStateFlow(
-                    fakeActivities
-                        .partition { !it.isMessagingApp() }
-                        .let { (mapAppActivities, messagingAppActivities) ->
-                            Pair(
-                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                            )
-                        }
-                        .toOutputDetailsForAppsByCategory(appDetails)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
@@ -540,24 +505,16 @@ private fun LoadingPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val activities = fakeActivities.filter {
+                it.packageName in setOf(
+                    PackageNames.COMAPS_FDROID,
+                    PackageNames.ORGANIC_MAPS,
+                )
+            }
             val appDetails: AppDetails = emptyMap()
             ResultApps(
-                outputsForAppsByCategory = MutableStateFlow(
-                    fakeActivities
-                        .filter {
-                            it.packageName in setOf(
-                                PackageNames.COMAPS_FDROID,
-                                PackageNames.ORGANIC_MAPS,
-                            )
-                        }
-                        .partition { !it.isMessagingApp() }
-                        .let { (mapAppActivities, messagingAppActivities) ->
-                            Pair(
-                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                            )
-                        }
-                        .toOutputDetailsForAppsByCategory(appDetails)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(activities, emptySet()).toOutputDetailsForApps(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
@@ -599,24 +556,16 @@ private fun DarkLoadingPreview() {
                 coordinateConverter = coordinateConverter,
                 log = log,
             )
+            val activities = fakeActivities.filter {
+                it.packageName in setOf(
+                    PackageNames.COMAPS_FDROID,
+                    PackageNames.ORGANIC_MAPS,
+                )
+            }
             val appDetails: AppDetails = emptyMap()
             ResultApps(
-                outputsForAppsByCategory = MutableStateFlow(
-                    fakeActivities
-                        .filter {
-                            it.packageName in setOf(
-                                PackageNames.COMAPS_FDROID,
-                                PackageNames.ORGANIC_MAPS,
-                            )
-                        }
-                        .partition { !it.isMessagingApp() }
-                        .let { (mapAppActivities, messagingAppActivities) ->
-                            Pair(
-                                outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                                outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                            )
-                        }
-                        .toOutputDetailsForAppsByCategory(appDetails)
+                outputsForApps = MutableStateFlow(
+                    outputRepository.getOutputsForApps(activities, emptySet()).toOutputDetailsForApps(appDetails)
                 ),
                 outputsForLinks = MutableStateFlow(
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)

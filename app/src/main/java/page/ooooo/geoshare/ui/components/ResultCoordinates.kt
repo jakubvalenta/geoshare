@@ -52,6 +52,7 @@ import page.ooooo.geoshare.data.formatters.CoordinateFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.NaivePoint
+import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
@@ -83,7 +84,7 @@ fun ResultCoordinates(
     outputsForPointsChips: StateFlow<List<OutputDetail<PointsOutput>>>,
     onExecute: (action: Action<*>) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
-    onSelect: (index: Int?) -> Unit,
+    onSelectPointToCopy: (point: Point?) -> Unit,
     initialExpanded: Boolean = false,
 ) {
     val lastPoint = points.lastOrNull() ?: return
@@ -198,7 +199,7 @@ fun ResultCoordinates(
                         }
                     }
                     IconButton(
-                        { onSelect(points.size - 1) },
+                        { onSelectPointToCopy(lastPoint) },
                         Modifier
                             .height(28.dp) // Set height to adjust default vertical padding
                             .testTag("geoShareResultLastPointMenu")
@@ -274,7 +275,7 @@ fun ResultCoordinates(
                                         index = index,
                                         coordinateFormat = userPreferencesValues.coordinateFormat,
                                         coordinateConverter = coordinateConverter,
-                                        onSelect = { onSelect(index) },
+                                        onSelect = { onSelectPointToCopy(point) },
                                     )
                                     HorizontalDivider()
                                 }
@@ -373,7 +374,7 @@ private fun DefaultPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -406,7 +407,7 @@ private fun DarkPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -439,7 +440,7 @@ private fun NameOnlyPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -472,7 +473,7 @@ private fun DarkNameOnlyPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -512,7 +513,7 @@ private fun PointsPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -552,7 +553,7 @@ private fun DarkPointsPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -594,7 +595,7 @@ private fun PointsExpandedPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -636,7 +637,7 @@ private fun DarkPointsExpandedPreview() {
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -678,7 +679,7 @@ private fun CoordinateFormatPreview() {
                 ),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }
@@ -720,7 +721,7 @@ private fun DarkCoordinateFormatPreview() {
                 ),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelect = {},
+                onSelectPointToCopy = {},
             )
         }
     }

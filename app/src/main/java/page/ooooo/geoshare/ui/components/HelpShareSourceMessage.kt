@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.android.PackageNames
-import page.ooooo.geoshare.data.android.isMessagingApp
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -35,23 +34,23 @@ import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.PointOutput
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.isDismissed
-import page.ooooo.geoshare.ui.OutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.OutputDetailsForApps
 import page.ooooo.geoshare.ui.string.FormatArg
 import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.defaultLinkStyles
-import page.ooooo.geoshare.ui.toOutputDetailsForAppsByCategory
+import page.ooooo.geoshare.ui.toOutputDetailsForApps
 
 @Composable
 fun HelpShareSourceMessage(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    outputsForAppsByCategory: StateFlow<OutputDetailsForAppsByCategory>,
+    outputsForApps: StateFlow<OutputDetailsForApps>,
     sourceComesFromIntent: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
-    val outputsForAppsByCategory by outputsForAppsByCategory.collectAsStateWithLifecycle()
+    val outputsForApps by outputsForApps.collectAsStateWithLifecycle()
     val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
 
     if (!sourceComesFromIntent) {
@@ -72,7 +71,7 @@ fun HelpShareSourceMessage(
             PackageNames.MAGIC_EARTH,
             PackageNames.MAPS_ME,
         ).firstNotNullOfOrNull { packageName ->
-            outputsForAppsByCategory.mapApps.firstNotNullOfOrNull { outputDetail ->
+            outputsForApps.maps.firstNotNullOfOrNull { outputDetail ->
                 if (outputDetail.packageName == packageName) {
                     Pair(
                         outputDetail.label,
@@ -148,16 +147,8 @@ private fun DefaultPreview() {
         val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForAppsByCategory = MutableStateFlow(
-                fakeActivities
-                    .partition { !it.isMessagingApp() }
-                    .let { (mapAppActivities, messagingAppActivities) ->
-                        Pair(
-                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                        )
-                    }
-                    .toOutputDetailsForAppsByCategory(appDetails)
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
@@ -181,16 +172,8 @@ private fun DarkPreview() {
         val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForAppsByCategory = MutableStateFlow(
-                fakeActivities
-                    .partition { !it.isMessagingApp() }
-                    .let { (mapAppActivities, messagingAppActivities) ->
-                        Pair(
-                            outputRepository.getOutputsForApps(mapAppActivities, hiddenApps = emptySet()),
-                            outputRepository.getOutputsForApps(messagingAppActivities, hiddenApps = emptySet()),
-                        )
-                    }
-                    .toOutputDetailsForAppsByCategory(appDetails)
+            outputsForApps = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
