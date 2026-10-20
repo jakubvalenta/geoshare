@@ -64,8 +64,10 @@ navigation, you can easily switch from Google Maps to your favorite
   clipboard in various formats, for example as a geo: link.
 - Shows all points of a **place list** link.
 - Allows performing an action **automatically** when a map link is processed.
+  (Pro feature)
 - Allows **launching navigation** in all apps that support it, including TomTom.
 - Allows opening a location in **web maps**, pre-installed ones or your own.
+  (Pro feature)
 - Allows saving a location as a **GPX file**.
 - Allows sending a location via a **messaging app**.
 - Allows saving a location to a **contact**.
