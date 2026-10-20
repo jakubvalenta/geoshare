@@ -21,12 +21,12 @@
     <string name="conversion_permission">連接至%1$s？</string>
     <string name="conversion_connecting">正在連接至%1$s…</string>
     <string name="conversion_failed_connection_permission_denied">此連結若未連接至地圖服務，則不支援</string>
-    <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> 不含有坐標. %2$s 需要連接至地圖服務來取得。]]></string>
+    <string name="conversion_permission_common_text">The link %1$s 不含有坐標. %2$s 需要連接至地圖服務來取得。</string>
     <string name="user_preferences_connection_title">允許連接到地圖服務嗎（ Google, Apple 等）？</string>
     <string name="user_preferences_connection_description">為了支援縮短的地圖連結，並在連結本身未包含座標時，從地圖服務的網頁中取得座標,，%1$s 可以連接到地圖服務。您可查看應用程式內的常見問題（FAQ）頁面了解更詳細的資訊。</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">放置圖釘</string>
     <string name="conversion_succeeded_apps_headline">用…開啟</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[首先，前往設定➞ Apps ➞ Maps ➞ <i>在預設中開啟</i> 然後關閉「在此應用程式中開啟連結」的功能。]]></string>
+    <string name="intro_open_by_default_google_maps_caption">首先，前往設定➞ Apps ➞ Maps ➞ %1$s 然後關閉「在此應用程式中開啟連結」的功能。</string>
     <string name="intro_open_by_default_google_maps_content_description">Google地圖中預設開啟設定畫面的螢幕截圖</string>
     <string name="intro_open_by_default_google_maps_button">開啟Google地圖設定</string>
     <string name="conversion_failed_cancelled">取消</string>
@@ -42,9 +42,10 @@
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="intro_open_by_default_app_button">開啟 %1$s 設定</string>
     <string name="conversion_failed_missing_url">找不到URL</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[然後去設定 ➞ Apps ➞ %1$s ➞ <i>預設開啟</i>，開啟「在此應用程式中開啟連結」功能，並點選，然後按 <i>新增連結</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">然後去設定 ➞ Apps ➞ %1$s ➞ %2$s，開啟「在此應用程式中開啟連結」功能，並點選，然後按 %3$s.</string>
     <string name="intro_open_by_default_app_note">若有部分連結呈現灰色無法選取，表示其他 Google 應用程式已設定為預設開啟這些連結。您可以像先前對 Google 地圖那樣，找到那些應用程式並關閉它們的「開啟連結」功能。</string>
     <string name="open_by_default">使用預設開啟方式</string>
+    <string name="open_by_default_add_links">新增連結</string>
     <string name="inputs_detail_text">您可以將以下地圖連結分享給 %1$s，或直接貼到應用程式中。</string>
     <string name="converter_coordinates_name">座標</string>
     <string name="example">例如：%1$s</string>

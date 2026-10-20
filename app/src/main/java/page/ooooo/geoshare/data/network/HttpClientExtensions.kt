@@ -30,8 +30,10 @@ import page.ooooo.geoshare.data.log.Log
 import java.net.SocketException
 import java.net.URL
 
+const val MOBILE_USER_AGENT =
+    "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
 const val DESKTOP_USER_AGENT =
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36"
 const val REQUEST_TIMEOUT = 256_000L
 const val CONNECT_TIMEOUT = 128_000L
 const val SOCKET_TIMEOUT = 128_000L

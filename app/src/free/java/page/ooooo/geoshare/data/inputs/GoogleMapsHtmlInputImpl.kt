@@ -11,6 +11,7 @@ import page.ooooo.geoshare.data.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.log.Log
+import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.uri.Uri
 import page.ooooo.geoshare.data.uri.UriQuote
@@ -34,7 +35,9 @@ class GoogleMapsHtmlInputImpl @Inject constructor(
             log,
             uriQuote,
             cookies = GoogleMapsShortLinkInput.COOKIES,
-            userAgent = GoogleMapsShortLinkInput.USER_AGENT,
+            // Set custom User-Agent, so that we don't receive Google Lite HTML, which doesn't contain coordinates in
+            // case of Google Maps, or doesn't contain a link to Google Maps in case of Google Search.
+            userAgent = DESKTOP_USER_AGENT,
         ) { data ->
             parseResultAsync {
                 val directionsPreviewPattern = Regex("""%213d$LAT%214d$LON""")

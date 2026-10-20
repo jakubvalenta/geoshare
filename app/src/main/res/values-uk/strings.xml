@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Спершу, перейдіть в Налаштування ➞ Програми ➞ Карти ➞ <i>Відкривати по стандарту</i> й вимкніть відкриття посилань в цьому застосунку.]]></string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Потім перейдіть в Налаштування ➞ Програми ➞ %1$s ➞ <i>Відкривати по стандарту</i>, ввімкніть відкриття посилань в цьому застосунку й натисніть <i>Додати посилання</i>.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Спершу, перейдіть в Налаштування ➞ Програми ➞ Карти ➞ %1$s й вимкніть відкриття посилань в цьому застосунку.</string>
+    <string name="intro_open_by_default_app_caption">Потім перейдіть в Налаштування ➞ Програми ➞ %1$s ➞ %2$s, ввімкніть відкриття посилань в цьому застосунку й натисніть %3$s.</string>
     <string name="intro_open_by_default_app_note">Якщо деякі посилання позначені сірим кольором, це означає, що типово їх відкривають інші застосунки Google. Ви можете знайти їх і вимкнути відкриття посилань для них, як зробили з Google Maps. Також перевірте застосунки, встановлені в приватному просторі, якщо ви користуєтеся цією функцією Android.</string>
     <string name="intro_settings_activity_not_found">Не вдалося відкрити налаштування</string>
     <string name="conversion_error_report">Повідомити про проблему</string>
@@ -20,7 +20,7 @@
     <string name="intro_nav_close">Закрити</string>
     <string name="main_input_uri_clear_content_description">Очистити</string>
     <string name="conversion_permission_common_grant">Гаразд</string>
-    <string name="conversion_permission_common_text"><![CDATA[Посилання <tt>%1$s</tt> не містить координат. %2$s потребує підключення до картографічного сервісу, щоб отримати їх.]]></string>
+    <string name="conversion_permission_common_text">Посилання %1$s не містить координат. %2$s потребує підключення до картографічного сервісу, щоб отримати їх.</string>
     <string name="main_input_uri_label">Вставте посилання на мапу тут</string>
     <string name="about_text"><![CDATA[<p>%1$s це безплатний застосунок з відкритим вихідним кодом, що розповсюджується під ліцензією <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> або пізнішої.</p><br><p>Ви можете знайти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, де також можете <a href="https://github.com/jakubvalenta/geoshare/issues">повідомити про помилку</a>.</p><br><p> Буду радий вашим відгукам. Ви можете зв’язатися зі мною за адресою <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="permission_do_not_ask">Не запитувати знову</string>
@@ -42,6 +42,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">Оберіть спосіб відкриття вебпосилань для цього застосунку</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">У застосунку</string>
     <string name="open_by_default">Відкрити по стандарту</string>
+    <string name="open_by_default_add_links">Додати посилання</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d підтримуване посилання</item>
         <item quantity="few">%1$d підтримувані посилання</item>
@@ -163,9 +164,8 @@
     <string name="faq_how_headline">Як це працює</string>
     <string name="faq_how_text_1">%1$s перетворює посилання на мапу в геопосилання, які можна відкрити в інших мапічних застосунках. Для створення геопосилання потрібні географічні координати. %1$s витягує їх з URL-адреси мапи.</string>
     <string name="faq_how_text_2">Однак не всі URL-адреси мапмістять координати. У таких випадках %1$s запросить у вас дозвіл на з’єднання зі службами мап (Google Maps, Apple Maps тощо) та отримання координат з:</string>
-    <string name="faq_how_text_2_item_http">або із заголовків HTTP,</string>
-    <string name="faq_how_text_2_item_html">або з HTML-документа,</string>
-    <string name="faq_how_text_2_item_web">або з вебсторінки в режимі реального часу, що включає JavaScript.</string>
+    <string name="faq_how_text_2_item_http">або із заголовків HTTP</string>
+    <string name="faq_how_text_2_item_html">або з HTML-документа</string>
     <string name="faq_how_text_3">Якщо ви не дозволяєте з’єднання зі службами мап, то %1$s створює геопосилання з назвою місця замість координат або зупиняється, залежно від конкретного посилання.</string>
     <string name="faq_how_text_4">Щоб назавжди дозволити або заборонити з’єднання зі службами мап замість постійного запиту (типово), перейдіть до %1$s застосунку.</string>
     <string name="faq_how_text_4_preferences_button">налаштувань</string>
@@ -268,7 +268,7 @@
     <string name="server_invalid">Указати облікові дані</string>
     <string name="server_list_description">Якщо з’єднання до мапографічного сервісу дозволено, %1$s використовує API-сервери для перетворення певних посилань у координати. Виберіть, чи використовувати офіційні сервери з вашими власними обліковими даними, проксі-серверами чи не використовувати їх взагалі.</string>
     <string name="server_list_google_maps_address_title">Адреси Google Maps</string>
-    <string name="server_list_google_maps_none_description">Витягнути координати із HTML (експериментальна функція)</string>
+    <string name="server_list_none_html">Витягнути координати із HTML (експериментальна функція)</string>
     <string name="server_list_google_maps_place_title">Ідентифікатори місць у Google Maps</string>
     <string name="server_list_none">Не використовувати API-сервер</string>
     <string name="server_list_search_none_description">Пошук буде недоступний</string>

@@ -42,7 +42,6 @@ android {
                 "tr",
                 "uk",
                 "zh-rCN",
-                "zh-rTW",
             )
         }
 
@@ -171,4 +170,30 @@ dependencies {
     androidTestImplementation(libs.androidx.test.uiautomator)
     androidTestImplementation(libs.fastlane.screengrab)
     androidTestUtil(libs.androidx.test.orchestrator)
+}
+
+tasks.register<Copy>("copyEnabledMetadata") {
+    group = "verification"
+    description = "Copies metadata for enabled languages from fastlane/metadata_src to fastlane/metadata"
+
+    from("$rootDir/fastlane/metadata_src")
+    into("$rootDir/fastlane/metadata")
+
+    for (locale in listOf(
+        "ar",
+        "bg",
+        "cs-CZ",
+        "de-DE",
+        "en-US",
+        "es-ES",
+        "fr-FR",
+        "pt-BR",
+        "pt-PT",
+        "ru-RU",
+        "tr-TR",
+        "uk",
+        "zh-CN",
+    )) {
+        include("android/$locale/**")
+    }
 }

@@ -9,7 +9,6 @@ import page.ooooo.geoshare.data.extensions.doubleGroupOrNull
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.Log
-import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject
@@ -30,8 +29,6 @@ class AppleMapsHtmlInput @Inject constructor(
             engine,
             log,
             uriQuote,
-            // Set a custom user agent, so that Apple Maps doesn't show "Unsupported browser"
-            userAgent = DESKTOP_USER_AGENT,
         ) { data ->
             parseResultAsync {
                 val latPattern = Regex("""<meta property="place:location:latitude" content="$LAT"""")

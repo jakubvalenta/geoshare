@@ -376,7 +376,7 @@ class BillingImpl(
     private fun BillingResult.toDebugString(): String =
         "BillingResult(responseCode=${responseCode},onPurchasesUpdatedSubResponseCode=${onPurchasesUpdatedSubResponseCode},debugMessage=${debugMessage})"
 
-    companion object {
-        const val TAG = "Billing"
+    private companion object {
+        private const val TAG = "Billing"
     }
 }

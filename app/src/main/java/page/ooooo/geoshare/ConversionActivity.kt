@@ -57,7 +57,7 @@ class ConversionActivity : ComponentActivity() {
         mainViewModel.onCreateOrNewIntent(intent)
     }
 
-    companion object {
-        const val TAG = "ConversionActivity"
+    private companion object {
+        private const val TAG = "ConversionActivity"
     }
 }

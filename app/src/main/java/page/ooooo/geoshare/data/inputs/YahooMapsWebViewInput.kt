@@ -18,19 +18,23 @@ class YahooMapsWebViewInput @Inject constructor(
     private val log: Log,
 ) : WebViewInput {
     @Serializable
-    private data class ExtractedPoint(val lat: Double, val lon: Double)
+    private data class ClientPoint(val lat: Double, val lon: Double)
 
     override fun getName(resources: Resources) = resources.getString(R.string.input_yahoo_maps_web_view_name)
     override val group = YahooMapsInputGroup
 
+    override val allowedUrlPattern by lazy {
+        Regex("""https://map\.yahoo\.co\.jp[/?#]\S+""")
+    }
+
     /**
-     * Extracts point from the page URL after the page JavaScript has changed the URL.
+     * Reads point from the page URL after the page JavaScript has changed the URL.
      *
-     * First time the function is run it only remembers the extracted point and when it's run again and the point is
+     * First time the function is run it only remembers the resulting point and when it's run again and the point is
      * different, then it returns the point.
      */
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript() = """
+    override val unsafeClientJavaScript = """
         () => {
             const queryParams = new URLSearchParams(location.search);
             const lat = parseFloat(queryParams.get("lat"));
@@ -52,7 +56,7 @@ class YahooMapsWebViewInput @Inject constructor(
             explicitNulls = false
         }
         try {
-            json.decodeFromString<ExtractedPoint>(data)
+            json.decodeFromString<ClientPoint>(data)
         } catch (tr: IllegalArgumentException) {
             log.e(TAG, "Deserialization error", tr)
             null

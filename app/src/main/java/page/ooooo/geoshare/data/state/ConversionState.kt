@@ -288,8 +288,8 @@ data class PermissionGrantedBasicInput(
  * When this state is the current state, the UI should:
  *
  * 1. Load [matchedInput]'s match as a page URL in a WebView.
- * 2. Get JavaScript code using [WebViewInput.getUnsafeExtractionJavaScript] and call it periodically.
- * 3. Once the result of the extraction JavaScript is not undefined, complete [pendingData].
+ * 2. Call [WebViewInput.unsafeClientJavaScript] on the page periodically.
+ * 3. As soon as the result of the client JavaScript is not undefined, complete [pendingData].
  *
  * When it fails, it retries up to [maxAttempts] times. Retrying is done by recursively transitioning this state while
  * tracking the number of attempts made and the cause of the last failure in [lastAttempt].
@@ -393,14 +393,14 @@ data class DataParsed(
         results.values.reversed().merge().run {
             if (points.lastOrNull()?.hasCoordinates() == true) {
                 stateContext.log.i(
-                    TAG, "Extracted coordinates $points from $matchedInput"
+                    TAG, "Read coordinates $points from $matchedInput"
                 )
                 ConversionSucceeded(source, matchedInput, points)
             } else if (next != null) {
                 if (next in results) {
                     stateContext.log.w(
                         TAG,
-                        "Failed to extract point with coordinates from $matchedInput and next matched input creates a loop"
+                        "Failed to read point with coordinates from $matchedInput and next matched input creates a loop"
                     )
                     ConversionFailed(
                         source,
@@ -408,18 +408,18 @@ data class DataParsed(
                     )
                 } else {
                     stateContext.log.i(
-                        TAG, "Failed to extract point with coordinates from $matchedInput, going to next matched input"
+                        TAG, "Failed to read point with coordinates from $matchedInput, going to next matched input"
                     )
                     InputMatched(source, next, permission, results)
                 }
             } else if (points.lastOrNull()?.hasName() == true) {
                 stateContext.log.i(
-                    TAG, "Extracted point with name $points from $matchedInput"
+                    TAG, "Read point with name $points from $matchedInput"
                 )
                 ConversionSucceeded(source, matchedInput, points)
             } else if (permission == Permission.NEVER) {
                 stateContext.log.i(
-                    TAG, "Failed to extract point from $matchedInput, because permission was denied"
+                    TAG, "Failed to read point from $matchedInput, because permission was denied"
                 )
                 ConversionFailed(
                     source,
@@ -427,7 +427,7 @@ data class DataParsed(
                 )
             } else {
                 stateContext.log.i(
-                    TAG, "Failed to extract point from $matchedInput"
+                    TAG, "Failed to read point from $matchedInput"
                 )
                 ConversionFailed(
                     source,

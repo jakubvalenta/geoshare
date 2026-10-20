@@ -12,8 +12,12 @@ object DebugWebViewInput : WebViewInput {
     override val group = DebugInputGroup
     override fun getName(resources: Resources) = "Debug Input (WebView)"
 
+    override val allowedUrlPattern by lazy {
+        Regex("""https://www\.example\.com[/?#]\S+""")
+    }
+
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript() = """
+    override val unsafeClientJavaScript = """
         () => location.href;
     """.trimIndent()
 

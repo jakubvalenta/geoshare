@@ -16,12 +16,14 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
     private val log: Log,
 ) : GoogleMapsPlaceListInput, WebViewInput {
     @Serializable
-    private data class ExtractedPoint(val lat: Double?, val lon: Double?)
+    private data class ClientPoint(val lat: Double?, val lon: Double?)
 
     override val group = GoogleMapsInputGroup
 
+    override val allowedUrlPattern = GoogleMapsWebViewInput.allowedUrlPattern
+
     /**
-     * Extracts point from the page JavaScript state.
+     * Reads point from the page JavaScript state.
      *
      * It takes coordinates from the `APP_INITIALIZATION_STATE` global variable, which has this structure:
      *
@@ -41,7 +43,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
      * ```
      */
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript() = $$"""
+    override val unsafeClientJavaScript = $$"""
         () => {
             function findPointsInAppInitState(obj) {
                 const MAX_PRECISION = 17;
@@ -86,7 +88,7 @@ class GoogleMapsPlaceListInputImpl @Inject constructor(
             explicitNulls = false
         }
         try {
-            json.decodeFromString<List<ExtractedPoint>>(data)
+            json.decodeFromString<List<ClientPoint>>(data)
         } catch (tr: IllegalArgumentException) {
             log.e(TAG, "Deserialization error", tr)
             null

@@ -23,6 +23,7 @@ platform :android do
 
   desc "Upload metadata to Google Play"
   lane :metadata do
+    gradle(task: "copyEnabledMetadata")
     upload_to_play_store(
       track: "internal",
       release_status: "draft",

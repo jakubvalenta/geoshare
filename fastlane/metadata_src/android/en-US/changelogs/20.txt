@@ -1,0 +1,7 @@
+- Added HERE WeGo support.
+- Added Magic Earth support.
+- Added OpenStreetMap and OsmAnd support.
+- Added Yandex Maps support.
+- Added support for text coordinates.
+- Improved Google Maps short links support by trimming invalid characters.
+- Removed support for URIs without scheme.

@@ -9,5 +9,5 @@
     <string name="billing_setup_error_unknown">Failed to fetch purchases</string>
     <string name="billing_unavailable" translatable="false">Google Play is not available on this device</string>
     <string name="conversion_failed_unsupported_source">This link is not supported</string>
-    <string name="server_list_google_maps_none_description">Extract place name instead of coordinates</string>
+    <string name="server_list_none_html">Read place name instead of coordinates</string>
 </resources>

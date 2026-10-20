@@ -1,0 +1,6 @@
+- Use coordinates from the 'data' parameter of a Google Maps URL, if available.
+- Get coordinates by parsing Google Maps HTML if they're not available in the URL.
+- Add the "open supported links" feature.
+- Add support for goo.gl and app.goo.gl short links.
+- Fix support for coordinates with 15 decimal places.
+- Show a toast message if link unshortening failed due to a network error.

@@ -46,10 +46,12 @@ class PermissionGrantedWebViewInputTest {
         override fun getName(resources: Resources) = "Test Input"
         override val group = DebugInputGroup
 
+        override val allowedUrlPattern = Regex("")
+
         override val timeout = 7.seconds
 
         @Suppress("SameReturnValue")
-        override fun getUnsafeExtractionJavaScript() = "undefined"
+        override val unsafeClientJavaScript = "undefined"
 
         override fun parse(data: String, match: String, resources: Resources) =
             result.copy(next = next.copy(match = data)) // Store data in MatchedInput, so we can test it
@@ -111,8 +113,10 @@ class PermissionGrantedWebViewInputTest {
                 override fun getName(resources: Resources) = "Test Input"
                 override val group = DebugInputGroup
 
+                override val allowedUrlPattern = Regex("")
+
                 @Suppress("SameReturnValue")
-                override fun getUnsafeExtractionJavaScript() = "undefined"
+                override val unsafeClientJavaScript = "undefined"
 
                 override fun parse(data: String, match: String, resources: Resources) =
                     ParseResult.Warning(
@@ -282,10 +286,12 @@ class PermissionGrantedWebViewInputTest {
             override fun getName(resources: Resources) = "Test Input"
             override val group = DebugInputGroup
 
+            override val allowedUrlPattern = Regex("")
+
             override val timeout = 7.seconds
 
             @Suppress("SameReturnValue")
-            override fun getUnsafeExtractionJavaScript() = "undefined"
+            override val unsafeClientJavaScript = "undefined"
 
             override fun parse(data: String, match: String, resources: Resources) =
                 throw CancellationException()

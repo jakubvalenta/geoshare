@@ -7,7 +7,7 @@
     <string name="conversion_succeeded_skip">Orijinal bağlantıyı kopyala</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="nav_back_content_description">Ana ekrana dön</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Önce, Ayarlar ➞ Uygulamalar ➞ Haritalar ➞ <i>Varsayılan olarak aç</i> ve bu uygulamada bağlantıların açılmasını kapatın.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Önce, Ayarlar ➞ Uygulamalar ➞ Haritalar ➞ %1$s ve bu uygulamada bağlantıların açılmasını kapatın.</string>
     <string name="intro_open_by_default_google_maps_content_description">Google Haritalar’ın Varsayılan olarak aç ayarlarının ekran görüntüsü</string>
     <string name="intro_open_by_default_google_maps_button">Google Haritalar ayarlarını açın</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Haritalar</string>
@@ -16,6 +16,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Tarayıcınızda</string>
     <string name="intro_open_by_default_app_button">%1$s ayarlarını aç</string>
     <string name="open_by_default">Varsayılan olarak aç</string>
+    <string name="open_by_default_add_links">Bağlantılar ekle</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d desteklenen bağlantı</item>
         <item quantity="other">%1$d desteklenen bağlantı</item>
@@ -92,7 +93,7 @@
     <string name="donation_button">Ko-fi üzerinden bağış yapın</string>
     <string name="donation_description">Bu uygulama size zaman kazandırıyor mu?</string>
     <string name="conversion_succeeded_apps_headline">Şununla aç</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Sonra Ayarlar ➞ Uygulamalar ➞ %1$s ➞ <i>Varsayılan olarak aç</i>, bağlantıların uygulamada açılmasını etkinleştirin ve <i>Bağlantılar ekle</i>’ye tıklayın.]]></string>
+    <string name="intro_open_by_default_app_caption">Sonra Ayarlar ➞ Uygulamalar ➞ %1$s ➞ %2$s, bağlantıların uygulamada açılmasını etkinleştirin ve %3$s’ye tıklayın.</string>
     <string name="output_gpx_location_permission">%1$s mevcut konumunuzdan başlayan bir rota oluşturacaktır.</string>
     <string name="output_gpx_route_share">GPX rotasını paylaş</string>
     <string name="output_gpx_route_share_failed">GPX paylaşımı başarısız oldu</string>
@@ -118,9 +119,8 @@
     <string name="conversion_automation_save_gpx_succeeded">GPX otomatik olarak kaydedildi</string>
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Şu nedenden dolayı %2$d denemeden %1$d’i başarısız oldu: %3$s</string>
     <string name="faq_how_headline">Nasıl çalışır</string>
-    <string name="faq_how_text_2_item_http">HTTP başlıkları,</string>
-    <string name="faq_how_text_2_item_html">HTML belgesi,</string>
-    <string name="faq_how_text_2_item_web">ya da JavaScript içeren canlı web sayfası.</string>
+    <string name="faq_how_text_2_item_http">HTTP başlıkları</string>
+    <string name="faq_how_text_2_item_html">HTML belgesi</string>
     <string name="faq_how_text_4_preferences_button">tercihler</string>
     <string name="faq_location_permission_headline">Konum izni</string>
     <string name="faq_privacy_headline">Gizlilik hususları</string>
@@ -179,7 +179,7 @@
     <string name="output_open_navigation">Gezinti</string>
     <string name="output_open_street_view">Sokak görünümü</string>
     <string name="output_open_link">%1$s bağlantısını aç</string>
-    <string name="conversion_permission_common_text"><![CDATA[<tt>%1$s</tt> linki koordinat içermiyor. %2$s’in bunları alabilmek için harita hizmetine bağlanması gerekiyor.]]></string>
+    <string name="conversion_permission_common_text">%1$s linki koordinat içermiyor. %2$s’in bunları alabilmek için harita hizmetine bağlanması gerekiyor.</string>
     <string name="user_preferences_connection_description">Kısa bağlantıları ve URL’de coğrafi koordinat içermeyen bağlantıları desteklemek için, %1$s harita servisine (Google Haritalar, Apple Haritalar vb.) bağlanabilir.</string>
     <string name="user_preferences_connection_option_always">İzin ver</string>
     <string name="user_preferences_connection_option_never">Asla izin verme</string>
@@ -236,7 +236,7 @@
     <string name="conversion_failed_reason_exception">Bilinmeyen istisna</string>
     <string name="output_save_to_contact_failed">Nokta rehbere kaydedilemedi</string>
     <string name="output_save_to_contact_automation_failed">Nokta otomatik olarak rehbere kaydedilemedi</string>
-    <string name="faq_how_text_2_item_api">harita servisinin API’si,</string>
+    <string name="faq_how_text_2_item_api">harita servisinin API’si</string>
     <string name="conversion_failed_unsupported_source_place_list">Yer listeleri desteklenmiyor</string>
     <string name="network_exception_connect_exception">Bağlantı reddedildi</string>
     <string name="network_exception_unauthorized">Yetkisiz</string>
@@ -250,7 +250,7 @@
     <string name="server_insert">Sunucu ekle</string>
     <string name="server_invalid">Kimlik bilgilerini ayarla</string>
     <string name="server_list_google_maps_address_title">Google Haritalar adresleri</string>
-    <string name="server_list_google_maps_none_description">HTML’den koordinatları çıkart (deneysel)</string>
+    <string name="server_list_none_html">HTML’den koordinatları çıkart (deneysel)</string>
     <string name="server_list_google_maps_place_title">Google Haritalar yer kimlikleri</string>
     <string name="server_list_none">API sunucusu kullanma</string>
     <string name="server_list_search_none_description">Arama kullanılamayacak</string>

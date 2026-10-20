@@ -1,0 +1,10 @@
+- Added send point via messaging app feature.
+- Added save point to contact feature.
+- Added web map Géoportail (cartes.gouv.fr).
+- Fixed Google Maps place list links.
+- Fixed Baidu Map location accuracy.
+- Fixed pin display when opening Cartes IGN.
+- Fixed splash screen in dark mode.
+- Improved sharing by closing GeoShare after opening a map app.
+- Improved web parsing UI.
+- Improved network error messages.

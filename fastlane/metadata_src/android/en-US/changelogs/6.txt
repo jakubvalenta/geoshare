@@ -1,0 +1,1 @@
+- Add support for the 'q' parameter of a Google Maps URL.

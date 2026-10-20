@@ -1,0 +1,2 @@
+- Improved network connection timeouts and messages.
+- Added Arabic, Chinese, Italian and Ukrainian translations.

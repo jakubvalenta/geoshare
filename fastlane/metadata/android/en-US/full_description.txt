@@ -49,6 +49,6 @@ When you like Google Maps for finding places, but you prefer a different app for
 
 <b>How it works and privacy considerations</b>
 
-GeoShare converts map links (e.g. https://maps.app.goo.gl/...) into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. GeoShare extracts them from the map URL.
+GeoShare converts map links (e.g. https://maps.app.goo.gl/...) into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. GeoShare reads them from the map URL.
 
-However, not all map URLs include coordinates. In such cases, GeoShare will <b>prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.)</b> and retrieve the coordinates from either HTTP headers or the HTML document of the link. For more detailed information, check the app’s FAQ screen.
+However, not all map URLs include coordinates. In such cases, GeoShare will <b>prompt you for permission to connect to the map service (Google Maps, Apple Maps, etc.)</b> and read the coordinates from HTTP headers, HTML document, or an API. For more detailed information, check the app’s FAQ screen.

@@ -29,7 +29,7 @@
     <string name="conversion_connecting">Connecting to %1$s…</string>
     <string name="conversion_permission">Connect to %1$s?</string>
     <string name="conversion_processing">Processing link of type %1$s</string>
-    <string name="conversion_succeeded_check_experimental">Location might be inaccurate due to an experimental extraction method.</string>
+    <string name="conversion_succeeded_check_experimental">Location might be inaccurate, because the support for this map link is experimental.</string>
     <string name="conversion_succeeded_check_map_center">Location might be a map center, not a pin.</string>
     <string name="conversion_succeeded_check_name_only">Failed to find coordinates, using a place name.</string>
     <string name="conversion_succeeded_check_name_only_points">Failed to find coordinates for some points.</string>
@@ -75,7 +75,6 @@
     <string name="input_google_maps_place_api_name" translatable="false">Google Maps (place API)</string>
     <string name="input_google_maps_place_list_name" translatable="false">Google Maps (place list)</string>
     <string name="input_google_maps_short_link_name" translatable="false">Google Maps (short link)</string>
-    <string name="input_google_maps_web_view_name" translatable="false">Google Maps (WebView)</string>
     <string name="input_google_search_name" translatable="false">Google Search</string>
     <string name="input_kagi_maps_name">Kagi Maps</string>
     <string name="input_kagi_maps_warning_account">Links with place ids are not supported, because they require a Kagi account.</string>
@@ -99,18 +98,19 @@
     <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
     <string name="conversion_succeeded_apps_headline">Open with</string>
     <string name="conversion_succeeded_apps_links_configure">Configure web maps</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings ➞ Apps ➞ Maps ➞ <i>Open by default</i> and turn off the opening of links in this app.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">First, go to Settings ➞ Apps ➞ Maps ➞ %1$s and turn off the opening of links in this app.</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot of Google Maps’ Open by default settings</string>
     <string name="intro_open_by_default_google_maps_button">Open Google Maps settings</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Choose how to open web links for this app</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">In the app</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">In your browser</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Then go to Settings ➞ Apps ➞ %1$s ➞ <i>Open by default</i>, turn on the opening of links in this app, and tap <i>Add links</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">Then go to Settings ➞ Apps ➞ %1$s ➞ %2$s, turn on the opening of links in this app, and tap %3$s.</string>
     <string name="intro_open_by_default_app_button">Open %1$s settings</string>
     <string name="intro_open_by_default_app_note_1">Select %1$s, %2$s, and %3$s. These are the common Google Maps links. You can choose other maps or the more rare links too, but it’s not essential.</string>
     <string name="intro_open_by_default_app_note">If some links are grayed out, other map apps are set to open them by default. You can find these apps and turn off the opening of links for them, like we did for Google Maps. Check also apps installed in private space, if you use this Android feature.</string>
     <string name="open_by_default">Open by default</string>
+    <string name="open_by_default_add_links">Add links</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d supported link</item>
         <item quantity="other">%1$d supported links</item>
@@ -196,7 +196,7 @@
     <string name="conversion_loading_indicator_description" tools:ignore="PluralsCandidate">Attempt %1$d out of %2$d due to: %3$s</string>
     <string name="conversion_permission_common_grant">OK</string>
     <string name="conversion_permission_common_deny">Cancel</string>
-    <string name="conversion_permission_common_text"><![CDATA[The link <tt>%1$s</tt> doesn’t contain coordinates. %2$s needs to connect to the map service to get them.]]></string>
+    <string name="conversion_permission_common_text">The link %1$s doesn’t contain coordinates. %2$s needs to connect to the map service to get them.</string>
     <string name="about_title">About</string>
     <string name="about_app_icon_content_description">Application icon</string>
     <string name="about_app_name_and_version">%1$s %2$s</string>
@@ -207,22 +207,21 @@
     <string name="permission_do_not_ask">Don’t ask me again</string>
     <string name="faq_title">FAQ</string>
     <string name="faq_how_headline">How it works</string>
-    <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s extracts them from the map URL.</string>
-    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and retrieve the coordinates from:</string>
-    <string name="faq_how_text_2_item_api">or the API of the map service,</string>
+    <string name="faq_how_text_1">%1$s converts map links into geo: links that can be opened by other map apps. To create a geo: link, geographic coordinates are required. %1$s read them from the map URL.</string>
+    <string name="faq_how_text_2">However, not all map URLs include coordinates. In such cases, %1$s will prompt you for permission to connect to the map service (Google Maps, Apple Maps etc.) and read the coordinates from:</string>
+    <string name="faq_how_text_2_item_api">or the API of the map service</string>
     <string name="faq_how_text_2_item_api_example" translatable="false">GET https://geocode.googleapis.com/v4/geocode/address/…</string>
-    <string name="faq_how_text_2_item_http">either HTTP headers,</string>
+    <string name="faq_how_text_2_item_http">either HTTP headers</string>
     <string name="faq_how_text_2_item_http_example" translatable="false">Location: https://google.com/maps/@40.78,-73.96,19z</string>
-    <string name="faq_how_text_2_item_html">or HTML document,</string>
+    <string name="faq_how_text_2_item_html">or HTML document</string>
     <string name="faq_how_text_2_item_html_example" translatable="false">&lt;meta property=&quot;place:location:latitude&quot; content=&quot;40.78&quot;&gt;</string>
-    <string name="faq_how_text_2_item_web">or the live web page including JavaScript.</string>
     <string name="faq_how_text_3">If you don’t allow connecting to the map service, then %1$s creates a geo: link with a place name instead of coordinates, or it stops, depending on the particular link.</string>
     <string name="faq_how_text_4">To permanently allow or deny connecting to the map service instead of always asking (the default), go to the app’s %1$s.</string>
     <string name="faq_how_text_4_preferences_button">preferences</string>
     <string name="faq_location_permission_headline">Location permission</string>
     <string name="faq_location_permission_text">%1$s asks for location permission when launching the TomTom navigation and when sharing a GPX route, because in these cases the app needs to create a GPX route that starts at your current location. The location information is discarded immediately after the creation of the route.</string>
     <string name="faq_name_only_title">Failed to find coordinates, using a place name</string>
-    <string name="faq_name_only_text_1">%1$s is able to extract only a place name, e.g. “Mount Kilimanjaro”, from certain map links. When you open this location in another map app, it might show a different place than the original link, because several places with the same name might exist.</string>
+    <string name="faq_name_only_text_1">%1$s is able to read only a place name, e.g. “Mount Kilimanjaro”, from certain map links. When you open this location in another map app, it might show a different place than the original link, because several places with the same name might exist.</string>
     <string name="faq_name_only_text_2">Points identified only by name are not included in GPX routes.</string>
     <string name="faq_open_by_default_headline">How to always open links in %1$s</string>
     <string name="faq_privacy_headline">Privacy considerations</string>
@@ -332,9 +331,9 @@
     <string name="server_invalid">Set credentials</string>
     <string name="server_list_description">When map service connection is allowed, %1$s uses API servers to convert certain links to coordinates. Choose whether to use official servers with your own credentials, proxy servers, or none.</string>
     <string name="server_list_google_maps_address_title">Google Maps addresses</string>
-    <string name="server_list_google_maps_none_description">Extract coordinates from HTML (experimental)</string>
     <string name="server_list_google_maps_place_title">Google Maps place ids</string>
     <string name="server_list_none">Don’t use API server</string>
+    <string name="server_list_none_html">Read coordinates from HTML (experimental)</string>
     <string name="server_list_search_none_description">Search will not be available</string>
     <string name="server_list_search_title">Search</string>
     <string name="server_list_title">API servers</string>

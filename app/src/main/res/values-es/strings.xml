@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="main_input_uri_label">Pegue aquí un enlace de mapa</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Luego vaya a Ajustes ➞ Aplicaciones ➞ %1$s ➞ <i>Abrir por defecto</i>, active la apertura de enlaces en esta aplicación, y pulse <i>Añadir enlaces</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">Luego vaya a Ajustes ➞ Aplicaciones ➞ %1$s ➞ %2$s, active la apertura de enlaces en esta aplicación, y pulse %3$s.</string>
     <string name="nav_menu_content_description">Menú</string>
     <string name="main_create_geo_uri">Mostrar coordenadas</string>
     <string name="intro_open_by_default_app_button">Abrir ajustes de %1$s</string>
     <string name="user_preferences_connection_description">Para soportar enlaces cortos de mapas, y para obtener coordenadas de la página web del servicio de mapas cuando el enlace no las contiene, %1$s puede conectarse al servicio de mapas. Puedes encontrar más información en la pantalla de preguntas frecuentes (FAQ).</string>
     <string name="conversion_permission_common_deny">Cancelar</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Primero, vaya a Ajustes ➞ Aplicaciones ➞ Mapas ➞ <i>Abrir por defecto</i> y apaga la apertura de enlaces en esta aplicación.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Primero, vaya a Ajustes ➞ Aplicaciones ➞ Mapas ➞ %1$s y apaga la apertura de enlaces en esta aplicación.</string>
     <string name="intro_open_by_default_google_maps_content_description">Captura de pantalla de la configuración predeterminada de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Abrir los ajustes de Google Maps</string>
     <string name="intro_nav_close">Cerrar</string>
@@ -30,7 +30,7 @@
     <string name="nav_back_content_description">Volver a la pantalla principal</string>
     <string name="intro_open_by_default_app_note">Si algunos enlaces aparecen en gris, otras aplicaciones de mapa están fijados para abrirlos por defecto. Puede encontrar estas apps y apagar la apertura de tales enlaces, como se hizo en Google Maps.</string>
     <string name="intro_settings_activity_not_found">Error al abrir ajustes</string>
-    <string name="conversion_permission_common_text"><![CDATA[El enlace <tt>%1$s</tt> no contiene coordenadas. %2$s necesita conectar al servicio de mapas para obtenerlos.]]></string>
+    <string name="conversion_permission_common_text">El enlace %1$s no contiene coordenadas. %2$s necesita conectar al servicio de mapas para obtenerlos.</string>
     <string name="main_input_uri_clear_content_description">Vaciar</string>
     <string name="about_text"><![CDATA[<p>%1$s es una aplicación libre y de código abierto distribuido bajo la licencia <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> o superior.</p><br><p>Puede encontrar el código por <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, donde puede también<a href="https://github.com/jakubvalenta/geoshare/issues">reportar incidentes</a>.</p><br><p>Sus comentarios son bienvenidos. Puede contactarme vía <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_title">¿Permitir conectarse al servicio de mapas (Google, Apple, etc.)?</string>
@@ -42,6 +42,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">En la aplicación</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">En tu navegador</string>
     <string name="open_by_default">Abrir por defecto</string>
+    <string name="open_by_default_add_links">Añadir enlaces</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d enlace soportado</item>
         <item quantity="many">%1$d enlaces soportados</item>
@@ -134,9 +135,8 @@
     <string name="faq_how_headline">Cómo funciona</string>
     <string name="faq_how_text_1">%1$s convierte enlaces de mapa a enlaces geo: que pueden ser abiertos por otras aplicaciones de mapa. Para crear un enlace geo:, coordenadas geográficas son requeridas. %1$s las extrae del URL del mapa.</string>
     <string name="faq_how_text_2">Sin embargo, no todos los URLs de mapa incluyen coordenadas. En estos casos, %1$s pedirá permiso para conectarse al servicio de mapa (Google Maps, Apple Maps, etc.) y recibir las coordenadas desde:</string>
-    <string name="faq_how_text_2_item_http">ya sean encabezados HTTP,</string>
-    <string name="faq_how_text_2_item_html">o documento HTML,</string>
-    <string name="faq_how_text_2_item_web">o la página web en vivo incluyendo JavaScript.</string>
+    <string name="faq_how_text_2_item_http">ya sean encabezados HTTP</string>
+    <string name="faq_how_text_2_item_html">o documento HTML</string>
     <string name="faq_how_text_3">Si no permites conectarse al servicio de mapa, entonces %1$s creará un enlace geo: con un término de búsqueda en vez de coordenadas, o se detiene, dependiendo del enlace en particular.</string>
     <string name="faq_how_text_4">Para permitir o denegar permanentemente conectarse al servicio de mapa en vez de siempre preguntar (la opción por defecto), ve al %1$s de la aplicación.</string>
     <string name="faq_how_text_4_preferences_button">preferencias</string>
@@ -214,7 +214,7 @@
     <string name="conversion_succeeded_hide">Ocultar</string>
     <string name="converter_google_navigation_uri_name">URI de Google Navigation</string>
     <string name="converter_plus_code_name">Plus Codes</string>
-    <string name="faq_how_text_2_item_api">o el API del servicio de mapa,</string>
+    <string name="faq_how_text_2_item_api">o el API del servicio de mapa</string>
     <string name="faq_name_only_title">No fue posible encontrar coordenadas, utilice un nombre del sitio</string>
     <string name="faq_name_only_text_1">%1$s solo es capaz de extraer el nombre de un lugar, por ejemplo, «Monte Kilimanjaro», de determinados enlaces de mapas. Al abrir esta ubicación en otra aplicación de mapas, es posible que se muestre un lugar distinto al del enlace original, ya que podrían existir varios lugares con el mismo nombre.</string>
     <string name="faq_name_only_text_2">Puntos especificados solo por nombre no son incluidos en las rutas GPX.</string>
@@ -276,7 +276,7 @@
     <string name="server_invalid">Establecer credenciales</string>
     <string name="server_list_description">Cuando se permite la conexión al servicio de mapas, %1$s utiliza servidores API para convertir determinados enlaces en coordenadas. Elija si desea utilizar servidores oficiales con sus propias credenciales, servidores proxy o ninguno.</string>
     <string name="server_list_google_maps_address_title">Direcciones de Google Maps</string>
-    <string name="server_list_google_maps_none_description">Coordenadas de extracto desde HTML (experimental)</string>
+    <string name="server_list_none_html">Coordenadas de extracto desde HTML (experimental)</string>
     <string name="server_list_google_maps_place_title">Ids del lugar Google Maps</string>
     <string name="server_list_none">No utilizar API del servidor</string>
     <string name="server_list_search_none_description">La búsqueda no estará disponible</string>

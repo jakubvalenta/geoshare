@@ -9,8 +9,8 @@ import page.ooooo.geoshare.data.extensions.toLatLonPoint
 import page.ooooo.geoshare.data.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.log.Log
-import page.ooooo.geoshare.data.network.DESKTOP_USER_AGENT
 import page.ooooo.geoshare.data.network.FetchTools
+import page.ooooo.geoshare.data.network.MOBILE_USER_AGENT
 import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,8 +30,8 @@ class MapQuestHtmlInput @Inject constructor(
             engine,
             log,
             uriQuote,
-            // Set a custom user agent, so that MapQuest doesn't return empty 202 Accepted response
-            userAgent = DESKTOP_USER_AGENT,
+            // Set any standard user agent, so that MapQuest doesn't return an empty 202 response
+            userAgent = MOBILE_USER_AGENT,
         ) { data ->
             parseResultAsync {
                 val latLonPattern = Regex(""""latitude":$LAT,"longitude":$LON""")

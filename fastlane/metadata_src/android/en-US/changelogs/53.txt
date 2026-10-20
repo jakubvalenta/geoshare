@@ -1,0 +1,4 @@
+- Added Amap and Baidu Map web maps.
+- Improved result screen by showing attribution.
+- Fixed back gesture on main screen.
+- Removed incomplete Chinese (Traditional Han script) translation.

@@ -1,0 +1,2 @@
+- Added the option to hide installed apps.
+- Fixed Baidu Map POI links support.

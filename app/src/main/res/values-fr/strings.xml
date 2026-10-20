@@ -6,7 +6,7 @@
     <string name="conversion_error_retry">Réessayer</string>
     <string name="intro_open_by_default_google_maps_content_description">Capture d’écran des paramètres d’ouverture par défaut de Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Ouvrir les paramètres de Google Maps</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Allez ensuite dans Paramètres ➞ Applications ➞ %1$s ➞ <i>Ouvrir par défaut</i>, activez l’ouverture des liens dans cette application et appuyez sur <i>Ajouter des liens</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">Allez ensuite dans Paramètres ➞ Applications ➞ %1$s ➞ %2$s, activez l’ouverture des liens dans cette application et appuyez sur %3$s.</string>
     <string name="intro_open_by_default_app_button">Ouvrir les paramètres %1$s</string>
     <string name="intro_nav_close">Fermer</string>
     <string name="intro_settings_activity_not_found">Échec de l’ouverture des paramètres</string>
@@ -29,12 +29,12 @@
     <string name="conversion_succeeded_apps_not_found">Aucune application cartographique n’est installée</string>
     <string name="copying_finished">Copié dans le presse-papiers</string>
     <string name="conversion_failed_connection_permission_denied">Ce lien n’est pas pris en charge sans connexion au service de cartographie</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Tout d’abord, allez dans Paramètres ➞ Applications ➞ Cartes ➞ <i>Ouvrir par défaut</i> et désactivez l’ouverture des liens dans cette application.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Tout d’abord, allez dans Paramètres ➞ Applications ➞ Cartes ➞ %1$s et désactivez l’ouverture des liens dans cette application.</string>
     <string name="intro_open_by_default_app_note">Si certains liens apparaissent en gris, cela signifie que d’autres applications de cartographie sont configurées pour les ouvrir par défaut. Vous pouvez identifier ces applications et désactiver l’ouverture des liens par celles-ci, comme nous l’avons fait pour Google Maps. Vérifiez également les applications installées dans l’espace privé, si vous utilisez cette fonctionnalité d’Android.</string>
     <string name="main_input_uri_label">Collez un lien de carte ici</string>
     <string name="conversion_permission_common_deny">Annuler</string>
     <string name="about_text"><![CDATA[<p>%1$s est une application gratuite et open source distribuée sous licence <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou ultérieure.</p><br><p>Vous trouverez le code sur <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, où vous pouvez également <a href="https://github.com/jakubvalenta/geoshare/issues">signaler des problèmes</a>.</p><br><p>Vos commentaires sont les bienvenus. Vous pouvez me contacter à <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
-    <string name="conversion_permission_common_text"><![CDATA[Le lien <tt>%1$s</tt> ne contient pas de coordonnées. %2$s doit se connecter au service de cartographie pour les obtenir.]]></string>
+    <string name="conversion_permission_common_text">Le lien %1$s ne contient pas de coordonnées. %2$s doit se connecter au service de cartographie pour les obtenir.</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Repère placé</string>
     <string name="conversion_succeeded_apps_headline">Ouvrir avec</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
@@ -42,6 +42,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">Dans l’application</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">Dans votre navigateur</string>
     <string name="open_by_default">Ouvrir par défaut</string>
+    <string name="open_by_default_add_links">Ajouter des liens</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d lien compatible</item>
         <item quantity="many">%1$d liens compatibles</item>
@@ -142,9 +143,8 @@
     <string name="faq_how_headline">Comment ça marche</string>
     <string name="faq_how_text_1">%1$s convertit les liens de carte en liens geo: pouvant être ouverts par d’autres applications de cartographie. La création d’un lien geo: nécessite des coordonnées géographiques. %1$s les extrait de l’URL de la carte.</string>
     <string name="faq_how_text_2">Cependant, toutes les URL de cartes ne contiennent pas de coordonnées. Dans ce cas, %1$s vous demandera l’autorisation de vous connecter au service de cartographie (Google Maps, Apple Maps, etc.) et de récupérer les coordonnées depuis :</string>
-    <string name="faq_how_text_2_item_http">soit les en-têtes HTTP,</string>
-    <string name="faq_how_text_2_item_html">ou document HTML,</string>
-    <string name="faq_how_text_2_item_web">ou la page web en direct, y compris JavaScript.</string>
+    <string name="faq_how_text_2_item_http">soit les en-têtes HTTP</string>
+    <string name="faq_how_text_2_item_html">ou document HTML</string>
     <string name="faq_how_text_3">Si vous n’autorisez pas la connexion au service de cartographie, %1$s crée alors un lien « geo: » contenant le nom d’un lieu à la place des coordonnées, ou bien il s’arrête, selon le type de lien concerné.</string>
     <string name="faq_how_text_4">Pour autoriser ou refuser définitivement la connexion au service de carte au lieu de toujours demander (comportement par défaut), accédez aux %1$s de l’application.</string>
     <string name="faq_how_text_4_preferences_button">préférences</string>
@@ -243,7 +243,7 @@
     <string name="output_send">Envoyer le point</string>
     <string name="output_send_via">Envoyer le point via %1$s</string>
     <string name="conversion_failed_reason_exception">Exception inconnue</string>
-    <string name="faq_how_text_2_item_api">ou l’API du service de cartographie,</string>
+    <string name="faq_how_text_2_item_api">ou l’API du service de cartographie</string>
     <string name="faq_privacy_text_server">Pour certains liens vers des cartes, %1$s fait appel à un serveur distant, le logiciel libre %3$s. Ce serveur interroge ensuite l’API du service de cartographie (par exemple, l’API Google Maps). %2$s ne conserve pas de journaux relatifs aux liens vers les cartes. Afin d’appliquer une limitation de débit, il stocke une clé publique qui identifie votre appareil ainsi que, séparément, votre adresse IP pendant une durée limitée.</string>
     <string name="faq_privacy_text_html">Pour certains liens vers des cartes, %1$s charge la page Web en direct du service de cartographie et exécute son code JavaScript. Cela se produit dans un environnement restreint, qui bloque les scripts de suivi et ne stocke pas de cookies.</string>
     <string name="conversion_failed_unsupported_source_place_list">Les listes de lieux ne sont pas prises en charge</string>
@@ -261,7 +261,7 @@
     <string name="server_invalid">Définir les informations d’identification</string>
     <string name="server_list_description">Lorsque la connexion au service de cartographie est autorisée, %1$s utilise des serveurs API pour convertir certains liens en coordonnées. Vous pouvez choisir d’utiliser les serveurs officiels avec vos propres identifiants, des serveurs proxy ou de ne pas en utiliser.</string>
     <string name="server_list_google_maps_address_title">Coordonnées Google Maps</string>
-    <string name="server_list_google_maps_none_description">Extraire les coordonnées d’un fichier HTML (en phase d’expérimentation)</string>
+    <string name="server_list_none_html">Extraire les coordonnées d’un fichier HTML (en phase d’expérimentation)</string>
     <string name="server_list_google_maps_place_title">Identifiants de lieux Google Maps</string>
     <string name="server_list_none">N’utilisez pas le serveur API</string>
     <string name="server_list_search_none_description">La fonction de recherche ne sera pas disponible</string>

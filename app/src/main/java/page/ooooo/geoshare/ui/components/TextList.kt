@@ -75,7 +75,7 @@ private fun DefaultPreview() {
                     listOf(
                         R.string.faq_how_text_2_item_http,
                         R.string.faq_how_text_2_item_html,
-                        R.string.faq_how_text_2_item_web,
+                        R.string.faq_how_text_2_item_api,
                     ).forEach { textResId ->
                         TextListItem(bullet = { TextListBullet() }) {
                             Text(stringResource(textResId))
@@ -98,7 +98,7 @@ private fun DarkPreview() {
                     listOf(
                         R.string.faq_how_text_2_item_http,
                         R.string.faq_how_text_2_item_html,
-                        R.string.faq_how_text_2_item_web,
+                        R.string.faq_how_text_2_item_api,
                     ).forEach { textResId ->
                         TextListItem(bullet = { TextListBullet() }) {
                             Text(stringResource(textResId))

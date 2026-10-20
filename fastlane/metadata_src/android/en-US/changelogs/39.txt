@@ -1,0 +1,10 @@
+- Added warning if resulting location might be inaccurate.
+- Added Plus Codes (global only) support.
+- Added Cartes IGN input support.
+- Added web map Zoom Earth and fixed OSM pin.
+- Added support for URLs with space characters.
+- Added support for OSM links with query params.
+- Improved Google Maps and Amap accuracy in the greater China region.
+- Improved Yandex Maps POI support.
+- Improved error messages.
+- Changed app name stylization and title in app stores.

@@ -14,6 +14,7 @@
     <string name="intro_open_by_default_app_button">Открыть настройки %1$s</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">В вашем браузере</string>
     <string name="open_by_default">Открывать по умолчанию</string>
+    <string name="open_by_default_add_links">Добавить ссылки</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
         <item quantity="one">%1$d поддерживаемая ссылка</item>
         <item quantity="few">%1$d поддерживаемые ссылки</item>
@@ -24,7 +25,7 @@
     <string name="intro_settings_activity_not_found">Не удалось открыть настройки</string>
     <string name="main_input_uri_label">Вставьте сюда ссылку на карту</string>
     <string name="intro_open_by_default_google_maps_content_description">Снимок экрана настроек Google Maps «Открыть по умолчанию»</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[Затем перейдите в настройки ➞ приложения ➞ %1$s ➞ <i>Открывать по умолчанию</i>, включите открытие ссылок в этом приложении и нажмите <i>Добавить ссылки</i>.]]></string>
+    <string name="intro_open_by_default_app_caption">Затем перейдите в настройки ➞ приложения ➞ %1$s ➞ %2$s, включите открытие ссылок в этом приложении и нажмите %3$s.</string>
     <string name="conversion_permission">Подключиться к %1$s?</string>
     <string name="conversion_permission_common_grant">Хорошо</string>
     <string name="conversion_permission_common_deny">Отмена</string>
@@ -40,14 +41,14 @@
     <string name="copying_finished">Скопировано в буфер обмена</string>
     <string name="conversion_failed_unsupported_service">Неподдерживаемый картографический сервис</string>
     <string name="conversion_succeeded_apps_not_found">Никакое приложение для карты не установлено</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[Сначала, перейдите в настройки ➞ приложения ➞ карты ➞ <i>Открывать по умолчанию</i> и отключите открытие ссылок в этом приложении.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">Сначала, перейдите в настройки ➞ приложения ➞ карты ➞ %1$s и отключите открытие ссылок в этом приложении.</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="about_title">О приложении</string>
     <string name="conversion_failed_connection_permission_denied">Эта ссылка не поддерживается без подключения к картографическому сервису</string>
     <string name="intro_open_by_default_app_note">Если некоторые ссылки выделены серым цветом, значит, другие приложения Google открывают их по умолчанию. Вы можете найти эти приложения и отключить открытие ссылок для них, как мы это сделали для Google Карт. Также проверьте приложения, установленные в личном (втором) пространстве, если вы используете эту функцию Android.</string>
     <string name="conversion_failed_missing_url">Отсутствует URL-адрес</string>
-    <string name="conversion_permission_common_text"><![CDATA[Эта ссылка <tt>%1$s</tt> не содержит координат. Для %2$s необходимо подключиться к картографическому сервису, чтобы получить их.]]></string>
+    <string name="conversion_permission_common_text">Эта ссылка %1$s не содержит координат. Для %2$s необходимо подключиться к картографическому сервису, чтобы получить их.</string>
     <string name="about_text"><![CDATA[<p>%1$s — это бесплатное приложение с открытым исходным кодом, распространяемое по лицензии <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> или более поздней версии.</p><br><p>Вы можете найти код на <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, где вы также можете <a href="https://github.com/jakubvalenta/geoshare/issues">сообщать о проблемах</a>.</p><br><p>Мы будем рады вашим отзывам. Вы можете связаться со мной по адресу <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="user_preferences_connection_description">Для поддержки коротких ссылок и ссылок без географических координат в URL-адресе, %1$s может подключаться к картографическому сервису (Google Карты, Карты Apple и др.).</string>
     <string name="conversion_connecting">Подключение к %1$s…</string>
@@ -144,9 +145,8 @@
     <string name="faq_how_headline">Как это работает</string>
     <string name="faq_how_text_1">%1$s преобразует ссылки карты в geo-ссылки, которые можно открыть другими картографическими приложениями. Для создания geo-ссылки необходимы географические координаты. %1$s извлекает их из URL-адреса карты.</string>
     <string name="faq_how_text_2">Однако не все URL-адреса карт содержат координаты. В таких случаях %1$s запросит у вас разрешение на подключение к картографическому сервису (Google Карты, Карты Apple и т. д.) и получение координат из:</string>
-    <string name="faq_how_text_2_item_http">либо HTTP-заголовков,</string>
-    <string name="faq_how_text_2_item_html">либо HTML-документа,</string>
-    <string name="faq_how_text_2_item_web">либо полной web-страницы, включая JavaScript.</string>
+    <string name="faq_how_text_2_item_http">либо HTTP-заголовков</string>
+    <string name="faq_how_text_2_item_html">либо HTML-документа</string>
     <string name="faq_how_text_3">Если вы не разрешаете подключаться к картографическому сервису, то %1$s создаёт geo-ссылку с названием места вместо координат или прерывает выполнение, в зависимости от конкретной ссылки.</string>
     <string name="faq_how_text_4">Чтобы навсегда разрешить или запретить подключение к картографическому сервису вместо постоянного запроса (по умолчанию), перейдите в %1$s приложения.</string>
     <string name="faq_how_text_4_preferences_button">настройки</string>
@@ -252,7 +252,7 @@
     <string name="output_save_to_contact_automation_failed">Не удалось автоматически сохранить точку в контакт</string>
     <string name="output_send">Отправить точку</string>
     <string name="conversion_failed_reason_exception">Неизвестное исключение</string>
-    <string name="faq_how_text_2_item_api">либо API картографического сервиса,</string>
+    <string name="faq_how_text_2_item_api">либо API картографического сервиса</string>
     <string name="faq_privacy_text_server">Для некоторых ссылок на карты %1$s обращается к удалённому серверу %3$s с открытым исходным кодом. Затем этот сервер вызывает API картографического сервиса (например, API Google Maps). %2$s не ведёт журналы ссылок на карты. Для применения ограничения скорости он сохраняет открытый ключ, который идентифицирует ваше устройство, и отдельно ваш IP-адрес в течение ограниченного времени.</string>
     <string name="faq_privacy_text_html">Для некоторых ссылок на карты %1$s загружает активную web-страницу картографического сервиса и выполняет её JavaScript. Это происходит в ограниченной среде, которая блокирует скрипты отслеживания и не сохраняет файлы cookie.</string>
     <string name="conversion_failed_unsupported_source_place_list">Списки мест не поддерживаются</string>
@@ -269,7 +269,7 @@
     <string name="server_insert">Добавить сервер</string>
     <string name="server_list_description">Если подключение к картографическому сервису разрешено, %1$s использует API серверов для преобразования определённых ссылок в координаты. Выберите, использовать ли официальные серверы с вашими собственными учётными данными, прокси-серверы или не использовать ничего.</string>
     <string name="server_list_google_maps_address_title">Адреса Google Карт</string>
-    <string name="server_list_google_maps_none_description">Извлекать координаты из HTML (экспериментально)</string>
+    <string name="server_list_none_html">Извлекать координаты из HTML (экспериментально)</string>
     <string name="server_list_google_maps_place_title">Идентификаторы мест в Google Картах</string>
     <string name="server_list_none">Не использовать API сервера</string>
     <string name="server_list_search_none_description">Поиск будет недоступен</string>

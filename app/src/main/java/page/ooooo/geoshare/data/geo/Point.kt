@@ -11,9 +11,9 @@ import page.ooooo.geoshare.data.extensions.toTrimmedString
  * This is the main structure to represent geographical data. See its implementations such as [WGS84Point] and
  * [GCJ02Point].
  *
- * Each point has a [source], which describes where the point was extracted from, e.g. map link URI, or HTML document;
+ * Each point has a [source], which describes where the point was read from, e.g. map link URI, or HTML document;
  * implementations must not set a default value in the constructor, so that when you create a point, you must
- * consciously decide where you extracted it from.
+ * consciously decide where you read it from.
  */
 sealed interface Point {
     val lat: Double?

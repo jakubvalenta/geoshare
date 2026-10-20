@@ -18,18 +18,22 @@ class BaiduMapWebViewInput @Inject constructor(
     private val log: Log,
 ) : WebViewInput {
     @Serializable
-    private data class ExtractedPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
+    private data class ClientPoint(val lat: Double?, val lon: Double?, val z: Double?, val name: String?)
 
     override fun getName(resources: Resources) = resources.getString(R.string.input_baidu_map_web_view_name)
     override val group = BaiduMapInputGroup
 
+    override val allowedUrlPattern by lazy {
+        Regex("""https://map\.baidu\.com[/?#]\S+""")
+    }
+
     /**
-     * Extracts point from the page JavaScript state.
+     * Reads point from the page JavaScript state.
      *
      * It doesn't take coordinates from `_appStateFromUrl.loc`, because these have a longitude offset.
      */
     // language=JavaScript
-    override fun getUnsafeExtractionJavaScript() = """
+    override val unsafeClientJavaScript = """
         () => {
             function deepGet(obj, ...keys) {
                 return keys.reduce((acc, key) => {
@@ -78,7 +82,7 @@ class BaiduMapWebViewInput @Inject constructor(
             explicitNulls = false
         }
         try {
-            json.decodeFromString<ExtractedPoint>(data)
+            json.decodeFromString<ClientPoint>(data)
         } catch (tr: IllegalArgumentException) {
             log.e(TAG, "Deserialization error", tr)
             null
