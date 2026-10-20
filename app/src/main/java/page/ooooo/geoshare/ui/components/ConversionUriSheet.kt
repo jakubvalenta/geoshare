@@ -49,6 +49,12 @@ fun ConversionUriSheet(
     onExecute: (action: Action<*>) -> Unit,
 ) {
     val outputsForUriByCategory by outputsForUriByCategory.collectAsStateWithLifecycle()
+    if (outputsForUriByCategory.copy.isEmpty() && outputsForUriByCategory.open.isEmpty()) {
+        // Don't render the sheet before the outputs have been loaded. Because the sheet glitches if it's rendered empty
+        // first and filled later.
+        return
+    }
+
     val sheetState = rememberBottomSheetState(initialValue)
 
     ModalBottomSheet(
