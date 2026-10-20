@@ -433,6 +433,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainSourceIcon" }.click() // Expand log
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_log")
+        saveScreenshot("free_strings/conversion_result_log")
         onElement { viewIdResourceName == "geoShareMainSourceIcon" }.click() // Collapse log
         quickWaitForStableInActiveWindow() // Wait for the log exit animation
 
@@ -502,6 +503,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.HOW_IT_WORKS}" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/faq_how_it_works")
+        saveScreenshot("free_strings/faq_how_it_works")
 
         // FAQ - Location permission
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.LOCATION_PERMISSION}" }.click()
