@@ -1,0 +1,3 @@
+- Přidána česká jazyková verze.
+- Opravena chyba, kdy se aplikace ptala na oprávnění na zařízeních Xiaomi, která nepoužívala MIUI.
+- Opravena chyba, kdy Google Mapy nereagovaly po odmítnutí oprávnění na Xiaomi.

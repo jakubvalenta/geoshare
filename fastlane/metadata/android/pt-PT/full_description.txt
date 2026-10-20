@@ -1,0 +1,49 @@
+Partilhe um link de mapa com o GeoShare e a aplicação irá abrir o mesmo em outra aplicação de mapas instalado.
+
+<b>Links de mapas suportados</b>
+
+- Google Maps
+- Apple Maps
+- 2GIS
+- Amap (AutoNavi)
+- Baidu Map (beta)
+- Cartes IGN
+- CoMaps
+- HERE WeGo
+- Magic Earth
+- Maps.me
+- Mapy.com
+- OpenStreetMap
+- Organic Maps
+- OsmAnd
+- Plus Codes (global only)
+- Urbi
+- Waze
+- Yandex Maps
+- coordinates
+
+<b>Casos de uso exemplo</b>
+
+Quando alguém envia-lhe um link do Google Maps, mas prefere usar OpenStreetMap, pode rapidamente <b>abrir a mesma localização</b> no OsmAnd ou Organic Maps.
+
+Quando gosta do Google Maps para encontrar sítios, mas prefere uma aplicação diferente para navegação, pode facilmente mudar do google maps para a sua <b>aplicação de navegação</b> favorita.
+
+<b>Outras funcionalidades</b>
+
+- Mostra as <b>coordenadas geográficas</b> de um link de mapa e permite-lhe copiar as mesmas para a área de transferência em vários formatos, por exemplo na forma de um geo: link
+- Mostra todos os pontos de um link de uma <b>lista de lugares</b>.
+- Permite realizar uma ação <b>automaticamente</b> quando um link de um mapa é processado.
+- Permite <b>lançar a navegação</b> em todas as aplicações que a suporta, incluindo o TomTom.
+- Permite abrir uma localização em <b>web maps</b>, pré-instalados ou os seus.
+- Permite guardar uma localização na forma de um <b>ficheiro GPX</b>.
+- Permite enviar uma localização através de uma <b>aplicação de mensagens</b>.
+- Permite guardar uma localização para um <b>contacto</b>.
+- Tenta novamente em <b>ligações de internet instáveis</b>.
+- Permite <b>colar links de mapas</b> diretamente na aplicação, em vez de partilhas as mesmas com ela.
+- A interface adapta-se a <b>tablets</b>.
+
+<b>Como funciona e considerações sobre privacidade</b>
+
+GeoShare converte links de mapas (p.ex. https://maps.app.goo.gl/...) em geo: links que podem ser abertos por outras aplicações de mapas. Para criar um geo: link , coordenadas geográficas são necessárias. GeoShare extrai as mesmas a partir do URL do mapa.
+
+No entanto, nem todos os URLs de mapas incluem coordenadas. Em tais casos, o GeoShare irá <b>pedir-lhe permissão para conectar-se ao serviço de mapa (Google Maps, Apple Maps etc.)</b> e buscar as coordenadas ou de cabeçalhos HTTP ou do documento HTML do link. Para informação mais detalhada, consulte o ecrã FAQ da aplicação.

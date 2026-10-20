@@ -1,0 +1,3 @@
+- Added support for certain URLs with trailing slash.
+- Added Polish translation.
+- Improved conversion form layout, so that it's not hidden behind keyboard.

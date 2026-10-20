@@ -2,6 +2,7 @@
 <resources>
     <string name="nav_menu_content_description">Menü</string>
     <string name="nav_back_content_description">Vissza a kezdőképernyőre</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[First, go to Settings ➞ Apps ➞ Maps ➞ <i>Megnyitás alapértelmezés szerint</i> és kapcsold ki a hivatkzások megnyitását az alkalmazással.]]></string>
+    <string name="intro_open_by_default_google_maps_caption">First, go to Settings ➞ Apps ➞ Maps ➞ %1$s és kapcsold ki a hivatkzások megnyitását az alkalmazással.</string>
     <string name="intro_open_by_default_google_maps_content_description">A Google Maps alapértelmezett megnyitás képernyőképe</string>
+    <string name="open_by_default">Megnyitás alapértelmezés szerint</string>
 </resources>

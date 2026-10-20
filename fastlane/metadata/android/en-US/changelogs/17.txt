@@ -1,0 +1,1 @@
+- Added French and Spanish translations.

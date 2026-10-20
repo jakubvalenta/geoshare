@@ -1,0 +1,2 @@
+- Ask before connecting to Google.
+- Add preferences screen.

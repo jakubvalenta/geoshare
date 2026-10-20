@@ -1,0 +1,2 @@
+- Added Google Maps waypoint names support.
+- Improved how points are show on the result screen when there's several of them.

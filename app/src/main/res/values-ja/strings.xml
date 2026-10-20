@@ -66,13 +66,15 @@
     <string name="intro_how_to_share_google_maps_screenshot_place">刺したピン</string>
     <string name="conversion_succeeded_apps_headline">他のアプリで開く</string>
     <string name="conversion_succeeded_apps_links_configure">Web地図を設定</string>
-    <string name="intro_open_by_default_google_maps_caption"><![CDATA[まず、設定➞アプリ➞マップ→<i>デフォルトで開く</i>へ移動し、アプリ内でリンクを開くをオフにします。]]></string>
+    <string name="intro_open_by_default_google_maps_caption">まず、設定➞アプリ➞マップ→%1$sへ移動し、アプリ内でリンクを開くをオフにします。</string>
     <string name="intro_open_by_default_google_maps_content_description">Googleマップのデフォルトで開く設定のスクリーンショット</string>
     <string name="intro_open_by_default_google_maps_button">Googleマップの設定を開く</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">マップ</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">このアプリのウェブリンクを開く方法を選択</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">アプリ内</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">ブラウザ内</string>
-    <string name="intro_open_by_default_app_caption"><![CDATA[まず、設定➞アプリ➞%1$s→<i>デフォルトで開く</i>へ移動し、アプリ内でリンクを開くをオフにして、<i>リンクを追加</i>を押します。]]></string>
+    <string name="intro_open_by_default_app_caption">まず、設定➞アプリ➞%1$s→%2$sへ移動し、アプリ内でリンクを開くをオフにして、%3$sを押します。</string>
     <string name="intro_open_by_default_app_button">%1$sの設定を開く</string>
+    <string name="open_by_default">デフォルトで開く</string>
+    <string name="open_by_default_add_links">リンクを追加</string>
 </resources>

@@ -1,0 +1,8 @@
+- Add form to convert Google Maps links to geo: links to the app's main screen.
+- Add an intro screen explaining how to share and copy links, and how to configure Open by default.
+- Hide the app from Recent Apps after sharing or copying a link.
+- Ask for the Xiaomi-specific 'Display pop-up windows while running in the background' permission.
+- Revert support for sharing a geo: link with the app, because it was confusing.
+- Fix text color on Xiaomi phones.
+- Add FAQ section about GMaps WV compatibility.
+- Shorten activity names to prevent ellipsis in Google Maps sharing UI.

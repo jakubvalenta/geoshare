@@ -1,0 +1,1 @@
+- Added support for place lists shared using the Google Maps "Send link to view" feature.

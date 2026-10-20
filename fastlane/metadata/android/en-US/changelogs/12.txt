@@ -1,0 +1,3 @@
+- Add Czech language version.
+- Fix Xiaomi permission dialog appearing on devices not running MIUI.
+- Fix unresponsive Google Maps after Xiaomi permission denied.

@@ -1,0 +1,2 @@
+- Fixed Google Maps place links.
+- Added Privacy considerations to FAQ screen.
