@@ -84,6 +84,8 @@ import page.ooooo.geoshare.data.preferences.ShareNavigationGoogleUriAutomation
 import page.ooooo.geoshare.data.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.preferences.ShareStreetViewGoogleUriAutomation
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
+import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -94,18 +96,18 @@ data class OutputsForPoint(
 )
 
 data class OutputsForPoints(
-    val open: List<PointsOutput>,
     val save: List<PointsOutput>,
+    val share: List<PointsOutput>,
 )
 
 data class OutputsForApps(
-    val maps: Map<String, List<Output>>,
-    val messaging: Map<String, List<Output>>,
+    val maps: Map<String, List<Output<*>>>,
+    val messaging: Map<String, List<Output<*>>>,
 )
 
 data class OutputsForSharing(
     val default: PointOutput,
-    val open: List<Output>,
+    val all: List<Output<*>>,
 )
 
 data class OutputsForUri(
@@ -117,27 +119,28 @@ data class OutputsForUri(
 class OutputRepository @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
     private val log: Log,
+    private val uriQuote: UriQuote,
 ) {
     fun getOutputsForPoint(links: List<Link>): OutputsForPoint =
         OutputsForPoint(
             copy = listOf(
-                CopyCoordsDecOutput(coordinateConverter),
-                CopyCoordsDegMinSecOutput(coordinateConverter),
-                CopyNameOutput,
-                CopyGeoUriOutput(coordinateConverter),
+                CopyCoordsDecOutput(coordinateConverter, uriQuote),
+                CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
+                CopyNameOutput(uriQuote),
+                CopyGeoUriOutput(coordinateConverter, uriQuote),
                 *links
                     .filter { it.sheetEnabled }
                     .groupBy { it.groupOrName }
                     .toSortedMap()
                     .values
                     .flatten()
-                    .map { CopyLinkUriOutput(it, coordinateConverter) }
+                    .map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }
                     .toTypedArray(),
             ),
             open = listOf(
-                ShareDisplayGeoUriOutput(coordinateConverter),
-                ShareNavigationGoogleUriOutput(coordinateConverter),
-                ShareStreetViewGoogleUriOutput(coordinateConverter),
+                ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+                ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
+                ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
                 SavePointToContactOutput(coordinateConverter),
             ),
             save = listOf(
@@ -148,13 +151,13 @@ class OutputRepository @Inject constructor(
 
     fun getOutputsForPoints(): OutputsForPoints =
         OutputsForPoints(
-            open = listOf(
-                ShareRouteGpxOutput(coordinateConverter),
-                SharePointsGpxOutput(coordinateConverter),
-            ),
             save = listOf(
                 SaveRouteGpxOutput(coordinateConverter),
                 SavePointsGpxOutput(coordinateConverter),
+            ),
+            share = listOf(
+                ShareRouteGpxOutput(coordinateConverter),
+                SharePointsGpxOutput(coordinateConverter),
             ),
         )
 
@@ -169,7 +172,7 @@ class OutputRepository @Inject constructor(
     private fun getOutputsForAppsCategory(
         activities: List<AppActivity>,
         hiddenApps: Set<String>?,
-    ): Map<String, List<Output>> =
+    ): Map<String, List<Output<*>>> =
         activities
             .groupBy { activity -> activity.packageName }
             .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
@@ -179,25 +182,25 @@ class OutputRepository @Inject constructor(
                     .flatMap { activity -> activity.toOutputs() }
             }
 
-    fun getOutputsForLinks(links: List<Link>): Map<String, List<Output>> =
+    fun getOutputsForLinks(links: List<Link>): Map<String, List<Output<*>>> =
         links
             .filter { it.appEnabled }
             .groupBy { it.groupOrName }
             .toSortedMap()
             .mapValues { (_, links) ->
                 listOf(
-                    *links.map { ShareLinkUriOutput(it, coordinateConverter) }.toTypedArray(),
-                    *links.map { CopyLinkUriOutput(it, coordinateConverter) }.toTypedArray(),
+                    *links.map { ShareLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
+                    *links.map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
                 )
             }
 
     fun getOutputsForSharing(): OutputsForSharing =
         OutputsForSharing(
-            default = ShareDisplayGeoUriOutput(coordinateConverter),
-            open = listOf(
-                ShareDisplayGeoUriOutput(coordinateConverter),
-                ShareNavigationGoogleUriOutput(coordinateConverter),
-                ShareStreetViewGoogleUriOutput(coordinateConverter),
+            default = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+            all = listOf(
+                ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+                ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
+                ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
                 ShareRouteGpxOutput(coordinateConverter),
                 SharePointsGpxOutput(coordinateConverter),
                 SavePointToContactOutput(coordinateConverter),
@@ -206,11 +209,11 @@ class OutputRepository @Inject constructor(
 
     fun getOutputsForPointChips(links: List<Link>): List<PointOutput> =
         listOf(
-            CopyGeoUriOutput(coordinateConverter),
+            CopyGeoUriOutput(coordinateConverter, uriQuote),
             *links
                 .filter { it.chipEnabled }
                 .sortedBy { it.name }
-                .map { CopyLinkUriOutput(it, coordinateConverter) }
+                .map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }
                 .toTypedArray(),
         )
 
@@ -235,7 +238,7 @@ class OutputRepository @Inject constructor(
             },
         )
 
-    private fun AppActivity.toOutputs(): List<Output> =
+    private fun AppActivity.toOutputs(): List<Output<*>> =
         when (this) {
             is FileActivity ->
                 when (fileType) {
@@ -250,30 +253,30 @@ class OutputRepository @Inject constructor(
                 }
 
             is TextActivity -> listOf(
-                SendPointOutput(this, coordinateConverter),
+                SendPointOutput(this, coordinateConverter, uriQuote),
             )
 
             is UriActivity ->
                 when (uriScheme) {
                     UriScheme.CARTES_IGN -> listOf(
-                        OpenDisplayCartesIGNUrlOutput(this, coordinateConverter),
+                        OpenDisplayCartesIGNUrlOutput(this, coordinateConverter, uriQuote),
                     )
 
                     UriScheme.GEO -> listOf(
-                        OpenDisplayGeoUriOutput(this, coordinateConverter),
+                        OpenDisplayGeoUriOutput(this, coordinateConverter, uriQuote),
                     )
 
                     UriScheme.GOOGLE_NAVIGATION -> listOf(
-                        OpenNavigationGoogleUriOutput(this, coordinateConverter),
+                        OpenNavigationGoogleUriOutput(this, coordinateConverter, uriQuote),
                     )
 
                     UriScheme.GOOGLE_STREET_VIEW -> listOf(
-                        OpenStreetViewGoogleUriOutput(this, coordinateConverter),
+                        OpenStreetViewGoogleUriOutput(this, coordinateConverter, uriQuote),
                     )
 
                     UriScheme.MAGIC_EARTH -> listOf(
-                        OpenDisplayMagicEarthUriOutput(this, coordinateConverter),
-                        OpenNavigationMagicEarthUriOutput(this, coordinateConverter),
+                        OpenDisplayMagicEarthUriOutput(this, coordinateConverter, uriQuote),
+                        OpenNavigationMagicEarthUriOutput(this, coordinateConverter, uriQuote),
                     )
 
                     UriScheme.UNKNOWN -> listOf(
@@ -283,19 +286,22 @@ class OutputRepository @Inject constructor(
         }
 }
 
-fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter): Output? =
+fun BasicAutomation.toOutput(
+    coordinateConverter: CoordinateConverter,
+    uriQuote: UriQuote = DefaultUriQuote,
+): Output<*>? =
     when (this) {
         is CopyCoordsDecAutomation ->
-            CopyCoordsDecOutput(coordinateConverter)
+            CopyCoordsDecOutput(coordinateConverter, uriQuote)
 
         is CopyCoordsDegMinSecAutomation ->
-            CopyCoordsDegMinSecOutput(coordinateConverter)
+            CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote)
 
         is CopyGeoUriAutomation ->
-            CopyGeoUriOutput(coordinateConverter)
+            CopyGeoUriOutput(coordinateConverter, uriQuote)
 
         is CopyNameAutomation ->
-            CopyNameOutput
+            CopyNameOutput(uriQuote)
 
         is NoopAutomation ->
             NoopOutput
@@ -313,7 +319,7 @@ fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter): Output? 
             SavePointToContactOutput(coordinateConverter)
 
         is ShareDisplayGeoUriAutomation ->
-            ShareDisplayGeoUriOutput(coordinateConverter)
+            ShareDisplayGeoUriOutput(coordinateConverter, uriQuote)
 
         is ShareRouteGpxAutomation ->
             ShareRouteGpxOutput(coordinateConverter)
@@ -322,34 +328,47 @@ fun BasicAutomation.toOutput(coordinateConverter: CoordinateConverter): Output? 
             SharePointsGpxOutput(coordinateConverter)
 
         is ShareNavigationGoogleUriAutomation ->
-            ShareNavigationGoogleUriOutput(coordinateConverter)
+            ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote)
 
         is ShareStreetViewGoogleUriAutomation ->
-            ShareStreetViewGoogleUriOutput(coordinateConverter)
+            ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote)
     }
 
-fun ActivityAutomation.toOutput(coordinateConverter: CoordinateConverter, log: Log = DefaultLog): Output? =
+fun ActivityAutomation.toOutput(
+    coordinateConverter: CoordinateConverter,
+    log: Log = DefaultLog,
+    uriQuote: UriQuote = DefaultUriQuote,
+): Output<*>? =
     when (this) {
         is OpenDisplayGeoUriAutomation ->
             packageName?.let { packageName ->
-                OpenDisplayGeoUriOutput(UriActivity(packageName, UriScheme.GEO), coordinateConverter)
+                OpenDisplayGeoUriOutput(UriActivity(packageName, UriScheme.GEO), coordinateConverter, uriQuote)
             }
 
         is OpenDisplayCartesIGNUrlAutomation ->
             packageName?.let { packageName ->
-                OpenDisplayCartesIGNUrlOutput(UriActivity(packageName, UriScheme.CARTES_IGN), coordinateConverter)
+                OpenDisplayCartesIGNUrlOutput(
+                    UriActivity(packageName, UriScheme.CARTES_IGN),
+                    coordinateConverter,
+                    uriQuote,
+                )
             }
 
         is OpenDisplayMagicEarthUriAutomation ->
             packageName?.let { packageName ->
-                OpenDisplayMagicEarthUriOutput(UriActivity(packageName, UriScheme.MAGIC_EARTH), coordinateConverter)
+                OpenDisplayMagicEarthUriOutput(
+                    UriActivity(packageName, UriScheme.MAGIC_EARTH),
+                    coordinateConverter,
+                    uriQuote,
+                )
             }
 
         is OpenNavigationGoogleUriAutomation ->
             packageName?.let { packageName ->
                 OpenNavigationGoogleUriOutput(
                     UriActivity(packageName, UriScheme.GOOGLE_NAVIGATION),
-                    coordinateConverter
+                    coordinateConverter,
+                    uriQuote,
                 )
             }
 
@@ -357,7 +376,8 @@ fun ActivityAutomation.toOutput(coordinateConverter: CoordinateConverter, log: L
             packageName?.let { packageName ->
                 OpenNavigationMagicEarthUriOutput(
                     UriActivity(packageName, UriScheme.MAGIC_EARTH),
-                    coordinateConverter
+                    coordinateConverter,
+                    uriQuote,
                 )
             }
 
@@ -365,7 +385,8 @@ fun ActivityAutomation.toOutput(coordinateConverter: CoordinateConverter, log: L
             packageName?.let { packageName ->
                 OpenStreetViewGoogleUriOutput(
                     UriActivity(packageName, UriScheme.GOOGLE_STREET_VIEW),
-                    coordinateConverter
+                    coordinateConverter,
+                    uriQuote,
                 )
             }
 
@@ -390,19 +411,23 @@ fun ActivityAutomation.toOutput(coordinateConverter: CoordinateConverter, log: L
 
         is SendPointAutomation ->
             packageName?.let { packageName ->
-                SendPointOutput(TextActivity(packageName, MimeType.TEXT_PLAIN), coordinateConverter)
+                SendPointOutput(TextActivity(packageName, MimeType.TEXT_PLAIN), coordinateConverter, uriQuote)
             }
     }
 
-fun LinkAutomation.toOutput(coordinateConverter: CoordinateConverter, link: Link): Output? =
+fun LinkAutomation.toOutput(
+    coordinateConverter: CoordinateConverter,
+    link: Link,
+    uriQuote: UriQuote = DefaultUriQuote,
+): Output<*>? =
     when (this) {
-        is CopyLinkUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is CopyLinkDisplayAppleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is CopyLinkDisplayGoogleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is CopyLinkDisplayMagicEarthUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is CopyLinkNavigationAppleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is CopyLinkNavigationGoogleUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is CopyLinkNavigationMagicEarthUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is CopyLinkStreetViewGoogleUriAutomation -> CopyLinkUriOutput(link, coordinateConverter)
-        is ShareLinkUriAutomation -> ShareLinkUriOutput(link, coordinateConverter)
+        is CopyLinkUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is CopyLinkDisplayAppleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is CopyLinkDisplayGoogleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is CopyLinkDisplayMagicEarthUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is CopyLinkNavigationAppleMapsUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is CopyLinkNavigationGoogleUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is CopyLinkNavigationMagicEarthUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is CopyLinkStreetViewGoogleUriAutomation -> CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+        is ShareLinkUriAutomation -> ShareLinkUriOutput(link, coordinateConverter, uriQuote)
     }

@@ -37,7 +37,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_choose">Escolha como abrir links da web para este app</string>
     <string name="conversion_failed_unsupported_service">Mapa sem suporte</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Alfinete inserido</string>
-    <string name="conversion_succeeded_apps_headline">Abrir com</string>
+    <string name="open_with">Abrir com</string>
     <string name="open_by_default">Abrir por padrão</string>
     <string name="open_by_default_add_links">Adicionar links</string>
     <plurals name="intro_open_by_default_app_screenshot_links">
@@ -64,7 +64,7 @@
     <string name="conversion_succeeded_save_gpx">Salvar pontos GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">Resultado do %1$s %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">%1$dº ponto</string>
-    <string name="conversion_succeeded_share">Compartilhar</string>
+    <string name="share">Compartilhar</string>
     <string name="conversion_error_retry">Tentar novamente</string>
     <string name="inputs_all">Todos os mapas</string>
     <string name="inputs_recent">Adicionados recentemente</string>
@@ -193,7 +193,7 @@
     <string name="links_form_enabled_option_sheet">Mostrar no menu de copiar</string>
     <string name="links_form_group">Grupo</string>
     <string name="links_form_name">Nome</string>
-    <string name="links_form_save">Gravar</string>
+    <string name="save">Gravar</string>
     <string name="links_form_srs">Sistema de coordenadas</string>
     <string name="links_form_type">Ícone do menu de contexto</string>
     <string name="links_form_uri_template_coords">Modelo de URL</string>

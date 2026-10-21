@@ -84,6 +84,7 @@ import page.ooooo.geoshare.data.preferences.ShareNavigationGoogleUriAutomation
 import page.ooooo.geoshare.data.preferences.SharePointsGpxAutomation
 import page.ooooo.geoshare.data.preferences.ShareRouteGpxAutomation
 import page.ooooo.geoshare.data.preferences.ShareStreetViewGoogleUriAutomation
+import page.ooooo.geoshare.data.uri.FakeUriQuote
 import java.util.UUID
 
 class OutputRepositoryTest {
@@ -91,9 +92,11 @@ class OutputRepositoryTest {
     private val geometries = Geometries(mockContext)
     private val coordinateConverter = CoordinateConverter(geometries)
     private val log = FakeLog
+    private val uriQuote = FakeUriQuote
     private val outputRepository = OutputRepository(
         coordinateConverter = coordinateConverter,
         log = log,
+        uriQuote = uriQuote,
     )
 
     @Test
@@ -101,21 +104,21 @@ class OutputRepositoryTest {
         assertEquals(
             OutputsForPoint(
                 copy = listOf(
-                    CopyCoordsDecOutput(coordinateConverter),
-                    CopyCoordsDegMinSecOutput(coordinateConverter),
-                    CopyNameOutput,
-                    CopyGeoUriOutput(coordinateConverter),
-                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter),
+                    CopyCoordsDecOutput(coordinateConverter, uriQuote),
+                    CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
+                    CopyNameOutput(uriQuote),
+                    CopyGeoUriOutput(coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
                 ),
                 open = listOf(
-                    ShareDisplayGeoUriOutput(coordinateConverter),
-                    ShareNavigationGoogleUriOutput(coordinateConverter),
-                    ShareStreetViewGoogleUriOutput(coordinateConverter),
+                    ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+                    ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
+                    ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
                     SavePointToContactOutput(coordinateConverter),
                 ),
                 save = listOf(
@@ -131,7 +134,7 @@ class OutputRepositoryTest {
     fun getOutputsForPoints_returnsOutputsThatDoNotRequirePackageName() {
         assertEquals(
             OutputsForPoints(
-                open = listOf(
+                share = listOf(
                     ShareRouteGpxOutput(coordinateConverter),
                     SharePointsGpxOutput(coordinateConverter),
                 ),
@@ -150,20 +153,27 @@ class OutputRepositoryTest {
             OutputsForApps(
                 maps = mapOf(
                     PackageNames.TEST to listOf(
-                        OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter)
+                        OpenDisplayGeoUriOutput(
+                            UriActivity(PackageNames.TEST, UriScheme.GEO),
+                            coordinateConverter,
+                            uriQuote
+                        )
                     ),
                     PackageNames.GOOGLE_MAPS to listOf(
                         OpenDisplayGeoUriOutput(
                             UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
                             coordinateConverter,
+                            uriQuote,
                         ),
                         OpenNavigationGoogleUriOutput(
                             UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_NAVIGATION),
                             coordinateConverter,
+                            uriQuote,
                         ),
                         OpenStreetViewGoogleUriOutput(
                             UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_STREET_VIEW),
                             coordinateConverter,
+                            uriQuote,
                         ),
                         OpenRouteGpxOutput(
                             FileActivity(PackageNames.GOOGLE_MAPS, FileType.GPX),
@@ -180,16 +190,19 @@ class OutputRepositoryTest {
                         OpenDisplayCartesIGNUrlOutput(
                             UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
                             coordinateConverter,
+                            uriQuote,
                         ),
                     ),
                     PackageNames.MAGIC_EARTH to listOf(
                         OpenDisplayMagicEarthUriOutput(
                             UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
-                            coordinateConverter
+                            coordinateConverter,
+                            uriQuote,
                         ),
                         OpenNavigationMagicEarthUriOutput(
                             UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
-                            coordinateConverter
+                            coordinateConverter,
+                            uriQuote,
                         ),
                     ),
                     PackageNames.TOMTOM to listOf(
@@ -205,6 +218,7 @@ class OutputRepositoryTest {
                         SendPointOutput(
                             TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                             coordinateConverter,
+                            uriQuote,
                         ),
                     ),
                 ),
@@ -235,6 +249,7 @@ class OutputRepositoryTest {
                         OpenDisplayGeoUriOutput(
                             UriActivity(PackageNames.TEST, UriScheme.GEO),
                             coordinateConverter,
+                            uriQuote,
                         )
                     ),
                     PackageNames.TOMTOM to listOf(
@@ -266,11 +281,11 @@ class OutputRepositoryTest {
     fun getOutputsForSharing_returnsHardCodedOutputs() {
         assertEquals(
             OutputsForSharing(
-                default = ShareDisplayGeoUriOutput(coordinateConverter),
-                open = listOf(
-                    ShareDisplayGeoUriOutput(coordinateConverter),
-                    ShareNavigationGoogleUriOutput(coordinateConverter),
-                    ShareStreetViewGoogleUriOutput(coordinateConverter),
+                default = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+                all = listOf(
+                    ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+                    ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
+                    ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
                     ShareRouteGpxOutput(coordinateConverter),
                     SharePointsGpxOutput(coordinateConverter),
                     SavePointToContactOutput(coordinateConverter),
@@ -285,30 +300,30 @@ class OutputRepositoryTest {
         assertEquals(
             mapOf(
                 "Google Maps" to listOf(
-                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter),
+                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter, uriQuote),
                 ),
                 "Apple Maps" to listOf(
-                    ShareLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
+                    ShareLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
                 ),
                 "Magic Earth" to listOf(
-                    ShareLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter),
+                    ShareLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter, uriQuote),
                 ),
                 "OpenStreetMap" to listOf(
-                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter),
+                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
                 ),
             ),
             outputRepository.getOutputsForLinks(defaultFakeLinks),
@@ -338,14 +353,14 @@ class OutputRepositoryTest {
         assertEquals(
             mapOf(
                 "first" to listOf(
-                    ShareLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, coordinateConverter),
-                    ShareLinkUriOutput(linkInFirstGroup, coordinateConverter),
-                    CopyLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, coordinateConverter),
-                    CopyLinkUriOutput(linkInFirstGroup, coordinateConverter),
+                    ShareLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(linkInFirstGroup, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(linkInFirstGroupWithoutExplicitGroup, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(linkInFirstGroup, coordinateConverter, uriQuote),
                 ),
                 "second" to listOf(
-                    ShareLinkUriOutput(linkInSecondGroup, coordinateConverter),
-                    CopyLinkUriOutput(linkInSecondGroup, coordinateConverter),
+                    ShareLinkUriOutput(linkInSecondGroup, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(linkInSecondGroup, coordinateConverter, uriQuote),
                 ),
             ),
             outputRepository.getOutputsForLinks(
@@ -362,9 +377,9 @@ class OutputRepositoryTest {
     fun getOutputsForPointChips_returnsHardCodedOutputs() {
         assertEquals(
             listOf(
-                CopyGeoUriOutput(coordinateConverter),
-                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
-                CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter),
+                CopyGeoUriOutput(coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
             ),
             outputRepository.getOutputsForPointChips(defaultFakeLinks),
         )
@@ -414,13 +429,13 @@ class OutputRepositoryTest {
                     NoopOutput,
                 ),
                 listOf(
-                    CopyCoordsDecOutput(coordinateConverter),
-                    CopyCoordsDegMinSecOutput(coordinateConverter),
-                    CopyNameOutput,
-                    CopyGeoUriOutput(coordinateConverter),
-                    ShareDisplayGeoUriOutput(coordinateConverter),
-                    ShareNavigationGoogleUriOutput(coordinateConverter),
-                    ShareStreetViewGoogleUriOutput(coordinateConverter),
+                    CopyCoordsDecOutput(coordinateConverter, uriQuote),
+                    CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
+                    CopyNameOutput(uriQuote),
+                    CopyGeoUriOutput(coordinateConverter, uriQuote),
+                    ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+                    ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
+                    ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
                     SavePointGpxOutput(coordinateConverter),
                     SavePointToContactOutput(coordinateConverter),
                 ),
@@ -434,45 +449,53 @@ class OutputRepositoryTest {
                     OpenDisplayCartesIGNUrlOutput(
                         UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
                         coordinateConverter,
+                        uriQuote,
                     ),
                     OpenDisplayMagicEarthUriOutput(
                         UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
                         coordinateConverter,
+                        uriQuote,
                     ),
                     OpenNavigationMagicEarthUriOutput(
                         UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
                         coordinateConverter,
+                        uriQuote,
                     ),
                     SendPointOutput(
                         TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                         coordinateConverter,
+                        uriQuote,
                     ),
                     OpenRouteOnePointGpxOutput(
                         FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
                         coordinateConverter,
                         log,
                     ),
-                    OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter),
+                    OpenDisplayGeoUriOutput(
+                        UriActivity(PackageNames.TEST, UriScheme.GEO),
+                        coordinateConverter,
+                        uriQuote
+                    ),
                 ),
                 listOf(
-                    ShareLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter),
-                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter),
-                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter),
+                    ShareLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
+                    ShareLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
+                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
                 ),
             ),
             listOf(
@@ -527,7 +550,7 @@ class OutputRepositoryTest {
             ).map { group ->
                 group.map { automation ->
                     when (automation) {
-                        is BasicAutomation -> automation.toOutput(coordinateConverter)
+                        is BasicAutomation -> automation.toOutput(coordinateConverter, uriQuote)
                         is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                         is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
                             automation.toOutput(coordinateConverter, link)
@@ -542,25 +565,27 @@ class OutputRepositoryTest {
     fun toOutput_convertsAllOldAutomationsToOutputs() = runTest {
         assertEquals(
             listOf(
-                CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter),
-                CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter),
-                CopyCoordsDecOutput(coordinateConverter),
-                CopyCoordsDegMinSecOutput(coordinateConverter),
-                CopyGeoUriOutput(coordinateConverter),
-                CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter),
-                CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter),
-                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter),
-                CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter),
-                CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter),
+                CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
+                CopyCoordsDecOutput(coordinateConverter, uriQuote),
+                CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
+                CopyGeoUriOutput(coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeGoogleMapsStreetViewLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeMagicEarthNavigationLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeMagicEarthDisplayLink, coordinateConverter, uriQuote),
                 NoopOutput,
-                OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter),
+                OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter, uriQuote),
                 OpenNavigationGoogleUriOutput(
                     UriActivity(PackageNames.TEST, UriScheme.GOOGLE_NAVIGATION),
-                    coordinateConverter
+                    coordinateConverter,
+                    uriQuote,
                 ),
                 OpenStreetViewGoogleUriOutput(
                     UriActivity(PackageNames.TEST, UriScheme.GOOGLE_STREET_VIEW),
-                    coordinateConverter
+                    coordinateConverter,
+                    uriQuote,
                 ),
                 OpenRouteOnePointGpxOutput(
                     FileActivity(PackageNames.TEST, FileType.GPX_ONE_POINT),
@@ -570,9 +595,10 @@ class OutputRepositoryTest {
                 OpenNavigationMagicEarthUriOutput(
                     UriActivity(PackageNames.TEST, UriScheme.MAGIC_EARTH),
                     coordinateConverter,
+                    uriQuote,
                 ),
                 SavePointsGpxOutput(coordinateConverter),
-                ShareDisplayGeoUriOutput(coordinateConverter),
+                ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
                 ShareRouteGpxOutput(coordinateConverter),
             ),
             listOf(
@@ -597,7 +623,7 @@ class OutputRepositoryTest {
                 ShareRouteGpxAutomation,
             ).map { automation ->
                 when (automation) {
-                    is BasicAutomation -> automation.toOutput(coordinateConverter)
+                    is BasicAutomation -> automation.toOutput(coordinateConverter, uriQuote)
                     is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                     is LinkAutomation ->
                         when (automation.linkUUID) {

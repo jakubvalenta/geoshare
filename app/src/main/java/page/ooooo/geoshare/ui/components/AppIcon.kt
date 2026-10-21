@@ -59,11 +59,11 @@ import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
-import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.data.outputs.SpacerIconDescriptor
 import page.ooooo.geoshare.data.outputs.isEnabled
 import page.ooooo.geoshare.data.outputs.toAction
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -133,7 +133,7 @@ fun AppIcon(
 fun AppMenu(
     expanded: Boolean,
     lastPoint: Point,
-    outputDetails: List<OutputDetail<Output>>,
+    outputDetails: List<OutputDetail<*>>,
     points: Points,
     source: String,
     onDismissRequest: () -> Unit,
@@ -217,7 +217,8 @@ private fun DefaultPreview() {
                 Box(Modifier.width(78.dp)) {
                     val geometries = Geometries(context)
                     val coordinateConverter = CoordinateConverter(geometries)
-                    val output = ShareDisplayGeoUriOutput(coordinateConverter)
+                    val uriQuote = DefaultUriQuote
+                    val output = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote)
                     AppIcon(
                         label = null,
                         menu = { _, _ -> },
@@ -299,7 +300,8 @@ private fun DarkPreview() {
                 Box(Modifier.width(78.dp)) {
                     val geometries = Geometries(context)
                     val coordinateConverter = CoordinateConverter(geometries)
-                    val output = ShareDisplayGeoUriOutput(coordinateConverter)
+                    val uriQuote = DefaultUriQuote
+                    val output = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote)
                     AppIcon(
                         label = null,
                         menu = { _, _ -> },

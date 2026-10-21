@@ -9,7 +9,7 @@
     <string name="conversion_permission">Mit %1$s verbinden?</string>
     <string name="conversion_permission_common_deny">Abbrechen</string>
     <string name="conversion_permission_common_text">Der Link %1$s enthält keine Koordinaten. %2$s muss sich mit dem Kartendienst verbinden, um sie zu erhalten.</string>
-    <string name="conversion_succeeded_apps_headline">Öffnen mit</string>
+    <string name="open_with">Öffnen mit</string>
     <string name="nav_back_content_description">Zurück zur Startseite</string>
     <string name="main_input_uri_label">Füge hier einen Kartenlink ein</string>
     <string name="intro_nav_close">Schließen</string>
@@ -62,7 +62,7 @@
     <string name="user_preferences_connection_title">Verbindung zu Kartendienst</string>
     <string name="user_preferences_connection_description">Um Kurzlinks und Links zu verarbeiten, deren URL keine geografischen Koordinaten enthält, kann %1$s sich mit dem Kartendienst (Google Maps, Apple Maps usw.) verbinden.</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s-Ergebnis_%2$s.gpx</string>
-    <string name="conversion_succeeded_share">Teilen</string>
+    <string name="share">Teilen</string>
     <string name="conversion_succeeded_point_number">Punkt %1$d</string>
     <string name="conversion_succeeded_save_gpx">GPX-Punkte speichern</string>
     <string name="inputs_all">Alle Kartendienste</string>
@@ -209,7 +209,7 @@
     <string name="links_form_enabled_option_sheet">Im Kopiermenü anzeigen</string>
     <string name="links_form_group">Gruppe</string>
     <string name="links_form_name">Name</string>
-    <string name="links_form_save">Speichern</string>
+    <string name="save">Speichern</string>
     <string name="links_form_srs">Koordinatensystem</string>
     <string name="links_form_type">Kontextmenü-Symbol</string>
     <string name="links_form_uri_template_coords">URL-Vorlage</string>

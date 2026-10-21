@@ -45,7 +45,7 @@ data class AutomationDetail(
     private val appDetail: AppDetail?,
     val automation: Automation,
     val icon: IconDescriptor?,
-    val output: Output,
+    val output: Output<*>,
 ) {
     @Composable
     fun label(): String = output.automationLabel(appDetail)
@@ -184,7 +184,7 @@ class UserPreferenceViewModel @Inject constructor(
     }
 }
 
-fun Output?.toAutomationDetail(automation: Automation, appDetails: AppDetails): AutomationDetail =
+fun Output<*>?.toAutomationDetail(automation: Automation, appDetails: AppDetails): AutomationDetail =
     (this ?: NoopOutput).run {
         (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
             AutomationDetail(

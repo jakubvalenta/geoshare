@@ -21,6 +21,7 @@ import javax.inject.Inject
 class SendPointOutput @Inject constructor(
     override val activity: TextActivity,
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) :
     PointOutput.WithoutLocation,
     Output.HasActivity<TextActivity>,
@@ -30,7 +31,7 @@ class SendPointOutput @Inject constructor(
 
     override val id = "SendPointOutput(activity=$activity)"
 
-    fun getUriString(value: Point, uriQuote: UriQuote): String? =
+    fun getUriString(value: Point): String? =
         UriFormatter.formatUriString(
             point = coordinateConverter.toSrs(value, Srs.GCJ02_MAINLAND_CHINA),
             // Use https://maps.google.com/?q= instead of https://www.google.com/maps/search/?api=1&q=, because
@@ -41,7 +42,7 @@ class SendPointOutput @Inject constructor(
         )
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getUriString(value, actionContext.uriQuote)
+        getUriString(value)
             ?.let { text -> activity.launch(actionContext.context, text) }
             .toActionResult(openedApp = true)
 

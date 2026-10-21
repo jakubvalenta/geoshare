@@ -15,16 +15,18 @@ import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.data.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.data.uri.FakeUriQuote
 
 class ActionReadyTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val log = FakeLog
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
     private val actionStateContext: ActionStateContext = mock()
+    private val uriQuote = FakeUriQuote
 
     @Test
     fun transition_whenActionIsCopyCoordsDec_returnsBasicActionReady() = runTest {
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val state = ActionReady(action, isAutomation = true)
         assertEquals(
             BasicActionReady(action, isAutomation = true),

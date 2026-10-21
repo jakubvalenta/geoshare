@@ -234,7 +234,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     // Card
     onElement(timeoutMs) {
         when (viewIdResourceName) {
-            "geoShareResultLastPointName" -> true
+            "geoShareResultName" -> true
             "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed: ${textAsString()}")
             else -> false
         }
@@ -251,7 +251,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
             setOf("Coordinates", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Coordonnées")
         }
         onElement {
-            if (viewIdResourceName == "geoShareResultLastPointName") {
+            if (viewIdResourceName == "geoShareResultName") {
                 assertTrue(
                     """Expected "${textAsString()}" to equal one of ${expectedNames.joinToString()}""",
                     textAsString() in expectedNames,
@@ -277,7 +277,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
             }
         }
         onElement {
-            if (viewIdResourceName == "geoShareResultLastPointCoordinates") {
+            if (viewIdResourceName == "geoShareResultCoordinates") {
                 assertTrue(
                     """Expected "${textAsString()}" to equal one of ${expectedCoordinatesOptions.joinToString()}""",
                     textAsString() in expectedCoordinatesOptions,
@@ -315,7 +315,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     }
 
     // Source
-    onElement { viewIdResourceName == "geoShareResultLastPointSource_${lastPoint.source}" }
+    onElement { viewIdResourceName == "geoShareResultSource_${lastPoint.source}" }
 
     // All points
     if (expectedPoints.size > 1) {

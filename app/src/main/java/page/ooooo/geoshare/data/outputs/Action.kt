@@ -16,7 +16,7 @@ import page.ooooo.geoshare.data.geo.Points
  */
 sealed interface Action<T> {
     val value: T
-    val output: Output
+    val output: Output<*>
 }
 
 /**

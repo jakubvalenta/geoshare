@@ -322,7 +322,7 @@ class MainBehaviorTest {
         shareUri()
 
         // Open sheet and tap Save GPX
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.run {
             expandSheet()
             longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
@@ -354,7 +354,7 @@ class MainBehaviorTest {
         shareUri(point)
 
         // Open sheet and tap Save to contact
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.run {
             expandSheet()
             longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet

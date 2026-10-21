@@ -12,15 +12,18 @@ import page.ooooo.geoshare.data.android.UriScheme
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.outputs.ActionResult
 import page.ooooo.geoshare.data.outputs.OpenDisplayGeoUriOutput
+import page.ooooo.geoshare.data.uri.FakeUriQuote
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 class ActionAutomationFailedTest {
     private val coordinateConverter: CoordinateConverter = mock()
+    private val uriQuote = FakeUriQuote
     private val output = OpenDisplayGeoUriOutput(
         UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
         coordinateConverter,
+        uriQuote,
     )
     private val actionResult = ActionResult.FAILED
     private val actionStateContext: ActionStateContext = mock()

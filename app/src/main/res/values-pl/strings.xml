@@ -37,7 +37,7 @@
     <string name="donation_button">Wesprzyj na Ko-fi</string>
     <string name="donation_description">Czy ta aplikacja pozwala tobie zaoszczędzić czas?</string>
     <string name="conversion_succeeded_skip">Skopiuj oryginalny link</string>
-    <string name="conversion_succeeded_share">Udostępnij</string>
+    <string name="share">Udostępnij</string>
     <string name="conversion_succeeded_save_gpx_failed">Nie udało się zapisać GPX</string>
     <string name="conversion_succeeded_save_gpx">Zapisz GPX</string>
     <string name="conversion_succeeded_open_app_street_view">Pokaż widok ulicy w %1$s</string>

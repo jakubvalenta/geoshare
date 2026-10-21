@@ -3,7 +3,7 @@
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Voltar para o ecrã inicial</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Alfinete inserido</string>
-    <string name="conversion_succeeded_apps_headline">Abrir com</string>
+    <string name="open_with">Abrir com</string>
     <string name="intro_open_by_default_google_maps_caption">Primeiro, vá em Configurações ➞ Apps ➞ Maps ➞ %1$s e desative a abertura de ligações nesta app.</string>
     <string name="intro_open_by_default_google_maps_content_description">Captura de ecrã das configurações de Abrir por predefinição do Google Maps</string>
     <string name="intro_open_by_default_google_maps_button">Abrir configurações do Google Maps</string>
@@ -69,7 +69,7 @@
     <string name="conversion_succeeded_save_gpx">Gravar pontos GPX</string>
     <string name="conversion_succeeded_save_gpx_failed">Falha ao gravar GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">Resultado do %1$s %2$s.gpx</string>
-    <string name="conversion_succeeded_share">Partilhar</string>
+    <string name="share">Partilhar</string>
     <string name="conversion_succeeded_skip">Copiar ligação original</string>
     <string name="donation_button">Doar no Ko-fi</string>
     <string name="donation_description">Esta app otimiza o seu tempo?</string>
@@ -207,7 +207,7 @@
     <string name="links_form_enabled_option_sheet">Mostrar no menu de copiar</string>
     <string name="links_form_group">Grupo</string>
     <string name="links_form_name">Nome</string>
-    <string name="links_form_save">Gravar</string>
+    <string name="save">Gravar</string>
     <string name="links_form_srs">Sistema de coordenadas</string>
     <string name="links_form_type">Ícone do menu de contexto</string>
     <string name="links_form_uri_template_coords">Modelo de URL</string>

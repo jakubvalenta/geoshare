@@ -381,19 +381,19 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         // Conversion - Check - Experimental
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
         grantConnectionPermission()
-        onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_experimental")
 
         // Conversion - Check - Map center
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_map_center")
 
         // Conversion - Check - SRS
         shareUri("https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a")
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_srs")
 
@@ -404,7 +404,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         shareUri(WGS84Point(52.47254, 13.4345, name = "Marked Location", source = Source.GENERATED))
 
         // Conversion - Result - Sheet - Page 1 name
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
         val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
         sheet.expandSheet()
         quickWaitForStableInActiveWindow()
@@ -419,7 +419,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         grantConnectionPermission()
 
         // Conversion - Result
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result")
 
@@ -438,7 +438,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         quickWaitForStableInActiveWindow() // Wait for the log exit animation
 
         // Conversion - Result - Message - Copy success
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
             scrollToElement(Direction.DOWN) {
@@ -450,7 +450,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         saveScreenshot("main_strings/conversion_result_message_copy_success")
 
         // Conversion - Result - Sheet - Page 1
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
         val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
         sheet.expandSheet()
         quickWaitForStableInActiveWindow()

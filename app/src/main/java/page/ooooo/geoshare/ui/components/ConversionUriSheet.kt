@@ -34,6 +34,7 @@ import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
 import page.ooooo.geoshare.data.outputs.ResourceIconDescriptor
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.OutputDetailsForUri
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.toOutputDetailsForUri
@@ -43,7 +44,7 @@ import page.ooooo.geoshare.ui.toOutputDetailsForUri
 fun ConversionUriSheet(
     outputsForUri: StateFlow<OutputDetailsForUri?>,
     uriString: String,
-    initialValue: SheetValue = SheetValue.Hidden,
+    intialSheetValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
@@ -53,7 +54,7 @@ fun ConversionUriSheet(
         ConversionUriSheet(
             outputsForUri = outputsForUri,
             uriString = uriString,
-            initialValue = initialValue,
+            intialSheetValue = intialSheetValue,
             onDismissRequest = onDismissRequest,
             onExecute = onExecute,
         )
@@ -65,11 +66,11 @@ fun ConversionUriSheet(
 private fun ConversionUriSheet(
     outputsForUri: OutputDetailsForUri,
     uriString: String,
-    initialValue: SheetValue = SheetValue.Hidden,
+    intialSheetValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
-    val sheetState = rememberBottomSheetState(initialValue)
+    val sheetState = rememberBottomSheetState(intialSheetValue)
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -110,6 +111,8 @@ private fun ConversionUriSheet(
     }
 }
 
+// Previews
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
@@ -121,9 +124,11 @@ private fun DefaultPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
             val activities = fakeActivities.filter {
                 it.packageName in setOf(
@@ -138,7 +143,7 @@ private fun DefaultPreview() {
                     outputRepository.getOutputsForUri(activities).toOutputDetailsForUri(appDetails)
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                initialValue = SheetValue.Expanded,
+                intialSheetValue = SheetValue.Expanded,
                 onDismissRequest = {},
                 onExecute = {},
             )
@@ -157,9 +162,11 @@ private fun DarkPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
             val activities = fakeActivities.filter {
                 it.packageName in setOf(
@@ -174,7 +181,7 @@ private fun DarkPreview() {
                     outputRepository.getOutputsForUri(activities).toOutputDetailsForUri(appDetails)
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                initialValue = SheetValue.Expanded,
+                intialSheetValue = SheetValue.Expanded,
                 onDismissRequest = {},
                 onExecute = {},
             )
@@ -185,7 +192,7 @@ private fun DarkPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-private fun DefaultLoadingPreview() {
+private fun LoadingPreview() {
     AppTheme {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
@@ -193,9 +200,11 @@ private fun DefaultLoadingPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
             val activities = fakeActivities.filter {
                 it.packageName in setOf(
@@ -209,42 +218,7 @@ private fun DefaultLoadingPreview() {
                     outputRepository.getOutputsForUri(activities).toOutputDetailsForUri(emptyMap())
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                initialValue = SheetValue.Expanded,
-                onDismissRequest = {},
-                onExecute = {},
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkLoadingPreview() {
-    AppTheme {
-        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-        Scaffold {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
-            )
-            val activities = fakeActivities.filter {
-                it.packageName in setOf(
-                    PackageNames.COMAPS_FDROID,
-                    PackageNames.CONVERSATIONS,
-                    PackageNames.OSMAND_PLUS,
-                )
-            }
-            ConversionUriSheet(
-                outputsForUri = MutableStateFlow(
-                    outputRepository.getOutputsForUri(activities).toOutputDetailsForUri(emptyMap())
-                ),
-                uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                initialValue = SheetValue.Expanded,
+                intialSheetValue = SheetValue.Expanded,
                 onDismissRequest = {},
                 onExecute = {},
             )

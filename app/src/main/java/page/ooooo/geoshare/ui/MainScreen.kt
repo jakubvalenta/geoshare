@@ -75,6 +75,7 @@ import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Point
+import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.log.DefaultLog
@@ -83,8 +84,6 @@ import page.ooooo.geoshare.data.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.ActionContext
 import page.ooooo.geoshare.data.outputs.LocationAction
-import page.ooooo.geoshare.data.outputs.PointOutput
-import page.ooooo.geoshare.data.outputs.PointsOutput
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues
@@ -106,6 +105,7 @@ import page.ooooo.geoshare.data.state.LocationRationaleShown
 import page.ooooo.geoshare.data.state.PermissionGrantedBasicInput
 import page.ooooo.geoshare.data.state.PermissionGrantedWebViewInput
 import page.ooooo.geoshare.data.state.PermissionRequested
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionStateLogList
 import page.ooooo.geoshare.ui.components.ConversionUriSheet
@@ -126,12 +126,13 @@ import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
-import page.ooooo.geoshare.ui.components.ResultCopySheet
 import page.ooooo.geoshare.ui.components.ResultError
-import page.ooooo.geoshare.ui.components.ResultSaveSheet
+import page.ooooo.geoshare.ui.components.ResultPoints
+import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
+import page.ooooo.geoshare.ui.components.pointTitle
 import page.ooooo.geoshare.ui.string.FormatArg
 import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -271,6 +272,7 @@ fun MainScreen(
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
         linkMessage = linkViewModel.message,
         outputsForApps = outputViewModel.outputsForApps,
+        outputsForExampleApp = outputViewModel.outputsForExampleApp,
         outputsForLinks = outputViewModel.outputsForLinks,
         outputsForPoint = outputViewModel.outputsForPoint,
         outputsForPointChips = outputViewModel.outputsForPointChips,
@@ -349,11 +351,12 @@ private fun MainScreen(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     linkMessage: StateFlow<Message?>,
     outputsForApps: StateFlow<OutputDetailsForApps>,
+    outputsForExampleApp: StateFlow<OutputDetailsForApp?>,
     outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
     outputsForPoint: StateFlow<OutputDetailsForPoint>,
-    outputsForPointChips: StateFlow<List<OutputDetail<PointOutput>>>,
+    outputsForPointChips: StateFlow<List<OutputDetail<Point>>>,
     outputsForPoints: StateFlow<OutputDetailsForPoints>,
-    outputsForPointsChips: StateFlow<List<OutputDetail<PointsOutput>>>,
+    outputsForPointsChips: StateFlow<List<OutputDetail<Points>>>,
     outputsForSharing: StateFlow<OutputDetailsForSharing?>,
     outputsForUri: StateFlow<OutputDetailsForUri?>,
     placeholderUris: StateFlow<List<String>>,
@@ -397,8 +400,7 @@ private fun MainScreen(
 
     var errorMessageResId by retain { mutableStateOf<Int?>(null) }
     var logExpanded by retain { mutableStateOf(false) }
-    var selectedPointToCopy by retain { mutableStateOf<Point?>(null) }
-    var selectedPointToSave by retain { mutableStateOf<Point?>(null) }
+    var resultSheetState by retain { mutableStateOf<ResultSheetState>(ResultSheetState.Hidden) }
     val selectedUri by selectedUri.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -426,7 +428,7 @@ private fun MainScreen(
         snackbarHost = {
             MessageSnackbarHost(snackbarHostState)
         },
-    ) {
+    ) { _ ->
         MainScaffold(
             actions = {
                 MainMenu(
@@ -488,20 +490,68 @@ private fun MainScreen(
                                         )
 
                                     is ConversionState.HasResult -> {
-                                        ResultCoordinates(
-                                            points = conversionState.points,
-                                            coordinateConverter = coordinateConverter,
-                                            inputGroup = conversionState.matchedInput.input.group,
-                                            outputsForPointChips = outputsForPointChips,
-                                            outputsForPointsChips = outputsForPointsChips,
-                                            userPreferencesValues = userPreferencesValues,
-                                            onExecute = onExecute,
-                                            onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                            onSelectPointToCopy = { index ->
-                                                onCancelAction()
-                                                selectedPointToCopy = index
-                                            },
-                                        )
+                                        conversionState.points.lastOrNull()?.let { point ->
+                                            ResultCoordinates(
+                                                point = point,
+                                                totalPoints = conversionState.points.size,
+                                                coordinateConverter = coordinateConverter,
+                                                inputGroup = conversionState.matchedInput.input.group,
+                                                outputsForPointChips = outputsForPointChips,
+                                                userPreferencesValues = userPreferencesValues,
+                                                onExecute = onExecute,
+                                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                onSelectPointToCopy = {
+                                                    onCancelAction()
+                                                    resultSheetState = ResultSheetState.PointToCopySelected(
+                                                        point,
+                                                        pointIndex = conversionState.points.size - 1,
+                                                    )
+                                                },
+                                                onSelectPointToSave = {
+                                                    onCancelAction()
+                                                    resultSheetState = ResultSheetState.PointToSaveSelected(
+                                                        point,
+                                                        pointIndex = conversionState.points.size - 1,
+                                                    )
+                                                },
+                                            ) {
+                                                if (conversionState.points.size > 1) {
+                                                    ResultPoints(
+                                                        points = conversionState.points,
+                                                        coordinateConverter = coordinateConverter,
+                                                        outputsForPointsChips = outputsForPointsChips,
+                                                        userPreferencesValues = userPreferencesValues,
+                                                        onExecute = onExecute,
+                                                        onNavigateToFaqScreen = onNavigateToFaqScreen,
+                                                        onOpenPoint = {}, // TODO
+                                                        onSelectPointToCopy = { point, pointIndex ->
+                                                            onCancelAction()
+                                                            resultSheetState = ResultSheetState.PointToCopySelected(
+                                                                point, pointIndex
+                                                            )
+                                                        },
+                                                        onSelectPointToSave = { point, pointIndex ->
+                                                            onCancelAction()
+                                                            resultSheetState = ResultSheetState.PointToSaveSelected(
+                                                                point, pointIndex
+                                                            )
+                                                        },
+                                                        onSelectPointsToSave = {
+                                                            onCancelAction()
+                                                            resultSheetState = ResultSheetState.PointsToSaveSelected(
+                                                                conversionState.points
+                                                            )
+                                                        },
+                                                        onSelectPointsToShare = {
+                                                            onCancelAction()
+                                                            resultSheetState = ResultSheetState.PointsToShareSelected(
+                                                                conversionState.points
+                                                            )
+                                                        },
+                                                    )
+                                                }
+                                            }
+                                        }
                                         if (helpLifecycleMessage != null) {
                                             helpLifecycleMessage(
                                                 Modifier.padding(top = spacing.tiny)
@@ -509,7 +559,7 @@ private fun MainScreen(
                                         } else {
                                             HelpShareSourceMessage(
                                                 dismissedHelpMessages = dismissedHelpMessages,
-                                                outputsForApps = outputsForApps,
+                                                outputsForExampleApp = outputsForExampleApp,
                                                 sourceComesFromIntent = sourceComesFromIntent,
                                                 modifier = Modifier.padding(top = spacing.tiny),
                                                 onDismissHelpMessage = onDismissHelpMessage,
@@ -670,25 +720,54 @@ private fun MainScreen(
     }
 
     if (conversionState is ConversionState.HasResult) {
-        selectedPointToCopy?.let {
-            ResultCopySheet(
-                point = it,
-                pointIndex = null, // TODO
-                outputsForPoint = outputsForPoint,
-                onExecute = onExecute,
-                onDismissRequest = { selectedPointToCopy = null },
-            )
-        }
-        selectedPointToSave?.let {
-            ResultSaveSheet(
-                point = it,
-                points = conversionState.points,
-                pointIndex = null, // TODO
-                outputsForPoint = outputsForPoint,
-                outputsForPoints = outputsForPoints,
-                onExecute = onExecute,
-                onDismissRequest = { selectedPointToSave = null },
-            )
+        resultSheetState.run {
+            when (this) {
+                is ResultSheetState.PointToCopySelected -> {
+                    val outputsForPoint by outputsForPoint.collectAsStateWithLifecycle()
+                    ResultSheet(
+                        value = point,
+                        outputs = outputsForPoint.copy,
+                        title = pointTitle(point, pointIndex, conversionState.points.size),
+                        onExecute = onExecute,
+                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
+                    )
+                }
+
+                is ResultSheetState.PointToSaveSelected -> {
+                    val outputsForPoint by outputsForPoint.collectAsStateWithLifecycle()
+                    ResultSheet(
+                        value = point,
+                        outputs = outputsForPoint.save,
+                        title = pointTitle(point, pointIndex, conversionState.points.size),
+                        onExecute = onExecute,
+                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
+                    )
+                }
+
+                is ResultSheetState.PointsToSaveSelected -> {
+                    val outputsForPoints by outputsForPoints.collectAsStateWithLifecycle()
+                    ResultSheet(
+                        value = points,
+                        outputs = outputsForPoints.save,
+                        title = stringResource(R.string.conversion_succeeded_point_all, points.size),
+                        onExecute = onExecute,
+                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
+                    )
+                }
+
+                is ResultSheetState.PointsToShareSelected -> {
+                    val outputsForPoints by outputsForPoints.collectAsStateWithLifecycle()
+                    ResultSheet(
+                        value = points,
+                        outputs = outputsForPoints.share,
+                        title = stringResource(R.string.conversion_succeeded_point_all, points.size),
+                        onExecute = onExecute,
+                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
+                    )
+                }
+
+                ResultSheetState.Hidden -> {}
+            }
         }
     }
 
@@ -748,6 +827,14 @@ private fun MainScreen(
     }
 }
 
+private sealed interface ResultSheetState {
+    data class PointToCopySelected(val point: Point, val pointIndex: Int) : ResultSheetState
+    data class PointToSaveSelected(val point: Point, val pointIndex: Int) : ResultSheetState
+    data class PointsToSaveSelected(val points: Points) : ResultSheetState
+    data class PointsToShareSelected(val points: Points) : ResultSheetState
+    object Hidden : ResultSheetState
+}
+
 // Previews
 
 @Preview(showBackground = true)
@@ -770,6 +857,7 @@ private fun DefaultPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -833,6 +921,7 @@ private fun DarkPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -896,6 +985,7 @@ private fun SmallPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -959,6 +1049,7 @@ private fun TabletPreview() {
             dismissedHelpMessages = MutableStateFlow(emptySet()),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1010,9 +1101,11 @@ private fun SucceededPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val log = DefaultLog
+        val uriQuote = DefaultUriQuote
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
             log = log,
+            uriQuote = uriQuote,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
@@ -1049,6 +1142,7 @@ private fun SucceededPreview() {
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
@@ -1108,9 +1202,11 @@ private fun DarkSucceededPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val log = DefaultLog
+        val uriQuote = DefaultUriQuote
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
             log = log,
+            uriQuote = uriQuote,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
@@ -1147,6 +1243,7 @@ private fun DarkSucceededPreview() {
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
@@ -1206,9 +1303,11 @@ private fun SmallSucceededPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val log = DefaultLog
+        val uriQuote = DefaultUriQuote
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
             log = log,
+            uriQuote = uriQuote,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
@@ -1244,6 +1343,7 @@ private fun SmallSucceededPreview() {
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
@@ -1303,9 +1403,11 @@ private fun TabletSucceededPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val log = DefaultLog
+        val uriQuote = DefaultUriQuote
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
             log = log,
+            uriQuote = uriQuote,
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
@@ -1342,6 +1444,7 @@ private fun TabletSucceededPreview() {
             outputsForApps = MutableStateFlow(
                 outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
             ),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
@@ -1424,6 +1527,7 @@ private fun ErrorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1498,6 +1602,7 @@ private fun DarkErrorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1572,6 +1677,7 @@ private fun TabletErrorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1647,6 +1753,7 @@ private fun WarningPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1722,6 +1829,7 @@ private fun DarkWarningPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1801,6 +1909,7 @@ private fun LoadingIndicatorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1880,6 +1989,7 @@ private fun DarkLoadingIndicatorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -1957,6 +2067,7 @@ private fun TabletLoadingIndicatorPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -2033,6 +2144,7 @@ private fun WebViewPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -2109,6 +2221,7 @@ private fun DarkWebViewPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -2185,6 +2298,7 @@ private fun TabletWebViewPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),
@@ -2260,6 +2374,7 @@ private fun EmptyPreview() {
             dismissedHelpMessages = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
+            outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
             outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
             outputsForPointChips = MutableStateFlow(emptyList()),

@@ -8,17 +8,25 @@ import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
-import page.ooooo.geoshare.data.uri.DefaultUriQuote
-import page.ooooo.geoshare.data.uri.UriQuote
 
-sealed interface Output {
+sealed interface Output<T> {
     /**
      * A unique id of the output and its parameters. Used as a LazyList key, testTag, etc.
      */
     val id: String
 
+    fun toAction(value: T): Action<T>
+
+    /**
+     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
+     */
+    @Suppress("SameReturnValue")
+    fun isEnabled(value: T): Boolean = true
+
     @Composable
     fun label(appDetail: AppDetail?): String
+
+    fun getDescription(value: T): String? = null
 
     fun getMenuIcon(appDetail: AppDetail?): IconDescriptor?
 
@@ -64,16 +72,7 @@ sealed interface Output {
     }
 }
 
-sealed interface PointOutput : Output {
-    fun toAction(value: Point): Action<Point>
-
-    fun getDescription(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
-
-    /**
-     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
-     */
-    fun isEnabled(value: Point, uriQuote: UriQuote = DefaultUriQuote): Boolean = true
-
+sealed interface PointOutput : Output<Point> {
     /**
      * Output that takes a single [Point].
      *
@@ -116,18 +115,7 @@ sealed interface PointOutput : Output {
     }
 }
 
-sealed interface PointsOutput : Output {
-    fun toAction(value: Points): Action<Points>
-
-    @Suppress("SameReturnValue")
-    fun getDescription(value: Points, uriQuote: UriQuote = DefaultUriQuote): String? = null
-
-    /**
-     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
-     */
-    @Suppress("SameReturnValue")
-    fun isEnabled(value: Points): Boolean = true
-
+sealed interface PointsOutput : Output<Points> {
     /**
      * Output that takes a [Point] list.
      *
@@ -170,25 +158,20 @@ sealed interface PointsOutput : Output {
     }
 }
 
-sealed interface StringOutput : Output {
-    fun getDescription(value: String, uriQuote: UriQuote = DefaultUriQuote): String? = null
+sealed interface StringOutput : Output<String> {
+    override fun toAction(value: String) = BasicAction.WithString(value, this)
 
     suspend fun execute(value: String, actionContext: ActionContext): ActionResult
-
-    @Suppress("SameReturnValue")
-    fun isEnabled(value: String, uriQuote: UriQuote = DefaultUriQuote): Boolean = true
-
-    fun toAction(value: String) = BasicAction.WithString(value, this)
 }
 
-fun Output.toAction(point: Point, points: Points, source: String): Action<*> =
+fun Output<*>.toAction(point: Point, points: Points, source: String): Action<*> =
     when (this) {
         is PointOutput -> toAction(point)
         is PointsOutput -> toAction(points)
         is StringOutput -> toAction(source)
     }
 
-fun Output.isEnabled(point: Point, points: Points, source: String): Boolean =
+fun Output<*>.isEnabled(point: Point, points: Points, source: String): Boolean =
     when (this) {
         is PointOutput -> isEnabled(point)
         is PointsOutput -> isEnabled(points)

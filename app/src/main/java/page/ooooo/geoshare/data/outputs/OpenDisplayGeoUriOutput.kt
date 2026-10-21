@@ -18,10 +18,11 @@ import javax.inject.Inject
 class OpenDisplayGeoUriOutput @Inject constructor(
     override val activity: UriActivity,
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) : OpenPointUriOutput {
     override val id = "OpenDisplayGeoUriOutput(activity=$activity)"
 
-    override fun getUriString(value: Point, uriQuote: UriQuote) =
+    override fun getUriString(value: Point) =
         GeoUriFormatter.formatGeoUriString(
             coordinateConverter.toSrs(value, PackageNames.getSrs(activity.packageName)),
             PackageNames.getGeoUriFlavor(activity.packageName),

@@ -230,7 +230,7 @@ fun ServerForm(
         }
         HorizontalDivider(Modifier.padding(vertical = spacing.medium))
         LargeButton(
-            stringResource(R.string.links_form_save),
+            stringResource(R.string.save),
             Modifier.testTag("geoShareServerFormSave"),
             enabled = item.isValid(),
         ) {

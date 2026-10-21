@@ -14,15 +14,16 @@ import javax.inject.Inject
 
 class ShareDisplayGeoUriOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) : SharePointUriOutput {
     override val id = "ShareDisplayGeoUriOutput"
 
-    override fun getUriString(value: Point, uriQuote: UriQuote) =
+    override fun getUriString(value: Point) =
         GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 
     @Composable
     override fun label(appDetail: AppDetail?) =
-        stringResource(R.string.conversion_succeeded_share)
+        stringResource(R.string.share)
 
     override fun getMenuIcon(appDetail: AppDetail?) =
         ResourceIconDescriptor(R.drawable.location_on_24px)
@@ -32,7 +33,7 @@ class ShareDisplayGeoUriOutput @Inject constructor(
 
     @Composable
     override fun automationLabel(appDetail: AppDetail?) =
-        stringResource(R.string.conversion_succeeded_share)
+        stringResource(R.string.share)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

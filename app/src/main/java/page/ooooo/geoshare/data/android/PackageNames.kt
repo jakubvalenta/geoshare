@@ -39,6 +39,17 @@ object PackageNames {
     const val VESPUCCI = "de.blau.android"
     const val WHATSAPP = "com.whatsapp"
 
+    val examples = setOf(
+        GOOGLE_MAPS,
+        OSMAND_PLUS,
+        COMAPS_FDROID,
+        ORGANIC_MAPS,
+        MAPY_COM,
+        HERE_WEGO,
+        MAGIC_EARTH,
+        MAPS_ME,
+    )
+
     fun getSrs(packageName: String?): Srs =
         when (packageName) {
             AMAP -> Srs.GCJ02_GREATER_CHINA_AND_TAIWAN

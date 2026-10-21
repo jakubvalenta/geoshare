@@ -19,10 +19,11 @@ import javax.inject.Inject
 class OpenDisplayMagicEarthUriOutput @Inject constructor(
     override val activity: UriActivity,
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) : OpenPointUriOutput {
     override val id = "OpenDisplayMagicEarthUriOutput(activity=$activity)"
 
-    override fun getUriString(value: Point, uriQuote: UriQuote) =
+    override fun getUriString(value: Point) =
         MagicEarthUriFormatter.formatDisplayUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable

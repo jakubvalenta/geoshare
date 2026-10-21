@@ -19,11 +19,11 @@ import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -31,10 +31,11 @@ import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
-import page.ooooo.geoshare.data.outputs.PointOutput
+import page.ooooo.geoshare.data.outputs.toAction
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.isDismissed
-import page.ooooo.geoshare.ui.OutputDetailsForApps
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
+import page.ooooo.geoshare.ui.OutputDetailsForApp
 import page.ooooo.geoshare.ui.string.FormatArg
 import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -44,59 +45,37 @@ import page.ooooo.geoshare.ui.toOutputDetailsForApps
 @Composable
 fun HelpShareSourceMessage(
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    outputsForApps: StateFlow<OutputDetailsForApps>,
+    outputsForExampleApp: StateFlow<OutputDetailsForApp?>,
     sourceComesFromIntent: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
-    val outputsForApps by outputsForApps.collectAsStateWithLifecycle()
     val sourceComesFromIntent by sourceComesFromIntent.collectAsStateWithLifecycle()
 
     if (!sourceComesFromIntent) {
-        val examplePoint = WGS84Point.Kilimanjaro
-
-        /**
-         * An output that opens a point in a map app.
-         *
-         * The map app is the first installed app from a list of common map apps.
-         */
-        val (exampleAppLabel, exampleAppOutput) = setOf(
-            PackageNames.GOOGLE_MAPS,
-            PackageNames.OSMAND_PLUS,
-            PackageNames.COMAPS_FDROID,
-            PackageNames.ORGANIC_MAPS,
-            PackageNames.MAPY_COM,
-            PackageNames.HERE_WEGO,
-            PackageNames.MAGIC_EARTH,
-            PackageNames.MAPS_ME,
-        ).firstNotNullOfOrNull { packageName ->
-            outputsForApps.maps.firstNotNullOfOrNull { outputDetail ->
-                if (outputDetail.packageName == packageName) {
-                    Pair(
-                        outputDetail.label,
-                        outputDetail.default.output as? PointOutput,
-                    )
-                } else {
-                    null
-                }
-            }
-        } ?: Pair(null, null)
-
         val helpMessage = HelpMessage.SHARE_SOURCE
         val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
+        val outputsForExampleApp by outputsForExampleApp.collectAsStateWithLifecycle()
         val visible = !helpMessage.isDismissed(dismissedHelpMessages)
 
         HelpMessageCard(
             title = { Text(stringResource(R.string.help_share_source_title)) },
             visible = visible,
             modifier = modifier.testTag("geoShareHelpMessage_$helpMessage"),
-            actionText = exampleAppLabel?.let { exampleAppLabel ->
-                { stringResource(R.string.help_share_source_action, exampleAppLabel) }
+            actionText = outputsForExampleApp?.let { outputsForExampleApp ->
+                { stringResource(R.string.help_share_source_action, outputsForExampleApp.label) }
             },
             onAction = {
-                exampleAppOutput?.let { exampleAppOutput ->
-                    onExecute(exampleAppOutput.toAction(examplePoint))
+                outputsForExampleApp?.let { outputsForExampleApp ->
+                    val examplePoint = WGS84Point.Kilimanjaro
+                    onExecute(
+                        outputsForExampleApp.default.output.toAction(
+                            point = examplePoint,
+                            points = persistentListOf(examplePoint),
+                            source = "",
+                        )
+                    )
                 }
             },
             onDismissRequest = { onDismissHelpMessage(helpMessage) },
@@ -140,15 +119,20 @@ private fun DefaultPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val log = DefaultLog
+        val uriQuote = DefaultUriQuote
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
             log = log,
+            uriQuote = uriQuote,
         )
         val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
+            outputsForExampleApp = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet())
+                    .maps
+                    .toOutputDetailsForApps(appDetails)
+                    .firstOrNull()
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
@@ -165,15 +149,20 @@ private fun DarkPreview() {
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
         val log = DefaultLog
+        val uriQuote = DefaultUriQuote
         val outputRepository = OutputRepository(
             coordinateConverter = coordinateConverter,
             log = log,
+            uriQuote = uriQuote,
         )
         val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
             dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
+            outputsForExampleApp = MutableStateFlow(
+                outputRepository.getOutputsForApps(fakeActivities, emptySet())
+                    .maps
+                    .toOutputDetailsForApps(appDetails)
+                    .firstOrNull()
             ),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},

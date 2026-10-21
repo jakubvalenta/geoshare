@@ -38,6 +38,7 @@ import page.ooooo.geoshare.data.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.preferences.ShareLinkUriAutomation
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.uri.FakeUriQuote
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,6 +48,7 @@ class AutomationRequestedTest {
     private val linkRepository: LinkRepository = FakeLinkRepository()
     private val log = FakeLog
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val uriQuote = FakeUriQuote
 
     @Test
     fun transition_whenPointsAreEmpty_returnsNull() = runTest {
@@ -130,7 +132,7 @@ class AutomationRequestedTest {
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(
@@ -190,7 +192,7 @@ class AutomationRequestedTest {
     @Test
     fun transition_whenBillingStatusContainsAutomationFeature_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(
             context,
             initialStatus = BillingStatus.Purchased(
@@ -224,7 +226,7 @@ class AutomationRequestedTest {
     @Test
     fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(context)
         val userPreferencesRepository = FakeUserPreferencesRepository(
             UserPreferencesValues(automation = automation)
@@ -330,7 +332,7 @@ class AutomationRequestedTest {
     @Test
     fun transition_whenUserPreferenceAutomationIsCopyCoords_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(
             context,
             initialStatus = BillingStatus.Purchased(
@@ -363,6 +365,7 @@ class AutomationRequestedTest {
         val output = OpenDisplayGeoUriOutput(
             UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
             coordinateConverter,
+            uriQuote,
         )
         val action = output.toAction(points.last())
         val delay = 2.seconds
@@ -395,7 +398,7 @@ class AutomationRequestedTest {
     @Test
     fun transition_whenUserPreferenceAutomationIsOpenLink_returnsActionWaiting() = runTest {
         val automation = ShareLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid)
-        val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter)
+        val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote)
         val action = output.toAction(points.last())
         val delay = 2.seconds
         val billing = FakeBilling(
@@ -489,6 +492,7 @@ class AutomationRequestedTest {
         val output = OpenDisplayGeoUriOutput(
             UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
             coordinateConverter,
+            uriQuote,
         )
         val action = output.toAction(points.last())
         val delay = 2.seconds

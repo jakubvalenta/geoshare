@@ -13,10 +13,11 @@ import javax.inject.Inject
 
 class CopyCoordsDegMinSecOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
+    override val uriQuote: UriQuote,
 ) : CopyPointTextOutput {
     override val id = "CopyCoordsDegMinSecOutput"
 
-    override fun getText(value: Point, uriQuote: UriQuote) =
+    override fun getText(value: Point) =
         CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(value))
 
     @Composable

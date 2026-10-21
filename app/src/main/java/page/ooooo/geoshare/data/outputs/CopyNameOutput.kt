@@ -6,16 +6,19 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.uri.UriQuote
+import javax.inject.Inject
 
 /**
  * Copies the name of the point to the clipboard.
  *
  * Only available when the point actually has a name.
  */
-object CopyNameOutput : CopyPointTextOutput {
+class CopyNameOutput @Inject constructor(
+    override val uriQuote: UriQuote,
+) : CopyPointTextOutput {
     override val id = "CopyNameOutput"
 
-    override fun getText(value: Point, uriQuote: UriQuote) =
+    override fun getText(value: Point) =
         value.cleanName
 
     @Composable

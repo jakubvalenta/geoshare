@@ -61,6 +61,8 @@ import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.outputs.CopyLinkUriOutput
 import page.ooooo.geoshare.data.outputs.IconDescriptor
 import page.ooooo.geoshare.data.outputs.ShareLinkUriOutput
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
+import page.ooooo.geoshare.data.uri.UriQuote
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -89,6 +91,7 @@ fun LinkForm(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     initialExpanded: Boolean = false,
+    uriQuote: UriQuote = DefaultUriQuote,
 ) {
     val context = LocalContext.current
     val spacing = LocalSpacing.current
@@ -218,7 +221,7 @@ fun LinkForm(
             ) {
                 AppEnabledBox(
                     label = link.groupOrName,
-                    icon = ShareLinkUriOutput(link, coordinateConverter).getIcon(null),
+                    icon = ShareLinkUriOutput(link, coordinateConverter, uriQuote).getIcon(null),
                 )
             }
             HorizontalDivider()
@@ -229,7 +232,7 @@ fun LinkForm(
                 modifier = Modifier.testTag("geoShareLinkFormSheetEnabled"),
                 enabled = enabled,
             ) {
-                val copyOutput = CopyLinkUriOutput(link, coordinateConverter)
+                val copyOutput = CopyLinkUriOutput(link, coordinateConverter, uriQuote)
                 SheetEnabledBox(
                     headlineText = copyOutput.label(null),
                     supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
@@ -244,7 +247,7 @@ fun LinkForm(
                 modifier = Modifier.testTag("geoShareLinkFormChipEnabled"),
                 enabled = enabled,
             ) {
-                val copyOutput = CopyLinkUriOutput(link, coordinateConverter)
+                val copyOutput = CopyLinkUriOutput(link, coordinateConverter, uriQuote)
                 ChipEnabledBox(
                     label = copyOutput.label(null),
                     icon = link.icon,
@@ -357,7 +360,7 @@ fun LinkForm(
                             shape = ShapeDefaults.Large,
                             color = MaterialTheme.colorScheme.surfaceContainerHighest,
                         ) {
-                            val shareOutput = ShareLinkUriOutput(link.copy(type = value), coordinateConverter)
+                            val shareOutput = ShareLinkUriOutput(link.copy(type = value), coordinateConverter, uriQuote)
                             DropdownMenuItem(
                                 text = { Text(shareOutput.label(null)) },
                                 onClick = { onSetType(value) },
@@ -375,7 +378,7 @@ fun LinkForm(
         }
         HorizontalDivider(Modifier.padding(vertical = spacing.medium))
         LargeButton(
-            stringResource(R.string.links_form_save),
+            stringResource(R.string.save),
             Modifier.testTag("geoShareLinkFormSave"),
             enabled = enabled && isValid,
         ) {

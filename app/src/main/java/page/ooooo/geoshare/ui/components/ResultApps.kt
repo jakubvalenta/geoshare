@@ -57,6 +57,7 @@ import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
 import page.ooooo.geoshare.data.outputs.toAction
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.OutputDetailsForApp
 import page.ooooo.geoshare.ui.OutputDetailsForApps
 import page.ooooo.geoshare.ui.OutputDetailsForLink
@@ -281,7 +282,7 @@ private fun ResultAppsShareIcon(
             AppMenu(
                 expanded = expanded,
                 lastPoint = lastPoint,
-                outputDetails = outputsForSharing.open,
+                outputDetails = outputsForSharing.all,
                 points = points,
                 source = source,
                 onDismissRequest = onDismissRequest,
@@ -361,9 +362,11 @@ private fun DefaultPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
@@ -396,9 +399,11 @@ private fun DarkPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
@@ -431,9 +436,11 @@ private fun SmallPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
@@ -466,9 +473,11 @@ private fun TabletPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
             val appDetails = getFakeAppDetails(context)
             ResultApps(
@@ -501,60 +510,11 @@ private fun LoadingPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
-            )
-            val activities = fakeActivities.filter {
-                it.packageName in setOf(
-                    PackageNames.COMAPS_FDROID,
-                    PackageNames.ORGANIC_MAPS,
-                )
-            }
-            val appDetails: AppDetails = emptyMap()
-            ResultApps(
-                outputsForApps = MutableStateFlow(
-                    outputRepository.getOutputsForApps(activities, emptySet()).toOutputDetailsForApps(appDetails)
-                ),
-                outputsForLinks = MutableStateFlow(
-                    outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
-                ),
-                outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
-                ),
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
-                onDisableLinkGroup = {},
-                onExecute = {},
-                onHideApp = {},
-                onNavigateToLinkScreen = {},
-            ) { paddingValues ->
-                if (helpLifecycleMessage == null) {
-                    HelpOpenByDefaultMessage(
-                        dismissedHelpMessages = MutableStateFlow(emptySet()),
-                        sourceComesFromIntent = MutableStateFlow(true),
-                        modifier = Modifier.padding(paddingValues),
-                        onDismissHelpMessage = {},
-                        onNavigateToFaqScreen = {},
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkLoadingPreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val outputRepository = OutputRepository(
-                coordinateConverter = coordinateConverter,
-                log = log,
+                uriQuote = uriQuote,
             )
             val activities = fakeActivities.filter {
                 it.packageName in setOf(

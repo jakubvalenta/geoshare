@@ -83,7 +83,7 @@ class ScreenshotsManagedDeviceProBehaviorTest {
         // Conversion - Check - Points name only
         shareUri("https://www.google.com/maps/dir/?api=1&origin=Paris,France&destination=Cherbourg,France&travelmode=driving&waypoints=Versailles,France%7CChartres,France%7CLe%2BMans,France%7CCaen,France")
         grantConnectionPermission()
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement { viewIdResourceName == "geoShareResultName" }
         saveScreenshot("main_strings/conversion_result_check_points_name_only")
     }
 }

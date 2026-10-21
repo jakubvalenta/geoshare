@@ -14,10 +14,11 @@ import javax.inject.Inject
 class CopyLinkUriOutput @Inject constructor(
     val link: Link,
     private val coordinateConverter: CoordinateConverter,
+    override val uriQuote: UriQuote,
 ) : CopyPointTextOutput {
     override val id = "CopyLinkUriOutput"
 
-    override fun getText(value: Point, uriQuote: UriQuote) =
+    override fun getText(value: Point) =
         UriFormatter.formatUriString(
             coordinateConverter.toSrs(value, link.srs),
             link.coordsUriTemplate,

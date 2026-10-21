@@ -55,6 +55,7 @@ import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.ActionAutomationFailedDetail
 import page.ooooo.geoshare.ui.ActionAutomationSucceededDetail
 import page.ooooo.geoshare.ui.ActionDetail
@@ -180,7 +181,7 @@ fun ResultTitle(
 
             null -> ResultMessageRow {
                 Text(
-                    stringResource(R.string.conversion_succeeded_apps_headline),
+                    stringResource(R.string.open_with),
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 FeatureBadged(
@@ -342,9 +343,11 @@ private fun ActionWaitingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val uriQuote = DefaultUriQuote
             val output = OpenDisplayGeoUriOutput(
                 UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
                 coordinateConverter,
+                uriQuote,
             )
             val appDetails = getFakeAppDetails(context)
             ResultTitle(
@@ -380,9 +383,11 @@ private fun DarkActionWaitingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val uriQuote = DefaultUriQuote
             val output = OpenDisplayGeoUriOutput(
                 UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
                 coordinateConverter,
+                uriQuote,
             )
             val appDetails = getFakeAppDetails(context)
             ResultTitle(

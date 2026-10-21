@@ -37,7 +37,7 @@
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">У браузері</string>
     <string name="conversion_failed_unsupported_service">Непідтримуваний картографічний сервіс</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлено позначку</string>
-    <string name="conversion_succeeded_apps_headline">Відкрити за допомогою</string>
+    <string name="open_with">Відкрити за допомогою</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Мапи</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Оберіть спосіб відкриття вебпосилань для цього застосунку</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">У застосунку</string>
@@ -65,7 +65,7 @@
     <string name="conversion_succeeded_save_gpx">Зберегти GPX-точки</string>
     <string name="conversion_succeeded_save_gpx_filename">Результат %1$s %2$s.gpx</string>
     <string name="conversion_succeeded_point_number">точка %1$d</string>
-    <string name="conversion_succeeded_share">Поділитися</string>
+    <string name="share">Поділитися</string>
     <string name="conversion_error_retry">Спробуйте ще раз</string>
     <string name="inputs_all">Усі картографічні сервіси</string>
     <string name="inputs_recent">Нещодавно додано</string>
@@ -213,7 +213,7 @@
     <string name="links_form_enabled_option_sheet">Показати в меню копіювання</string>
     <string name="links_form_group">Група</string>
     <string name="links_form_name">Назва</string>
-    <string name="links_form_save">Зберегти</string>
+    <string name="save">Зберегти</string>
     <string name="links_form_srs">Система координат</string>
     <string name="links_form_type">Піктограма контекстного меню</string>
     <string name="links_form_uri_template_coords">Шаблон URL-адреси</string>

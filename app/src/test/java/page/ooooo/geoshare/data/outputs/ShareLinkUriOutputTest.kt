@@ -24,10 +24,9 @@ class ShareLinkUriOutputTest {
         )
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285067%2C121.475524",
-            ShareLinkUriOutput(link, coordinateConverter)
+            ShareLinkUriOutput(link, coordinateConverter, uriQuote)
                 .getUriString(
-                    WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                    uriQuote,
+                    WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED)
                 ),
         )
     }
@@ -41,10 +40,9 @@ class ShareLinkUriOutputTest {
         )
         assertEquals(
             "https://www.google.com/maps/search/?api=1&query=31.2285069%2C121.4755246",
-            ShareLinkUriOutput(link, coordinateConverter)
+            ShareLinkUriOutput(link, coordinateConverter, uriQuote)
                 .getUriString(
-                    GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                    uriQuote,
+                    GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED)
                 ),
         )
     }

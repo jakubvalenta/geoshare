@@ -19,10 +19,11 @@ import javax.inject.Inject
 class OpenNavigationGoogleUriOutput @Inject constructor(
     override val activity: UriActivity,
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) : OpenPointUriOutput {
     override val id = "OpenNavigationGoogleUriOutput(activity=$activity)"
 
-    override fun getUriString(value: Point, uriQuote: UriQuote) =
+    override fun getUriString(value: Point) =
         GoogleMapsUriFormatter.formatNavigationUriString(
             coordinateConverter.toSrs(value, PackageNames.getSrs(activity.packageName)),
             uriQuote,

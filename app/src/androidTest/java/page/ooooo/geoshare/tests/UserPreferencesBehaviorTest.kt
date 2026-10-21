@@ -38,7 +38,7 @@ class UserPreferencesBehaviorTest {
 
         // Shows WGS 84 coordinates in the decimal degrees format
         onElement {
-            if (viewIdResourceName == "geoShareResultLastPointCoordinates") {
+            if (viewIdResourceName == "geoShareResultCoordinates") {
                 assertEquals(
                     CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(gcj02Point)),
                     textAsString(),
@@ -56,7 +56,7 @@ class UserPreferencesBehaviorTest {
         // Shows WGS 84 coordinates in the degrees, minutes, seconds format
         val coordinates = goBackToElement(
             2_000 // Increase timeout to prevent coordinate element not found on tablet
-        ) { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+        ) { viewIdResourceName == "geoShareResultCoordinates" }
         assertEquals(
             CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(gcj02Point)),
             coordinates.text,
@@ -73,7 +73,7 @@ class UserPreferencesBehaviorTest {
         assertConversionSucceeds(point)
 
         // Copy coordinates
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
             scrollToElement(Direction.UP) {
@@ -94,10 +94,10 @@ class UserPreferencesBehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.AFTER_ACTION_SUCCEEDED}" }.click()
 
         // Go back to result screen
-        goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+        goBackToElement { viewIdResourceName == "geoShareResultCoordinates" }
 
         // Copy coordinates again
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
             scrollToElement(Direction.UP) {
@@ -147,7 +147,7 @@ class UserPreferencesBehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.NEVER}" }.click()
 
         // Go back to result screen
-        goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+        goBackToElement { viewIdResourceName == "geoShareResultCoordinates" }
 
         // Open Google Maps
         scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()

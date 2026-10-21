@@ -13,10 +13,11 @@ import javax.inject.Inject
 
 class CopyCoordsDecOutput @Inject constructor(
     private val coordinateConverter: CoordinateConverter,
+    override val uriQuote: UriQuote,
 ) : CopyPointTextOutput {
     override val id = "CopyCoordsDecOutput"
 
-    override fun getText(value: Point, uriQuote: UriQuote) =
+    override fun getText(value: Point) =
         CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(value))
 
     @Composable

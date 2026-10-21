@@ -36,7 +36,7 @@
     <string name="user_preferences_connection_title">¿Permitir conectarse al servicio de mapas (Google, Apple, etc.)?</string>
     <string name="conversion_succeeded_skip">Copiar enlace original</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Pin caído</string>
-    <string name="conversion_succeeded_apps_headline">Abrir con</string>
+    <string name="open_with">Abrir con</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Mapas</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Elije cómo abrir enlaces web para esta aplicación</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">En la aplicación</string>
@@ -63,7 +63,7 @@
     <string name="converter_geo_name">URIs de geo:</string>
     <string name="conversion_succeeded_save_gpx">Guardar GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s resultado %2$s.gpx</string>
-    <string name="conversion_succeeded_share">Compartir</string>
+    <string name="share">Compartir</string>
     <string name="conversion_error_retry">Intentar de nuevo</string>
     <string name="conversion_succeeded_point_number">punto %1$d</string>
     <string name="inputs_all">Todos los servicios de mapas</string>
@@ -243,7 +243,7 @@
     <string name="links_form_enabled_option_sheet">Mostrar en el menú de copia</string>
     <string name="links_form_group">Grupo</string>
     <string name="links_form_name">Nombre</string>
-    <string name="links_form_save">Guardar</string>
+    <string name="save">Guardar</string>
     <string name="links_form_srs">Sistema de coordenadas</string>
     <string name="links_form_type">Icono del menú contextual</string>
     <string name="links_form_uri_template_coords">Plantilla URL</string>

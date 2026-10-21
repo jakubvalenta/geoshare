@@ -15,10 +15,11 @@ import javax.inject.Inject
 class ShareLinkUriOutput @Inject constructor(
     val link: Link,
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) : SharePointUriOutput {
     override val id = "ShareLinkUriOutput(link.uuid=${link.uuid})"
 
-    override fun getUriString(value: Point, uriQuote: UriQuote) =
+    override fun getUriString(value: Point) =
         UriFormatter.formatUriString(
             coordinateConverter.toSrs(value, link.srs),
             link.coordsUriTemplate,
@@ -27,12 +28,12 @@ class ShareLinkUriOutput @Inject constructor(
         )
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getUriString(value, actionContext.uriQuote)?.let { uriString ->
+        getUriString(value)?.let { uriString ->
             actionContext.context.openUriInDefaultApp(uriString)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
-    override fun isEnabled(value: Point, uriQuote: UriQuote) =
-        !getUriString(value, uriQuote).isNullOrEmpty()
+    override fun isEnabled(value: Point) =
+        !getUriString(value).isNullOrEmpty()
 
     @Composable
     override fun label(appDetail: AppDetail?) =

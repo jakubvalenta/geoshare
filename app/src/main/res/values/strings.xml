@@ -52,8 +52,9 @@
     <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="conversion_succeeded_save_gpx_succeeded">Saved GPX file</string>
-    <string name="conversion_succeeded_share">Share</string>
+    <string name="share">Share</string>
     <string name="conversion_succeeded_skip">Copy original link</string>
+    <string name="copy">Copy</string>
     <string name="copyright" translatable="false">© %1$s</string>
     <string name="donation_button">Donate on Ko-fi</string>
     <string name="donation_description">Does this app save you time?</string>
@@ -280,7 +281,7 @@
     <string name="links_form_enabled_option_sheet">Show in the copy menu</string>
     <string name="links_form_group">Group</string>
     <string name="links_form_name">Name</string>
-    <string name="links_form_save">Save</string>
+    <string name="save">Save</string>
     <string name="links_form_srs">Coordinate system</string>
     <string name="links_form_test_china" translatable="false">Test Forbidden City</string>
     <string name="links_form_test_world" translatable="false">Test Kilimanjaro</string>

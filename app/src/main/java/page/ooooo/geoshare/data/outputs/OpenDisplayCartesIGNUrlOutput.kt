@@ -19,10 +19,11 @@ import javax.inject.Inject
 class OpenDisplayCartesIGNUrlOutput @Inject constructor(
     override val activity: UriActivity,
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) : OpenPointUriOutput {
     override val id = "OpenDisplayCartesIGNUrlOutput(activity=$activity)"
 
-    override fun getUriString(value: Point, uriQuote: UriQuote) =
+    override fun getUriString(value: Point) =
         UriFormatter.formatUriString(
             coordinateConverter.toWGS84(value),
             "https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}",

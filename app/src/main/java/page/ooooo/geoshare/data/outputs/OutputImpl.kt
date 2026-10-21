@@ -17,7 +17,6 @@ import page.ooooo.geoshare.data.android.writeToContentProvider
 import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.log.Log
-import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.data.uri.UriQuote
 import java.io.File
 
@@ -26,21 +25,23 @@ sealed interface CopyPointTextOutput :
     Output.HasSuccessText,
     Output.HasAutomationSuccessText {
 
-    fun getText(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
+    val uriQuote: UriQuote
 
-    override fun isEnabled(value: Point, uriQuote: UriQuote) =
-        !getText(value, uriQuote).isNullOrEmpty()
+    fun getText(value: Point): String? = null
+
+    override fun isEnabled(value: Point) =
+        !getText(value).isNullOrEmpty()
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getText(value, actionContext.uriQuote)
+        getText(value)
             ?.let { text ->
                 actionContext.clipboard.copy(text)
                 true
             }
             .toActionResult()
 
-    override fun getDescription(value: Point, uriQuote: UriQuote) =
-        getText(value, uriQuote)
+    override fun getDescription(value: Point) =
+        getText(value)
 
     override fun getMenuIcon(appDetail: AppDetail?) =
         ResourceIconDescriptor(R.drawable.content_copy_24px)
@@ -59,10 +60,10 @@ sealed interface OpenPointUriOutput :
 
     override val activity: UriActivity
 
-    fun getUriString(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
+    fun getUriString(value: Point): String? = null
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getUriString(value, actionContext.uriQuote)
+        getUriString(value)
             ?.let { uriString -> activity.launch(actionContext.context, uriString) }
             .toActionResult(openedApp = true)
 
@@ -231,10 +232,10 @@ sealed interface SharePointUriOutput :
     Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
-    fun getUriString(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
+    fun getUriString(value: Point): String? = null
 
     override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getUriString(value, actionContext.uriQuote)
+        getUriString(value)
             ?.let { uriString -> actionContext.context.openUriWithChooser(uriString) }
             .toActionResult(openedApp = true)
 
