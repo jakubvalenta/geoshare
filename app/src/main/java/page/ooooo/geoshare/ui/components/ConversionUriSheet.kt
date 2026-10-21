@@ -44,7 +44,7 @@ import page.ooooo.geoshare.ui.toOutputDetailsForUri
 fun ConversionUriSheet(
     outputsForUri: StateFlow<OutputDetailsForUri?>,
     uriString: String,
-    intialSheetValue: SheetValue = SheetValue.Hidden,
+    initialSheetValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
@@ -54,7 +54,7 @@ fun ConversionUriSheet(
         ConversionUriSheet(
             outputsForUri = outputsForUri,
             uriString = uriString,
-            intialSheetValue = intialSheetValue,
+            initialSheetValue = initialSheetValue,
             onDismissRequest = onDismissRequest,
             onExecute = onExecute,
         )
@@ -66,11 +66,11 @@ fun ConversionUriSheet(
 private fun ConversionUriSheet(
     outputsForUri: OutputDetailsForUri,
     uriString: String,
-    intialSheetValue: SheetValue = SheetValue.Hidden,
+    initialSheetValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
-    val sheetState = rememberBottomSheetState(intialSheetValue)
+    val sheetState = rememberBottomSheetState(initialSheetValue)
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -143,7 +143,7 @@ private fun DefaultPreview() {
                     outputRepository.getOutputsForUri(activities).toOutputDetailsForUri(appDetails)
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                intialSheetValue = SheetValue.Expanded,
+                initialSheetValue = SheetValue.Expanded,
                 onDismissRequest = {},
                 onExecute = {},
             )
@@ -181,7 +181,7 @@ private fun DarkPreview() {
                     outputRepository.getOutputsForUri(activities).toOutputDetailsForUri(appDetails)
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                intialSheetValue = SheetValue.Expanded,
+                initialSheetValue = SheetValue.Expanded,
                 onDismissRequest = {},
                 onExecute = {},
             )
@@ -218,7 +218,7 @@ private fun LoadingPreview() {
                     outputRepository.getOutputsForUri(activities).toOutputDetailsForUri(emptyMap())
                 ),
                 uriString = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA",
-                intialSheetValue = SheetValue.Expanded,
+                initialSheetValue = SheetValue.Expanded,
                 onDismissRequest = {},
                 onExecute = {},
             )

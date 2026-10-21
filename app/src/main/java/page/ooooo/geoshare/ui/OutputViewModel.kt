@@ -15,14 +15,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.OutputsForApps
-import page.ooooo.geoshare.data.OutputsForPoint
 import page.ooooo.geoshare.data.OutputsForPoints
 import page.ooooo.geoshare.data.OutputsForSharing
 import page.ooooo.geoshare.data.OutputsForUri
@@ -39,7 +37,6 @@ import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.outputs.IconDescriptor
 import page.ooooo.geoshare.data.outputs.Output
-import page.ooooo.geoshare.data.outputs.StringOutput
 import javax.inject.Inject
 
 data class OutputDetail<T>(
@@ -51,12 +48,6 @@ data class OutputDetail<T>(
     @Composable
     fun label(): String = output.label(appDetail)
 }
-
-data class OutputDetailsForPoint(
-    val copy: List<OutputDetail<Point>> = emptyList(),
-    val open: List<OutputDetail<Point>> = emptyList(),
-    val save: List<OutputDetail<Point>> = emptyList(),
-)
 
 data class OutputDetailsForPoints(
     val save: List<OutputDetail<Points>> = emptyList(),
@@ -81,15 +72,15 @@ data class OutputDetailsForLink(
     val all: List<OutputDetail<*>>,
 )
 
-data class OutputDetailForUri(
+data class OutputDetailForApp<T>(
     val label: String?,
     val icon: IconDescriptor?,
-    val output: StringOutput,
+    val output: Output<T>,
 )
 
 data class OutputDetailsForUri(
-    val copy: OutputDetailForUri,
-    val open: List<OutputDetailForUri>,
+    val copy: OutputDetail<String>,
+    val open: List<OutputDetailForApp<String>>,
 )
 
 data class OutputDetailsForSharing(
@@ -151,41 +142,56 @@ class OutputViewModel @Inject constructor(
 
     // Outputs
 
-    val outputsForPoint: StateFlow<OutputDetailsForPoint> =
-        linkRepository.all.map { outputRepository.getOutputsForPoint(it) }
-            .combine(appRepository.appDetails) { outputsForPoint, appDetails ->
-                outputsForPoint.toOutputDetailsForPoint(appDetails)
-            }
+    val outputsForPointCopy: StateFlow<List<OutputDetail<Point>>> =
+        linkRepository.all
+            .map { links -> outputRepository.getOutputsForPointCopy(links) }
+            .combine(appRepository.appDetails) { outputs, appDetails -> outputs.toOutputDetails(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                OutputDetailsForPoint(),
+                emptyList(),
+            )
+    val outputsForPointOpen: StateFlow<List<OutputDetailForApp<Point>>> =
+        appRepository.activities
+            .combine(
+                userPreferencesRepository.values
+                    .map { it.hiddenApps }
+                    .distinctUntilChanged()
+            ) { activities, hiddenApps -> outputRepository.getOutputsForPointOpen(activities, hiddenApps) }
+            .combine(appRepository.appDetails) { outputs, appDetails -> outputs.toOutputDetailsForApp(appDetails) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList(),
+            )
+    val outputsForPointSave: StateFlow<List<OutputDetail<Point>>> =
+        appRepository.appDetails
+            .map { appDetails -> outputRepository.outputsForPointSave.toOutputDetails(appDetails) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList(),
             )
     val outputsForPoints: StateFlow<OutputDetailsForPoints> =
-        flow { emit(outputRepository.getOutputsForPoints()) }
-            .combine(appRepository.appDetails) { outputsForPoints, appDetails ->
-                outputsForPoints.toOutputDetailsForPoints(appDetails)
-            }
+        appRepository.appDetails
+            .map { appDetails -> outputRepository.outputsForPoints.toOutputDetailsForPoints(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 OutputDetailsForPoints(),
             )
     val outputsForPointChips: StateFlow<List<OutputDetail<Point>>> =
-        linkRepository.all.map { outputRepository.getOutputsForPointChips(it) }
-            .combine(appRepository.appDetails) { outputs, appDetails ->
-                outputs.map { it.toOutputDetail(appDetails) }
-            }
+        linkRepository.all
+            .map { links -> outputRepository.getOutputsForPointChips(links) }
+            .combine(appRepository.appDetails) { outputs, appDetails -> outputs.toOutputDetails(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 emptyList(),
             )
     val outputsForPointsChips: StateFlow<List<OutputDetail<Points>>> =
-        flow { emit(outputRepository.getOutputsForPointsChips()) }
-            .combine(appRepository.appDetails) { outputs, appDetails ->
-                outputs.map { it.toOutputDetail(appDetails) }
-            }
+        appRepository.appDetails
+            .map { appDetails -> outputRepository.outputsForPointsChips.toOutputDetails(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
@@ -197,42 +203,34 @@ class OutputViewModel @Inject constructor(
                 userPreferencesRepository.values
                     .map { it.hiddenApps }
                     .distinctUntilChanged()
-            ) { activities, hiddenApps ->
-                outputRepository.getOutputsForApps(activities, hiddenApps)
-            }
-            .combine(appDetails) { outputsForApps, appDetails ->
-                outputsForApps.toOutputDetailsForApps(appDetails)
-            }
+            ) { activities, hiddenApps -> outputRepository.getOutputsForApps(activities, hiddenApps) }
+            .combine(appDetails) { outputsForApps, appDetails -> outputsForApps.toOutputDetailsForApps(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 OutputDetailsForApps(),
             )
     val outputsForLinks: StateFlow<List<OutputDetailsForLink>> =
-        linkRepository.all.map { links -> outputRepository.getOutputsForLinks(links) }
-            .combine(appDetails) { outputsForLinks, appDetails ->
-                outputsForLinks.toOutputDetailsForLinks(appDetails)
-            }
+        linkRepository.all
+            .map { links -> outputRepository.getOutputsForLinks(links) }
+            .combine(appDetails) { outputsForLinks, appDetails -> outputsForLinks.toOutputDetailsForLinks(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 emptyList(),
             )
     val outputsForSharing: StateFlow<OutputDetailsForSharing?> =
-        flow { emit(outputRepository.getOutputsForSharing()) }
-            .combine(appDetails) { outputs, appDetails ->
-                outputs.toOutputDetailsForSharing(appDetails)
-            }
+        appRepository.appDetails
+            .map { appDetails -> outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 null,
             )
     val outputsForUri: StateFlow<OutputDetailsForUri?> =
-        activitiesForUri.map { activities -> outputRepository.getOutputsForUri(activities) }
-            .combine(appDetailsForUri) { outputsForUri, appDetails ->
-                outputsForUri.toOutputDetailsForUri(appDetails)
-            }
+        activitiesForUri
+            .map { activities -> outputRepository.getOutputsForUri(activities) }
+            .combine(appDetailsForUri) { outputsForUri, appDetails -> outputsForUri.toOutputDetailsForUri(appDetails) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
@@ -264,26 +262,26 @@ fun <T> Output<T>.toOutputDetail(appDetails: AppDetails): OutputDetail<T> =
         )
     }
 
-fun StringOutput.toOutputDetailForUri(appDetails: AppDetails): OutputDetailForUri =
+fun <T> List<Output<T>>.toOutputDetails(appDetails: AppDetails): List<OutputDetail<T>> =
+    map { it.toOutputDetail(appDetails) }
+
+fun <T> Output<T>.toOutputDetailForApp(appDetails: AppDetails): OutputDetailForApp<T> = // TODO Rename
     (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
-        OutputDetailForUri(
+        OutputDetailForApp(
             label = appDetail?.label,
             icon = getIcon(appDetail),
             output = this,
         )
     }
 
-fun OutputsForPoint.toOutputDetailsForPoint(appDetails: AppDetails): OutputDetailsForPoint =
-    OutputDetailsForPoint(
-        copy = copy.map { it.toOutputDetail(appDetails) },
-        open = open.map { it.toOutputDetail(appDetails) },
-        save = save.map { it.toOutputDetail(appDetails) },
-    )
+fun <T> List<Output<T>>.toOutputDetailsForApp(appDetails: AppDetails): List<OutputDetailForApp<T>> =
+    map { it.toOutputDetailForApp(appDetails) }
+        .sortedBy { it.label }
 
 fun OutputsForPoints.toOutputDetailsForPoints(appDetails: AppDetails): OutputDetailsForPoints =
     OutputDetailsForPoints(
-        save = save.map { it.toOutputDetail(appDetails) },
-        share = share.map { it.toOutputDetail(appDetails) },
+        save = save.toOutputDetails(appDetails),
+        share = share.toOutputDetails(appDetails),
     )
 
 fun OutputsForApps.toOutputDetailsForApps(appDetails: AppDetails): OutputDetailsForApps =
@@ -328,6 +326,6 @@ fun OutputsForSharing.toOutputDetailsForSharing(appDetails: AppDetails): OutputD
 
 fun OutputsForUri.toOutputDetailsForUri(appDetails: AppDetails): OutputDetailsForUri =
     OutputDetailsForUri(
-        copy = copy.toOutputDetailForUri(appDetails),
-        open = open.map { it.toOutputDetailForUri(appDetails) }.sortedBy { it.label },
+        copy = copy.toOutputDetail(appDetails),
+        open = open.toOutputDetailsForApp(appDetails),
     )

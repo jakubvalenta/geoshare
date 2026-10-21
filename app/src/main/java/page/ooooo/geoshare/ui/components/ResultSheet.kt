@@ -25,6 +25,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
@@ -35,7 +36,7 @@ import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.toOutputDetailsForPoint
+import page.ooooo.geoshare.ui.toOutputDetails
 import page.ooooo.geoshare.ui.toOutputDetailsForPoints
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,8 +46,8 @@ fun <T> ResultSheet(
     title: String?,
     value: T,
     initialSheetValue: SheetValue = SheetValue.Hidden,
-    onExecute: (action: Action<*>) -> Unit,
     onDismissRequest: () -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberBottomSheetState(initialSheetValue)
@@ -102,7 +103,7 @@ fun <T> ResultSheet(
 // Previews
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
+@Preview(showBackground = true)
 @Composable
 private fun CopyPointPreview() {
     AppTheme {
@@ -119,11 +120,11 @@ private fun CopyPointPreview() {
                 uriQuote = uriQuote,
             )
             val appDetails: AppDetails = emptyMap()
-            val outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks)
-                .toOutputDetailsForPoint(appDetails)
+            val outputsForPointCopy = outputRepository.getOutputsForPointCopy(defaultFakeLinks)
+                .toOutputDetails(appDetails)
             val point = WGS84Point(NaivePoint.example)
             ResultSheet(
-                outputs = outputsForPoint.copy,
+                outputs = outputsForPointCopy,
                 title = pointTitle(point, pointIndex = 0, totalPoints = 2),
                 value = point,
                 initialSheetValue = SheetValue.Expanded,
@@ -135,11 +136,7 @@ private fun CopyPointPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(
-    showBackground = true,
-    device = "spec:width=1080px,height=3200px,dpi=440",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun DarkCopyPointPreview() {
     AppTheme {
@@ -156,11 +153,11 @@ private fun DarkCopyPointPreview() {
                 uriQuote = uriQuote,
             )
             val appDetails: AppDetails = emptyMap()
-            val outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks)
-                .toOutputDetailsForPoint(appDetails)
+            val outputsForPointCopy = outputRepository.getOutputsForPointCopy(defaultFakeLinks)
+                .toOutputDetails(appDetails)
             val point = WGS84Point(NaivePoint.example)
             ResultSheet(
-                outputs = outputsForPoint.copy,
+                outputs = outputsForPointCopy,
                 title = pointTitle(point, pointIndex = 0, totalPoints = 2),
                 value = point,
                 initialSheetValue = SheetValue.Expanded,
@@ -172,7 +169,40 @@ private fun DarkCopyPointPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
+@Preview(showBackground = true)
+@Composable
+private fun OpenPointPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            val appDetails: AppDetails = emptyMap()
+            val outputsForPointOpen = outputRepository.getOutputsForPointOpen(fakeActivities, emptySet())
+                .toOutputDetails(appDetails)
+            val point = WGS84Point(NaivePoint.example)
+            ResultSheet(
+                outputs = outputsForPointOpen,
+                title = pointTitle(point, pointIndex = 2, totalPoints = 3),
+                value = point,
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
 @Composable
 private fun SavePointPreview() {
     AppTheme {
@@ -189,11 +219,10 @@ private fun SavePointPreview() {
                 uriQuote = uriQuote,
             )
             val appDetails: AppDetails = emptyMap()
-            val outputsForPoint = outputRepository.getOutputsForPoint(defaultFakeLinks)
-                .toOutputDetailsForPoint(appDetails)
+            val outputsForPointSave = outputRepository.outputsForPointSave.toOutputDetails(appDetails)
             val point = WGS84Point(NaivePoint.example)
             ResultSheet(
-                outputs = outputsForPoint.save,
+                outputs = outputsForPointSave,
                 title = pointTitle(point, pointIndex = 2, totalPoints = 3),
                 value = point,
                 initialSheetValue = SheetValue.Expanded,
@@ -205,7 +234,7 @@ private fun SavePointPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
+@Preview(showBackground = true)
 @Composable
 private fun SavePointsPreview() {
     AppTheme {
@@ -222,8 +251,7 @@ private fun SavePointsPreview() {
                 uriQuote = uriQuote,
             )
             val appDetails: AppDetails = emptyMap()
-            val outputsForPoints = outputRepository.getOutputsForPoints()
-                .toOutputDetailsForPoints(appDetails)
+            val outputsForPoints = outputRepository.outputsForPoints.toOutputDetailsForPoints(appDetails)
             val points = persistentListOf(
                 WGS84Point(NaivePoint.genRandomPoint()),
                 WGS84Point(NaivePoint.genRandomPoint()),

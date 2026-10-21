@@ -59,7 +59,7 @@ import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.theme.defaultLinkStyles
-import page.ooooo.geoshare.ui.toOutputDetail
+import page.ooooo.geoshare.ui.toOutputDetails
 
 @Composable
 fun ResultCoordinates(
@@ -294,7 +294,7 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
                 inputGroup = OpenStreetMapInputGroup,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -328,7 +328,7 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
                 inputGroup = OpenStreetMapInputGroup,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -362,7 +362,7 @@ private fun SeveralPointsPreview() {
                 coordinateConverter = coordinateConverter,
                 inputGroup = GoogleMapsInputGroup,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -396,7 +396,7 @@ private fun NameOnlyPreview() {
                 coordinateConverter = coordinateConverter,
                 inputGroup = GeoUriInputGroup,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
@@ -430,7 +430,7 @@ private fun CoordinateFormatPreview() {
                 coordinateConverter = coordinateConverter,
                 inputGroup = GeoUriInputGroup,
                 outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(
                     defaultFakeUserPreferences.copy(coordinateFormat = CoordinateFormat.DEG_MIN_SEC)

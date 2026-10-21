@@ -377,7 +377,7 @@ private fun DefaultPreview() {
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                    outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
@@ -414,7 +414,7 @@ private fun DarkPreview() {
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                    outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
@@ -451,7 +451,7 @@ private fun SmallPreview() {
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                    outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
@@ -488,7 +488,7 @@ private fun TabletPreview() {
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                    outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
@@ -531,7 +531,7 @@ private fun LoadingPreview() {
                     outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
                 ),
                 outputsForSharing = MutableStateFlow(
-                    outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                    outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),

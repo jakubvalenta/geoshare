@@ -69,7 +69,7 @@ import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.theme.defaultLinkStyles
-import page.ooooo.geoshare.ui.toOutputDetail
+import page.ooooo.geoshare.ui.toOutputDetails
 
 @Composable
 fun ResultPoints(
@@ -79,7 +79,7 @@ fun ResultPoints(
     userPreferencesValues: StateFlow<UserPreferencesValues>,
     initialExpanded: Boolean = false,
     onExecute: (action: Action<*>) -> Unit,
-    onOpenPoint: (point: Point) -> Unit,
+    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onSelectPointToCopy: (point: Point, pointIndex: Int) -> Unit,
     onSelectPointToSave: (point: Point, pointIndex: Int) -> Unit,
@@ -152,7 +152,7 @@ private fun ResultPointsBox(
     coordinateConverter: CoordinateConverter,
     userPreferencesValues: StateFlow<UserPreferencesValues>,
     initialExpanded: Boolean = false,
-    onOpenPoint: (point: Point) -> Unit,
+    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
     onSelectPointToCopy: (point: Point, pointIndex: Int) -> Unit,
     onSelectPointToSave: (point: Point, pointIndex: Int) -> Unit,
     onSelectPointsToSave: () -> Unit,
@@ -211,7 +211,7 @@ private fun ResultPointsBox(
                         pointIndex = pointIndex,
                         coordinateFormat = userPreferencesValues.coordinateFormat,
                         coordinateConverter = coordinateConverter,
-                        onOpenPoint = { onOpenPoint(point) },
+                        onOpenPoint = { onOpenPoint(point, pointIndex) },
                         onSelectPointToCopy = { onSelectPointToCopy(point, pointIndex) },
                         onSelectPointToSave = { onSelectPointToSave(point, pointIndex) },
                     )
@@ -344,13 +344,13 @@ private fun DefaultPreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 initialExpanded = true,
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = {},
+                onOpenPoint = { _, _ -> },
                 onSelectPointToCopy = { _, _ -> },
                 onSelectPointToSave = { _, _ -> },
                 onSelectPointsToSave = {},
@@ -389,13 +389,13 @@ private fun DarkPreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 initialExpanded = true,
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = {},
+                onOpenPoint = { _, _ -> },
                 onSelectPointToCopy = { _, _ -> },
                 onSelectPointToSave = { _, _ -> },
                 onSelectPointsToSave = {},
@@ -429,7 +429,7 @@ private fun CoordinateFormatPreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
                 ),
                 initialExpanded = true,
                 userPreferencesValues = MutableStateFlow(
@@ -437,7 +437,7 @@ private fun CoordinateFormatPreview() {
                 ),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = {},
+                onOpenPoint = { _, _ -> },
                 onSelectPointToCopy = { _, _ -> },
                 onSelectPointToSave = { _, _ -> },
                 onSelectPointsToSave = {},
@@ -471,12 +471,12 @@ private fun CollapsedPreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 outputsForPointsChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
                 ),
                 userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = {},
+                onOpenPoint = { _, _ -> },
                 onSelectPointToCopy = { _, _ -> },
                 onSelectPointToSave = { _, _ -> },
                 onSelectPointsToSave = {},

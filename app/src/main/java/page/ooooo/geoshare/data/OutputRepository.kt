@@ -13,6 +13,8 @@ import page.ooooo.geoshare.data.android.isMessagingApp
 import page.ooooo.geoshare.data.android.sorted
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.Point
+import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.outputs.CopyCoordsDecOutput
@@ -34,7 +36,6 @@ import page.ooooo.geoshare.data.outputs.OpenStreetViewGoogleUriOutput
 import page.ooooo.geoshare.data.outputs.OpenUnknownUriOutput
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.outputs.PointOutput
-import page.ooooo.geoshare.data.outputs.PointsOutput
 import page.ooooo.geoshare.data.outputs.SavePointGpxOutput
 import page.ooooo.geoshare.data.outputs.SavePointToContactOutput
 import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
@@ -89,15 +90,9 @@ import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class OutputsForPoint(
-    val copy: List<PointOutput>,
-    val open: List<PointOutput>,
-    val save: List<PointOutput>,
-)
-
 data class OutputsForPoints(
-    val save: List<PointsOutput>,
-    val share: List<PointsOutput>,
+    val save: List<Output<Points>>,
+    val share: List<Output<Points>>,
 )
 
 data class OutputsForApps(
@@ -106,13 +101,13 @@ data class OutputsForApps(
 )
 
 data class OutputsForSharing(
-    val default: PointOutput,
+    val default: Output<Point>,
     val all: List<Output<*>>,
 )
 
 data class OutputsForUri(
     val copy: CopyStringOutput,
-    val open: List<StringOutput>,
+    val open: List<Output<String>>,
 )
 
 @Singleton
@@ -121,35 +116,38 @@ class OutputRepository @Inject constructor(
     private val log: Log,
     private val uriQuote: UriQuote,
 ) {
-    fun getOutputsForPoint(links: List<Link>): OutputsForPoint =
-        OutputsForPoint(
-            copy = listOf(
-                CopyCoordsDecOutput(coordinateConverter, uriQuote),
-                CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
-                CopyNameOutput(uriQuote),
-                CopyGeoUriOutput(coordinateConverter, uriQuote),
-                *links
-                    .filter { it.sheetEnabled }
-                    .groupBy { it.groupOrName }
-                    .toSortedMap()
-                    .values
-                    .flatten()
-                    .map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }
-                    .toTypedArray(),
-            ),
-            open = listOf(
-                ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
-                ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
-                ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
-                SavePointToContactOutput(coordinateConverter),
-            ),
-            save = listOf(
-                SavePointGpxOutput(coordinateConverter),
-                SavePointToContactOutput(coordinateConverter),
-            ),
+    fun getOutputsForPointCopy(links: List<Link>): List<Output<Point>> =
+        listOf(
+            CopyCoordsDecOutput(coordinateConverter, uriQuote),
+            CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
+            CopyNameOutput(uriQuote),
+            CopyGeoUriOutput(coordinateConverter, uriQuote),
+            *links
+                .filter { it.sheetEnabled }
+                .groupBy { it.groupOrName }
+                .toSortedMap()
+                .values
+                .flatten()
+                .map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }
+                .toTypedArray(),
         )
 
-    fun getOutputsForPoints(): OutputsForPoints =
+    fun getOutputsForPointOpen(activities: List<AppActivity>, hiddenApps: Set<String>?): List<Output<Point>> =
+        getOutputsForAppsCategory(activities, hiddenApps)
+            .values
+            .mapNotNull { it
+                .filterIsInstance<PointOutput>()
+                .firstOrNull()
+            }
+
+    val outputsForPointSave: List<Output<Point>> by lazy {
+        listOf(
+            SavePointGpxOutput(coordinateConverter),
+            SavePointToContactOutput(coordinateConverter),
+        )
+    }
+
+    val outputsForPoints: OutputsForPoints by lazy {
         OutputsForPoints(
             save = listOf(
                 SaveRouteGpxOutput(coordinateConverter),
@@ -160,6 +158,7 @@ class OutputRepository @Inject constructor(
                 SharePointsGpxOutput(coordinateConverter),
             ),
         )
+    }
 
     fun getOutputsForApps(activities: List<AppActivity>, hiddenApps: Set<String>?): OutputsForApps =
         activities.partition { !it.isMessagingApp() }.let { (mapActivities, messagingActivities) ->
@@ -194,7 +193,7 @@ class OutputRepository @Inject constructor(
                 )
             }
 
-    fun getOutputsForSharing(): OutputsForSharing =
+    val outputsForSharing: OutputsForSharing by lazy {
         OutputsForSharing(
             default = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
             all = listOf(
@@ -206,8 +205,9 @@ class OutputRepository @Inject constructor(
                 SavePointToContactOutput(coordinateConverter),
             ),
         )
+    }
 
-    fun getOutputsForPointChips(links: List<Link>): List<PointOutput> =
+    fun getOutputsForPointChips(links: List<Link>): List<Output<Point>> =
         listOf(
             CopyGeoUriOutput(coordinateConverter, uriQuote),
             *links
@@ -217,12 +217,13 @@ class OutputRepository @Inject constructor(
                 .toTypedArray(),
         )
 
-    fun getOutputsForPointsChips(): List<PointsOutput> =
+    val outputsForPointsChips: List<Output<Points>> by lazy {
         listOf(
             ShareRouteGpxOutput(coordinateConverter),
             SaveRouteGpxOutput(coordinateConverter),
             SavePointsGpxOutput(coordinateConverter),
         )
+    }
 
     fun getOutputsForUri(activities: List<AppActivity>): OutputsForUri =
         OutputsForUri(

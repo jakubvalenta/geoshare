@@ -100,38 +100,90 @@ class OutputRepositoryTest {
     )
 
     @Test
-    fun getOutputsForPoint_returnsOutputsThatDoNotRequirePackageName() {
+    fun getOutputsForPointCopy_returnsOutputsThatDoNotRequirePackageName() {
         assertEquals(
-            OutputsForPoint(
-                copy = listOf(
-                    CopyCoordsDecOutput(coordinateConverter, uriQuote),
-                    CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
-                    CopyNameOutput(uriQuote),
-                    CopyGeoUriOutput(coordinateConverter, uriQuote),
-                    CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
-                    CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
-                    CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
-                    CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
-                    CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
-                    CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
-                ),
-                open = listOf(
-                    ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
-                    ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
-                    ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
-                    SavePointToContactOutput(coordinateConverter),
-                ),
-                save = listOf(
-                    SavePointGpxOutput(coordinateConverter),
-                    SavePointToContactOutput(coordinateConverter),
-                ),
+            listOf(
+                CopyCoordsDecOutput(coordinateConverter, uriQuote),
+                CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
+                CopyNameOutput(uriQuote),
+                CopyGeoUriOutput(coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeAppleMapsDisplayLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeAppleMapsNavigationLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeGoogleMapsNavigationLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
+                CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
             ),
-            outputRepository.getOutputsForPoint(defaultFakeLinks),
+            outputRepository.getOutputsForPointCopy(defaultFakeLinks),
         )
     }
 
     @Test
-    fun getOutputsForPoints_returnsOutputsThatDoNotRequirePackageName() {
+    fun getOutputsForPointOpen_returnsFirstOutputForEachPassedActivity() {
+        assertEquals(
+            listOf(
+                OpenDisplayGeoUriOutput(
+                    UriActivity(PackageNames.TEST, UriScheme.GEO),
+                    coordinateConverter,
+                    uriQuote,
+                ),
+                OpenDisplayGeoUriOutput(
+                    UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
+                    coordinateConverter,
+                    uriQuote,
+                ),
+                OpenDisplayCartesIGNUrlOutput(
+                    UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
+                    coordinateConverter,
+                    uriQuote,
+                ),
+                OpenDisplayMagicEarthUriOutput(
+                    UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
+                    coordinateConverter,
+                    uriQuote,
+                ),
+                SendPointOutput(
+                    TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
+                    coordinateConverter,
+                    uriQuote,
+                ),
+                OpenRouteOnePointGpxOutput(
+                    FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+                    coordinateConverter,
+                    log,
+                ),
+            ),
+            outputRepository.getOutputsForPointOpen(
+                listOf(
+                    // TODO Test filtering first activity that is for a single point
+                    UriActivity(PackageNames.TEST, UriScheme.GEO),
+                    UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
+                    UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_NAVIGATION),
+                    UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_STREET_VIEW),
+                    FileActivity(PackageNames.GOOGLE_MAPS, FileType.GPX),
+                    UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
+                    UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
+                    TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
+                    FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+                ),
+                emptySet(), // TODO Test hidden apps
+            ),
+        )
+    }
+
+    @Test
+    fun outputsForPointSave_returnsHardCodedOutputs() {
+        assertEquals(
+            listOf(
+                SavePointGpxOutput(coordinateConverter),
+                SavePointToContactOutput(coordinateConverter),
+            ),
+            outputRepository.outputsForPointSave,
+        )
+    }
+
+    @Test
+    fun outputsForPoints_returnsHardCodedOutputs() {
         assertEquals(
             OutputsForPoints(
                 share = listOf(
@@ -143,12 +195,12 @@ class OutputRepositoryTest {
                     SavePointsGpxOutput(coordinateConverter),
                 ),
             ),
-            outputRepository.getOutputsForPoints(),
+            outputRepository.outputsForPoints,
         )
     }
 
     @Test
-    fun getOutputsForApps_returnOutputsThatSupportPassedPackageNamesAndDataTypes() {
+    fun getOutputsForApps_returnOutputsThatSupportPassedActivities() {
         assertEquals(
             OutputsForApps(
                 maps = mapOf(
@@ -278,7 +330,7 @@ class OutputRepositoryTest {
     }
 
     @Test
-    fun getOutputsForSharing_returnsHardCodedOutputs() {
+    fun outputsForSharing_returnsHardCodedOutputs() {
         assertEquals(
             OutputsForSharing(
                 default = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
@@ -291,7 +343,7 @@ class OutputRepositoryTest {
                     SavePointToContactOutput(coordinateConverter),
                 ),
             ),
-            outputRepository.getOutputsForSharing(),
+            outputRepository.outputsForSharing,
         )
     }
 
@@ -386,14 +438,14 @@ class OutputRepositoryTest {
     }
 
     @Test
-    fun getOutputsForPointsChips_returnsHardCodedOutputs() {
+    fun outputsForPointsChips_returnsHardCodedOutputs() {
         assertEquals(
             listOf(
                 ShareRouteGpxOutput(coordinateConverter),
                 SaveRouteGpxOutput(coordinateConverter),
                 SavePointsGpxOutput(coordinateConverter),
             ),
-            outputRepository.getOutputsForPointsChips(),
+            outputRepository.outputsForPointsChips,
         )
     }
 

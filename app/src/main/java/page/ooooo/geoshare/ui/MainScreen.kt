@@ -127,6 +127,7 @@ import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
 import page.ooooo.geoshare.ui.components.ResultError
+import page.ooooo.geoshare.ui.components.ResultPointOpenSheet
 import page.ooooo.geoshare.ui.components.ResultPoints
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
@@ -274,8 +275,10 @@ fun MainScreen(
         outputsForApps = outputViewModel.outputsForApps,
         outputsForExampleApp = outputViewModel.outputsForExampleApp,
         outputsForLinks = outputViewModel.outputsForLinks,
-        outputsForPoint = outputViewModel.outputsForPoint,
         outputsForPointChips = outputViewModel.outputsForPointChips,
+        outputsForPointCopy = outputViewModel.outputsForPointCopy,
+        outputsForPointOpen = outputViewModel.outputsForPointOpen,
+        outputsForPointSave = outputViewModel.outputsForPointSave,
         outputsForPoints = outputViewModel.outputsForPoints,
         outputsForPointsChips = outputViewModel.outputsForPointsChips,
         outputsForSharing = outputViewModel.outputsForSharing,
@@ -353,8 +356,10 @@ private fun MainScreen(
     outputsForApps: StateFlow<OutputDetailsForApps>,
     outputsForExampleApp: StateFlow<OutputDetailsForApp?>,
     outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
-    outputsForPoint: StateFlow<OutputDetailsForPoint>,
     outputsForPointChips: StateFlow<List<OutputDetail<Point>>>,
+    outputsForPointCopy: StateFlow<List<OutputDetail<Point>>>,
+    outputsForPointOpen: StateFlow<List<OutputDetailForApp<Point>>>,
+    outputsForPointSave: StateFlow<List<OutputDetail<Point>>>,
     outputsForPoints: StateFlow<OutputDetailsForPoints>,
     outputsForPointsChips: StateFlow<List<OutputDetail<Points>>>,
     outputsForSharing: StateFlow<OutputDetailsForSharing?>,
@@ -523,7 +528,12 @@ private fun MainScreen(
                                                         userPreferencesValues = userPreferencesValues,
                                                         onExecute = onExecute,
                                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                        onOpenPoint = {}, // TODO
+                                                        onOpenPoint = { point, pointIndex ->
+                                                            onCancelAction()
+                                                            resultSheetState = ResultSheetState.PointToOpenSelected(
+                                                                point, pointIndex
+                                                            )
+                                                        },
                                                         onSelectPointToCopy = { point, pointIndex ->
                                                             onCancelAction()
                                                             resultSheetState = ResultSheetState.PointToCopySelected(
@@ -723,10 +733,21 @@ private fun MainScreen(
         resultSheetState.run {
             when (this) {
                 is ResultSheetState.PointToCopySelected -> {
-                    val outputsForPoint by outputsForPoint.collectAsStateWithLifecycle()
+                    val outputsForPointCopy by outputsForPointCopy.collectAsStateWithLifecycle()
                     ResultSheet(
                         value = point,
-                        outputs = outputsForPoint.copy,
+                        outputs = outputsForPointCopy,
+                        title = pointTitle(point, pointIndex, conversionState.points.size),
+                        onExecute = onExecute,
+                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
+                    )
+                }
+
+                is ResultSheetState.PointToOpenSelected -> {
+                    val outputsForPointOpen by outputsForPointOpen.collectAsStateWithLifecycle()
+                    ResultPointOpenSheet(
+                        value = point,
+                        outputs = outputsForPointOpen,
                         title = pointTitle(point, pointIndex, conversionState.points.size),
                         onExecute = onExecute,
                         onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
@@ -734,10 +755,10 @@ private fun MainScreen(
                 }
 
                 is ResultSheetState.PointToSaveSelected -> {
-                    val outputsForPoint by outputsForPoint.collectAsStateWithLifecycle()
+                    val outputsForPointSave by outputsForPointSave.collectAsStateWithLifecycle()
                     ResultSheet(
                         value = point,
-                        outputs = outputsForPoint.save,
+                        outputs = outputsForPointSave,
                         title = pointTitle(point, pointIndex, conversionState.points.size),
                         onExecute = onExecute,
                         onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
@@ -829,6 +850,7 @@ private fun MainScreen(
 
 private sealed interface ResultSheetState {
     data class PointToCopySelected(val point: Point, val pointIndex: Int) : ResultSheetState
+    data class PointToOpenSelected(val point: Point, val pointIndex: Int) : ResultSheetState
     data class PointToSaveSelected(val point: Point, val pointIndex: Int) : ResultSheetState
     data class PointsToSaveSelected(val points: Points) : ResultSheetState
     data class PointsToShareSelected(val points: Points) : ResultSheetState
@@ -859,8 +881,10 @@ private fun DefaultPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -923,8 +947,10 @@ private fun DarkPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -987,8 +1013,10 @@ private fun SmallPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1051,8 +1079,10 @@ private fun TabletPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1146,16 +1176,18 @@ private fun SucceededPreview() {
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
             ),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
-                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
             ),
             outputsForSharing = MutableStateFlow(
-                outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
             ),
             outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
@@ -1247,16 +1279,18 @@ private fun DarkSucceededPreview() {
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
             ),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
-                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
             ),
             outputsForSharing = MutableStateFlow(
-                outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
             ),
             outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
@@ -1347,16 +1381,18 @@ private fun SmallSucceededPreview() {
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
             ),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
-                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
             ),
             outputsForSharing = MutableStateFlow(
-                outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
             ),
             outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
@@ -1448,16 +1484,18 @@ private fun TabletSucceededPreview() {
             outputsForLinks = MutableStateFlow(
                 outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
             ),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
             ),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(
-                outputRepository.getOutputsForPointsChips().map { it.toOutputDetail(appDetails) }
+                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
             ),
             outputsForSharing = MutableStateFlow(
-                outputRepository.getOutputsForSharing().toOutputDetailsForSharing(appDetails)
+                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
             ),
             outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
@@ -1529,8 +1567,10 @@ private fun ErrorPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1604,8 +1644,10 @@ private fun DarkErrorPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1679,8 +1721,10 @@ private fun TabletErrorPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1755,8 +1799,10 @@ private fun WarningPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1831,8 +1877,10 @@ private fun DarkWarningPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1911,8 +1959,10 @@ private fun LoadingIndicatorPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -1991,8 +2041,10 @@ private fun DarkLoadingIndicatorPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -2069,8 +2121,10 @@ private fun TabletLoadingIndicatorPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -2146,8 +2200,10 @@ private fun WebViewPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -2223,8 +2279,10 @@ private fun DarkWebViewPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -2300,8 +2358,10 @@ private fun TabletWebViewPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
@@ -2376,8 +2436,10 @@ private fun EmptyPreview() {
             outputsForApps = MutableStateFlow(OutputDetailsForApps()),
             outputsForExampleApp = MutableStateFlow(null),
             outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPoint = MutableStateFlow(OutputDetailsForPoint()),
+            outputsForPointCopy = MutableStateFlow(emptyList()),
+            outputsForPointOpen = MutableStateFlow(emptyList()),
             outputsForPointChips = MutableStateFlow(emptyList()),
+            outputsForPointSave = MutableStateFlow(emptyList()),
             outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
             outputsForPointsChips = MutableStateFlow(emptyList()),
             outputsForSharing = MutableStateFlow(null),
