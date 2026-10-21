@@ -96,7 +96,7 @@
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
-    <string name="conversion_succeeded_apps_headline">Open with</string>
+    <string name="open_with">Open with</string>
     <string name="conversion_succeeded_apps_links_configure">Configure web maps</string>
     <string name="intro_open_by_default_google_maps_caption">First, go to Settings ➞ Apps ➞ Maps ➞ %1$s and turn off the opening of links in this app.</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot of Google Maps’ Open by default settings</string>
