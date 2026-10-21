@@ -222,8 +222,8 @@ private fun ResultCoordinatesBox(
                 }
             }
         }
-        ResultPointCopyButton(onClick = onSelectPointToCopy)
-        ResultPointSaveButton(onClick = onSelectPointToSave)
+        ResultPointCopyButton(onClick = onSelectPointToCopy, modifier = Modifier.testTag("geoShareResultCopy"))
+        ResultPointSaveButton(onClick = onSelectPointToSave, modifier = Modifier.testTag("geoShareResultSave"))
     }
 }
 

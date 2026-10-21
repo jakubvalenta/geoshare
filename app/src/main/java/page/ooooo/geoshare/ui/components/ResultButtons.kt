@@ -16,13 +16,12 @@ import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
 
 @Composable
-fun ResultPointCopyButton(onClick: () -> Unit) {
+fun ResultPointCopyButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     IconButton(
         onClick,
-        Modifier
+        modifier
             .width(36.dp)
             .height(28.dp) // Set height to adjust default vertical padding
-            .testTag("geoShareResultCopyMenu")
     ) {
         Icon(
             painterResource(R.drawable.content_copy_24px),
@@ -32,13 +31,12 @@ fun ResultPointCopyButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun ResultPointSaveButton(onClick: () -> Unit) {
+fun ResultPointSaveButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     IconButton(
         onClick,
-        Modifier
+        modifier
             .width(36.dp)
             .height(28.dp) // Set height to adjust default vertical padding
-            .testTag("geoShareResultSaveMenu")
     ) {
         Icon(
             painterResource(R.drawable.download_24px),
@@ -48,13 +46,12 @@ fun ResultPointSaveButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun ResultPointShareButton(onClick: () -> Unit) {
+fun ResultPointShareButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     IconButton(
         onClick,
-        Modifier
+        modifier
             .width(30.dp)
             .height(28.dp) // Set height to adjust default vertical padding
-            .testTag("geoShareResultSaveMenu")
     ) {
         Icon(
             Icons.Default.Share,

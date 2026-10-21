@@ -319,14 +319,13 @@ class MainBehaviorTest {
     @Test
     fun whenPointIsShared_allowsSavingGpxRoute() = uiAutomator {
         // Share a URI with the app
-        shareUri()
+        shareUri("https://mapy.com/en/turisticka?planovani-trasy&rc=9eJ.Ex5-GG9eY14x5Ls1jBHe8t9emdXcI5&rs=osm&rs=osm&rs=osm&rs=pubt&ri=20227705&ri=120789104&ri=81032078&ri=28872262&mrp=%7B%22c%22%3A121%2C%22dt%22%3A%22%22%2C%22d%22%3Atrue%7D&xc=%5B%5D&rbf=alf&x=13.4308032&y=52.4684951&z=18")
 
         // Open sheet and tap Save GPX
-        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
-        onElement { viewIdResourceName == "geoShareResultSheet" }.run {
+        onElement { viewIdResourceName == "geoShareResultSavePoints" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToElement(Direction.DOWN) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Save GPX route",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
@@ -354,11 +353,10 @@ class MainBehaviorTest {
         shareUri(point)
 
         // Open sheet and tap Save to contact
-        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
-        onElement { viewIdResourceName == "geoShareResultSheet" }.run {
+        onElement { viewIdResourceName == "geoShareResultSave" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToElement(Direction.DOWN) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Save to contact",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer dans les contacts",

@@ -23,7 +23,7 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class UserPreferencesBehaviorTest {
     @Test
-    fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormatInWGS84() = uiAutomator { // FIXME
+    fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormatAsWGS84() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
@@ -73,10 +73,10 @@ class UserPreferencesBehaviorTest {
         assertConversionSucceeds(point)
 
         // Copy coordinates
-        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToElement(Direction.UP) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Copy coordinates",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
@@ -97,10 +97,10 @@ class UserPreferencesBehaviorTest {
         goBackToElement { viewIdResourceName == "geoShareResultCoordinates" }
 
         // Copy coordinates again
-        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToElement(Direction.UP) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Copy coordinates",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",

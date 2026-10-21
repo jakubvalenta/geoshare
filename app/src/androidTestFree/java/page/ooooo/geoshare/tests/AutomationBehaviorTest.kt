@@ -27,6 +27,7 @@ import page.ooooo.geoshare.data.preferences.OpenRouteOnePointGpxAutomation
 import page.ooooo.geoshare.data.preferences.SavePointToContactAutomation
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.preferences.SendPointAutomation
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import kotlin.time.Duration.Companion.seconds
 
@@ -229,7 +230,8 @@ class AutomationBehaviorTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
-        val output = CopyGeoUriOutput(coordinateConverter)
+        val uriQuote = DefaultUriQuote
+        val output = CopyGeoUriOutput(coordinateConverter, uriQuote)
         onElement { viewIdResourceName == "geoShareResultChip_${output.id}" }.click()
 
         // Doesn't show automation counter

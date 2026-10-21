@@ -50,7 +50,6 @@ import page.ooooo.geoshare.tests.goToInputList
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.grantConnectionPermission
 import page.ooooo.geoshare.tests.launchApplication
-import page.ooooo.geoshare.tests.longScrollSheet
 import page.ooooo.geoshare.tests.onElementOrScrollToElement
 import page.ooooo.geoshare.tests.onMainScrollablePane
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
@@ -404,12 +403,13 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         shareUri(WGS84Point(52.47254, 13.4345, name = "Marked Location", source = Source.GENERATED))
 
         // Conversion - Result - Sheet - Page 1 name
-        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
-        val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
-        sheet.expandSheet()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_sheet_page_1_name")
-        sheet.collapseSheet()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            expandSheet()
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_page_1_name")
+            collapseSheet()
+        }
 
         goBackToMainForm()
     }
@@ -438,39 +438,48 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         quickWaitForStableInActiveWindow() // Wait for the log exit animation
 
         // Conversion - Result - Message - Copy success
-        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Copy coordinates"
-            }
+            onElement { viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Copy coordinates" }
                 .click()
         }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_copy_success")
 
-        // Conversion - Result - Sheet - Page 1
-        onElement { viewIdResourceName == "geoShareResultCopyMenu" }.click()
-        val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
-        sheet.expandSheet()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_sheet_page_1")
+        // Conversion - Result - Sheet - Copy point
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            expandSheet()
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_copy_point")
+            collapseSheet()
+        }
 
-        // Conversion - Result - Sheet - Page 2
-        sheet.longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-        sheet
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save to contact"
-            }
+        // Conversion - Result - Sheet - Save point
+        onElement { viewIdResourceName == "geoShareResultSave" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_save_point")
+            collapseSheet()
+        }
+
+        // Conversion - Result - Sheet - Share points
+        onElement { viewIdResourceName == "geoShareResultSharePoints" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_share_points")
+            collapseSheet()
+        }
+
+        // Conversion - Result - Sheet - Save points
+        onElement { viewIdResourceName == "geoShareResultSavePoints" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_sheet_page_2")
+        saveScreenshot("main_strings/conversion_result_sheet_save_points")
 
         // Conversion - Result - Save GPX - File chooser
-        sheet
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save GPX route"
-            }
-            .click()
+        onElement { viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save GPX route" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_save_gpx_file_chooser")
 

@@ -14,7 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -65,7 +68,12 @@ fun <T> ResultSheet(
             onDismissRequest = onDismissRequest,
             sheetState = sheetState,
         ) {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
+            Column(
+                Modifier
+                    .verticalScroll(rememberScrollState())
+                    .semantics { testTagsAsResourceId = true }
+                    .testTag("geoShareResultSheet")
+            ) {
                 SheetSection(title = title) {
                     outputs.zipWithNextFirstNull { prevOutputDetail, outputDetail ->
                         val enabled = outputDetail.output.isEnabled(value)

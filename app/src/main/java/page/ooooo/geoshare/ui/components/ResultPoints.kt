@@ -172,7 +172,8 @@ private fun ResultPointsBox(
             Row(
                 Modifier
                     .weight(1f)
-                    .toggleable(value = expanded, onValueChange = { expanded = !expanded }),
+                    .toggleable(value = expanded, onValueChange = { expanded = !expanded })
+                    .testTag("geoShareResultPoints"),
                 horizontalArrangement = Arrangement.spacedBy(spacing.tiny),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -189,8 +190,14 @@ private fun ResultPointsBox(
                     modifier = Modifier.size(28.dp),
                 )
             }
-            ResultPointShareButton(onClick = onSelectPointsToShare)
-            ResultPointSaveButton(onClick = onSelectPointsToSave)
+            ResultPointShareButton(
+                onClick = onSelectPointsToShare,
+                modifier = Modifier.testTag("geoShareResultSharePoints"),
+            )
+            ResultPointSaveButton(
+                onClick = onSelectPointsToSave,
+                modifier = Modifier.testTag("geoShareResultSavePoints"),
+            )
         }
         AnimatedVisibility(
             expanded,
