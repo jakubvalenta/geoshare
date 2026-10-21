@@ -45,29 +45,31 @@ fun <T> ResultPointOpenSheet(
     onDismissRequest: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
-    // TODO Add behavior test
     val sheetState = rememberBottomSheetState(initialSheetValue)
 
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        modifier = Modifier
-            .semantics { testTagsAsResourceId = true }
-            .testTag("geoShareResultOpenPointSheet"),
-        sheetState = sheetState,
-    ) {
-        Column(Modifier.verticalScroll(rememberScrollState())) {
-            SheetSection(title = title) {
-                outputs.forEach { outputDetail ->
-                    key(outputDetail.output.id) {
-                        SheetListItem(
-                            headlineText = outputDetail.label.orEmpty(),
-                            modifier = Modifier.testTag("geoSharePointOpenSheetItem_${outputDetail.output.id}"),
-                            onClick = {
-                                onDismissRequest()
-                                onExecute(outputDetail.output.toAction(value))
-                            },
-                            icon = outputDetail.icon ?: PlaceholderIconDescriptor,
-                        )
+    // TODO Add behavior test
+    if (outputs.isNotEmpty()) {
+        ModalBottomSheet(
+            onDismissRequest = onDismissRequest,
+            modifier = Modifier
+                .semantics { testTagsAsResourceId = true }
+                .testTag("geoShareResultOpenPointSheet"),
+            sheetState = sheetState,
+        ) {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                SheetSection(title = title) {
+                    outputs.forEach { outputDetail ->
+                        key(outputDetail.output.id) {
+                            SheetListItem(
+                                headlineText = outputDetail.label.orEmpty(),
+                                modifier = Modifier.testTag("geoSharePointOpenSheetItem_${outputDetail.output.id}"),
+                                onClick = {
+                                    onDismissRequest()
+                                    onExecute(outputDetail.output.toAction(value))
+                                },
+                                icon = outputDetail.icon ?: PlaceholderIconDescriptor,
+                            )
+                        }
                     }
                 }
             }

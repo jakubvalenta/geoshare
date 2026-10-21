@@ -672,10 +672,6 @@ fun UiObject2.expandSheet() {
     swipe(Direction.UP, 1f)
 }
 
-fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {
-    scroll(direction, 10f)
-}
-
 fun UiAutomatorTestScope.chooseFile() {
     if (onElementOrNull(3_000) { textAsString() in setOf("Recent", "Récents") } != null) {
         // If we happen to be in the Recent folder, go to Downloads, because it's not possible to save a file to Recent
