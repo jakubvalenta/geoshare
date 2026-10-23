@@ -19,7 +19,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
     private val engine: HttpClientEngine,
     private val log: Log,
     private val uriQuote: UriQuote,
-) : BasicOnlineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOnlineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = resources.getString(R.string.input_google_maps_short_link_name)
     override val group = GoogleMapsInputGroup
     override val changelog = persistentListOf(
@@ -51,7 +51,7 @@ class GoogleMapsShortLinkInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) = "https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8"
+    override fun genRandomSource(point: Point) = "https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8"
 
     override fun toString() = "GoogleMapsShortLinkInput"
 

@@ -35,17 +35,16 @@ import page.ooooo.geoshare.data.outputs.toAction
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.isDismissed
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
-import page.ooooo.geoshare.ui.OutputDetailsForApp
+import page.ooooo.geoshare.ui.ResultAppsState
 import page.ooooo.geoshare.ui.string.FormatArg
 import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.defaultLinkStyles
-import page.ooooo.geoshare.ui.toOutputDetailsForApps
 
 @Composable
 fun HelpShareSourceMessage(
+    state: StateFlow<ResultAppsState>,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
-    outputsForExampleApp: StateFlow<OutputDetailsForApp?>,
     sourceComesFromIntent: StateFlow<Boolean>,
     modifier: Modifier = Modifier,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
@@ -56,21 +55,26 @@ fun HelpShareSourceMessage(
     if (!sourceComesFromIntent) {
         val helpMessage = HelpMessage.SHARE_SOURCE
         val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
-        val outputsForExampleApp by outputsForExampleApp.collectAsStateWithLifecycle()
+        val state by state.collectAsStateWithLifecycle()
         val visible = !helpMessage.isDismissed(dismissedHelpMessages)
 
         HelpMessageCard(
             title = { Text(stringResource(R.string.help_share_source_title)) },
             visible = visible,
             modifier = modifier.testTag("geoShareHelpMessage_$helpMessage"),
-            actionText = outputsForExampleApp?.let { outputsForExampleApp ->
-                { stringResource(R.string.help_share_source_action, outputsForExampleApp.label) }
+            actionText = state.appsOutputs.exampleAppOutputs?.let { appOutputs ->
+                {
+                    stringResource(
+                        R.string.help_share_source_action,
+                        state.appDetails[appOutputs.packageName]?.label.orEmpty()
+                    )
+                }
             },
             onAction = {
-                outputsForExampleApp?.let { outputsForExampleApp ->
+                state.appsOutputs.exampleAppOutputs?.let { appOutputs ->
                     val examplePoint = WGS84Point.Kilimanjaro
                     onExecute(
-                        outputsForExampleApp.default.output.toAction(
+                        appOutputs.defaultOutput.toAction(
                             point = examplePoint,
                             points = persistentListOf(examplePoint),
                             source = "",
@@ -125,15 +129,14 @@ private fun DefaultPreview() {
             log = log,
             uriQuote = uriQuote,
         )
-        val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
-            dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForExampleApp = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet())
-                    .maps
-                    .toOutputDetailsForApps(appDetails)
-                    .firstOrNull()
+            state = MutableStateFlow(
+                ResultAppsState(
+                    appDetails = getFakeAppDetails(context),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                )
             ),
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
             onExecute = {},
@@ -155,15 +158,14 @@ private fun DarkPreview() {
             log = log,
             uriQuote = uriQuote,
         )
-        val appDetails = getFakeAppDetails(context)
         HelpShareSourceMessage(
-            dismissedHelpMessages = MutableStateFlow(emptySet()),
-            outputsForExampleApp = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet())
-                    .maps
-                    .toOutputDetailsForApps(appDetails)
-                    .firstOrNull()
+            state = MutableStateFlow(
+                ResultAppsState(
+                    appDetails = getFakeAppDetails(context),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                )
             ),
+            dismissedHelpMessages = MutableStateFlow(emptySet()),
             sourceComesFromIntent = MutableStateFlow(false),
             onDismissHelpMessage = {},
             onExecute = {},

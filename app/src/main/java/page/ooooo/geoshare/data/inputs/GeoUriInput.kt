@@ -23,7 +23,7 @@ import javax.inject.Singleton
 @Singleton
 class GeoUriInput @Inject constructor(
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = GeoUriInputGroup
     override val changelog = persistentListOf(
@@ -75,7 +75,7 @@ class GeoUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "geo:{lat},{lon}?z={z}&q={lat},{lon}({name})")
 
     override fun toString() = "GeoUriInput"

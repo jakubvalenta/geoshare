@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.di.FakeOpenStreetMapDisplayLink
 import page.ooooo.geoshare.data.di.getFakeAppDetails
@@ -59,12 +60,12 @@ import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
+import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.outputs.ShareDisplayGeoUriOutput
 import page.ooooo.geoshare.data.outputs.SpacerIconDescriptor
 import page.ooooo.geoshare.data.outputs.isEnabled
 import page.ooooo.geoshare.data.outputs.toAction
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
-import page.ooooo.geoshare.ui.OutputDetail
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -131,9 +132,10 @@ fun AppIcon(
 
 @Composable
 fun AppMenu(
+    appDetails: AppDetails,
     expanded: Boolean,
     lastPoint: Point,
-    outputDetails: List<OutputDetail<*>>,
+    outputs: List<Output<*>>,
     points: Points,
     source: String,
     onDismissRequest: () -> Unit,
@@ -147,25 +149,26 @@ fun AppMenu(
         shape = ShapeDefaults.Large,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
-        outputDetails.zipWithNextFirstNull { prevOutputDetail, outputDetail ->
+        outputs.zipWithNextFirstNull { prevOutput, output ->
             DropdownMenuItem(
                 text = {
                     Text(
-                        outputDetail.label(),
+                        output.label(appDetails),
                         Modifier.testTag("geoShareAppOutput"),
                     )
                 },
                 onClick = {
                     onDismissRequest()
-                    onExecute(outputDetail.output.toAction(lastPoint, points, source))
+                    onExecute(output.toAction(lastPoint, points, source))
                 },
                 leadingIcon = {
                     IconFromDescriptor(
-                        outputDetail.menuIcon?.takeIf { it != prevOutputDetail?.menuIcon } ?: SpacerIconDescriptor,
+                        output.getMenuIcon(appDetails)?.takeIf { it != prevOutput?.getMenuIcon(appDetails) }
+                            ?: SpacerIconDescriptor,
                         contentDescription = null,
                     )
                 },
-                enabled = outputDetail.output.isEnabled(lastPoint, points, source),
+                enabled = output.isEnabled(lastPoint, points, source),
             )
         }
         if (onHide != null) {
@@ -230,8 +233,8 @@ private fun DefaultPreview() {
                             shape = CircleShape,
                         ) {
                             IconFromDescriptor(
-                                output.getIcon(null),
-                                contentDescription = output.label(null),
+                                output.getIcon(emptyMap()),
+                                contentDescription = output.label(emptyMap()),
                                 size = 24.dp,
                             )
                         }
@@ -313,8 +316,8 @@ private fun DarkPreview() {
                             shape = CircleShape,
                         ) {
                             IconFromDescriptor(
-                                output.getIcon(null),
-                                contentDescription = output.label(null),
+                                output.getIcon(emptyMap()),
+                                contentDescription = output.label(emptyMap()),
                                 size = 24.dp,
                             )
                         }

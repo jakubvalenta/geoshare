@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.LinkType
@@ -93,6 +94,7 @@ fun LinkForm(
     initialExpanded: Boolean = false,
     uriQuote: UriQuote = DefaultUriQuote,
 ) {
+    val appDetails: AppDetails = emptyMap() // Link outputs never require app details
     val context = LocalContext.current
     val spacing = LocalSpacing.current
 
@@ -221,7 +223,7 @@ fun LinkForm(
             ) {
                 AppEnabledBox(
                     label = link.groupOrName,
-                    icon = ShareLinkUriOutput(link, coordinateConverter, uriQuote).getIcon(null),
+                    icon = ShareLinkUriOutput(link, coordinateConverter, uriQuote).getIcon(appDetails),
                 )
             }
             HorizontalDivider()
@@ -234,9 +236,9 @@ fun LinkForm(
             ) {
                 val copyOutput = CopyLinkUriOutput(link, coordinateConverter, uriQuote)
                 SheetEnabledBox(
-                    headlineText = copyOutput.label(null),
+                    headlineText = copyOutput.label(appDetails),
                     supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
-                    icon = copyOutput.getIcon(null),
+                    icon = copyOutput.getIcon(appDetails),
                 )
             }
             HorizontalDivider()
@@ -249,7 +251,7 @@ fun LinkForm(
             ) {
                 val copyOutput = CopyLinkUriOutput(link, coordinateConverter, uriQuote)
                 ChipEnabledBox(
-                    label = copyOutput.label(null),
+                    label = copyOutput.label(appDetails),
                     icon = link.icon,
                     onClick = { onSetChipEnabled(!chipEnabled) },
                 )
@@ -362,11 +364,11 @@ fun LinkForm(
                         ) {
                             val shareOutput = ShareLinkUriOutput(link.copy(type = value), coordinateConverter, uriQuote)
                             DropdownMenuItem(
-                                text = { Text(shareOutput.label(null)) },
+                                text = { Text(shareOutput.label(appDetails)) },
                                 onClick = { onSetType(value) },
                                 leadingIcon = {
                                     IconFromDescriptor(
-                                        shareOutput.getMenuIcon(null),
+                                        shareOutput.getMenuIcon(appDetails),
                                         contentDescription = null,
                                     )
                                 },

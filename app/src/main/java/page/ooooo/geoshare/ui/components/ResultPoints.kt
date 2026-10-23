@@ -48,7 +48,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.formatters.CoordinateFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -62,29 +61,27 @@ import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.FaqItemId
-import page.ooooo.geoshare.ui.OutputDetail
+import page.ooooo.geoshare.ui.ResultPointsState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.theme.defaultLinkStyles
-import page.ooooo.geoshare.ui.toOutputDetails
 
 @Composable
 fun ResultPoints(
+    state: StateFlow<ResultPointsState>,
     points: Points,
     coordinateConverter: CoordinateConverter,
-    outputsForPointsChips: StateFlow<List<OutputDetail<Points>>>,
-    userPreferencesValues: StateFlow<UserPreferencesValues>,
+    coordinateFormat: StateFlow<CoordinateFormat>,
     initialExpanded: Boolean = false,
     onExecute: (action: Action<*>) -> Unit,
-    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
-    onSelectPointToCopy: (point: Point, pointIndex: Int) -> Unit,
-    onSelectPointToSave: (point: Point, pointIndex: Int) -> Unit,
-    onSelectPointsToSave: () -> Unit,
-    onSelectPointsToShare: () -> Unit,
+    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
+    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onSavePoints: (points: Points) -> Unit,
+    onSharePoints: (points: Points) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -100,16 +97,16 @@ fun ResultPoints(
             ResultPointsBox(
                 points = points,
                 coordinateConverter = coordinateConverter,
-                userPreferencesValues = userPreferencesValues,
+                coordinateFormat = coordinateFormat,
                 initialExpanded = initialExpanded,
+                onCopyPoint = onCopyPoint,
                 onOpenPoint = onOpenPoint,
-                onSelectPointToCopy = onSelectPointToCopy,
-                onSelectPointToSave = onSelectPointToSave,
-                onSelectPointsToSave = onSelectPointsToSave,
-                onSelectPointsToShare = onSelectPointsToShare,
+                onSavePoint = onSavePoint,
+                onSavePoints = onSavePoints,
+                onSharePoints = onSharePoints,
             )
             ResultPointsChips(
-                outputsForPointsChips = outputsForPointsChips,
+                state = state,
                 onExecute = { output -> onExecute(output.toAction(points)) },
             )
         }
@@ -150,19 +147,19 @@ private fun ResultPointsChecks(
 private fun ResultPointsBox(
     points: Points,
     coordinateConverter: CoordinateConverter,
-    userPreferencesValues: StateFlow<UserPreferencesValues>,
+    coordinateFormat: StateFlow<CoordinateFormat>,
     initialExpanded: Boolean = false,
+    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
     onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
-    onSelectPointToCopy: (point: Point, pointIndex: Int) -> Unit,
-    onSelectPointToSave: (point: Point, pointIndex: Int) -> Unit,
-    onSelectPointsToSave: () -> Unit,
-    onSelectPointsToShare: () -> Unit,
+    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onSavePoints: (points: Points) -> Unit,
+    onSharePoints: (points: Points) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     // TODO Why does ResultPointsBox expand so slow?
+    val coordinateFormat by coordinateFormat.collectAsStateWithLifecycle()
     var expanded by retain { mutableStateOf(initialExpanded) }
-    val userPreferencesValues by userPreferencesValues.collectAsStateWithLifecycle()
 
     Column {
         Row(
@@ -191,11 +188,11 @@ private fun ResultPointsBox(
                 )
             }
             ResultPointShareButton(
-                onClick = onSelectPointsToShare,
+                onClick = { onSharePoints(points) },
                 modifier = Modifier.testTag("geoShareResultSharePoints"),
             )
             ResultPointSaveButton(
-                onClick = onSelectPointsToSave,
+                onClick = { onSavePoints(points) },
                 modifier = Modifier.testTag("geoShareResultSavePoints"),
             )
         }
@@ -209,11 +206,11 @@ private fun ResultPointsBox(
                     ResultPoint(
                         point = point,
                         pointIndex = pointIndex,
-                        coordinateFormat = userPreferencesValues.coordinateFormat,
                         coordinateConverter = coordinateConverter,
-                        onOpenPoint = { onOpenPoint(point, pointIndex) },
-                        onSelectPointToCopy = { onSelectPointToCopy(point, pointIndex) },
-                        onSelectPointToSave = { onSelectPointToSave(point, pointIndex) },
+                        coordinateFormat = coordinateFormat,
+                        onCopyPoint = onCopyPoint,
+                        onOpenPoint = onOpenPoint,
+                        onSavePoint = onSavePoint,
                     )
                     HorizontalDivider()
                 }
@@ -224,19 +221,19 @@ private fun ResultPointsBox(
 
 @Composable
 private fun ResultPointsChips(
-    outputsForPointsChips: StateFlow<List<OutputDetail<Points>>>,
+    state: StateFlow<ResultPointsState>,
     onExecute: (output: Output<Points>) -> Unit,
 ) {
-    val outputsForPointsChips by outputsForPointsChips.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
 
-    if (outputsForPointsChips.isNotEmpty()) {
+    if (state.chipsOutputs.isNotEmpty()) {
         ScrollableChips(Modifier.testTag("geoShareResultPointsChips")) {
-            outputsForPointsChips.forEach { outputDetail ->
-                key(outputDetail.output.id) {
+            state.chipsOutputs.forEach { output ->
+                key(output.id) {
                     StyledChip(
-                        onClick = { onExecute(outputDetail.output) },
-                        label = { Text(outputDetail.label()) },
-                        icon = outputDetail.icon?.let {
+                        onClick = { onExecute(output) },
+                        label = { Text(output.label(state.appDetails)) },
+                        icon = output.getIcon(state.appDetails)?.let {
                             { IconFromDescriptor(it, contentDescription = null) }
                         },
                     )
@@ -250,11 +247,11 @@ private fun ResultPointsChips(
 private fun ResultPoint(
     point: Point,
     pointIndex: Int,
-    coordinateFormat: CoordinateFormat,
     coordinateConverter: CoordinateConverter,
-    onOpenPoint: () -> Unit,
-    onSelectPointToCopy: () -> Unit,
-    onSelectPointToSave: () -> Unit,
+    coordinateFormat: CoordinateFormat,
+    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
+    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -264,13 +261,11 @@ private fun ResultPoint(
                 SelectionContainer {
                     Text(
                         when (coordinateFormat) {
-                            CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
-                                coordinateConverter.toWGS84(point)
-                            )
+                            CoordinateFormat.DEC ->
+                                CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(point))
 
-                            CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
-                                coordinateConverter.toWGS84(point)
-                            )
+                            CoordinateFormat.DEG_MIN_SEC ->
+                                CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(point))
                         }
                     )
                 }
@@ -281,7 +276,7 @@ private fun ResultPoint(
         trailingContent = {
             Row {
                 Button(
-                    onClick = onOpenPoint,
+                    onClick = { onOpenPoint(point, pointIndex) },
                     modifier = Modifier
                         .height(28.dp)
                         .padding(end = spacing.tiny),
@@ -293,8 +288,12 @@ private fun ResultPoint(
                 ) {
                     Text(stringResource(R.string.open_with))
                 }
-                ResultPointCopyButton(onClick = onSelectPointToCopy)
-                ResultPointSaveButton(onClick = onSelectPointToSave)
+                ResultPointCopyButton(
+                    onClick = { onCopyPoint(point, pointIndex) },
+                )
+                ResultPointSaveButton(
+                    onClick = { onSavePoint(point, pointIndex) },
+                )
             }
         },
         colors = ListItemDefaults.colors(
@@ -330,8 +329,13 @@ private fun DefaultPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultPoints(
+                state = MutableStateFlow(
+                    ResultPointsState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.pointsChipsOutputs,
+                    )
+                ),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(name = "Central Park", source = Source.GENERATED),
@@ -343,18 +347,15 @@ private fun DefaultPreview() {
                     ),
                 ),
                 coordinateConverter = coordinateConverter,
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 initialExpanded = true,
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onOpenPoint = { _, _ -> },
-                onSelectPointToCopy = { _, _ -> },
-                onSelectPointToSave = { _, _ -> },
-                onSelectPointsToSave = {},
-                onSelectPointsToShare = {},
+                onSavePoint = { _, _ -> },
+                onSavePoints = {},
+                onSharePoints = {},
             )
         }
     }
@@ -375,8 +376,13 @@ private fun DarkPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultPoints(
+                state = MutableStateFlow(
+                    ResultPointsState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.pointsChipsOutputs,
+                    )
+                ),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(name = "Central Park", source = Source.GENERATED),
@@ -388,18 +394,15 @@ private fun DarkPreview() {
                     ),
                 ),
                 coordinateConverter = coordinateConverter,
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 initialExpanded = true,
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onOpenPoint = { _, _ -> },
-                onSelectPointToCopy = { _, _ -> },
-                onSelectPointToSave = { _, _ -> },
-                onSelectPointsToSave = {},
-                onSelectPointsToShare = {},
+                onSavePoint = { _, _ -> },
+                onSavePoints = {},
+                onSharePoints = {},
             )
         }
     }
@@ -420,28 +423,28 @@ private fun CoordinateFormatPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultPoints(
+                state = MutableStateFlow(
+                    ResultPointsState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.pointsChipsOutputs,
+                    )
+                ),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 ),
                 coordinateConverter = coordinateConverter,
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-                ),
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEG_MIN_SEC),
                 initialExpanded = true,
-                userPreferencesValues = MutableStateFlow(
-                    defaultFakeUserPreferences.copy(coordinateFormat = CoordinateFormat.DEG_MIN_SEC)
-                ),
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onOpenPoint = { _, _ -> },
-                onSelectPointToCopy = { _, _ -> },
-                onSelectPointToSave = { _, _ -> },
-                onSelectPointsToSave = {},
-                onSelectPointsToShare = {},
+                onSavePoint = { _, _ -> },
+                onSavePoints = {},
+                onSharePoints = {},
             )
         }
     }
@@ -462,25 +465,27 @@ private fun CollapsedPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultPoints(
+                state = MutableStateFlow(
+                    ResultPointsState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.pointsChipsOutputs,
+                    )
+                ),
                 points = persistentListOf(
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                     WGS84Point(NaivePoint.genRandomPoint()),
                 ),
                 coordinateConverter = coordinateConverter,
-                outputsForPointsChips = MutableStateFlow(
-                    outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
                 onOpenPoint = { _, _ -> },
-                onSelectPointToCopy = { _, _ -> },
-                onSelectPointToSave = { _, _ -> },
-                onSelectPointsToSave = {},
-                onSelectPointsToShare = {},
+                onSavePoint = { _, _ -> },
+                onSavePoints = {},
+                onSharePoints = {},
             )
         }
     }

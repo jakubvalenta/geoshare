@@ -75,6 +75,7 @@ fun AnimatedPlaceholderTextField(
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     contentPadding: PaddingValues = contentPaddingWithoutLabel(),
 ) {
+    // TODO Fix animated placeholder overflowing supporting text
     val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val mergedTextStyle = remember(enabled, isError, isFocused) {

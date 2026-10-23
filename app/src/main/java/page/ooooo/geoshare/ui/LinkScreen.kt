@@ -93,7 +93,6 @@ fun LinkScreen(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     billingViewModel: BillingViewModel = hiltViewModel(),
-    outputViewModel: OutputViewModel = hiltViewModel(),
     viewModel: LinkViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -112,7 +111,7 @@ fun LinkScreen(
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
         billingStatus = billingStatus,
-        coordinateConverter = outputViewModel.coordinateConverter,
+        coordinateConverter = viewModel.coordinateConverter,
         message = message,
         appEnabled = viewModel.appEnabled,
         chipEnabled = viewModel.chipEnabled,

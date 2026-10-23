@@ -2,7 +2,6 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import android.view.KeyEvent
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -37,11 +36,10 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
-fun MainTextField(
-    errorMessageResId: Int?,
+fun MainForm(
+    error: StateFlow<String?>,
     placeholderUris: StateFlow<List<String>>,
     source: StateFlow<String>,
-    onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
     onSetSource: (newSource: String) -> Unit,
     onSubmit: () -> Unit,
 ) {
@@ -49,25 +47,20 @@ fun MainTextField(
     val coroutineScope = rememberCoroutineScope()
     val spacing = LocalSpacing.current
 
+    val error by error.collectAsStateWithLifecycle()
     val placeholderUris by placeholderUris.collectAsStateWithLifecycle()
     val source by source.collectAsStateWithLifecycle()
 
-    Column(
-        Modifier.padding(horizontal = spacing.windowPadding),
-        verticalArrangement = Arrangement.spacedBy(spacing.tiny),
-    ) {
+    Column(Modifier.padding(horizontal = spacing.windowPadding)) {
         Text(
             stringResource(R.string.main_input_uri_label),
-            Modifier.padding(start = 2.dp),
+            Modifier.padding(start = 2.dp, bottom = spacing.tiny),
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.bodyMedium
         )
         AnimatedPlaceholderTextField(
             value = source,
-            onValueChange = {
-                onSetSource(it)
-                onSetErrorMessageResId(null)
-            },
+            onValueChange = onSetSource,
             placeholders = placeholderUris,
             modifier = Modifier
                 .fillMaxWidth()
@@ -84,7 +77,6 @@ fun MainTextField(
                 if (source.isNotEmpty()) {
                     IconButton({
                         onSetSource("")
-                        onSetErrorMessageResId(null)
                     }) {
                         Icon(
                             Icons.Default.Clear,
@@ -95,7 +87,6 @@ fun MainTextField(
                     IconButton({
                         coroutineScope.launch {
                             onSetSource(clipboard.paste())
-                            onSetErrorMessageResId(null)
                         }
                     }) {
                         Icon(
@@ -105,21 +96,25 @@ fun MainTextField(
                     }
                 }
             },
-            supportingText = errorMessageResId?.let { errorMessageResId ->
+            supportingText = error?.let { error ->
                 {
-                    Text(
-                        stringResource(errorMessageResId),
-                        Modifier.padding(top = spacing.extraTiny),
-                    )
+                    Text(error, Modifier.padding(top = spacing.extraTiny))
                 }
             },
-            isError = errorMessageResId != null,
+            isError = error != null,
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
                 onDone = { onSubmit() },
             ),
+        )
+        LargeButton(
+            stringResource(R.string.main_create_geo_uri),
+            Modifier
+                .padding(top = spacing.small)
+                .testTag("geoShareMainSubmitButton"),
+            onClick = onSubmit,
         )
     }
 }
@@ -129,11 +124,10 @@ fun MainTextField(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            MainTextField(
-                errorMessageResId = null,
+            MainForm(
+                error = MutableStateFlow(null),
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow(""),
-                onSetErrorMessageResId = {},
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -146,11 +140,10 @@ private fun DefaultPreview() {
 private fun DarkPreview() {
     AppTheme {
         Surface {
-            MainTextField(
-                errorMessageResId = null,
+            MainForm(
+                error = MutableStateFlow(null),
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow(""),
-                onSetErrorMessageResId = {},
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -163,11 +156,10 @@ private fun DarkPreview() {
 private fun FilledPreview() {
     AppTheme {
         Surface {
-            MainTextField(
-                errorMessageResId = null,
+            MainForm(
+                error = MutableStateFlow(null),
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                onSetErrorMessageResId = {},
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -180,11 +172,10 @@ private fun FilledPreview() {
 private fun DarkFilledPreview() {
     AppTheme {
         Surface {
-            MainTextField(
-                errorMessageResId = null,
+            MainForm(
+                error = MutableStateFlow(null),
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                onSetErrorMessageResId = {},
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -197,11 +188,10 @@ private fun DarkFilledPreview() {
 private fun ErrorPreview() {
     AppTheme {
         Surface {
-            MainTextField(
-                errorMessageResId = R.string.conversion_failed_missing_url,
+            MainForm(
+                error = MutableStateFlow(stringResource(R.string.conversion_failed_missing_url)),
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                onSetErrorMessageResId = {},
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -214,11 +204,10 @@ private fun ErrorPreview() {
 private fun DarkErrorPreview() {
     AppTheme {
         Surface {
-            MainTextField(
-                errorMessageResId = R.string.conversion_failed_missing_url,
+            MainForm(
+                error = MutableStateFlow(stringResource(R.string.conversion_failed_missing_url)),
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
                 source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
-                onSetErrorMessageResId = {},
                 onSetSource = {},
                 onSubmit = {},
             )

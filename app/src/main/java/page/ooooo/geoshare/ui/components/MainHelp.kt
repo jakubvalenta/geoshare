@@ -2,7 +2,6 @@ package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -13,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import kotlinx.coroutines.flow.MutableStateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -21,12 +19,9 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun MainHelp(
-    onGenRandomUri: () -> String?,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
     onNavigateToInputsScreen: () -> Unit,
-    onSetErrorMessageResId: (newErrorMessageResId: Int?) -> Unit,
-    onSetSource: (newSource: String) -> Unit,
-    message: (@Composable (paddingValues: PaddingValues) -> Unit)? = null,
+    onSetRandomSource: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -35,7 +30,6 @@ fun MainHelp(
             .padding(horizontal = spacing.windowPadding)
             .padding(top = spacing.tiny)
     ) {
-        message?.invoke(PaddingValues(bottom = spacing.small))
         TextButton(onNavigateToInputsScreen) {
             Icon(
                 painterResource(R.drawable.map_24px),
@@ -52,12 +46,7 @@ fun MainHelp(
             )
             Text(stringResource(R.string.faq_title))
         }
-        TextButton({
-            onGenRandomUri()?.let { newSource ->
-                onSetSource(newSource)
-                onSetErrorMessageResId(null)
-            }
-        }) {
+        TextButton(onSetRandomSource) {
             Icon(
                 painterResource(R.drawable.ifl_24px),
                 null,
@@ -76,11 +65,9 @@ private fun DefaultPreview() {
     AppTheme {
         Surface {
             MainHelp(
-                onGenRandomUri = { null },
                 onNavigateToFaqScreen = {},
                 onNavigateToInputsScreen = {},
-                onSetErrorMessageResId = {},
-                onSetSource = {},
+                onSetRandomSource = {},
             )
         }
     }
@@ -92,64 +79,10 @@ private fun DarkPreview() {
     AppTheme {
         Surface {
             MainHelp(
-                onGenRandomUri = { null },
                 onNavigateToFaqScreen = {},
                 onNavigateToInputsScreen = {},
-                onSetErrorMessageResId = {},
-                onSetSource = {},
+                onSetRandomSource = {},
             )
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun MessagePreview() {
-    AppTheme {
-        Surface {
-            MainHelp(
-                onGenRandomUri = { null },
-                onNavigateToFaqScreen = {},
-                onNavigateToInputsScreen = {},
-                onSetErrorMessageResId = {},
-                onSetSource = {},
-            ) { paddingValues ->
-                if (helpLifecycleMessage != null) {
-                    helpLifecycleMessage(Modifier.padding(paddingValues))
-                } else {
-                    HelpWelcomeMessage(
-                        dismissedHelpMessages = MutableStateFlow(emptySet()),
-                        modifier = Modifier.padding(paddingValues),
-                        onDismissHelpMessage = {},
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkMessagePreview() {
-    AppTheme {
-        Surface {
-            MainHelp(
-                onGenRandomUri = { null },
-                onNavigateToFaqScreen = {},
-                onNavigateToInputsScreen = {},
-                onSetErrorMessageResId = {},
-                onSetSource = {},
-            ) { paddingValues ->
-                if (helpLifecycleMessage != null) {
-                    helpLifecycleMessage(Modifier.padding(paddingValues))
-                } else {
-                    HelpWelcomeMessage(
-                        dismissedHelpMessages = MutableStateFlow(emptySet()),
-                        modifier = Modifier.padding(paddingValues),
-                        onDismissHelpMessage = {},
-                    )
-                }
-            }
         }
     }
 }

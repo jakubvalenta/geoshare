@@ -19,7 +19,7 @@ import javax.inject.Singleton
 class YahooMapsUriInput @Inject constructor(
     private val yahooMapsWebViewInput: dagger.Lazy<YahooMapsWebViewInput>,
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = YahooMapsInputGroup
     override val changelog = persistentListOf(
@@ -155,7 +155,7 @@ class YahooMapsUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://map.yahoo.co.jp/place?lat={lat}&lon={lon}&zoom={z}")
 
     override fun toString() = "YahooMapsUriInput"

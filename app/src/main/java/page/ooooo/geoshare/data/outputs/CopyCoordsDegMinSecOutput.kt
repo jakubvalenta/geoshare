@@ -3,7 +3,7 @@ package page.ooooo.geoshare.data.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.formatters.CoordinateFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Point
@@ -21,7 +21,7 @@ class CopyCoordsDegMinSecOutput @Inject constructor(
         CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(value))
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.conversion_succeeded_copy_coordinates)
 
     @Composable
@@ -29,7 +29,7 @@ class CopyCoordsDegMinSecOutput @Inject constructor(
         CoordinateFormatter.formatDegMinSecCoords(WGS84Point.Kilimanjaro)
 
     @Composable
-    override fun automationSuccessText(appDetail: AppDetail?) =
+    override fun automationSuccessText(appDetails: AppDetails) =
         stringResource(R.string.conversion_automation_copy_succeeded)
 
     override fun equals(other: Any?): Boolean {

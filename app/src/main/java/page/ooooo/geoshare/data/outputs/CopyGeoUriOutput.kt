@@ -3,7 +3,7 @@ package page.ooooo.geoshare.data.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.formatters.GeoUriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Point
@@ -20,17 +20,17 @@ class CopyGeoUriOutput @Inject constructor(
         GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.conversion_succeeded_copy_link, stringResource(R.string.converter_geo_name))
 
-    override fun getIcon(appDetail: AppDetail?) =
+    override fun getIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.language_24px)
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
+    override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.location_on_24px)
 
     @Composable
-    override fun automationSuccessText(appDetail: AppDetail?) =
+    override fun automationSuccessText(appDetails: AppDetails) =
         stringResource(R.string.conversion_automation_copy_link_succeeded)
 
     override fun equals(other: Any?): Boolean {

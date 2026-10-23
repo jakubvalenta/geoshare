@@ -114,7 +114,7 @@ class OutputRepositoryTest {
                 CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
                 CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
             ),
-            outputRepository.getOutputsForPointCopy(defaultFakeLinks),
+            outputRepository.getPointCopyOutputs(defaultFakeLinks),
         )
     }
 
@@ -153,7 +153,7 @@ class OutputRepositoryTest {
                     log,
                 ),
             ),
-            outputRepository.getOutputsForPointOpen(
+            outputRepository.getPointOpenOutputs(
                 listOf(
                     // TODO Test filtering first activity that is for a single point
                     UriActivity(PackageNames.TEST, UriScheme.GEO),
@@ -178,32 +178,32 @@ class OutputRepositoryTest {
                 SavePointGpxOutput(coordinateConverter),
                 SavePointToContactOutput(coordinateConverter),
             ),
-            outputRepository.outputsForPointSave,
+            outputRepository.pointSaveOutputs,
         )
     }
 
     @Test
     fun outputsForPoints_returnsHardCodedOutputs() {
         assertEquals(
-            OutputsForPoints(
-                share = listOf(
+            PointsOutputs(
+                shareOutputs = listOf(
                     ShareRouteGpxOutput(coordinateConverter),
                     SharePointsGpxOutput(coordinateConverter),
                 ),
-                save = listOf(
+                saveOutputs = listOf(
                     SaveRouteGpxOutput(coordinateConverter),
                     SavePointsGpxOutput(coordinateConverter),
                 ),
             ),
-            outputRepository.outputsForPoints,
+            outputRepository.pointsOutputs,
         )
     }
 
     @Test
     fun getOutputsForApps_returnOutputsThatSupportPassedActivities() {
         assertEquals(
-            OutputsForApps(
-                maps = mapOf(
+            AppsOutputs(
+                mapAppsOutputs = mapOf(
                     PackageNames.TEST to listOf(
                         OpenDisplayGeoUriOutput(
                             UriActivity(PackageNames.TEST, UriScheme.GEO),
@@ -265,7 +265,7 @@ class OutputRepositoryTest {
                         ),
                     ),
                 ),
-                messaging = mapOf(
+                messagingAppsOutputs = mapOf(
                     PackageNames.SIGNAL to listOf(
                         SendPointOutput(
                             TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
@@ -275,7 +275,7 @@ class OutputRepositoryTest {
                     ),
                 ),
             ),
-            outputRepository.getOutputsForApps(
+            outputRepository.getAppsOutputs(
                 listOf(
                     UriActivity(PackageNames.TEST, UriScheme.GEO),
                     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
@@ -295,8 +295,8 @@ class OutputRepositoryTest {
     @Test
     fun getOutputsForApps_doesNotReturnOutputsForHiddenApps() {
         assertEquals(
-            OutputsForApps(
-                maps = mapOf(
+            AppsOutputs(
+                mapAppsOutputs = mapOf(
                     PackageNames.TEST to listOf(
                         OpenDisplayGeoUriOutput(
                             UriActivity(PackageNames.TEST, UriScheme.GEO),
@@ -312,9 +312,9 @@ class OutputRepositoryTest {
                         ),
                     ),
                 ),
-                messaging = emptyMap(),
+                messagingAppsOutputs = emptyMap(),
             ),
-            outputRepository.getOutputsForApps(
+            outputRepository.getAppsOutputs(
                 listOf(
                     UriActivity(PackageNames.TEST, UriScheme.GEO),
                     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
@@ -332,7 +332,7 @@ class OutputRepositoryTest {
     @Test
     fun outputsForSharing_returnsHardCodedOutputs() {
         assertEquals(
-            OutputsForSharing(
+            ShareOutputs(
                 default = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
                 all = listOf(
                     ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
@@ -378,7 +378,7 @@ class OutputRepositoryTest {
                     CopyLinkUriOutput(FakeOpenStreetMapNavigationLink, coordinateConverter, uriQuote),
                 ),
             ),
-            outputRepository.getOutputsForLinks(defaultFakeLinks),
+            outputRepository.getLinksOutputs(defaultFakeLinks),
         )
     }
 
@@ -415,7 +415,7 @@ class OutputRepositoryTest {
                     CopyLinkUriOutput(linkInSecondGroup, coordinateConverter, uriQuote),
                 ),
             ),
-            outputRepository.getOutputsForLinks(
+            outputRepository.getLinksOutputs(
                 listOf(
                     linkInFirstGroupWithoutExplicitGroup,
                     linkInFirstGroup,
@@ -433,7 +433,7 @@ class OutputRepositoryTest {
                 CopyLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote),
                 CopyLinkUriOutput(FakeOpenStreetMapDisplayLink, coordinateConverter, uriQuote),
             ),
-            outputRepository.getOutputsForPointChips(defaultFakeLinks),
+            outputRepository.getPointChipsOutputs(defaultFakeLinks),
         )
     }
 
@@ -445,16 +445,16 @@ class OutputRepositoryTest {
                 SaveRouteGpxOutput(coordinateConverter),
                 SavePointsGpxOutput(coordinateConverter),
             ),
-            outputRepository.outputsForPointsChips,
+            outputRepository.pointsChipsOutputs,
         )
     }
 
     @Test
     fun getOutputsForUri_returnsOutputsForTextActivityAndUriActivityAndIgnoresFileActivity() {
         assertEquals(
-            OutputsForUri(
-                copy = CopyStringOutput,
-                open = listOf(
+            SourceShareOutputs(
+                copyOutput = CopyStringOutput,
+                openOutputs = listOf(
                     OpenUnknownUriOutput(
                         UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
                     ),
@@ -463,7 +463,7 @@ class OutputRepositoryTest {
                     ),
                 ),
             ),
-            outputRepository.getOutputsForUri(
+            outputRepository.getSourceShareOutputs(
                 listOf(
                     UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO),
                     TextActivity(packageName = PackageNames.CONVERSATIONS, mimeType = MimeType.TEXT_PLAIN),

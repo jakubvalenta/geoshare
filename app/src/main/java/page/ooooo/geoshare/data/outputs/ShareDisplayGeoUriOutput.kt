@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.formatters.GeoUriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Point
@@ -22,17 +22,17 @@ class ShareDisplayGeoUriOutput @Inject constructor(
         GeoUriFormatter.formatGeoUriString(coordinateConverter.toWGS84(value), uriQuote = uriQuote)
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.share)
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
+    override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.location_on_24px)
 
-    override fun getIcon(appDetail: AppDetail?) =
+    override fun getIcon(appDetails: AppDetails) =
         ImageVectorIconDescriptor(Icons.Default.Share)
 
     @Composable
-    override fun automationLabel(appDetail: AppDetail?) =
+    override fun automationLabel(appDetails: AppDetails) =
         stringResource(R.string.share)
 
     override fun equals(other: Any?): Boolean {

@@ -1,11 +1,10 @@
-@file:Suppress("DEPRECATION")
-
 package page.ooooo.geoshare.data
 
 import page.ooooo.geoshare.data.android.AppActivity
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.android.FileType
 import page.ooooo.geoshare.data.android.MimeType
+import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.android.TextActivity
 import page.ooooo.geoshare.data.android.UriActivity
 import page.ooooo.geoshare.data.android.UriScheme
@@ -48,7 +47,6 @@ import page.ooooo.geoshare.data.outputs.ShareNavigationGoogleUriOutput
 import page.ooooo.geoshare.data.outputs.SharePointsGpxOutput
 import page.ooooo.geoshare.data.outputs.ShareRouteGpxOutput
 import page.ooooo.geoshare.data.outputs.ShareStreetViewGoogleUriOutput
-import page.ooooo.geoshare.data.outputs.StringOutput
 import page.ooooo.geoshare.data.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.preferences.BasicAutomation
 import page.ooooo.geoshare.data.preferences.CopyCoordsDecAutomation
@@ -90,24 +88,28 @@ import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class OutputsForPoints(
-    val save: List<Output<Points>>,
-    val share: List<Output<Points>>,
+data class AppOutputs<T>(
+    val packageName: String,
+    val defaultOutput: T,
+    val allOutputs: List<T>,
 )
 
-data class OutputsForApps(
-    val maps: Map<String, List<Output<*>>>,
-    val messaging: Map<String, List<Output<*>>>,
+data class AppsOutputs(
+    val mapAppsOutputs: List<AppOutputs<Output<*>>> = emptyList(),
+    val messagingAppsOutputs: List<AppOutputs<Output<*>>> = emptyList(),
+    val exampleAppOutputs: AppOutputs<Output<*>>? = null,
+    val shareOutputs: ShareOutputs? = null,
 )
 
-data class OutputsForSharing(
-    val default: Output<Point>,
-    val all: List<Output<*>>,
+data class LinkOutputs(
+    val group: String,
+    val defaultOutput: Output<Point>,
+    val allOutputs: List<Output<Point>>,
 )
 
-data class OutputsForUri(
-    val copy: CopyStringOutput,
-    val open: List<Output<String>>,
+data class ShareOutputs(
+    val defaultOutput: Output<*>,
+    val allOutputs: List<Output<*>>,
 )
 
 @Singleton
@@ -116,7 +118,7 @@ class OutputRepository @Inject constructor(
     private val log: Log,
     private val uriQuote: UriQuote,
 ) {
-    fun getOutputsForPointCopy(links: List<Link>): List<Output<Point>> =
+    fun getPointCopyOutputs(links: List<Link>): List<Output<Point>> =
         listOf(
             CopyCoordsDecOutput(coordinateConverter, uriQuote),
             CopyCoordsDegMinSecOutput(coordinateConverter, uriQuote),
@@ -132,71 +134,66 @@ class OutputRepository @Inject constructor(
                 .toTypedArray(),
         )
 
-    fun getOutputsForPointOpen(activities: List<AppActivity>, hiddenApps: Set<String>?): List<Output<Point>> =
-        getOutputsForAppsCategory(activities, hiddenApps)
+    fun getPointOpenOutputs(activities: List<AppActivity>, hiddenApps: Set<String>?): List<AppOutputs<Output<Point>>> =
+        activities
+            .groupBy { it.packageName }
+            .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
             .values
-            .mapNotNull { it
-                .filterIsInstance<PointOutput>()
-                .firstOrNull()
+            .mapNotNull { activities ->
+                activities.firstNotNullOfOrNull { activity ->
+                    activity
+                        .toOutputs()
+                        .firstNotNullOfOrNull { it as? PointOutput }
+                        ?.let { defaultOutput ->
+                            AppOutputs(
+                                packageName = activity.packageName,
+                                defaultOutput = defaultOutput,
+                                allOutputs = emptyList(),
+                            )
+                        }
+                }
             }
 
-    val outputsForPointSave: List<Output<Point>> by lazy {
+    val pointSaveOutputs: List<Output<Point>> by lazy {
         listOf(
             SavePointGpxOutput(coordinateConverter),
             SavePointToContactOutput(coordinateConverter),
         )
     }
 
-    val outputsForPoints: OutputsForPoints by lazy {
-        OutputsForPoints(
-            save = listOf(
-                SaveRouteGpxOutput(coordinateConverter),
-                SavePointsGpxOutput(coordinateConverter),
-            ),
-            share = listOf(
-                ShareRouteGpxOutput(coordinateConverter),
-                SharePointsGpxOutput(coordinateConverter),
-            ),
+    val pointsSaveOutputs: List<Output<Points>> by lazy {
+        listOf(
+            SaveRouteGpxOutput(coordinateConverter),
+            SavePointsGpxOutput(coordinateConverter),
         )
     }
 
-    fun getOutputsForApps(activities: List<AppActivity>, hiddenApps: Set<String>?): OutputsForApps =
-        activities.partition { !it.isMessagingApp() }.let { (mapActivities, messagingActivities) ->
-            OutputsForApps(
-                maps = getOutputsForAppsCategory(mapActivities, hiddenApps),
-                messaging = getOutputsForAppsCategory(messagingActivities, hiddenApps),
-            )
-        }
+    val pointsShareOutputs: List<Output<Points>> by lazy {
+        listOf(
+            ShareRouteGpxOutput(coordinateConverter),
+            SharePointsGpxOutput(coordinateConverter),
+        )
+    }
 
-    private fun getOutputsForAppsCategory(
-        activities: List<AppActivity>,
-        hiddenApps: Set<String>?,
-    ): Map<String, List<Output<*>>> =
+    fun getAppsOutputs(activities: List<AppActivity>, hiddenApps: Set<String>?): AppsOutputs =
         activities
-            .groupBy { activity -> activity.packageName }
-            .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
-            .mapValues { (_, activities) ->
-                activities
-                    .sorted()
-                    .flatMap { activity -> activity.toOutputs() }
-            }
-
-    fun getOutputsForLinks(links: List<Link>): Map<String, List<Output<*>>> =
-        links
-            .filter { it.appEnabled }
-            .groupBy { it.groupOrName }
-            .toSortedMap()
-            .mapValues { (_, links) ->
-                listOf(
-                    *links.map { ShareLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
-                    *links.map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
+            .partition { activity -> !activity.isMessagingApp() }
+            .let { (mapActivities, messagingActivities) ->
+                val mapAppsOutputs = mapActivities.toOutputsForApps(hiddenApps)
+                AppsOutputs(
+                    mapAppsOutputs = mapAppsOutputs,
+                    messagingAppsOutputs = messagingActivities.toOutputsForApps(hiddenApps),
+                    shareOutputs = shareOutputs,
+                    exampleAppOutputs = PackageNames.examples.firstNotNullOfOrNull { packageName ->
+                        mapAppsOutputs.firstOrNull { appOutputs -> appOutputs.packageName == packageName }
+                    },
                 )
             }
 
-    val outputsForSharing: OutputsForSharing by lazy {
-        OutputsForSharing(
-            default = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
-            all = listOf(
+    val shareOutputs by lazy {
+        ShareOutputs(
+            defaultOutput = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+            allOutputs = listOf(
                 ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
                 ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
                 ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
@@ -207,7 +204,23 @@ class OutputRepository @Inject constructor(
         )
     }
 
-    fun getOutputsForPointChips(links: List<Link>): List<Output<Point>> =
+    fun getLinksOutputs(links: List<Link>): List<LinkOutputs> =
+        links
+            .filter { it.appEnabled }
+            .groupBy { it.groupOrName }
+            .toSortedMap()
+            .mapNotNull { (group, links) ->
+                listOf(
+                    *links.map { ShareLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
+                    *links.map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
+                ).let { all ->
+                    all.firstOrNull()?.let { default ->
+                        LinkOutputs(group = group, defaultOutput = default, allOutputs = all)
+                    }
+                }
+            }
+
+    fun getPointChipsOutputs(links: List<Link>): List<Output<Point>> =
         listOf(
             CopyGeoUriOutput(coordinateConverter, uriQuote),
             *links
@@ -217,7 +230,7 @@ class OutputRepository @Inject constructor(
                 .toTypedArray(),
         )
 
-    val outputsForPointsChips: List<Output<Points>> by lazy {
+    val pointsChipsOutputs: List<Output<Points>> by lazy {
         listOf(
             ShareRouteGpxOutput(coordinateConverter),
             SaveRouteGpxOutput(coordinateConverter),
@@ -225,19 +238,43 @@ class OutputRepository @Inject constructor(
         )
     }
 
-    fun getOutputsForUri(activities: List<AppActivity>): OutputsForUri =
-        OutputsForUri(
-            copy = CopyStringOutput,
-            open = activities.mapNotNull<AppActivity, StringOutput> { activity ->
-                when (activity) {
-                    // Don't show an item for a file activity, because we don't know how to create a file from the
-                    // source, which is a URI or a text
-                    is FileActivity -> null
-                    is TextActivity -> SendStringOutput(activity)
-                    is UriActivity -> OpenUnknownUriOutput(activity)
-                }
-            },
-        )
+    val sourceCopyOutput: Output<String> by lazy {
+        CopyStringOutput
+    }
+
+    fun getSourceAppsOutputs(activities: List<AppActivity>): List<AppOutputs<Output<String>>> =
+        activities.mapNotNull { activity ->
+            when (activity) {
+                // Don't show an item for a file activity, because we don't know how to create a file from the
+                // source, which is a URI or a text
+                is FileActivity -> null
+                is TextActivity -> AppOutputs(
+                    packageName = activity.packageName,
+                    defaultOutput = SendStringOutput(activity),
+                    allOutputs = emptyList(),
+                )
+
+                is UriActivity -> AppOutputs(
+                    packageName = activity.packageName,
+                    defaultOutput = OpenUnknownUriOutput(activity),
+                    allOutputs = emptyList(),
+                )
+            }
+        }
+
+    private fun List<AppActivity>.toOutputsForApps(hiddenApps: Set<String>?): List<AppOutputs<Output<*>>> =
+        groupBy { it.packageName }
+            .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
+            .mapNotNull { (packageName, activities) ->
+                activities
+                    .sorted()
+                    .flatMap { activity -> activity.toOutputs() }
+                    .let { all ->
+                        all.firstOrNull()?.let { default ->
+                            AppOutputs(packageName = packageName, defaultOutput = default, allOutputs = all)
+                        }
+                    }
+            }
 
     private fun AppActivity.toOutputs(): List<Output<*>> =
         when (this) {
@@ -416,6 +453,7 @@ fun ActivityAutomation.toOutput(
             }
     }
 
+@Suppress("DEPRECATION")
 fun LinkAutomation.toOutput(
     coordinateConverter: CoordinateConverter,
     link: Link,

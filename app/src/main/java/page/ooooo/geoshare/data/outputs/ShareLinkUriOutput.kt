@@ -3,7 +3,7 @@ package page.ooooo.geoshare.data.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.formatters.UriFormatter
@@ -36,13 +36,13 @@ class ShareLinkUriOutput @Inject constructor(
         !getUriString(value).isNullOrEmpty()
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_open_link, link.name)
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
+    override fun getMenuIcon(appDetails: AppDetails) =
         link.menuIcon
 
-    override fun getIcon(appDetail: AppDetail?) =
+    override fun getIcon(appDetails: AppDetails) =
         link.icon
 
     override fun equals(other: Any?): Boolean {

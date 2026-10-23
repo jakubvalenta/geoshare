@@ -3,7 +3,7 @@ package page.ooooo.geoshare.data.outputs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.UriActivity
 import page.ooooo.geoshare.data.formatters.MagicEarthUriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -27,15 +27,15 @@ class OpenNavigationMagicEarthUriOutput @Inject constructor(
         MagicEarthUriFormatter.formatNavigationUriString(coordinateConverter.toWGS84(value), uriQuote)
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_open_navigation)
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
+    override fun getMenuIcon(appDetails: AppDetails) =
         ResourceIconDescriptor(R.drawable.navigation_24px)
 
     @Composable
-    override fun automationLabel(appDetail: AppDetail?) =
-        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appDetail?.label.orEmpty())
+    override fun automationLabel(appDetails: AppDetails) =
+        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appDetails[activity.packageName]?.label.orEmpty())
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

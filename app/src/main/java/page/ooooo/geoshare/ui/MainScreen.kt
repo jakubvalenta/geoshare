@@ -67,7 +67,6 @@ import page.ooooo.geoshare.data.billing.CustomLinkFeature
 import page.ooooo.geoshare.data.billing.Feature
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
-import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.extensions.truncateMiddle
@@ -84,9 +83,9 @@ import page.ooooo.geoshare.data.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.ActionContext
 import page.ooooo.geoshare.data.outputs.LocationAction
+import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.preferences.shouldAppFinish
 import page.ooooo.geoshare.data.state.ActionState
 import page.ooooo.geoshare.data.state.Attempt
@@ -108,32 +107,29 @@ import page.ooooo.geoshare.data.state.PermissionRequested
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.components.ConfirmationDialog
 import page.ooooo.geoshare.ui.components.ConversionStateLogList
-import page.ooooo.geoshare.ui.components.ConversionUriSheet
 import page.ooooo.geoshare.ui.components.ConversionWebView
 import page.ooooo.geoshare.ui.components.HelpOpenByDefaultMessage
 import page.ooooo.geoshare.ui.components.HelpShareSourceMessage
 import page.ooooo.geoshare.ui.components.HelpWelcomeMessage
+import page.ooooo.geoshare.ui.components.MainForm
 import page.ooooo.geoshare.ui.components.MainHeadline
 import page.ooooo.geoshare.ui.components.MainHelp
 import page.ooooo.geoshare.ui.components.MainLoadingIndicator
 import page.ooooo.geoshare.ui.components.MainMenu
 import page.ooooo.geoshare.ui.components.MainScaffold
 import page.ooooo.geoshare.ui.components.MainSourceBar
-import page.ooooo.geoshare.ui.components.MainSubmit
-import page.ooooo.geoshare.ui.components.MainTextField
 import page.ooooo.geoshare.ui.components.MessageSnackbarHost
 import page.ooooo.geoshare.ui.components.MessageSnackbarVisuals
 import page.ooooo.geoshare.ui.components.PermissionDialog
 import page.ooooo.geoshare.ui.components.ResultApps
 import page.ooooo.geoshare.ui.components.ResultCoordinates
 import page.ooooo.geoshare.ui.components.ResultError
-import page.ooooo.geoshare.ui.components.ResultPointOpenSheet
+import page.ooooo.geoshare.ui.components.ResultLinks
 import page.ooooo.geoshare.ui.components.ResultPoints
 import page.ooooo.geoshare.ui.components.ResultSheet
 import page.ooooo.geoshare.ui.components.ResultTitle
 import page.ooooo.geoshare.ui.components.fakeStateLog
 import page.ooooo.geoshare.ui.components.helpLifecycleMessage
-import page.ooooo.geoshare.ui.components.pointTitle
 import page.ooooo.geoshare.ui.string.FormatArg
 import page.ooooo.geoshare.ui.string.annotatedStringResource
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -155,7 +151,6 @@ fun MainScreen(
     mainViewModel: MainViewModel,
     helpViewModel: HelpViewModel = hiltViewModel(),
     inputViewModel: InputViewModel = hiltViewModel(),
-    outputViewModel: OutputViewModel = hiltViewModel(),
     linkViewModel: LinkViewModel = hiltViewModel(),
     userPreferenceViewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
@@ -264,49 +259,44 @@ fun MainScreen(
     MainScreen(
         conversionState = conversionState,
         actionState = actionState,
-        actionDetail = mainViewModel.actionDetail,
         billingAppNameResId = billingViewModel.billingAppNameResId,
         billingFeatures = billingViewModel.billingFeatures,
         billingStatus = billingViewModel.billingStatus,
         changelogShown = inputViewModel.changelogShown,
-        coordinateConverter = outputViewModel.coordinateConverter,
+        coordinateConverter = mainViewModel.coordinateConverter,
+        coordinateFormat = userPreferenceViewModel.coordinateFormat,
         dismissedHelpMessages = helpViewModel.dismissedHelpMessages,
+        error = mainViewModel.error,
         linkMessage = linkViewModel.message,
-        outputsForApps = outputViewModel.outputsForApps,
-        outputsForExampleApp = outputViewModel.outputsForExampleApp,
-        outputsForLinks = outputViewModel.outputsForLinks,
-        outputsForPointChips = outputViewModel.outputsForPointChips,
-        outputsForPointCopy = outputViewModel.outputsForPointCopy,
-        outputsForPointOpen = outputViewModel.outputsForPointOpen,
-        outputsForPointSave = outputViewModel.outputsForPointSave,
-        outputsForPoints = outputViewModel.outputsForPoints,
-        outputsForPointsChips = outputViewModel.outputsForPointsChips,
-        outputsForSharing = outputViewModel.outputsForSharing,
-        outputsForUri = outputViewModel.outputsForUri,
         placeholderUris = inputViewModel.placeholderUris,
-        selectedUri = outputViewModel.selectedUri,
-        start = mainViewModel.conversionStart,
-        stateLog = mainViewModel.extendedConversionStateLog,
+        resultAppsState = mainViewModel.resultAppsState,
+        resultCoordinatesState = mainViewModel.resultCoordinateState,
+        resultLinksState = mainViewModel.resultLinksState,
+        resultPointsState = mainViewModel.resultPointsState,
+        resultSheetState = mainViewModel.resultSheetState,
         source = mainViewModel.source,
         sourceComesFromIntent = mainViewModel.sourceComesFromIntent,
+        start = mainViewModel.conversionStart,
+        stateLog = mainViewModel.extendedConversionStateLog,
         userPreferenceMessage = userPreferenceViewModel.message,
-        userPreferencesValues = userPreferenceViewModel.values,
         onCancelAction = {
             locationJob?.cancel()
             mainViewModel.cancelAction()
         },
         onCancelConversion = { mainViewModel.cancelConversion() },
-        onDeny = { doNotAsk -> mainViewModel.deny(doNotAsk) },
+        onCopyPoint = { point, pointIndex -> mainViewModel.copyPoint(point, pointIndex) },
         onDenyAction = { doNotAsk -> mainViewModel.denyAction(doNotAsk) },
+        onDenyConversion = { doNotAsk -> mainViewModel.deny(doNotAsk) },
         onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
         onDismissHelpMessage = { helpMessage -> helpViewModel.dismissHelpMessage(helpMessage) },
         onDismissLinkMessage = { linkViewModel.dismissMessage() },
         onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
         onExecute = { action -> mainViewModel.startAction(action) },
-        onGenRandomUri = { inputViewModel.genRandomUri() },
-        onGrant = { doNotAsk -> mainViewModel.grant(doNotAsk) },
         onGrantAction = { doNotAsk -> mainViewModel.grantAction(doNotAsk) },
+        onGrantConversion = { doNotAsk -> mainViewModel.grant(doNotAsk) },
         onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
+        onHideSheet = { mainViewModel.hideSheet() },
+        onOpenPoint = { point, pointIndex -> mainViewModel.openPoint(point, pointIndex) },
         onNavigateToAboutScreen = {
             mainViewModel.cancelAction()
             onNavigateToAboutScreen()
@@ -333,58 +323,56 @@ fun MainScreen(
         },
         onReset = { mainViewModel.reset() },
         onRetry = { mainViewModel.retry() },
-        onSelectUri = { outputViewModel.setSelectedUri(it) },
+        onSavePoint = { point, pointIndex -> mainViewModel.savePoint(point, pointIndex) },
+        onSavePoints = { points -> mainViewModel.savePoints(points) },
+        onSharePoints = { points -> mainViewModel.sharePoints(points) },
+        onShareSource = { source -> mainViewModel.shareSource(source) },
         onSetSource = { mainViewModel.setSource(it) },
+        onSetRandomSource = { mainViewModel.setRandomSource() },
         onSubmit = { mainViewModel.start(false) },
     )
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScreen(
     conversionState: ConversionState,
     actionState: ActionState,
-    actionDetail: StateFlow<ActionDetail?>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
     changelogShown: StateFlow<Boolean>,
     coordinateConverter: CoordinateConverter,
+    coordinateFormat: StateFlow<CoordinateFormat>,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
+    error: StateFlow<String?>,
     linkMessage: StateFlow<Message?>,
-    outputsForApps: StateFlow<OutputDetailsForApps>,
-    outputsForExampleApp: StateFlow<OutputDetailsForApp?>,
-    outputsForLinks: StateFlow<List<OutputDetailsForLink>>,
-    outputsForPointChips: StateFlow<List<OutputDetail<Point>>>,
-    outputsForPointCopy: StateFlow<List<OutputDetail<Point>>>,
-    outputsForPointOpen: StateFlow<List<OutputDetailForApp<Point>>>,
-    outputsForPointSave: StateFlow<List<OutputDetail<Point>>>,
-    outputsForPoints: StateFlow<OutputDetailsForPoints>,
-    outputsForPointsChips: StateFlow<List<OutputDetail<Points>>>,
-    outputsForSharing: StateFlow<OutputDetailsForSharing?>,
-    outputsForUri: StateFlow<OutputDetailsForUri?>,
     placeholderUris: StateFlow<List<String>>,
-    selectedUri: StateFlow<String?>,
+    resultAppsState: StateFlow<ResultAppsState>,
+    resultCoordinatesState: StateFlow<ResultCoordinatesState>,
+    resultLinksState: StateFlow<ResultLinksState>,
+    resultPointsState: StateFlow<ResultPointsState>,
+    resultSheetState: StateFlow<ResultSheetState>,
     source: StateFlow<String>,
     sourceComesFromIntent: StateFlow<Boolean>,
     start: StateFlow<ComparableTimeMark?>,
     stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     userPreferenceMessage: StateFlow<Message?>,
-    userPreferencesValues: StateFlow<UserPreferencesValues>,
     onCancelAction: () -> Unit,
     onCancelConversion: () -> Unit,
-    onDeny: (Boolean) -> Unit,
+    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
     onDenyAction: (Boolean) -> Unit,
+    onDenyConversion: (Boolean) -> Unit,
     onDisableLinkGroup: (String?) -> Unit,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onDismissLinkMessage: () -> Unit,
     onDismissUserPreferenceMessage: () -> Unit,
     onExecute: (Action<*>) -> Unit,
-    onGenRandomUri: () -> String?,
-    onGrant: (Boolean) -> Unit,
     onGrantAction: (Boolean) -> Unit,
+    onGrantConversion: (Boolean) -> Unit,
     onHideApp: (String) -> Unit,
+    onHideSheet: () -> Unit,
+    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
@@ -393,8 +381,12 @@ private fun MainScreen(
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
     onReset: () -> Unit,
     onRetry: () -> Unit,
-    onSelectUri: (String?) -> Unit,
+    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onSavePoints: (points: Points) -> Unit,
+    onSetRandomSource: () -> Unit,
     onSetSource: (String) -> Unit,
+    onSharePoints: (points: Points) -> Unit,
+    onShareSource: (source: String) -> Unit,
     onSubmit: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -403,10 +395,7 @@ private fun MainScreen(
     val linkMessage by linkMessage.collectAsStateWithLifecycle()
     val userPreferenceMessage by userPreferenceMessage.collectAsStateWithLifecycle()
 
-    var errorMessageResId by retain { mutableStateOf<Int?>(null) }
     var logExpanded by retain { mutableStateOf(false) }
-    var resultSheetState by retain { mutableStateOf<ResultSheetState>(ResultSheetState.Hidden) }
-    val selectedUri by selectedUri.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler(conversionState !is ConversionState.Initial) {
@@ -451,20 +440,12 @@ private fun MainScreen(
             topContent = {
                 when (conversionState) {
                     is ConversionState.Initial -> {
-                        item(key = "main_text_field", contentType = "main_text_field") {
-                            MainTextField(
-                                errorMessageResId = errorMessageResId,
+                        item(key = "main_form", contentType = "main_form") {
+                            MainForm(
+                                error = error,
                                 placeholderUris = placeholderUris,
                                 source = source,
-                                onSetErrorMessageResId = { errorMessageResId = it },
                                 onSetSource = onSetSource,
-                                onSubmit = onSubmit,
-                            )
-                        }
-                        item(key = "main_submit", contentType = "main_submit") {
-                            MainSubmit(
-                                source = source,
-                                onSetErrorMessageResId = { errorMessageResId = it },
                                 onSubmit = onSubmit,
                             )
                         }
@@ -484,7 +465,7 @@ private fun MainScreen(
                                 ConversionStateLogList(
                                     expanded = logExpanded,
                                     stateLog = stateLog,
-                                    onUriClick = onSelectUri,
+                                    onShareSource = onShareSource,
                                 )
                                 when (conversionState) {
                                     is ConversionState.HasError ->
@@ -497,67 +478,30 @@ private fun MainScreen(
                                     is ConversionState.HasResult -> {
                                         conversionState.points.lastOrNull()?.let { point ->
                                             ResultCoordinates(
+                                                state = resultCoordinatesState,
                                                 point = point,
                                                 totalPoints = conversionState.points.size,
                                                 coordinateConverter = coordinateConverter,
+                                                coordinateFormat = coordinateFormat,
                                                 inputGroup = conversionState.matchedInput.input.group,
-                                                outputsForPointChips = outputsForPointChips,
-                                                userPreferencesValues = userPreferencesValues,
+                                                onCopyPoint = onCopyPoint,
                                                 onExecute = onExecute,
                                                 onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                onSelectPointToCopy = {
-                                                    onCancelAction()
-                                                    resultSheetState = ResultSheetState.PointToCopySelected(
-                                                        point,
-                                                        pointIndex = conversionState.points.size - 1,
-                                                    )
-                                                },
-                                                onSelectPointToSave = {
-                                                    onCancelAction()
-                                                    resultSheetState = ResultSheetState.PointToSaveSelected(
-                                                        point,
-                                                        pointIndex = conversionState.points.size - 1,
-                                                    )
-                                                },
+                                                onSavePoint = onSavePoint,
                                             ) {
                                                 if (conversionState.points.size > 1) {
                                                     ResultPoints(
+                                                        state = resultPointsState,
                                                         points = conversionState.points,
                                                         coordinateConverter = coordinateConverter,
-                                                        outputsForPointsChips = outputsForPointsChips,
-                                                        userPreferencesValues = userPreferencesValues,
+                                                        coordinateFormat = coordinateFormat,
+                                                        onCopyPoint = onCopyPoint,
                                                         onExecute = onExecute,
                                                         onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                                        onOpenPoint = { point, pointIndex ->
-                                                            onCancelAction()
-                                                            resultSheetState = ResultSheetState.PointToOpenSelected(
-                                                                point, pointIndex
-                                                            )
-                                                        },
-                                                        onSelectPointToCopy = { point, pointIndex ->
-                                                            onCancelAction()
-                                                            resultSheetState = ResultSheetState.PointToCopySelected(
-                                                                point, pointIndex
-                                                            )
-                                                        },
-                                                        onSelectPointToSave = { point, pointIndex ->
-                                                            onCancelAction()
-                                                            resultSheetState = ResultSheetState.PointToSaveSelected(
-                                                                point, pointIndex
-                                                            )
-                                                        },
-                                                        onSelectPointsToSave = {
-                                                            onCancelAction()
-                                                            resultSheetState = ResultSheetState.PointsToSaveSelected(
-                                                                conversionState.points
-                                                            )
-                                                        },
-                                                        onSelectPointsToShare = {
-                                                            onCancelAction()
-                                                            resultSheetState = ResultSheetState.PointsToShareSelected(
-                                                                conversionState.points
-                                                            )
-                                                        },
+                                                        onOpenPoint = onOpenPoint,
+                                                        onSavePoint = onSavePoint,
+                                                        onSavePoints = onSavePoints,
+                                                        onSharePoints = onSharePoints,
                                                     )
                                                 }
                                             }
@@ -568,8 +512,8 @@ private fun MainScreen(
                                             )
                                         } else {
                                             HelpShareSourceMessage(
+                                                state = resultAppsState,
                                                 dismissedHelpMessages = dismissedHelpMessages,
-                                                outputsForExampleApp = outputsForExampleApp,
                                                 sourceComesFromIntent = sourceComesFromIntent,
                                                 modifier = Modifier.padding(top = spacing.tiny),
                                                 onDismissHelpMessage = onDismissHelpMessage,
@@ -625,24 +569,33 @@ private fun MainScreen(
             bottomContent = when (conversionState) {
                 is ConversionState.Initial -> {
                     {
-                        item(key = "main_help", contentType = "main_help") {
+                        if (helpLifecycleMessage != null) {
+                            item(key = "help_lifecycle_message", contentType = "help_lifecycle_message") {
+                                helpLifecycleMessage(
+                                    Modifier.padding(
+                                        horizontal = spacing.windowPadding,
+                                        vertical = spacing.tiny,
+                                    )
+                                )
+                            }
+                        } else {
+                            item(key = "help_welcome_message", contentType = "help_welcome_message") {
+                                HelpWelcomeMessage(
+                                    dismissedHelpMessages = dismissedHelpMessages,
+                                    modifier = Modifier.padding(
+                                        horizontal = spacing.windowPadding,
+                                        vertical = spacing.tiny,
+                                    ),
+                                    onDismissHelpMessage = onDismissHelpMessage,
+                                )
+                            }
+                        }
+                        item(key = "main_help", contentType = "column") {
                             MainHelp(
-                                onGenRandomUri = onGenRandomUri,
                                 onNavigateToFaqScreen = onNavigateToFaqScreen,
                                 onNavigateToInputsScreen = onNavigateToInputsScreen,
-                                onSetErrorMessageResId = { errorMessageResId = it },
-                                onSetSource = onSetSource,
-                            ) { paddingValues ->
-                                if (helpLifecycleMessage != null) {
-                                    helpLifecycleMessage(Modifier.padding(paddingValues))
-                                } else {
-                                    HelpWelcomeMessage(
-                                        dismissedHelpMessages = dismissedHelpMessages,
-                                        modifier = Modifier.padding(paddingValues),
-                                        onDismissHelpMessage = onDismissHelpMessage,
-                                    )
-                                }
-                            }
+                                onSetRandomSource = onSetRandomSource,
+                            )
                         }
                     }
                 }
@@ -651,25 +604,34 @@ private fun MainScreen(
                     {
                         item(key = "result_apps", contentType = "result_apps") {
                             ResultApps(
-                                outputsForApps = outputsForApps,
-                                outputsForLinks = outputsForLinks,
-                                outputsForSharing = outputsForSharing,
+                                state = resultAppsState,
                                 points = conversionState.points,
                                 source = source,
                                 modifier = Modifier.padding(top = spacing.tiny),
-                                onDisableLinkGroup = onDisableLinkGroup,
                                 onExecute = onExecute,
                                 onHideApp = onHideApp,
+                            )
+                        }
+                        item(key = "result_links", contentType = "result_links") {
+                            ResultLinks(
+                                state = resultLinksState,
+                                points = conversionState.points,
+                                source = source,
+                                onDisableLinkGroup = onDisableLinkGroup,
+                                onExecute = onExecute,
                                 onNavigateToLinkScreen = onNavigateToLinkScreen,
-                            ) { paddingValues ->
-                                HelpOpenByDefaultMessage(
-                                    dismissedHelpMessages = dismissedHelpMessages,
-                                    sourceComesFromIntent = sourceComesFromIntent,
-                                    modifier = Modifier.padding(paddingValues),
-                                    onDismissHelpMessage = onDismissHelpMessage,
-                                    onNavigateToFaqScreen = onNavigateToFaqScreen,
-                                )
-                            }
+                            )
+                        }
+                        item(key = "help_open_by_default_message", contentType = "help_open_by_default_message") {
+                            HelpOpenByDefaultMessage(
+                                dismissedHelpMessages = dismissedHelpMessages,
+                                sourceComesFromIntent = sourceComesFromIntent,
+                                modifier = Modifier
+                                    .padding(horizontal = spacing.windowPadding)
+                                    .padding(top = spacing.small),
+                                onDismissHelpMessage = onDismissHelpMessage,
+                                onNavigateToFaqScreen = onNavigateToFaqScreen,
+                            )
                         }
                     }
                 }
@@ -694,18 +656,19 @@ private fun MainScreen(
                         logExpanded = logExpanded,
                         start = start,
                         stateLog = stateLog,
-                        onSelectUri = onSelectUri,
                         onSetLogExpanded = { logExpanded = it },
+                        onShareSource = onShareSource,
                     )
                 }
             },
             supportingTitle = if (conversionState is ConversionState.HasResult) {
                 {
                     ResultTitle(
-                        actionDetail = actionDetail,
+                        state = resultAppsState,
+                        actionState = actionState,
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
-                        onCancel = onCancelAction,
+                        onCancelAction = onCancelAction,
                         onNavigateToUserPreferencesScreen = onNavigateToUserPreferencesScreen,
                     )
                 }
@@ -720,77 +683,12 @@ private fun MainScreen(
         )
     }
 
-    selectedUri?.let { uriString ->
-        ConversionUriSheet(
-            outputsForUri = outputsForUri,
-            uriString = uriString,
-            onDismissRequest = { onSelectUri(null) },
-            onExecute = onExecute,
-        )
-    }
-
-    if (conversionState is ConversionState.HasResult) {
-        resultSheetState.run {
-            when (this) {
-                is ResultSheetState.PointToCopySelected -> {
-                    val outputsForPointCopy by outputsForPointCopy.collectAsStateWithLifecycle()
-                    ResultSheet(
-                        value = point,
-                        outputs = outputsForPointCopy,
-                        title = pointTitle(point, pointIndex, conversionState.points.size),
-                        onExecute = onExecute,
-                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
-                    )
-                }
-
-                is ResultSheetState.PointToOpenSelected -> {
-                    val outputsForPointOpen by outputsForPointOpen.collectAsStateWithLifecycle()
-                    ResultPointOpenSheet(
-                        value = point,
-                        outputs = outputsForPointOpen,
-                        title = pointTitle(point, pointIndex, conversionState.points.size),
-                        onExecute = onExecute,
-                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
-                    )
-                }
-
-                is ResultSheetState.PointToSaveSelected -> {
-                    val outputsForPointSave by outputsForPointSave.collectAsStateWithLifecycle()
-                    ResultSheet(
-                        value = point,
-                        outputs = outputsForPointSave,
-                        title = pointTitle(point, pointIndex, conversionState.points.size),
-                        onExecute = onExecute,
-                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
-                    )
-                }
-
-                is ResultSheetState.PointsToSaveSelected -> {
-                    val outputsForPoints by outputsForPoints.collectAsStateWithLifecycle()
-                    ResultSheet(
-                        value = points,
-                        outputs = outputsForPoints.save,
-                        title = stringResource(R.string.conversion_succeeded_point_all, points.size),
-                        onExecute = onExecute,
-                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
-                    )
-                }
-
-                is ResultSheetState.PointsToShareSelected -> {
-                    val outputsForPoints by outputsForPoints.collectAsStateWithLifecycle()
-                    ResultSheet(
-                        value = points,
-                        outputs = outputsForPoints.share,
-                        title = stringResource(R.string.conversion_succeeded_point_all, points.size),
-                        onExecute = onExecute,
-                        onDismissRequest = { resultSheetState = ResultSheetState.Hidden },
-                    )
-                }
-
-                ResultSheetState.Hidden -> {}
-            }
-        }
-    }
+    @OptIn(ExperimentalMaterial3Api::class)
+    ResultSheet(
+        state = resultSheetState,
+        onExecute = onExecute,
+        onDismissRequest = onHideSheet,
+    )
 
     when (conversionState) {
         is PermissionRequested ->
@@ -801,8 +699,8 @@ private fun MainScreen(
                 ),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
                 dismissText = stringResource(R.string.conversion_permission_common_deny),
-                onConfirmation = onGrant,
-                onDismissRequest = onDeny,
+                onConfirmation = onGrantConversion,
+                onDismissRequest = onDenyConversion,
                 modifier = Modifier
                     .semantics { testTagsAsResourceId = true }
                     .testTag("geoShareConnectionPermissionDialog"),
@@ -848,15 +746,6 @@ private fun MainScreen(
     }
 }
 
-private sealed interface ResultSheetState {
-    data class PointToCopySelected(val point: Point, val pointIndex: Int) : ResultSheetState
-    data class PointToOpenSelected(val point: Point, val pointIndex: Int) : ResultSheetState
-    data class PointToSaveSelected(val point: Point, val pointIndex: Int) : ResultSheetState
-    data class PointsToSaveSelected(val points: Points) : ResultSheetState
-    data class PointsToShareSelected(val points: Points) : ResultSheetState
-    object Hidden : ResultSheetState
-}
-
 // Previews
 
 @Preview(showBackground = true)
@@ -870,46 +759,41 @@ private fun DefaultPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -918,8 +802,12 @@ private fun DefaultPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -936,46 +824,41 @@ private fun DarkPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(""),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
             sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -984,8 +867,12 @@ private fun DarkPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1002,46 +889,41 @@ private fun SmallPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1050,8 +932,12 @@ private fun SmallPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1068,46 +954,41 @@ private fun TabletPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
             changelogShown = MutableStateFlow(false),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(""),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(emptyList()),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1116,8 +997,12 @@ private fun TabletPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1139,7 +1024,6 @@ private fun SucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = getFakeAppDetails(context)
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
@@ -1154,7 +1038,6 @@ private fun SucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1167,50 +1050,45 @@ private fun SucceededPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
-            ),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(
-                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
-            ),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-            ),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(
-                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-            ),
-            outputsForSharing = MutableStateFlow(
-                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
-            ),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(
+                ResultAppsState(
+                    appDetails = getFakeAppDetails(context),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                )
+            ),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(
+                ResultLinksState(
+                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
+                )
+            ),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1219,8 +1097,12 @@ private fun SucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1242,7 +1124,6 @@ private fun DarkSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = getFakeAppDetails(context)
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
@@ -1257,7 +1138,6 @@ private fun DarkSucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1270,50 +1150,45 @@ private fun DarkSucceededPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
-            ),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(
-                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
-            ),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-            ),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(
-                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-            ),
-            outputsForSharing = MutableStateFlow(
-                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
-            ),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(
+                ResultAppsState(
+                    appDetails = getFakeAppDetails(context),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                )
+            ),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(
+                ResultLinksState(
+                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
+                )
+            ),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1322,8 +1197,12 @@ private fun DarkSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1345,7 +1224,6 @@ private fun SmallSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = getFakeAppDetails(context)
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
@@ -1359,7 +1237,6 @@ private fun SmallSucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1372,50 +1249,45 @@ private fun SmallSucceededPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
-            ),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(
-                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
-            ),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-            ),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(
-                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-            ),
-            outputsForSharing = MutableStateFlow(
-                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
-            ),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(
+                ResultAppsState(
+                    appDetails = getFakeAppDetails(context),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                )
+            ),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(
+                ResultLinksState(
+                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
+                )
+            ),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(true),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(true),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1424,8 +1296,12 @@ private fun SmallSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1447,7 +1323,6 @@ private fun TabletSucceededPreview() {
         )
         val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
         val timeSource = TestTimeSource()
-        val appDetails = getFakeAppDetails(context)
         MainScreen(
             conversionState = ConversionSucceeded(
                 source = source,
@@ -1462,7 +1337,6 @@ private fun TabletSucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1475,50 +1349,45 @@ private fun TabletSucceededPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(setOf(HelpMessage.SHARE_SOURCE)),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(
-                outputRepository.getOutputsForApps(fakeActivities, emptySet()).toOutputDetailsForApps(appDetails)
-            ),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(
-                outputRepository.getOutputsForLinks(defaultFakeLinks).toOutputDetailsForLinks(appDetails)
-            ),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(
-                outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-            ),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(
-                outputRepository.outputsForPointsChips.toOutputDetails(appDetails)
-            ),
-            outputsForSharing = MutableStateFlow(
-                outputRepository.outputsForSharing.toOutputDetailsForSharing(appDetails)
-            ),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(
+                ResultAppsState(
+                    appDetails = getFakeAppDetails(context),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                )
+            ),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(
+                ResultLinksState(
+                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
+                )
+            ),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1527,8 +1396,12 @@ private fun TabletSucceededPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1549,7 +1422,6 @@ private fun ErrorPreview() {
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1562,40 +1434,36 @@ private fun ErrorPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1604,8 +1472,12 @@ private fun ErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1626,7 +1498,6 @@ private fun DarkErrorPreview() {
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1639,40 +1510,36 @@ private fun DarkErrorPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1681,8 +1548,12 @@ private fun DarkErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1703,7 +1574,6 @@ private fun TabletErrorPreview() {
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1716,40 +1586,36 @@ private fun TabletErrorPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1758,8 +1624,12 @@ private fun TabletErrorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1781,7 +1651,6 @@ private fun WarningPreview() {
                 warning = true,
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1794,40 +1663,36 @@ private fun WarningPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1836,8 +1701,12 @@ private fun WarningPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1859,7 +1728,6 @@ private fun DarkWarningPreview() {
                 warning = true,
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1872,40 +1740,36 @@ private fun DarkWarningPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1914,8 +1778,12 @@ private fun DarkWarningPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -1941,7 +1809,6 @@ private fun LoadingIndicatorPreview() {
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1954,40 +1821,36 @@ private fun LoadingIndicatorPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -1996,8 +1859,12 @@ private fun LoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -2023,7 +1890,6 @@ private fun DarkLoadingIndicatorPreview() {
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2036,40 +1902,36 @@ private fun DarkLoadingIndicatorPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -2078,8 +1940,12 @@ private fun DarkLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -2103,7 +1969,6 @@ private fun TabletLoadingIndicatorPreview() {
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2116,40 +1981,36 @@ private fun TabletLoadingIndicatorPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -2158,8 +2019,12 @@ private fun TabletLoadingIndicatorPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -2182,7 +2047,6 @@ private fun WebViewPreview() {
                 results = emptyMap(),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2195,40 +2059,36 @@ private fun WebViewPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -2237,8 +2097,12 @@ private fun WebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -2261,7 +2125,6 @@ private fun DarkWebViewPreview() {
                 results = emptyMap(),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2274,40 +2137,36 @@ private fun DarkWebViewPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -2316,8 +2175,12 @@ private fun DarkWebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -2340,7 +2203,6 @@ private fun TabletWebViewPreview() {
                 results = emptyMap(),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2353,40 +2215,36 @@ private fun TabletWebViewPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -2395,8 +2253,12 @@ private fun TabletWebViewPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }
@@ -2418,7 +2280,6 @@ private fun EmptyPreview() {
                 points = persistentListOf(),
             ),
             actionState = ActionState.Initial,
-            actionDetail = MutableStateFlow(null),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2431,40 +2292,36 @@ private fun EmptyPreview() {
             ),
             changelogShown = MutableStateFlow(true),
             coordinateConverter = coordinateConverter,
+            coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
             dismissedHelpMessages = MutableStateFlow(null),
+            error = MutableStateFlow(null),
             linkMessage = MutableStateFlow(null),
-            outputsForApps = MutableStateFlow(OutputDetailsForApps()),
-            outputsForExampleApp = MutableStateFlow(null),
-            outputsForLinks = MutableStateFlow(emptyList()),
-            outputsForPointCopy = MutableStateFlow(emptyList()),
-            outputsForPointOpen = MutableStateFlow(emptyList()),
-            outputsForPointChips = MutableStateFlow(emptyList()),
-            outputsForPointSave = MutableStateFlow(emptyList()),
-            outputsForPoints = MutableStateFlow(OutputDetailsForPoints()),
-            outputsForPointsChips = MutableStateFlow(emptyList()),
-            outputsForSharing = MutableStateFlow(null),
-            outputsForUri = MutableStateFlow(null),
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-            selectedUri = MutableStateFlow(null),
+            resultAppsState = MutableStateFlow(ResultAppsState()),
+            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultLinksState = MutableStateFlow(ResultLinksState()),
+            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultSheetState = MutableStateFlow(ResultSheetState.Hidden),
             source = MutableStateFlow(source),
+            sourceComesFromIntent = MutableStateFlow(false),
             start = MutableStateFlow(timeSource.markNow()),
             stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-            sourceComesFromIntent = MutableStateFlow(false),
             userPreferenceMessage = MutableStateFlow(null),
-            userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
             onCancelAction = {},
             onCancelConversion = {},
-            onDeny = {},
+            onCopyPoint = { _, _ -> },
             onDenyAction = {},
+            onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
-            onExecute = {},
             onDismissUserPreferenceMessage = {},
-            onGenRandomUri = { null },
-            onGrant = {},
+            onExecute = {},
             onGrantAction = {},
+            onGrantConversion = {},
             onHideApp = {},
+            onHideSheet = {},
+            onOpenPoint = { _, _ -> },
             onNavigateToAboutScreen = {},
             onNavigateToBillingScreen = {},
             onNavigateToFaqScreen = {},
@@ -2473,8 +2330,12 @@ private fun EmptyPreview() {
             onNavigateToUserPreferencesScreen = {},
             onReset = {},
             onRetry = {},
-            onSelectUri = {},
+            onSavePoint = { _, _ -> },
+            onSavePoints = {},
             onSetSource = {},
+            onSetRandomSource = {},
+            onSharePoints = {},
+            onShareSource = {},
             onSubmit = {},
         )
     }

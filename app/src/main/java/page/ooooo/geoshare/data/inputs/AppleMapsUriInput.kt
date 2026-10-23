@@ -21,7 +21,7 @@ import javax.inject.Singleton
 class AppleMapsUriInput @Inject constructor(
     private val appleMapsHtmlInput: dagger.Lazy<AppleMapsHtmlInput>,
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = AppleMapsInputGroup
     override val changelog = persistentListOf(
@@ -137,7 +137,7 @@ class AppleMapsUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(
             point,
             listOf(

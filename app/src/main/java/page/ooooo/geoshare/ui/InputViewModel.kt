@@ -30,7 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class InputViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    val inputRepository: InputRepository,
+    private val inputRepository: InputRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
 ) : ViewModel() {
 
@@ -87,15 +87,6 @@ class InputViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 emptyList(),
             )
-
-    fun genRandomUri(): String? =
-        inputRepository.genRandomUri(
-            WGS84Point(
-                NaivePoint.genRandomPoint(
-                    name = context.resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place)
-                )
-            )
-        )
 
     fun setChangelogShown() {
         val newestInputAddedInVersionCode = inputRepository.all

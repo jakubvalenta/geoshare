@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.data.android.AppActivity
-import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
@@ -24,16 +23,16 @@ sealed interface Output<T> {
     fun isEnabled(value: T): Boolean = true
 
     @Composable
-    fun label(appDetail: AppDetail?): String
+    fun label(appDetails: AppDetails): String
 
     fun getDescription(value: T): String? = null
 
-    fun getMenuIcon(appDetail: AppDetail?): IconDescriptor?
+    fun getMenuIcon(appDetails: AppDetails): IconDescriptor?
 
-    fun getIcon(appDetail: AppDetail?): IconDescriptor? = getMenuIcon(appDetail)
+    fun getIcon(appDetails: AppDetails): IconDescriptor? = getMenuIcon(appDetails)
 
     @Composable
-    fun automationLabel(appDetail: AppDetail?): String = label(appDetail)
+    fun automationLabel(appDetails: AppDetails): String = label(appDetails)
 
     @Composable
     fun automationDescription(): String? = null
@@ -41,34 +40,31 @@ sealed interface Output<T> {
     interface HasActivity<T : AppActivity> {
         @Suppress("EmptyMethod")
         val activity: T
-
-        fun getAppDetail(appDetails: AppDetails): AppDetail? =
-            activity.packageName.let { appDetails[it] }
     }
 
     interface HasErrorText {
         @Composable
-        fun errorText(appDetail: AppDetail?): String
+        fun errorText(appDetails: AppDetails): String
     }
 
     interface HasSuccessText {
         @Composable
-        fun successText(appDetail: AppDetail?): String
+        fun successText(appDetails: AppDetails): String
     }
 
     interface HasAutomationErrorText {
         @Composable
-        fun automationErrorText(appDetail: AppDetail?): String
+        fun automationErrorText(appDetails: AppDetails): String
     }
 
     interface HasAutomationSuccessText {
         @Composable
-        fun automationSuccessText(appDetail: AppDetail?): String
+        fun automationSuccessText(appDetails: AppDetails): String
     }
 
     interface HasAutomationDelay {
         @Composable
-        fun automationWaitingText(counterSec: Int, appDetail: AppDetail?): String
+        fun automationWaitingText(counterSec: Int, appDetails: AppDetails): String
     }
 }
 

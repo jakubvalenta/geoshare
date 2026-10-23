@@ -17,7 +17,7 @@ import page.ooooo.geoshare.data.geo.WGS84Point
  *
  * See https://plus.codes/
  */
-object PlusCodeTextInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+object PlusCodeTextInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = PlusCodeInputGroup
     override val changelog = persistentListOf(
@@ -49,7 +49,7 @@ object PlusCodeTextInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomU
             // e.g. `28WR+CW` or `28WR+CW Comstock Park, Michigan`
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         PlusCodeFormatter.formatPlusCode(point)
 
     override fun toString() = "PlusCodeTextInput"

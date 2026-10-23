@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.di.defaultFakeLinks
-import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.formatters.CoordinateFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -52,27 +51,25 @@ import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.FaqItemId
-import page.ooooo.geoshare.ui.OutputDetail
+import page.ooooo.geoshare.ui.ResultCoordinatesState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 import page.ooooo.geoshare.ui.theme.defaultLinkStyles
-import page.ooooo.geoshare.ui.toOutputDetails
 
 @Composable
 fun ResultCoordinates(
+    state: StateFlow<ResultCoordinatesState>,
     point: Point,
     totalPoints: Int,
     coordinateConverter: CoordinateConverter,
+    coordinateFormat: StateFlow<CoordinateFormat>,
     inputGroup: InputGroup,
-    outputsForPointChips: StateFlow<List<OutputDetail<Point>>>,
-    userPreferencesValues: StateFlow<UserPreferencesValues>,
     onExecute: (action: Action<*>) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
-    onSelectPointToCopy: () -> Unit,
-    onSelectPointToSave: () -> Unit,
+    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -91,12 +88,12 @@ fun ResultCoordinates(
                     point = point,
                     totalPoints = totalPoints,
                     coordinateConverter = coordinateConverter,
-                    userPreferencesValues = userPreferencesValues,
-                    onSelectPointToCopy = onSelectPointToCopy,
-                    onSelectPointToSave = onSelectPointToSave,
+                    coordinateFormat = coordinateFormat,
+                    onCopyPoint = onCopyPoint,
+                    onSavePoint = onSavePoint,
                 )
                 ResultCoordinatesChips(
-                    outputsForPointChips = outputsForPointChips,
+                    state = state,
                     onExecute = { output -> onExecute(output.toAction(point)) },
                 )
             }
@@ -177,13 +174,13 @@ private fun ResultCoordinatesBox(
     point: Point,
     totalPoints: Int,
     coordinateConverter: CoordinateConverter,
-    userPreferencesValues: StateFlow<UserPreferencesValues>,
-    onSelectPointToCopy: () -> Unit,
-    onSelectPointToSave: () -> Unit,
+    coordinateFormat: StateFlow<CoordinateFormat>,
+    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
-    val userPreferencesValues by userPreferencesValues.collectAsStateWithLifecycle()
+    val coordinateFormat by coordinateFormat.collectAsStateWithLifecycle()
 
     Row(
         Modifier
@@ -207,14 +204,12 @@ private fun ResultCoordinatesBox(
             if (point.hasCoordinates()) {
                 SelectionContainer {
                     Text(
-                        when (userPreferencesValues.coordinateFormat) {
-                            CoordinateFormat.DEC -> CoordinateFormatter.formatDecCoords(
-                                coordinateConverter.toWGS84(point)
-                            )
+                        when (coordinateFormat) {
+                            CoordinateFormat.DEC ->
+                                CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(point))
 
-                            CoordinateFormat.DEG_MIN_SEC -> CoordinateFormatter.formatDegMinSecCoords(
-                                coordinateConverter.toWGS84(point)
-                            )
+                            CoordinateFormat.DEG_MIN_SEC ->
+                                CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(point))
                         },
                         Modifier.testTag("geoShareResultCoordinates"),
                         style = MaterialTheme.typography.bodyLarge,
@@ -222,27 +217,33 @@ private fun ResultCoordinatesBox(
                 }
             }
         }
-        ResultPointCopyButton(onClick = onSelectPointToCopy, modifier = Modifier.testTag("geoShareResultCopy"))
-        ResultPointSaveButton(onClick = onSelectPointToSave, modifier = Modifier.testTag("geoShareResultSave"))
+        ResultPointCopyButton(
+            onClick = { onCopyPoint(point, totalPoints - 1) },
+            modifier = Modifier.testTag("geoShareResultCopy"),
+        )
+        ResultPointSaveButton(
+            onClick = { onSavePoint(point, totalPoints - 1) },
+            modifier = Modifier.testTag("geoShareResultSave"),
+        )
     }
 }
 
 @Composable
 private fun ResultCoordinatesChips(
-    outputsForPointChips: StateFlow<List<OutputDetail<Point>>>,
+    state: StateFlow<ResultCoordinatesState>,
     onExecute: (output: Output<Point>) -> Unit,
 ) {
-    val outputsForPointChips by outputsForPointChips.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
 
-    if (outputsForPointChips.isNotEmpty()) {
+    if (state.chipsOutputs.isNotEmpty()) {
         ScrollableChips {
-            outputsForPointChips.forEach { outputDetail ->
-                key(outputDetail.output.id) {
+            state.chipsOutputs.forEach { output ->
+                key(output.id) {
                     StyledChip(
-                        onClick = { onExecute(outputDetail.output) },
-                        label = { Text(outputDetail.label()) },
-                        modifier = Modifier.testTag("geoShareResultChip_${outputDetail.output.id}"),
-                        icon = outputDetail.icon?.let {
+                        onClick = { onExecute(output) },
+                        label = { Text(output.label(state.appDetails)) },
+                        modifier = Modifier.testTag("geoShareResultChip_${output.id}"),
+                        icon = output.getIcon(state.appDetails)?.let {
                             { IconFromDescriptor(it, contentDescription = null) }
                         },
                     )
@@ -287,20 +288,22 @@ private fun DefaultPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
+                state = MutableStateFlow(
+                    ResultCoordinatesState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
+                    )
+                ),
                 point = coordinateConverter.toGCJ02(WGS84Point.ForbiddenCity),
                 totalPoints = 1,
                 coordinateConverter = coordinateConverter,
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = OpenStreetMapInputGroup,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelectPointToCopy = {},
-                onSelectPointToSave = {},
+                onSavePoint = { _, _ -> },
             ) {}
         }
     }
@@ -321,20 +324,22 @@ private fun DarkPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
+                state = MutableStateFlow(
+                    ResultCoordinatesState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
+                    )
+                ),
                 point = coordinateConverter.toGCJ02(WGS84Point.ForbiddenCity),
                 totalPoints = 1,
                 coordinateConverter = coordinateConverter,
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = OpenStreetMapInputGroup,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelectPointToCopy = {},
-                onSelectPointToSave = {},
+                onSavePoint = { _, _ -> },
             ) {}
         }
     }
@@ -355,20 +360,22 @@ private fun SeveralPointsPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
+                state = MutableStateFlow(
+                    ResultCoordinatesState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
+                    )
+                ),
                 point = WGS84Point(NaivePoint.example.copy(source = Source.HTML_NOT_SEMANTIC)),
                 totalPoints = 2,
                 coordinateConverter = coordinateConverter,
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = GoogleMapsInputGroup,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelectPointToCopy = {},
-                onSelectPointToSave = {},
+                onSavePoint = { _, _ -> },
             ) {}
         }
     }
@@ -389,20 +396,22 @@ private fun NameOnlyPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
+                state = MutableStateFlow(
+                    ResultCoordinatesState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
+                    )
+                ),
                 point = WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI),
                 totalPoints = 1,
                 coordinateConverter = coordinateConverter,
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = GeoUriInputGroup,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(defaultFakeUserPreferences),
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelectPointToCopy = {},
-                onSelectPointToSave = {},
+                onSavePoint = { _, _ -> },
             ) {}
         }
     }
@@ -423,22 +432,22 @@ private fun CoordinateFormatPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultCoordinates(
+                state = MutableStateFlow(
+                    ResultCoordinatesState(
+                        appDetails = getFakeAppDetails(context),
+                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
+                    )
+                ),
                 point = WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 totalPoints = 1,
                 coordinateConverter = coordinateConverter,
+                coordinateFormat = MutableStateFlow(CoordinateFormat.DEG_MIN_SEC),
                 inputGroup = GeoUriInputGroup,
-                outputsForPointChips = MutableStateFlow(
-                    outputRepository.getOutputsForPointChips(defaultFakeLinks).toOutputDetails(appDetails)
-                ),
-                userPreferencesValues = MutableStateFlow(
-                    defaultFakeUserPreferences.copy(coordinateFormat = CoordinateFormat.DEG_MIN_SEC)
-                ),
+                onCopyPoint = { _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSelectPointToCopy = {},
-                onSelectPointToSave = {},
+                onSavePoint = { _, _ -> },
             ) {}
         }
     }

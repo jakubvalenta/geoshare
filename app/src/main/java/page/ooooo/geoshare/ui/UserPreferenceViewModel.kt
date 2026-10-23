@@ -34,6 +34,7 @@ import page.ooooo.geoshare.data.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.preferences.Automation
 import page.ooooo.geoshare.data.preferences.AutomationPreference
 import page.ooooo.geoshare.data.preferences.BasicAutomation
+import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.preferences.LinkAutomation
 import page.ooooo.geoshare.data.preferences.NoopAutomation
@@ -42,17 +43,9 @@ import page.ooooo.geoshare.data.toOutput
 import javax.inject.Inject
 
 data class AutomationDetail(
-    private val appDetail: AppDetail?,
-    val automation: Automation,
-    val icon: IconDescriptor?,
-    val output: Output<*>,
-) {
-    @Composable
-    fun label(): String = output.automationLabel(appDetail)
-
-    @Composable
-    fun description(): String? = output.automationDescription()
-}
+    val automation: Automation = NoopAutomation,
+    val output: Output<*> = NoopOutput,
+)
 
 data class HiddenAppDetail(
     val label: String?,
@@ -97,15 +90,12 @@ class UserPreferenceViewModel @Inject constructor(
                         automation.toOutput(coordinateConverter, link)
                     }
                 } ?: NoopOutput
-                automation to output
-            }
-            .combine(appRepository.appDetails) { (automation, output), appDetails ->
-                output.toAutomationDetail(automation, appDetails)
+                AutomationDetail(automation, output)
             }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                NoopOutput.toAutomationDetail(NoopAutomation, emptyMap()),
+                AutomationDetail(),
             )
     val automationDetails: StateFlow<List<List<AutomationDetail>>> =
         combine(
@@ -119,13 +109,14 @@ class UserPreferenceViewModel @Inject constructor(
             AutomationPreference.getOptionGroups(activities, appDetails, hiddenApps, links)
                 .map { group ->
                     group.map { automation ->
-                        when (automation) {
+                        val output = when (automation) {
                             is BasicAutomation -> automation.toOutput(coordinateConverter)
                             is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
                             is LinkAutomation -> links.findByUUID(automation.linkUUID)?.let { link ->
                                 automation.toOutput(coordinateConverter, link)
                             }
-                        }.toAutomationDetail(automation, appDetails)
+                        }
+                        AutomationDetail(automation, output)
                     }
                 }
         }
@@ -133,6 +124,14 @@ class UserPreferenceViewModel @Inject constructor(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 emptyList(),
+            )
+    val coordinateFormat: StateFlow<CoordinateFormat> =
+        userPreferencesRepository.values
+            .map { it.coordinateFormat }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                CoordinateFormat.DEC,
             )
     val hiddenAppsDetails: StateFlow<List<HiddenAppDetail>> =
         appRepository.activities
@@ -183,26 +182,3 @@ class UserPreferenceViewModel @Inject constructor(
         _message.value = null
     }
 }
-
-fun Output<*>?.toAutomationDetail(automation: Automation, appDetails: AppDetails): AutomationDetail =
-    (this ?: NoopOutput).run {
-        (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
-            AutomationDetail(
-                appDetail = appDetail,
-                automation = automation,
-                icon = getIcon(appDetail),
-                output = this,
-            )
-        }
-    }
-
-fun Set<String>.toHiddenAppsDetails(appDetails: AppDetails): List<HiddenAppDetail> =
-    map { packageName ->
-        appDetails[packageName].let { appDetail ->
-            HiddenAppDetail(
-                label = appDetail?.label,
-                icon = appDetail?.icon,
-                packageName = packageName,
-            )
-        }
-    }

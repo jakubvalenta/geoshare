@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.TextActivity
 import page.ooooo.geoshare.data.formatters.UriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -47,33 +47,36 @@ class SendPointOutput @Inject constructor(
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_send)
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
+    override fun getMenuIcon(appDetails: AppDetails) =
         ImageVectorIconDescriptor(Icons.AutoMirrored.Default.Send)
 
-    override fun getIcon(appDetail: AppDetail?) =
-        appDetail?.let { DrawableIconDescriptor(it.icon) }
+    override fun getIcon(appDetails: AppDetails) =
+        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     @Composable
-    override fun errorText(appDetail: AppDetail?) =
-        stringResource(R.string.conversion_succeeded_open_app_failed, appDetail?.label.orEmpty())
+    override fun errorText(appDetails: AppDetails) =
+        stringResource(R.string.conversion_succeeded_open_app_failed, appDetails[activity.packageName]?.label.orEmpty())
 
     @Composable
-    override fun automationLabel(appDetail: AppDetail?) =
-        stringResource(R.string.output_send_via, appDetail?.label.orEmpty())
+    override fun automationLabel(appDetails: AppDetails) =
+        stringResource(R.string.output_send_via, appDetails[activity.packageName]?.label.orEmpty())
 
     @Composable
-    override fun automationErrorText(appDetail: AppDetail?) =
-        stringResource(R.string.conversion_automation_open_app_failed, appDetail?.label.orEmpty())
+    override fun automationErrorText(appDetails: AppDetails) =
+        stringResource(
+            R.string.conversion_automation_open_app_failed,
+            appDetails[activity.packageName]?.label.orEmpty()
+        )
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetail: AppDetail?) =
+    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) =
         pluralStringResource(
             R.plurals.conversion_automation_open_app_waiting,
             counterSec,
-            appDetail?.label.orEmpty(),
+            appDetails[activity.packageName]?.label.orEmpty(),
             counterSec,
         )
 

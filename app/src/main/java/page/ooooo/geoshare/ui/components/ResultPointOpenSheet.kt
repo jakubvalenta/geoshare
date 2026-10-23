@@ -106,7 +106,7 @@ private fun DefaultPreview() {
             val appDetails = getFakeAppDetails(context)
             val point = WGS84Point(NaivePoint.example)
             ResultPointOpenSheet(
-                outputs = outputRepository.getOutputsForPointOpen(activities, emptySet())
+                outputs = outputRepository.getPointOpenOutputs(activities, emptySet())
                     .toOutputDetailsForApp(appDetails),
                 title = pointTitle(point, pointIndex = 2, totalPoints = 3),
                 value = point,
@@ -145,7 +145,7 @@ private fun DarkPreview() {
             val appDetails = getFakeAppDetails(context)
             val point = WGS84Point(NaivePoint.example)
             ResultPointOpenSheet(
-                outputs = outputRepository.getOutputsForPointOpen(activities, emptySet())
+                outputs = outputRepository.getPointOpenOutputs(activities, emptySet())
                     .toOutputDetailsForApp(appDetails),
                 title = pointTitle(point, pointIndex = 2, totalPoints = 3),
                 value = point,
@@ -183,7 +183,7 @@ private fun LoadingPreview() {
             }
             val point = WGS84Point(NaivePoint.example)
             ResultPointOpenSheet(
-                outputs = outputRepository.getOutputsForPointOpen(activities, emptySet())
+                outputs = outputRepository.getPointOpenOutputs(activities, emptySet())
                     .map { it.toOutputDetailForApp(emptyMap()) },
                 title = pointTitle(point, pointIndex = 2, totalPoints = 3),
                 value = point,
