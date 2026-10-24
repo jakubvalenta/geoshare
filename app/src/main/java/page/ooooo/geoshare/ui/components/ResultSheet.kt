@@ -30,8 +30,10 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppOutputs
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
@@ -50,7 +52,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSheet(
-    state: StateFlow<ResultSheetState>,
+    state: StateFlow<ResultSheetState?>,
     initialSheetValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
@@ -67,7 +69,7 @@ fun ResultSheet(
                     appDetails = appDetails,
                     value = point,
                     outputs = outputs,
-                    title = pointTitle(point, pointIndex, totalPoints),
+                    title = pointTitle(point, pointCount, pointIndex),
                     onHide = onHide,
                     onExecute = onExecute,
                 )
@@ -83,7 +85,7 @@ fun ResultSheet(
                     appDetails = appDetails,
                     appsOutputs = appsOutputs,
                     value = point,
-                    title = pointTitle(point, pointIndex, totalPoints),
+                    title = pointTitle(point, pointCount, pointIndex),
                     onHide = onHide,
                     onExecute = onExecute,
                 )
@@ -99,7 +101,7 @@ fun ResultSheet(
                     appDetails = appDetails,
                     value = point,
                     outputs = outputs,
-                    title = pointTitle(point, pointIndex, totalPoints),
+                    title = pointTitle(point, pointCount, pointIndex),
                     onHide = onHide,
                     onExecute = onExecute,
                 )
@@ -154,7 +156,7 @@ fun ResultSheet(
             }
         }
 
-        ResultSheetState.Hidden -> {}
+        null -> {}
     }
 }
 
@@ -310,7 +312,7 @@ private fun CopyPointPreview() {
                         appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 0,
-                        totalPoints = 2,
+                        pointCount = 2,
                         outputs = outputRepository.getPointCopyOutputs(defaultFakeLinks),
                     )
                 ),
@@ -345,7 +347,7 @@ private fun DarkCopyPointPreview() {
                         appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 0,
-                        totalPoints = 2,
+                        pointCount = 2,
                         outputs = outputRepository.getPointCopyOutputs(defaultFakeLinks),
                     )
                 ),
@@ -374,14 +376,63 @@ private fun OpenPointPreview() {
                 log = log,
                 uriQuote = uriQuote,
             )
+            val activities = fakeActivities.filter {
+                it.packageName in setOf(
+                    PackageNames.COMAPS_FDROID,
+                    PackageNames.CONVERSATIONS,
+                    PackageNames.OSMAND_PLUS,
+                )
+            }
+            ResultSheet(
+                state = MutableStateFlow(
+                    ResultSheetState.PointOpen(
+                        appDetails = getFakeAppDetails(context),
+                        point = WGS84Point(NaivePoint.example),
+                        pointIndex = 2,
+                        pointCount = 3,
+                        appsOutputs = outputRepository.getPointOpenOutputs(activities, emptySet()),
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun OpenPointLoadingPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            val activities = fakeActivities.filter {
+                it.packageName in setOf(
+                    PackageNames.COMAPS_FDROID,
+                    PackageNames.CONVERSATIONS,
+                    PackageNames.OSMAND_PLUS,
+                )
+            }
             ResultSheet(
                 state = MutableStateFlow(
                     ResultSheetState.PointOpen(
                         appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 2,
-                        totalPoints = 3,
-                        appsOutputs = outputRepository.getPointOpenOutputs(fakeActivities, emptySet()),
+                        pointCount = 3,
+                        appsOutputs = outputRepository.getPointOpenOutputs(activities, emptySet()),
                     )
                 ),
                 initialSheetValue = SheetValue.Expanded,
@@ -415,7 +466,7 @@ private fun SavePointPreview() {
                         appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 2,
-                        totalPoints = 3,
+                        pointCount = 3,
                         outputs = outputRepository.pointSaveOutputs,
                     )
                 ),

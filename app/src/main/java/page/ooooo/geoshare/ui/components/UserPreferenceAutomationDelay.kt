@@ -25,7 +25,6 @@ import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.BillingProduct
 import page.ooooo.geoshare.data.billing.BillingStatus
 import page.ooooo.geoshare.data.billing.Feature
-import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.outputs.Output
@@ -33,17 +32,17 @@ import page.ooooo.geoshare.data.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.toOutput
-import page.ooooo.geoshare.ui.AutomationDetail
+import page.ooooo.geoshare.ui.AutomationOption
+import page.ooooo.geoshare.ui.SelectedAutomationOptionState
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.toAutomationDetail
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 @Composable
 fun UserPreferenceAutomationDelayListItem(
+    state: StateFlow<SelectedAutomationOptionState>,
     index: Int,
     count: Int,
-    automationDetail: StateFlow<AutomationDetail>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     selected: Boolean,
@@ -51,10 +50,11 @@ fun UserPreferenceAutomationDelayListItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val automationDetail by automationDetail.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
+
     val enabled = billingStatus is BillingStatus.Purchased &&
         AutomationFeature in billingFeatures &&
-        automationDetail.output is Output.HasAutomationDelay
+        state.option.output is Output.HasAutomationDelay
 
     SegmentedListItem(
         selected = selected,
@@ -132,17 +132,18 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(
+                            appDetails = emptyMap(),
+                            option = AutomationOption(
+                                automation = SavePointsGpxAutomation,
+                                output = SavePointsGpxAutomation.toOutput(coordinateConverter),
+                            ),
+                        )
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation.let { automation ->
-                            automation
-                                .toOutput(coordinateConverter)
-                                .toAutomationDetail(automation, appDetails)
-                        }
-                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -168,17 +169,18 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(
+                            appDetails = emptyMap(),
+                            option = AutomationOption(
+                                automation = SavePointsGpxAutomation,
+                                output = SavePointsGpxAutomation.toOutput(coordinateConverter),
+                            ),
+                        )
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation.let { automation ->
-                            automation
-                                .toOutput(coordinateConverter)
-                                .toAutomationDetail(automation, appDetails)
-                        }
-                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),

@@ -327,7 +327,7 @@ class OutputRepository @Inject constructor(
 fun BasicAutomation.toOutput(
     coordinateConverter: CoordinateConverter,
     uriQuote: UriQuote = DefaultUriQuote,
-): Output<*>? =
+): Output<*> =
     when (this) {
         is CopyCoordsDecAutomation ->
             CopyCoordsDecOutput(coordinateConverter, uriQuote)

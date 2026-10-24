@@ -9,7 +9,6 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.android.AppActivity
-import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.android.FileType
 import page.ooooo.geoshare.data.android.TextActivity
@@ -210,7 +209,6 @@ object AutomationPreference : OptionsPreference<Automation> {
 
     fun getOptionGroups(
         activities: List<AppActivity>,
-        appDetails: AppDetails,
         hiddenApps: Set<String>?,
         links: List<Link>,
     ): List<List<Automation>> = listOfNotNull(
@@ -237,7 +235,7 @@ object AutomationPreference : OptionsPreference<Automation> {
         activities
             .groupBy { activity -> activity.packageName }
             .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
-            .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
+            // TODO .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
             .flatMap { (_, activities) ->
                 activities
                     .sorted()

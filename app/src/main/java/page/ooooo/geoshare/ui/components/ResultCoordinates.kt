@@ -62,14 +62,15 @@ import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 fun ResultCoordinates(
     state: StateFlow<ResultCoordinatesState>,
     point: Point,
-    totalPoints: Int,
+    pointCount: Int,
+    pointIndex: Int,
     coordinateConverter: CoordinateConverter,
     coordinateFormat: StateFlow<CoordinateFormat>,
     inputGroup: InputGroup,
     onExecute: (action: Action<*>) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
-    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
-    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onCopyPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
     content: @Composable () -> Unit,
 ) {
     val spacing = LocalSpacing.current
@@ -86,7 +87,8 @@ fun ResultCoordinates(
             ) {
                 ResultCoordinatesBox(
                     point = point,
-                    totalPoints = totalPoints,
+                    pointCount = pointCount,
+                    pointIndex = pointIndex,
                     coordinateConverter = coordinateConverter,
                     coordinateFormat = coordinateFormat,
                     onCopyPoint = onCopyPoint,
@@ -172,11 +174,12 @@ private fun ResultCoordinatesChecks(
 @Composable
 private fun ResultCoordinatesBox(
     point: Point,
-    totalPoints: Int,
+    pointCount: Int,
+    pointIndex: Int,
     coordinateConverter: CoordinateConverter,
     coordinateFormat: StateFlow<CoordinateFormat>,
-    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
-    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onCopyPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -193,8 +196,8 @@ private fun ResultCoordinatesBox(
             Text(
                 pointTitle(
                     point = point,
-                    pointIndex = totalPoints - 1,
-                    totalPoints = totalPoints,
+                    pointIndex = pointCount - 1,
+                    pointCount = pointCount,
                 ) ?: stringResource(R.string.conversion_succeeded_title),
                 Modifier.testTag("geoShareResultName"),
                 overflow = TextOverflow.Ellipsis,
@@ -218,11 +221,11 @@ private fun ResultCoordinatesBox(
             }
         }
         ResultPointCopyButton(
-            onClick = { onCopyPoint(point, totalPoints - 1) },
+            onClick = { onCopyPoint(point, pointCount, pointIndex) },
             modifier = Modifier.testTag("geoShareResultCopy"),
         )
         ResultPointSaveButton(
-            onClick = { onSavePoint(point, totalPoints - 1) },
+            onClick = { onSavePoint(point, pointCount, pointIndex) },
             modifier = Modifier.testTag("geoShareResultSave"),
         )
     }
@@ -296,14 +299,15 @@ private fun DefaultPreview() {
                     )
                 ),
                 point = coordinateConverter.toGCJ02(WGS84Point.ForbiddenCity),
-                totalPoints = 1,
+                pointCount = 1,
+                pointIndex = 0,
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = OpenStreetMapInputGroup,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSavePoint = { _, _ -> },
+                onSavePoint = { _, _, _ -> },
             ) {}
         }
     }
@@ -332,14 +336,15 @@ private fun DarkPreview() {
                     )
                 ),
                 point = coordinateConverter.toGCJ02(WGS84Point.ForbiddenCity),
-                totalPoints = 1,
+                pointCount = 1,
+                pointIndex = 0,
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = OpenStreetMapInputGroup,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSavePoint = { _, _ -> },
+                onSavePoint = { _, _, _ -> },
             ) {}
         }
     }
@@ -368,14 +373,15 @@ private fun SeveralPointsPreview() {
                     )
                 ),
                 point = WGS84Point(NaivePoint.example.copy(source = Source.HTML_NOT_SEMANTIC)),
-                totalPoints = 2,
+                pointCount = 2,
+                pointIndex = 1,
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = GoogleMapsInputGroup,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSavePoint = { _, _ -> },
+                onSavePoint = { _, _, _ -> },
             ) {}
         }
     }
@@ -404,14 +410,15 @@ private fun NameOnlyPreview() {
                     )
                 ),
                 point = WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI),
-                totalPoints = 1,
+                pointCount = 1,
+                pointIndex = 0,
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 inputGroup = GeoUriInputGroup,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSavePoint = { _, _ -> },
+                onSavePoint = { _, _, _ -> },
             ) {}
         }
     }
@@ -440,14 +447,15 @@ private fun CoordinateFormatPreview() {
                     )
                 ),
                 point = WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
-                totalPoints = 1,
+                pointCount = 1,
+                pointIndex = 0,
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEG_MIN_SEC),
                 inputGroup = GeoUriInputGroup,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onSavePoint = { _, _ -> },
+                onSavePoint = { _, _, _ -> },
             ) {}
         }
     }

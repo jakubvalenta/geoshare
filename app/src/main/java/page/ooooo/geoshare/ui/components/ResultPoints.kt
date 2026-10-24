@@ -77,9 +77,9 @@ fun ResultPoints(
     initialExpanded: Boolean = false,
     onExecute: (action: Action<*>) -> Unit,
     onNavigateToFaqScreen: (itemId: FaqItemId?) -> Unit,
-    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
-    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
-    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onCopyPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onOpenPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
     onSavePoints: (points: Points) -> Unit,
     onSharePoints: (points: Points) -> Unit,
 ) {
@@ -149,9 +149,9 @@ private fun ResultPointsBox(
     coordinateConverter: CoordinateConverter,
     coordinateFormat: StateFlow<CoordinateFormat>,
     initialExpanded: Boolean = false,
-    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
-    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
-    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onCopyPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onOpenPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
     onSavePoints: (points: Points) -> Unit,
     onSharePoints: (points: Points) -> Unit,
 ) {
@@ -160,6 +160,7 @@ private fun ResultPointsBox(
     // TODO Why does ResultPointsBox expand so slow?
     val coordinateFormat by coordinateFormat.collectAsStateWithLifecycle()
     var expanded by retain { mutableStateOf(initialExpanded) }
+    val pointCount = points.size
 
     Column {
         Row(
@@ -205,6 +206,7 @@ private fun ResultPointsBox(
                 points.forEachIndexed { pointIndex, point ->
                     ResultPoint(
                         point = point,
+                        pointCount = pointCount,
                         pointIndex = pointIndex,
                         coordinateConverter = coordinateConverter,
                         coordinateFormat = coordinateFormat,
@@ -246,12 +248,13 @@ private fun ResultPointsChips(
 @Composable
 private fun ResultPoint(
     point: Point,
+    pointCount: Int,
     pointIndex: Int,
     coordinateConverter: CoordinateConverter,
     coordinateFormat: CoordinateFormat,
-    onCopyPoint: (point: Point, pointIndex: Int) -> Unit,
-    onOpenPoint: (point: Point, pointIndex: Int) -> Unit,
-    onSavePoint: (point: Point, pointIndex: Int) -> Unit,
+    onCopyPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onOpenPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
+    onSavePoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -276,7 +279,7 @@ private fun ResultPoint(
         trailingContent = {
             Row {
                 Button(
-                    onClick = { onOpenPoint(point, pointIndex) },
+                    onClick = { onOpenPoint(point, pointCount, pointIndex) },
                     modifier = Modifier
                         .height(28.dp)
                         .padding(end = spacing.tiny),
@@ -289,10 +292,10 @@ private fun ResultPoint(
                     Text(stringResource(R.string.open_with))
                 }
                 ResultPointCopyButton(
-                    onClick = { onCopyPoint(point, pointIndex) },
+                    onClick = { onCopyPoint(point, pointCount, pointIndex) },
                 )
                 ResultPointSaveButton(
-                    onClick = { onSavePoint(point, pointIndex) },
+                    onClick = { onSavePoint(point, pointCount, pointIndex) },
                 )
             }
         },
@@ -349,11 +352,11 @@ private fun DefaultPreview() {
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 initialExpanded = true,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = { _, _ -> },
-                onSavePoint = { _, _ -> },
+                onOpenPoint = { _, _, _ -> },
+                onSavePoint = { _, _, _ -> },
                 onSavePoints = {},
                 onSharePoints = {},
             )
@@ -396,11 +399,11 @@ private fun DarkPreview() {
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
                 initialExpanded = true,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = { _, _ -> },
-                onSavePoint = { _, _ -> },
+                onOpenPoint = { _, _, _ -> },
+                onSavePoint = { _, _, _ -> },
                 onSavePoints = {},
                 onSharePoints = {},
             )
@@ -438,11 +441,11 @@ private fun CoordinateFormatPreview() {
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEG_MIN_SEC),
                 initialExpanded = true,
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = { _, _ -> },
-                onSavePoint = { _, _ -> },
+                onOpenPoint = { _, _, _ -> },
+                onSavePoint = { _, _, _ -> },
                 onSavePoints = {},
                 onSharePoints = {},
             )
@@ -479,11 +482,11 @@ private fun CollapsedPreview() {
                 ),
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
-                onCopyPoint = { _, _ -> },
+                onCopyPoint = { _, _, _ -> },
                 onExecute = {},
                 onNavigateToFaqScreen = {},
-                onOpenPoint = { _, _ -> },
-                onSavePoint = { _, _ -> },
+                onOpenPoint = { _, _, _ -> },
+                onSavePoint = { _, _, _ -> },
                 onSavePoints = {},
                 onSharePoints = {},
             )

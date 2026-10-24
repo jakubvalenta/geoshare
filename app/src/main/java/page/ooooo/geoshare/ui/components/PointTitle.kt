@@ -6,12 +6,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.geo.Point
 
 @Composable
-fun pointTitle(point: Point, pointIndex: Int, totalPoints: Int): String? =
+fun pointTitle(point: Point, pointCount: Int, pointIndex: Int): String? =
     point.cleanName.let { cleanName ->
         if (!cleanName.isNullOrEmpty()) {
             cleanName
-        } else if (totalPoints > 1) {
-            if (pointIndex == totalPoints - 1) {
+        } else if (pointCount > 1) {
+            if (pointIndex == pointCount - 1) {
                 stringResource(R.string.conversion_succeeded_point_last)
             } else {
                 stringResource(R.string.conversion_succeeded_point_number, pointIndex + 1)

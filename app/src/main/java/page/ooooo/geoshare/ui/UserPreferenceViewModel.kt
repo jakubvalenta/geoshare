@@ -1,8 +1,6 @@
 package page.ooooo.geoshare.ui
 
 import android.content.res.Resources
-import android.graphics.drawable.Drawable
-import androidx.compose.runtime.Composable
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,13 +19,12 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.findByUUID
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.message.Message
-import page.ooooo.geoshare.data.outputs.IconDescriptor
 import page.ooooo.geoshare.data.outputs.NoopOutput
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.ActivityAutomation
@@ -42,20 +39,29 @@ import page.ooooo.geoshare.data.preferences.UserPreferencesValues
 import page.ooooo.geoshare.data.toOutput
 import javax.inject.Inject
 
-data class AutomationDetail(
+data class AutomationOption(
     val automation: Automation = NoopAutomation,
     val output: Output<*> = NoopOutput,
 )
 
-data class HiddenAppDetail(
-    val label: String?,
-    val icon: Drawable?,
-    val packageName: String,
+data class SelectedAutomationOptionState(
+    val appDetails: AppDetails = emptyMap(),
+    val option: AutomationOption = AutomationOption(),
 )
 
-data class HiddenAppsSize(
-    val total: Int,
-    val visible: Int,
+data class AutomationOptionsState(
+    val appDetails: AppDetails = emptyMap(),
+    val optionGroups: List<List<AutomationOption>> = emptyList(),
+)
+
+data class SelectedHiddenAppsState(
+    val totalCount: Int = 0,
+    val visibleCount: Int = 0,
+)
+
+data class HiddenAppsOptionsState(
+    val appDetails: AppDetails = emptyMap(),
+    val hiddenApps: Set<String> = emptySet(),
 )
 
 @HiltViewModel
@@ -78,7 +84,9 @@ class UserPreferenceViewModel @Inject constructor(
                 UserPreferencesValues(),
             )
 
-    val automationDetail: StateFlow<AutomationDetail> =
+    // Automation
+
+    val selectedAutomationOption: StateFlow<SelectedAutomationOptionState> =
         userPreferencesRepository.values
             .map { it.automation }
             .distinctUntilChanged()
@@ -90,41 +98,42 @@ class UserPreferenceViewModel @Inject constructor(
                         automation.toOutput(coordinateConverter, link)
                     }
                 } ?: NoopOutput
-                AutomationDetail(automation, output)
+                AutomationOption(automation, output)
+            }
+            .combine(appRepository.appDetails) { option, appDetails ->
+                SelectedAutomationOptionState(appDetails, option)
             }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                AutomationDetail(),
+                SelectedAutomationOptionState(),
             )
-    val automationDetails: StateFlow<List<List<AutomationDetail>>> =
+    val automationOptions: StateFlow<AutomationOptionsState> =
         combine(
             appRepository.activities,
-            appRepository.appDetails,
             userPreferencesRepository.values
                 .map { it.hiddenApps }
                 .distinctUntilChanged(),
             linkRepository.all,
-        ) { activities, appDetails, hiddenApps, links ->
-            AutomationPreference.getOptionGroups(activities, appDetails, hiddenApps, links)
+        ) { activities, hiddenApps, links ->
+            AutomationPreference.getOptionGroups(activities, hiddenApps, links)
                 .map { group ->
                     group.map { automation ->
-                        val output = when (automation) {
-                            is BasicAutomation -> automation.toOutput(coordinateConverter)
-                            is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                            is LinkAutomation -> links.findByUUID(automation.linkUUID)?.let { link ->
-                                automation.toOutput(coordinateConverter, link)
-                            }
-                        }
-                        AutomationDetail(automation, output)
+                        AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                     }
                 }
         }
+            .combine(appRepository.appDetails) { optionGroups, appDetails ->
+                AutomationOptionsState(appDetails, optionGroups)
+            }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                emptyList(),
+                AutomationOptionsState(),
             )
+
+    // Coordinate format
+
     val coordinateFormat: StateFlow<CoordinateFormat> =
         userPreferencesRepository.values
             .map { it.coordinateFormat }
@@ -133,34 +142,39 @@ class UserPreferenceViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 CoordinateFormat.DEC,
             )
-    val hiddenAppsDetails: StateFlow<List<HiddenAppDetail>> =
-        appRepository.activities
-            .map { activities -> HiddenAppsPreference.getOptions(activities) }
-            .combine(appRepository.appDetails) { hiddenApps, appDetails ->
-                hiddenApps.toHiddenAppsDetails(appDetails)
-            }
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                emptyList(),
-            )
-    val hiddenAppsSize: StateFlow<HiddenAppsSize> =
+
+    // Hidden apps
+
+    val selectedHiddenApps: StateFlow<SelectedHiddenAppsState> =
         appRepository.activities
             .combine(
                 userPreferencesRepository.values
                     .map { it.hiddenApps }
                     .distinctUntilChanged()
             ) { activities, hiddenApps ->
-                HiddenAppsSize(
-                    total = activities.size,
-                    visible = (activities.map { it.packageName }.toSet() - (hiddenApps ?: emptySet())).size,
+                SelectedHiddenAppsState(
+                    totalCount = activities.size,
+                    visibleCount = (activities.map { it.packageName }.toSet() - (hiddenApps ?: emptySet())).size,
                 )
             }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                HiddenAppsSize(total = 0, visible = 0),
+                SelectedHiddenAppsState(),
             )
+    val hiddenAppsOptions: StateFlow<HiddenAppsOptionsState> =
+        appRepository.activities
+            .map { activities -> HiddenAppsPreference.getOptions(activities) }
+            .combine(appRepository.appDetails) { hiddenApps, appDetails ->
+                HiddenAppsOptionsState(appDetails, hiddenApps)
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                HiddenAppsOptionsState(),
+            )
+
+    // Methods
 
     fun editUserPreferences(transform: (preferences: MutablePreferences) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -182,3 +196,12 @@ class UserPreferenceViewModel @Inject constructor(
         _message.value = null
     }
 }
+
+fun Automation.toOutput(coordinateConverter: CoordinateConverter, links: List<Link>, log: Log): Output<*> =
+    when (this) {
+        is BasicAutomation -> toOutput(coordinateConverter)
+        is ActivityAutomation -> toOutput(coordinateConverter, log)
+        is LinkAutomation -> links.findByUUID(linkUUID)?.let { link ->
+            toOutput(coordinateConverter, link)
+        }
+    } ?: NoopOutput
