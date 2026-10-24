@@ -143,7 +143,7 @@
     <string name="converter_waze_name">Waze</string>
     <string name="converter_yandex_maps_name">Яндекс Карты</string>
     <string name="faq_how_headline">Как это работает</string>
-    <string name="faq_how_text_1">%1$s преобразует ссылки карты в geo-ссылки, которые можно открыть другими картографическими приложениями. Для создания geo-ссылки необходимы географические координаты. %1$s извлекает их из URL-адреса карты.</string>
+    <string name="faq_how_text_1">%1$s преобразует ссылки карты в geo-ссылки, которые можно открыть другими картографическими приложениями. Для создания geo-ссылки необходимы географические координаты. %1$s получает их из URL-адреса карты.</string>
     <string name="faq_how_text_2">Однако не все URL-адреса карт содержат координаты. В таких случаях %1$s запросит у вас разрешение на подключение к картографическому сервису (Google Карты, Карты Apple и т. д.) и получение координат из:</string>
     <string name="faq_how_text_2_item_http">либо HTTP-заголовков</string>
     <string name="faq_how_text_2_item_html">либо HTML-документа</string>
@@ -239,7 +239,7 @@
     <string name="conversion_failed_reason_timeout">Истекло время ожидания</string>
     <string name="network_exception_too_many_requests">слишком много запросов</string>
     <string name="licenses">Лицензии</string>
-    <string name="conversion_succeeded_check_experimental">Местоположение может быть неточным из-за экспериментального метода извлечения.</string>
+    <string name="conversion_succeeded_check_experimental">Местоположение может быть неточным, т. к. поддержка данного типа ссылок на карту экспериментальная.</string>
     <string name="conversion_succeeded_check_map_center">Местоположение может быть центром карты, а не маркером.</string>
     <string name="conversion_succeeded_check_srs">Местоположение может быть неточным из-за преобразования системы координат.</string>
     <string name="srs_description_mainland_china">Материковый Китай</string>
@@ -269,7 +269,7 @@
     <string name="server_insert">Добавить сервер</string>
     <string name="server_list_description">Если подключение к картографическому сервису разрешено, %1$s использует API серверов для преобразования определённых ссылок в координаты. Выберите, использовать ли официальные серверы с вашими собственными учётными данными, прокси-серверы или не использовать ничего.</string>
     <string name="server_list_google_maps_address_title">Адреса Google Карт</string>
-    <string name="server_list_none_html">Извлекать координаты из HTML (экспериментально)</string>
+    <string name="server_list_none_html">Получать координаты из HTML (экспериментально)</string>
     <string name="server_list_google_maps_place_title">Идентификаторы мест в Google Картах</string>
     <string name="server_list_none">Не использовать API сервера</string>
     <string name="server_list_search_none_description">Поиск будет недоступен</string>
@@ -305,7 +305,7 @@
     <string name="conversion_succeeded_check_name_only_points">Для некоторых точек координаты не найдены.</string>
     <string name="converter_google_navigation_uri_name">Ссылка навигации Google</string>
     <string name="faq_name_only_title">Координаты не найдены, используется название места</string>
-    <string name="faq_name_only_text_1">%1$s может извлекать только название места (например, «Гора Килиманджаро») из определённых ссылок на карту. Когда вы откроете это место в другом картографическом приложении, оно может показать совсем другое место, а не то, на которое указывает исходная ссылка, поскольку может существовать несколько мест с одинаковым названием.</string>
+    <string name="faq_name_only_text_1">%1$s может получать только название места (например, «Гора Килиманджаро») из определённых ссылок на карту. Когда вы откроете это место в другом картографическом приложении, оно может показать совсем другое место, а не то, на которое указывает исходная ссылка, поскольку может существовать несколько мест с одинаковым названием.</string>
     <string name="faq_name_only_text_2">Точки, указанные только названием, не включаются в маршруты GPX.</string>
     <string name="network_exception_webview">ошибка WebView</string>
     <string name="billing_intro_purchased">У вас</string>
