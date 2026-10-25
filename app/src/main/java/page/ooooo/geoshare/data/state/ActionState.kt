@@ -41,7 +41,7 @@ import page.ooooo.geoshare.data.toOutput
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-interface ActionState : State<ActionStateContext> {
+sealed interface ActionState : State<ActionStateContext> {
     interface HasPermission : State.HasPermission<ActionStateContext> {
         override suspend fun grant(stateContext: ActionStateContext, doNotAsk: Boolean): ActionState
         override suspend fun deny(stateContext: ActionStateContext, doNotAsk: Boolean): ActionState

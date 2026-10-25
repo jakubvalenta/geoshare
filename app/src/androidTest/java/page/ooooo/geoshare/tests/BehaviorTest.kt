@@ -349,6 +349,11 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
     // Wait for Google Maps
     onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
 
+    // If there is a location permission dialog, confirm it
+    if (isSystemPermissionShown(1_000)) {
+        grantSystemPermission()
+    }
+
     // If there is a Google Maps sign in screen, skip it
     onElementOrNull(3_000) {
         packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
@@ -362,11 +367,6 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
                 "ignorer",
             )
         }.click()
-    }
-
-    // If there is a location permission dialog, confirm it
-    if (isSystemPermissionShown(2_000)) {
-        grantSystemPermission()
     }
 
     // Verify Google Maps content

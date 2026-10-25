@@ -174,7 +174,7 @@ class MainBehaviorTest {
     }
 
     @Test
-    fun whenLinkIsShared_allowsOpeningUriSourceAndDoesNotCancelPendingConversion() = uiAutomator { // FIXME
+    fun whenLinkIsShared_allowsOpeningUriSourceAndDoesNotCancelPendingConversion() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps place link with the app

@@ -50,10 +50,16 @@ import page.ooooo.geoshare.data.outputs.LocationAction
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.FinishPreference
 import page.ooooo.geoshare.data.preferences.shouldAppFinish
+import page.ooooo.geoshare.data.state.ActionAutomationFailed
+import page.ooooo.geoshare.data.state.ActionAutomationSucceeded
 import page.ooooo.geoshare.data.state.ActionCompleted
+import page.ooooo.geoshare.data.state.ActionFailed
+import page.ooooo.geoshare.data.state.ActionRan
 import page.ooooo.geoshare.data.state.ActionReady
 import page.ooooo.geoshare.data.state.ActionState
 import page.ooooo.geoshare.data.state.ActionStateContext
+import page.ooooo.geoshare.data.state.ActionSucceeded
+import page.ooooo.geoshare.data.state.ActionWaiting
 import page.ooooo.geoshare.data.state.ActivityShouldFinish
 import page.ooooo.geoshare.data.state.AutomationRequested
 import page.ooooo.geoshare.data.state.BasicActionReady
@@ -66,8 +72,10 @@ import page.ooooo.geoshare.data.state.ExtendedStateLogItem
 import page.ooooo.geoshare.data.state.FileActionReady
 import page.ooooo.geoshare.data.state.FileUriRequested
 import page.ooooo.geoshare.data.state.LocationActionReady
+import page.ooooo.geoshare.data.state.LocationFindingFailed
 import page.ooooo.geoshare.data.state.LocationPermissionReceived
 import page.ooooo.geoshare.data.state.LocationRationaleConfirmed
+import page.ooooo.geoshare.data.state.LocationRationaleRequested
 import page.ooooo.geoshare.data.state.LocationRationaleShown
 import page.ooooo.geoshare.data.state.LocationReceived
 import page.ooooo.geoshare.data.state.SourceReceived
@@ -76,6 +84,7 @@ import page.ooooo.geoshare.data.state.append
 import page.ooooo.geoshare.data.state.transitionRecursively
 import javax.inject.Inject
 import kotlin.time.ComparableTimeMark
+import kotlin.time.Duration
 
 data class ResultAppsState(
     val appsOutputs: AppsOutputs = AppsOutputs(),
@@ -91,7 +100,7 @@ data class ResultLinksState(
 )
 
 data class ResultPointsState(
-    val chipsOutputs: List<Output<Points>> = emptyList()
+    val chipsOutputs: List<Output<Points>> = emptyList(),
 )
 
 sealed interface ResultSheetState {
@@ -132,6 +141,16 @@ sealed interface ResultSheetState {
         val appsOutputs: List<AppOutputs<Output<String>>>,
         val copyOutput: Output<String>,
     ) : ResultSheetState
+}
+
+sealed interface ResultTitleState {
+    class ActionWaiting(val delay: Duration, val output: Output.HasAutomationDelay) : ResultTitleState
+    class ActionSucceeded(val output: Output.HasSuccessText) : ResultTitleState
+    class ActionFailed(val output: Output.HasErrorText) : ResultTitleState
+    class ActionAutomationSucceeded(val output: Output.HasAutomationSuccessText) : ResultTitleState
+    class ActionAutomationFailed(val output: Output.HasAutomationErrorText) : ResultTitleState
+    data object LocationFindingFailed : ResultTitleState
+    data object LocationPermissionReceived : ResultTitleState
 }
 
 @HiltViewModel
@@ -450,6 +469,39 @@ class MainViewModel @Inject constructor(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
                 ResultLinksState(),
+            )
+
+    val resultTitleState: StateFlow<ResultTitleState?> =
+        actionState
+            .map { actionState ->
+                when (actionState) {
+                    ActionState.Initial -> null
+                    ActivityShouldFinish -> null
+                    is ActionAutomationFailed -> ResultTitleState.ActionAutomationFailed(actionState.output)
+                    is ActionAutomationSucceeded -> ResultTitleState.ActionAutomationSucceeded(actionState.output)
+                    is ActionCompleted -> null
+                    is ActionFailed -> ResultTitleState.ActionFailed(actionState.output)
+                    is ActionRan -> null
+                    is ActionReady -> null
+                    is ActionSucceeded -> ResultTitleState.ActionSucceeded(actionState.output)
+                    is ActionWaiting -> ResultTitleState.ActionWaiting(actionState.delay, actionState.output)
+                    is AutomationRequested -> null
+                    is BasicActionReady -> null
+                    is FileActionReady -> null
+                    is FileUriRequested -> null
+                    is LocationActionReady -> null
+                    is LocationFindingFailed -> ResultTitleState.LocationFindingFailed
+                    is LocationPermissionReceived -> ResultTitleState.LocationPermissionReceived
+                    is LocationRationaleConfirmed -> null
+                    is LocationRationaleRequested -> null
+                    is LocationRationaleShown -> null
+                    is LocationReceived -> null
+                }
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                null,
             )
 
     private var resultSheetJob: Job? = null
