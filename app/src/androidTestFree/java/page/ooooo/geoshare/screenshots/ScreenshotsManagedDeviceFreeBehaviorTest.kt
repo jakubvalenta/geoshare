@@ -60,6 +60,7 @@ import page.ooooo.geoshare.tests.scrollToAppIcon
 import page.ooooo.geoshare.tests.scrollToAutomationItem
 import page.ooooo.geoshare.tests.scrollToBottom
 import page.ooooo.geoshare.tests.scrollToLinkIcon
+import page.ooooo.geoshare.tests.scrollToTop
 import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
@@ -491,8 +492,10 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
 
         // Conversion - Result - Points
         onElement { viewIdResourceName == "geoShareResultPoints" }.click() // Expand points pane
+        onMainScrollablePane().scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultPointsLoadMore" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_points")
+        onMainScrollablePane().scrollToTop()
         onElement { viewIdResourceName == "geoShareResultPoints" }.click() // Collapse points pane
         quickWaitForStableInActiveWindow() // Wait for the points pane to collapse
 

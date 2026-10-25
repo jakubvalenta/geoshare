@@ -226,7 +226,9 @@ private fun ResultPointsBox(
                 if (limit < points.size) {
                     Button(
                         { limit += pageSize },
-                        Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+                        Modifier
+                            .padding(horizontal = spacing.windowPadding, vertical = spacing.tiny)
+                            .testTag("geoShareResultPointsLoadMore"),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.tertiary,
                             contentColor = MaterialTheme.colorScheme.onTertiary,
