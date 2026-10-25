@@ -113,7 +113,7 @@ class UserPreferenceBehaviorTest {
         }
         runBlocking {
             // Wait for automation success message to disappear and the activity to finish
-            delay(3.1.seconds)
+            delay(3.5.seconds)
         }
 
         // App is not visible

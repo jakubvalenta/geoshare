@@ -299,6 +299,7 @@
     <string name="links_restore_initial_data_title">Reset web maps to factory defaults?</string>
     <string name="links_title">Web maps</string>
     <string name="links_update">Edit web map</string>
+    <string name="load_more">Load more</string>
     <string name="network_exception_connect_exception">Connection refused</string>
     <string name="network_exception_connect_timeout">Connect timeout</string>
     <string name="network_exception_content_convert">Invalid response content</string>
@@ -375,5 +376,4 @@
     <string name="user_preferences_section_output">Output</string>
     <string name="user_preferences_server_edit">Edit servers</string>
     <string name="yes">Yes</string>
-    <string name="load_more">Load more</string>
 </resources>
