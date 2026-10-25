@@ -186,7 +186,7 @@ fun MainScreen(
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = actionState.action.execute(actionContext)
                     if (userPreferenceViewModel.getFinish().shouldAppFinish(actionResult)) {
-                        onFinish()
+                        onFinish() // TODO Don't finish if conversion is running
                     }
                     mainViewModel.completeBasicAction(actionResult)
                 }

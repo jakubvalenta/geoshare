@@ -492,6 +492,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun shareSource(source: String) {
+        // Notice that sharing source does not cancel action
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
             // First load only activities and outputs

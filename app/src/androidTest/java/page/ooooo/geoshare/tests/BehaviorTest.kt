@@ -365,7 +365,7 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
     }
 
     // If there is a location permission dialog, confirm it
-    if (isSystemPermissionShown(1_000)) {
+    if (isSystemPermissionShown(2_000)) {
         grantSystemPermission()
     }
 

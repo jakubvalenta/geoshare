@@ -281,19 +281,21 @@ private fun ResultSheetSourceContent(
     }
     if (appsOutputs.isNotEmpty()) {
         SheetSection(title = stringResource(R.string.main_source_open), first = false) {
-            appsOutputs.forEach { appOutputs ->
-                key(appOutputs.defaultOutput.id) {
-                    SheetListItem(
-                        headlineText = appDetailsForSource[appOutputs.packageName]?.label.orEmpty(),
-                        modifier = Modifier.testTag("geoShareResultSheetItem_${appOutputs.defaultOutput.id}"),
-                        onClick = {
-                            onHide()
-                            onExecute(appOutputs.defaultOutput.toAction(value))
-                        },
-                        icon = appOutputs.defaultOutput.getIcon(appDetailsForSource) ?: PlaceholderIconDescriptor,
-                    )
+            appsOutputs
+                .sortedBy { appOutputs -> appDetailsForSource[appOutputs.packageName]?.label }
+                .forEach { appOutputs ->
+                    key(appOutputs.defaultOutput.id) {
+                        SheetListItem(
+                            headlineText = appDetailsForSource[appOutputs.packageName]?.label.orEmpty(),
+                            modifier = Modifier.testTag("geoShareResultSheetItem_${appOutputs.defaultOutput.id}"),
+                            onClick = {
+                                onHide()
+                                onExecute(appOutputs.defaultOutput.toAction(value))
+                            },
+                            icon = appOutputs.defaultOutput.getIcon(appDetailsForSource) ?: PlaceholderIconDescriptor,
+                        )
+                    }
                 }
-            }
         }
     }
 }

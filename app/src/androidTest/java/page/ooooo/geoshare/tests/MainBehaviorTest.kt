@@ -128,7 +128,7 @@ class MainBehaviorTest {
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = SendStringOutput(TextActivity(messagingAppPackageName, MimeType.TEXT_PLAIN))
-        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
+        onElement { viewIdResourceName == "geoShareResultSheet" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             .click()
 
@@ -156,7 +156,7 @@ class MainBehaviorTest {
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
-        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
+        onElement { viewIdResourceName == "geoShareResultSheet" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             .click()
 
@@ -174,7 +174,7 @@ class MainBehaviorTest {
     }
 
     @Test
-    fun whenLinkIsShared_allowsOpeningUriSourceAndDoesNotCancelPendingConversion() = uiAutomator {
+    fun whenLinkIsShared_allowsOpeningUriSourceAndDoesNotCancelPendingConversion() = uiAutomator { // FIXME
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 
         // Share a Google Maps place link with the app
@@ -186,10 +186,10 @@ class MainBehaviorTest {
         // Open the source sheet
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
-        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
+        onElement { viewIdResourceName == "geoShareResultSheet" }
             .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             // Tap an app while the conversion is still running. This is an imperfect test scenario, because there's a
-            // small chance that the conversion finishes before we tap the app.
+            // chance that the conversion finishes before we return back to the app from Google Maps.
             .click()
 
         // Google Maps shows precise location
@@ -455,6 +455,7 @@ class MainBehaviorTest {
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
         waitForHelpMessageToDisappear()
+        quickWaitForStableInActiveWindow() // Wait to make sure the message really disappears; it's necessary only here for this message for some reason
         assertNull(
             onElementOrNull(500) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}"
