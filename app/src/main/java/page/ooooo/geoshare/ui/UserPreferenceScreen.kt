@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.BillingStatus
 import page.ooooo.geoshare.data.billing.CustomLinkFeature
@@ -43,7 +44,7 @@ import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.components.LargeTopAppBarPane
 import page.ooooo.geoshare.ui.components.NavigableStyledListDetailPaneScaffold
 import page.ooooo.geoshare.ui.components.SegmentedListLabel
@@ -99,10 +100,10 @@ fun UserPreferenceScreen(
     val billingAppNameResId = billingViewModel.billingAppNameResId
     val billingFeatures = billingViewModel.billingFeatures
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val userPreferencesValues by viewModel.values.collectAsStateWithLifecycle()
 
     UserPreferenceScreen(
         initialGroupId = initialGroupId,
+        appDetails = viewModel.appDetails,
         automationOptions = viewModel.automationOptions,
         billingAppNameResId = billingAppNameResId,
         billingFeatures = billingFeatures,
@@ -113,7 +114,7 @@ fun UserPreferenceScreen(
         selectedHiddenApps = viewModel.selectedHiddenApps,
         selectedServers = serverViewModel.selectedServers,
         servers = serverViewModel.all,
-        userPreferencesValues = userPreferencesValues,
+        values = viewModel.values,
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinkScreen = onNavigateToLinkScreen,
@@ -131,6 +132,7 @@ fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceScreen(
     initialGroupId: UserPreferenceGroupId?,
+    appDetails: StateFlow<AppDetails>,
     automationOptions: StateFlow<AutomationOptionsState>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -141,7 +143,7 @@ private fun UserPreferenceScreen(
     selectedHiddenApps: StateFlow<SelectedHiddenAppsState>,
     selectedServers: StateFlow<SelectedServers>,
     servers: StateFlow<List<Server>>,
-    userPreferencesValues: UserPreferencesValues,
+    values: StateFlow<UserPreferenceValues>,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
@@ -174,12 +176,13 @@ private fun UserPreferenceScreen(
         listPane = {
             UserPreferenceListPane(
                 currentGroupId = currentGroupId,
+                appDetails = appDetails,
                 billingStatus = billingStatus,
                 billingFeatures = billingFeatures,
                 selectedHiddenApps = selectedHiddenApps,
                 links = links,
                 selectedAutomationOption = selectedAutomationOption,
-                values = userPreferencesValues,
+                values = values,
                 onBack = {
                     coroutineScope.launch {
                         if (navigator.canNavigateBack()) {
@@ -201,6 +204,7 @@ private fun UserPreferenceScreen(
             if (currentGroupId != null) {
                 UserPreferenceDetailPane(
                     currentGroupId = currentGroupId,
+                    appDetails = appDetails,
                     automationOptions = automationOptions,
                     billingAppNameResId = billingAppNameResId,
                     billingFeatures = billingFeatures,
@@ -208,7 +212,7 @@ private fun UserPreferenceScreen(
                     hiddenAppsOptions = hiddenAppsOptions,
                     selectedServers = selectedServers,
                     servers = servers,
-                    values = userPreferencesValues,
+                    values = values,
                     wide = wide,
                     onBack = {
                         coroutineScope.launch {
@@ -237,17 +241,20 @@ private fun UserPreferenceScreen(
 @Composable
 private fun UserPreferenceListPane(
     currentGroupId: UserPreferenceGroupId?,
+    appDetails: StateFlow<AppDetails>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     links: StateFlow<List<Link>>,
     selectedAutomationOption: StateFlow<SelectedAutomationOptionState>,
     selectedHiddenApps: StateFlow<SelectedHiddenAppsState>,
-    values: UserPreferencesValues,
+    values: StateFlow<UserPreferenceValues>,
     onBack: () -> Unit,
     onNavigateToGroup: (id: UserPreferenceGroupId) -> Unit,
     onNavigateToLinkScreen: () -> Unit,
 ) {
     val spacing = LocalSpacing.current
+
+    val values by values.collectAsStateWithLifecycle()
 
     LargeTopAppBarPane(
         modifier = Modifier.testTag("geoShareUserPreferencesListPane"),
@@ -303,6 +310,7 @@ private fun UserPreferenceListPane(
                 verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
             ) {
                 UserPreferenceAutomationListItem(
+                    appDetails = appDetails,
                     state = selectedAutomationOption,
                     index = 0,
                     count = 2,
@@ -427,6 +435,7 @@ private fun UserPreferenceListPane(
 @Composable
 private fun UserPreferenceDetailPane(
     currentGroupId: UserPreferenceGroupId,
+    appDetails: StateFlow<AppDetails>,
     automationOptions: StateFlow<AutomationOptionsState>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -434,7 +443,7 @@ private fun UserPreferenceDetailPane(
     hiddenAppsOptions: StateFlow<HiddenAppsOptionsState>,
     servers: StateFlow<List<Server>>,
     selectedServers: StateFlow<SelectedServers>,
-    values: UserPreferencesValues,
+    values: StateFlow<UserPreferenceValues>,
     wide: Boolean,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
@@ -444,6 +453,8 @@ private fun UserPreferenceDetailPane(
     onSelectServerSearch: (server: Server?) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
+    val values by values.collectAsStateWithLifecycle()
+
     when (currentGroupId) {
         UserPreferenceGroupId.APPEARANCE_DYNAMIC_COLOR -> UserPreferenceDynamicColorControls(
             billingAppNameResId = billingAppNameResId,
@@ -455,6 +466,7 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.AUTOMATION -> UserPreferenceAutomationControls(
+            appDetails = appDetails,
             state = automationOptions,
             billingAppNameResId = billingAppNameResId,
             billingFeatures = billingFeatures,
@@ -514,6 +526,7 @@ private fun UserPreferenceDetailPane(
         )
 
         UserPreferenceGroupId.HIDDEN_APPS -> UserPreferenceHiddenAppsControls(
+            appDetails = appDetails,
             state = hiddenAppsOptions,
             billingAppNameResId = billingAppNameResId,
             onBack = onBack,
@@ -550,6 +563,7 @@ private fun DefaultPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
+                    appDetails = MutableStateFlow(emptyMap()),
                     automationOptions = MutableStateFlow(AutomationOptionsState()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -560,8 +574,8 @@ private fun DefaultPreview() {
                     links = MutableStateFlow(defaultFakeLinks),
                     selectedServers = MutableStateFlow(SelectedServers()),
                     servers = MutableStateFlow(emptyList()),
-                    userPreferencesValues = defaultFakeUserPreferences.copy(
-                        connectionPermission = Permission.NEVER,
+                    values = MutableStateFlow(
+                        defaultFakeUserPreferences.copy(connectionPermission = Permission.NEVER)
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -589,6 +603,7 @@ private fun DarkPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
+                    appDetails = MutableStateFlow(emptyMap()),
                     automationOptions = MutableStateFlow(AutomationOptionsState()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -599,8 +614,8 @@ private fun DarkPreview() {
                     links = MutableStateFlow(defaultFakeLinks),
                     selectedServers = MutableStateFlow(SelectedServers()),
                     servers = MutableStateFlow(emptyList()),
-                    userPreferencesValues = defaultFakeUserPreferences.copy(
-                        connectionPermission = Permission.NEVER,
+                    values = MutableStateFlow(
+                        defaultFakeUserPreferences.copy(connectionPermission = Permission.NEVER)
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},
@@ -624,6 +639,7 @@ private fun TabletPreview() {
             Column {
                 UserPreferenceScreen(
                     initialGroupId = null,
+                    appDetails = MutableStateFlow(emptyMap()),
                     automationOptions = MutableStateFlow(AutomationOptionsState()),
                     billingAppNameResId = R.string.app_name_pro,
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -634,8 +650,8 @@ private fun TabletPreview() {
                     links = MutableStateFlow(defaultFakeLinks),
                     selectedServers = MutableStateFlow(SelectedServers()),
                     servers = MutableStateFlow(emptyList()),
-                    userPreferencesValues = defaultFakeUserPreferences.copy(
-                        connectionPermission = Permission.NEVER,
+                    values = MutableStateFlow(
+                        defaultFakeUserPreferences.copy(connectionPermission = Permission.NEVER)
                     ),
                     onBack = {},
                     onNavigateToBillingScreen = {},

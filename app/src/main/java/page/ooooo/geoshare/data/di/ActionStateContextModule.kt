@@ -6,7 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.billing.Billing
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.log.Log
@@ -23,13 +23,13 @@ object ActionStateContextModule {
         coordinateConverter: CoordinateConverter,
         linkRepository: LinkRepository,
         log: Log,
-        userPreferencesRepository: UserPreferencesRepository,
+        userPreferenceRepository: UserPreferenceRepository,
     ): ActionStateContext =
         ActionStateContext(
             billing = billing,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
 }

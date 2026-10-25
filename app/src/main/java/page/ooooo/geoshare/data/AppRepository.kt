@@ -3,22 +3,26 @@ package page.ooooo.geoshare.data
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import page.ooooo.geoshare.data.android.AppActivity
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.getPackageNames
 import page.ooooo.geoshare.data.android.queryActivities
+import page.ooooo.geoshare.data.android.queryActivitiesForUri
 import page.ooooo.geoshare.data.android.queryAppDetails
 import page.ooooo.geoshare.data.di.ApplicationScope
 import javax.inject.Inject
 
 interface AppRepository {
-    val activities: Flow<List<AppActivity>>
-    val appDetails: Flow<AppDetails>
+    val activities: StateFlow<List<AppActivity>?>
+    val appDetails: StateFlow<AppDetails?>
+    fun queryActivitiesForUri(uriString: String): List<AppActivity>
 }
 
 class DefaultAppRepository @Inject constructor(
@@ -27,8 +31,14 @@ class DefaultAppRepository @Inject constructor(
 ) : AppRepository {
     override val activities =
         flow { emit(context.packageManager.queryActivities()) }
-            .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+            .catch { emit(emptyList()) }
+            .stateIn(applicationScope, SharingStarted.Lazily, null)
     override val appDetails =
-        activities.map { activities -> context.packageManager.queryAppDetails(activities.getPackageNames()) }
-            .shareIn(applicationScope, SharingStarted.WhileSubscribed(5000), replay = 1)
+        activities
+            .filterNotNull()
+            .map { activities -> context.packageManager.queryAppDetails(activities.getPackageNames()) }
+            .stateIn(applicationScope, SharingStarted.Lazily, null)
+
+    override fun queryActivitiesForUri(uriString: String): List<AppActivity> =
+        context.packageManager.queryActivitiesForUri(uriString)
 }

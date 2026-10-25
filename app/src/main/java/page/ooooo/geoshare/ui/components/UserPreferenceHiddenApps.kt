@@ -24,12 +24,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
 import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
 import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.HiddenAppsOptionsState
 import page.ooooo.geoshare.ui.SelectedHiddenAppsState
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -76,15 +77,17 @@ fun UserPreferenceHiddenAppsListItem(
 
 @Composable
 fun UserPreferenceHiddenAppsControls(
+    appDetails: StateFlow<AppDetails>,
     state: StateFlow<HiddenAppsOptionsState>,
     billingAppNameResId: Int,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
+    val appDetails by appDetails.collectAsStateWithLifecycle()
     val state by state.collectAsStateWithLifecycle()
 
     UserPreferenceControls(
@@ -119,13 +122,13 @@ fun UserPreferenceHiddenAppsControls(
             SegmentedList(
                 values = state.hiddenApps,
                 modifier = modifier.padding(horizontal = spacing.windowPadding),
-                itemHeadline = { packageName -> state.appDetails[packageName]?.label.orEmpty() },
+                itemHeadline = { packageName -> appDetails[packageName]?.label.orEmpty() },
                 itemOnClick = { packageName -> setValue(packageName, !isChecked(packageName)) },
                 itemEnabled = { enabled },
                 itemLeadingContent = { packageName ->
                     {
                         IconFromDescriptor(
-                            state.appDetails[packageName]?.icon?.let { DrawableIconDescriptor(it) }
+                            appDetails[packageName]?.icon?.let { DrawableIconDescriptor(it) }
                                 ?: PlaceholderIconDescriptor,
                             contentDescription = null,
                             placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -265,18 +268,18 @@ private fun ControlsPreview() {
         Surface {
             val context = LocalContext.current
             UserPreferenceHiddenAppsControls(
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 state = MutableStateFlow(
                     HiddenAppsOptionsState(
-                        appDetails = getFakeAppDetails(context),
                         hiddenApps = setOf(
                             PackageNames.COMAPS_FDROID,
                             PackageNames.ORGANIC_MAPS,
                             PackageNames.OSMAND_PLUS,
-                        ),
+                        )
                     )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -293,18 +296,18 @@ private fun DarkControlsPreview() {
         Surface {
             val context = LocalContext.current
             UserPreferenceHiddenAppsControls(
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 state = MutableStateFlow(
                     HiddenAppsOptionsState(
-                        appDetails = getFakeAppDetails(context),
                         hiddenApps = setOf(
                             PackageNames.COMAPS_FDROID,
                             PackageNames.ORGANIC_MAPS,
                             PackageNames.OSMAND_PLUS,
-                        ),
+                        )
                     )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -321,18 +324,18 @@ private fun TabletControlsPreview() {
         Surface {
             val context = LocalContext.current
             UserPreferenceHiddenAppsControls(
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 state = MutableStateFlow(
                     HiddenAppsOptionsState(
-                        appDetails = getFakeAppDetails(context),
                         hiddenApps = setOf(
                             PackageNames.COMAPS_FDROID,
                             PackageNames.ORGANIC_MAPS,
                             PackageNames.OSMAND_PLUS,
-                        ),
+                        )
                     )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -348,18 +351,18 @@ private fun LoadingControlsPreview() {
     AppTheme {
         Surface {
             UserPreferenceHiddenAppsControls(
+                appDetails = MutableStateFlow(emptyMap()),
                 state = MutableStateFlow(
                     HiddenAppsOptionsState(
-                        appDetails = emptyMap(),
                         hiddenApps = setOf(
                             PackageNames.COMAPS_FDROID,
                             PackageNames.ORGANIC_MAPS,
                             PackageNames.OSMAND_PLUS,
-                        ),
+                        )
                     )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},

@@ -42,6 +42,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.android.FileType
 import page.ooooo.geoshare.data.android.PackageNames
@@ -72,7 +73,6 @@ import page.ooooo.geoshare.data.state.ActionWaiting
 import page.ooooo.geoshare.data.state.LocationFindingFailed
 import page.ooooo.geoshare.data.state.LocationPermissionReceived
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
-import page.ooooo.geoshare.ui.ResultAppsState
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -82,7 +82,7 @@ import kotlin.time.DurationUnit
 
 @Composable
 fun ResultTitle(
-    state: StateFlow<ResultAppsState>,
+    appDetails: StateFlow<AppDetails>,
     actionState: ActionState,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
@@ -93,8 +93,8 @@ fun ResultTitle(
 ) {
     var counter by retain { mutableStateOf(Duration.ZERO) }
 
+    val appDetails by appDetails.collectAsStateWithLifecycle()
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
-    val state by state.collectAsStateWithLifecycle()
 
     AnimatedMessage(
         state = actionState,
@@ -114,7 +114,7 @@ fun ResultTitle(
                     }
                 }
                 ResultMessageText(
-                    targetState.output.automationWaitingText(counter.toInt(DurationUnit.SECONDS), state.appDetails),
+                    targetState.output.automationWaitingText(counter.toInt(DurationUnit.SECONDS), appDetails),
                     Modifier.testTag("geoShareResultAutomationCounter"),
                 )
                 FilledIconButton(
@@ -134,14 +134,14 @@ fun ResultTitle(
 
             is ActionSucceeded -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.successText(state.appDetails),
+                    targetState.output.successText(appDetails),
                     Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
             is ActionFailed -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.errorText(state.appDetails),
+                    targetState.output.errorText(appDetails),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                 )
@@ -149,14 +149,14 @@ fun ResultTitle(
 
             is ActionAutomationSucceeded -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.automationSuccessText(state.appDetails),
+                    targetState.output.automationSuccessText(appDetails),
                     Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
             is ActionAutomationFailed -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.output.automationErrorText(state.appDetails),
+                    targetState.output.automationErrorText(appDetails),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                 )
@@ -189,7 +189,9 @@ fun ResultTitle(
                 }
             }
 
-            null -> ResultMessageRow {
+            is ActionCompleted,
+            null,
+                -> ResultMessageRow {
                 Text(
                     stringResource(R.string.open_with),
                     style = MaterialTheme.typography.headlineSmall,
@@ -262,7 +264,7 @@ private fun ActionCompletedPreview() {
     AppTheme {
         Surface {
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState()),
+                appDetails = MutableStateFlow(emptyMap()),
                 actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -287,7 +289,7 @@ private fun DarkActionCompletedPreview() {
     AppTheme {
         Surface {
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState()),
+                appDetails = MutableStateFlow(emptyMap()),
                 actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -313,7 +315,7 @@ private fun ActionCompletedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 ResultTitle(
-                    state = MutableStateFlow(ResultAppsState()),
+                    appDetails = MutableStateFlow(emptyMap()),
                     actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
@@ -334,7 +336,7 @@ private fun DarkActionCompletedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 ResultTitle(
-                    state = MutableStateFlow(ResultAppsState()),
+                    appDetails = MutableStateFlow(emptyMap()),
                     actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
@@ -363,7 +365,7 @@ private fun ActionWaitingPreview() {
                 uriQuote,
             )
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = ActionWaiting(
                     action = output.toAction(WGS84Point(NaivePoint.example)),
                     output = output,
@@ -402,7 +404,7 @@ private fun DarkActionWaitingPreview() {
                 uriQuote,
             )
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = ActionWaiting(
                     action = output.toAction(WGS84Point(NaivePoint.example)),
                     output = output,
@@ -441,7 +443,7 @@ private fun LocationPermissionReceivedPreview() {
                 log,
             )
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = LocationPermissionReceived(
                     action = output.toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = false,
@@ -478,7 +480,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                 log,
             )
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = LocationPermissionReceived(
                     action = output.toAction(WGS84Point(NaivePoint.example)),
                     isAutomation = false,
@@ -510,7 +512,7 @@ private fun SucceededPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = ActionSucceeded(actionResult = ActionResult.SUCCEEDED, output = output),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -539,7 +541,7 @@ private fun DarkSucceededPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = ActionSucceeded(actionResult = ActionResult.SUCCEEDED, output = output),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -568,7 +570,7 @@ private fun FailedPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = ActionFailed(output = output),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -597,7 +599,7 @@ private fun DarkFailedPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                state = MutableStateFlow(ResultAppsState(getFakeAppDetails(context))),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 actionState = ActionFailed(output = output),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(

@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.preferences.TextPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
@@ -141,7 +141,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
 fun <T> LazyListScope.userPreferenceTextControl(
     key: String,
     userPreference: TextPreference<T>,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,

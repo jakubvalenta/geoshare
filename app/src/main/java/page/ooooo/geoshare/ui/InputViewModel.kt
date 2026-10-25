@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.InputChangelogItem
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class InputViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val inputRepository: InputRepository,
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
 ) : ViewModel() {
 
     private val allChangelogsByGroupFlow: Flow<Map<InputGroup, ImmutableList<InputChangelogItem>>> =
@@ -50,7 +50,7 @@ class InputViewModel @Inject constructor(
                 emptyMap(),
             )
     val recentChangelogsByGroup: StateFlow<Map<InputGroup, ImmutableList<InputChangelogItem>>> =
-        userPreferencesRepository.values
+        userPreferenceRepository.values
             .mapNotNull { values -> values.changelogShownForVersionCode }
             .combine(allChangelogsByGroupFlow) { changelogShownForVersionCode, allGroups ->
                 allGroups.filterValues { changelog ->
@@ -93,7 +93,7 @@ class InputViewModel @Inject constructor(
             .maxOfOrNull { input -> input.changelog.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE }
             ?: BuildConfig.VERSION_CODE
         viewModelScope.launch {
-            userPreferencesRepository.setValue(
+            userPreferenceRepository.setValue(
                 ChangelogShownForVersionCodePreference,
                 newestInputAddedInVersionCode,
             )

@@ -9,7 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.inputs.BasicInput
 import page.ooooo.geoshare.data.inputs.BasicOfflineInput
@@ -82,7 +82,7 @@ data class ConversionStateContext(
     val log: Log = DefaultLog,
     val resources: Resources,
     val uriQuote: UriQuote = DefaultUriQuote,
-    val userPreferencesRepository: UserPreferencesRepository,
+    val userPreferenceRepository: UserPreferenceRepository,
 )
 
 typealias Results = Map<MatchedInput<*>, ParseResult.Success>
@@ -123,7 +123,7 @@ data class InputMatched(
             // Online interfaces must be checked before offline interfaces, so that online interfaces take precedence if
             // the input extends both an online and offline interface
             is BasicOnlineInput, is WebViewInput ->
-                when (permission ?: stateContext.userPreferencesRepository.getValue(ConnectionPermissionPreference)) {
+                when (permission ?: stateContext.userPreferenceRepository.getValue(ConnectionPermissionPreference)) {
                     Permission.ALWAYS -> PermissionGranted(source, matchedInput, Permission.ALWAYS, results)
                     Permission.ASK -> PermissionRequested(source, matchedInput, results)
                     Permission.NEVER -> PermissionDenied(source, matchedInput, results)
@@ -143,14 +143,14 @@ data class PermissionRequested(
 ) : ConversionState, ConversionState.HasPermission, ConversionState.HasSource, ConversionState.HasMatchedInput {
     override suspend fun grant(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
+            stateContext.userPreferenceRepository.setValue(ConnectionPermissionPreference, Permission.ALWAYS)
         }
         return PermissionGranted(source, matchedInput, Permission.ALWAYS, results)
     }
 
     override suspend fun deny(stateContext: ConversionStateContext, doNotAsk: Boolean): ConversionState {
         if (doNotAsk) {
-            stateContext.userPreferencesRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
+            stateContext.userPreferenceRepository.setValue(ConnectionPermissionPreference, Permission.NEVER)
         }
         return PermissionDenied(source, matchedInput, results)
     }

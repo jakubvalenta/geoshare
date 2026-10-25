@@ -22,7 +22,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.android.KeyStoreTools
 import page.ooooo.geoshare.data.database.Server
 import page.ooooo.geoshare.data.database.ServerAuthType
@@ -36,7 +36,7 @@ class ServerHttpClientFactory @Inject constructor(
     private val engine: HttpClientEngine,
     private val keyStoreTools: KeyStoreTools,
     private val log: Log = DefaultLog,
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
 ) {
     @Serializable
     data class ChallengeResponse(val challenge: String)
@@ -119,7 +119,7 @@ class ServerHttpClientFactory @Inject constructor(
         }
 
     suspend fun attestationLoadTokens(): BearerTokens? =
-        userPreferencesRepository.getValue(CachedServerTokenPreference)
+        userPreferenceRepository.getValue(CachedServerTokenPreference)
             ?.let { BearerTokens(it.token, it.publicKey) }
 
     private suspend fun HttpResponse.parseChallenge(): ByteArray? =
@@ -183,7 +183,7 @@ class ServerHttpClientFactory @Inject constructor(
             throw e
         }
         log.i(TAG, "Login succeeded")
-        userPreferencesRepository.setValue(
+        userPreferenceRepository.setValue(
             CachedServerTokenPreference,
             CachedServerToken(token, publicKeyBase64),
         )
@@ -228,7 +228,7 @@ class ServerHttpClientFactory @Inject constructor(
             throw e
         }
         log.i(TAG, "Registration succeeded")
-        userPreferencesRepository.setValue(
+        userPreferenceRepository.setValue(
             CachedServerTokenPreference,
             CachedServerToken(token, publicKeyBase64),
         )

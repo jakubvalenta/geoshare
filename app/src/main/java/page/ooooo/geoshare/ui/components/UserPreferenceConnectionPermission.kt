@@ -18,7 +18,7 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -26,7 +26,7 @@ fun UserPreferenceConnectionPermissionListItem(
     index: Int,
     count: Int,
     selected: Boolean,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -55,7 +55,7 @@ fun UserPreferenceConnectionPermissionControls(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
     UserPreferenceControls(

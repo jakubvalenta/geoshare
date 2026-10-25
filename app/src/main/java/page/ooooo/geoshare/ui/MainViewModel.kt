@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -31,7 +33,8 @@ import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.LinkOutputs
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.ShareOutputs
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.getUriString
 import page.ooooo.geoshare.data.extensions.zipWithNextLastNull
@@ -73,12 +76,11 @@ import javax.inject.Inject
 import kotlin.time.ComparableTimeMark
 
 data class ResultAppsState(
-    val appDetails: AppDetails = emptyMap(),
     val appsOutputs: AppsOutputs = AppsOutputs(),
+    val shareOutputs: ShareOutputs? = null,
 )
 
 data class ResultCoordinatesState(
-    val appDetails: AppDetails = emptyMap(),
     val chipsOutputs: List<Output<Point>> = emptyList(),
 )
 
@@ -87,13 +89,11 @@ data class ResultLinksState(
 )
 
 data class ResultPointsState(
-    val appDetails: AppDetails = emptyMap(),
     val chipsOutputs: List<Output<Points>> = emptyList()
 )
 
 sealed interface ResultSheetState {
     class PointCopy(
-        val appDetails: AppDetails,
         val point: Point,
         val pointIndex: Int,
         val pointCount: Int,
@@ -101,7 +101,6 @@ sealed interface ResultSheetState {
     ) : ResultSheetState
 
     class PointOpen(
-        val appDetails: AppDetails,
         val point: Point,
         val pointIndex: Int,
         val pointCount: Int,
@@ -109,7 +108,6 @@ sealed interface ResultSheetState {
     ) : ResultSheetState
 
     class PointSave(
-        val appDetails: AppDetails,
         val point: Point,
         val pointIndex: Int,
         val pointCount: Int,
@@ -117,19 +115,16 @@ sealed interface ResultSheetState {
     ) : ResultSheetState
 
     class PointsSave(
-        val appDetails: AppDetails,
         val points: Points,
         val outputs: List<Output<Points>>,
     ) : ResultSheetState
 
     class PointsShare(
-        val appDetails: AppDetails,
         val points: Points,
         val outputs: List<Output<Points>>,
     ) : ResultSheetState
 
     class SourceShare(
-        val appDetails: AppDetails,
         val source: String,
         val appsOutputs: List<AppOutputs<Output<String>>>,
         val copyOutput: Output<String>,
@@ -146,7 +141,7 @@ class MainViewModel @Inject constructor(
     private val linkRepository: LinkRepository,
     private val log: Log,
     private val outputRepository: OutputRepository,
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
     savedStateHandle: SavedStateHandle,
     val coordinateConverter: CoordinateConverter,
 ) : ViewModel() {
@@ -370,17 +365,27 @@ class MainViewModel @Inject constructor(
 
     // Result
 
+    val appDetails: StateFlow<AppDetails> =
+        appRepository.appDetails
+            .filterNotNull()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyMap(),
+            )
+
     val resultAppsState: StateFlow<ResultAppsState> =
         appRepository.activities
+            .filterNotNull()
             .combine(
-                userPreferencesRepository.values
+                userPreferenceRepository.values
                     .map { it.hiddenApps }
                     .distinctUntilChanged()
             ) { activities, hiddenApps ->
-                outputRepository.getAppsOutputs(activities, hiddenApps)
-            }
-            .combine(appRepository.appDetails) { appsOutputs, appDetails ->
-                ResultAppsState(appDetails, appsOutputs)
+                ResultAppsState(
+                    appsOutputs = outputRepository.getAppsOutputs(activities, hiddenApps),
+                    shareOutputs = outputRepository.shareOutputs,
+                )
             }
             .stateIn(
                 viewModelScope,
@@ -388,10 +393,10 @@ class MainViewModel @Inject constructor(
                 ResultAppsState(),
             )
 
-    val resultCoordinateState: StateFlow<ResultCoordinatesState> =
+    val resultCoordinatesState: StateFlow<ResultCoordinatesState> =
         linkRepository.all
-            .combine(appRepository.appDetails) { links, appDetails ->
-                ResultCoordinatesState(appDetails, outputRepository.getPointChipsOutputs(links))
+            .map { links ->
+                ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(links))
             }
             .stateIn(
                 viewModelScope,
@@ -400,8 +405,7 @@ class MainViewModel @Inject constructor(
             )
 
     val resultPointsState: StateFlow<ResultPointsState> =
-        appRepository.appDetails
-            .map { appDetails -> ResultPointsState(appDetails, outputRepository.pointsChipsOutputs) }
+        flow { emit(ResultPointsState(chipsOutputs = outputRepository.pointsChipsOutputs)) }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
@@ -426,10 +430,8 @@ class MainViewModel @Inject constructor(
         cancelAction()
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
-            val appDetails = appRepository.appDetails.first()
-            val links = linkRepository.all.first()
+            val links = linkRepository.all.firstOrNull() ?: emptyList()
             _resultSheetState.value = ResultSheetState.PointCopy(
-                appDetails = appDetails,
                 point = point,
                 pointIndex = pointIndex,
                 pointCount = pointCount,
@@ -442,11 +444,9 @@ class MainViewModel @Inject constructor(
         cancelAction()
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
-            val appDetails = appRepository.appDetails.first()
-            val activities = appRepository.activities.first()
-            val hiddenApps = userPreferencesRepository.values.map { it.hiddenApps }.first()
+            val activities = appRepository.activities.filterNotNull().firstOrNull() ?: emptyList()
+            val hiddenApps = userPreferenceRepository.values.map { it.hiddenApps }.firstOrNull() ?: emptySet()
             _resultSheetState.value = ResultSheetState.PointOpen(
-                appDetails = appDetails,
                 point = point,
                 pointIndex = pointIndex,
                 pointCount = pointCount,
@@ -459,9 +459,7 @@ class MainViewModel @Inject constructor(
         cancelAction()
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
-            val appDetails = appRepository.appDetails.first()
             _resultSheetState.value = ResultSheetState.PointSave(
-                appDetails = appDetails,
                 point = point,
                 pointIndex = pointIndex,
                 pointCount = pointCount,
@@ -474,9 +472,7 @@ class MainViewModel @Inject constructor(
         cancelAction()
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
-            val appDetails = appRepository.appDetails.first()
             _resultSheetState.value = ResultSheetState.PointsSave(
-                appDetails = appDetails,
                 points = points,
                 outputs = outputRepository.pointsSaveOutputs,
             )
@@ -487,9 +483,7 @@ class MainViewModel @Inject constructor(
         cancelAction()
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
-            val appDetails = appRepository.appDetails.first()
             _resultSheetState.value = ResultSheetState.PointsShare(
-                appDetails = appDetails,
                 points = points,
                 outputs = outputRepository.pointsShareOutputs,
             )
@@ -499,10 +493,8 @@ class MainViewModel @Inject constructor(
     fun shareSource(source: String) {
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
-            val appDetails = appRepository.appDetails.first()
-            val activities = appRepository.activities.first()
+            val activities = appRepository.queryActivitiesForUri(source)
             _resultSheetState.value = ResultSheetState.SourceShare(
-                appDetails = appDetails,
                 source = source,
                 appsOutputs = outputRepository.getSourceAppsOutputs(activities),
                 copyOutput = outputRepository.sourceCopyOutput,

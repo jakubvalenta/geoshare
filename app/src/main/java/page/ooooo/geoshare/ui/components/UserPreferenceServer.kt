@@ -33,7 +33,7 @@ import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.SelectedServers
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -43,7 +43,7 @@ fun UserPreferenceServerListItem(
     index: Int,
     count: Int,
     selected: Boolean,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {

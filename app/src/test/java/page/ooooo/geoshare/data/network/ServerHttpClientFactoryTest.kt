@@ -18,11 +18,11 @@ import org.junit.Test
 import page.ooooo.geoshare.data.database.Server
 import page.ooooo.geoshare.data.database.ServerAuthType
 import page.ooooo.geoshare.data.di.FakeKeyStoreTools
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.di.FakeUserPreferenceRepository
 import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.preferences.CachedServerToken
 import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.data.uri.FakeUriQuote
 import kotlin.random.Random
 
@@ -64,8 +64,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository()
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val userPreferenceRepository = FakeUserPreferenceRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         val res = factory.createHttpClient(apiKeyServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -87,8 +87,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository()
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val userPreferenceRepository = FakeUserPreferenceRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         factory.createHttpClient(apiKeyServer.copy(apiKey = "spam")).use { client ->
             client.get(apiKeyServer.getUrl(query, uriQuote))
         }
@@ -108,15 +108,15 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(
                 cachedServerToken = CachedServerToken(
                     correctToken,
                     keyStoreTools.getKey()!!.publicKey.encoded.base64Encode(),
                 ),
             )
         )
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         val res = factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -140,8 +140,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository()
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val userPreferenceRepository = FakeUserPreferenceRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -164,8 +164,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository()
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val userPreferenceRepository = FakeUserPreferenceRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -201,8 +201,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository()
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val userPreferenceRepository = FakeUserPreferenceRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -238,8 +238,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository()
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val userPreferenceRepository = FakeUserPreferenceRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -278,8 +278,8 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository()
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val userPreferenceRepository = FakeUserPreferenceRepository()
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
@@ -360,15 +360,15 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val userPreferencesRepository = FakeUserPreferencesRepository()
-            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+            val userPreferenceRepository = FakeUserPreferenceRepository()
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
             assertEquals(
                 CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
-                userPreferencesRepository.getValue(CachedServerTokenPreference),
+                userPreferenceRepository.getValue(CachedServerTokenPreference),
             )
         }
 
@@ -447,15 +447,15 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val userPreferencesRepository = FakeUserPreferencesRepository()
-            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+            val userPreferenceRepository = FakeUserPreferenceRepository()
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
             assertEquals(
                 CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
-                userPreferencesRepository.getValue(CachedServerTokenPreference),
+                userPreferenceRepository.getValue(CachedServerTokenPreference),
             )
         }
 
@@ -535,22 +535,22 @@ class ServerHttpClientFactoryTest {
                 }
             }
 
-            val userPreferencesRepository = FakeUserPreferencesRepository(
-                UserPreferencesValues(
+            val userPreferenceRepository = FakeUserPreferenceRepository(
+                UserPreferenceValues(
                     cachedServerToken = CachedServerToken(
                         incorrectToken,
                         "incorrect public key".toByteArray().base64Encode(),
                     ),
                 )
             )
-            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
             assertEquals(
                 CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
-                userPreferencesRepository.getValue(CachedServerTokenPreference),
+                userPreferenceRepository.getValue(CachedServerTokenPreference),
             )
         }
 
@@ -607,22 +607,22 @@ class ServerHttpClientFactoryTest {
                 else -> throw NotImplementedError()
             }
         }
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(
                 cachedServerToken = CachedServerToken(
                     incorrectToken,
                     keyStoreTools.getKey()!!.publicKey.encoded.base64Encode(),
                 ),
             )
         )
-        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+        val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
         val res = factory.createHttpClient(attestationServer).use { client ->
             client.get(attestationServer.getUrl(query, uriQuote))
         }
         assertEquals("success", res.bodyAsText())
         assertEquals(
             CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
-            userPreferencesRepository.getValue(CachedServerTokenPreference),
+            userPreferenceRepository.getValue(CachedServerTokenPreference),
         )
     }
 
@@ -682,22 +682,22 @@ class ServerHttpClientFactoryTest {
                     else -> throw NotImplementedError()
                 }
             }
-            val userPreferencesRepository = FakeUserPreferencesRepository(
-                UserPreferencesValues(
+            val userPreferenceRepository = FakeUserPreferenceRepository(
+                UserPreferenceValues(
                     cachedServerToken = CachedServerToken(
                         incorrectToken,
                         keyStoreTools.getKey()!!.publicKey.encoded.base64Encode(),
                     ),
                 )
             )
-            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository)
+            val factory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository)
             val res = factory.createHttpClient(attestationServer).use { client ->
                 client.get(attestationServer.getUrl(query, uriQuote))
             }
             assertEquals("success", res.bodyAsText())
             assertEquals(
                 CachedServerToken(newToken, keyStoreTools.getKey()!!.publicKey.encoded.base64Encode()),
-                userPreferencesRepository.getValue(CachedServerTokenPreference),
+                userPreferenceRepository.getValue(CachedServerTokenPreference),
             )
         }
 }

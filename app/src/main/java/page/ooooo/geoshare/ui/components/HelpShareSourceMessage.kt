@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -43,6 +44,7 @@ import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 
 @Composable
 fun HelpShareSourceMessage(
+    appDetails: StateFlow<AppDetails>,
     state: StateFlow<ResultAppsState>,
     dismissedHelpMessages: StateFlow<Set<HelpMessage>?>,
     sourceComesFromIntent: StateFlow<Boolean>,
@@ -54,6 +56,7 @@ fun HelpShareSourceMessage(
 
     if (!sourceComesFromIntent) {
         val helpMessage = HelpMessage.SHARE_SOURCE
+        val appDetails by appDetails.collectAsStateWithLifecycle()
         val dismissedHelpMessages by dismissedHelpMessages.collectAsStateWithLifecycle()
         val state by state.collectAsStateWithLifecycle()
         val visible = !helpMessage.isDismissed(dismissedHelpMessages)
@@ -66,7 +69,7 @@ fun HelpShareSourceMessage(
                 {
                     stringResource(
                         R.string.help_share_source_action,
-                        state.appDetails[appOutputs.packageName]?.label.orEmpty()
+                        appDetails[appOutputs.packageName]?.label.orEmpty()
                     )
                 }
             },
@@ -130,10 +133,10 @@ private fun DefaultPreview() {
             uriQuote = uriQuote,
         )
         HelpShareSourceMessage(
+            appDetails = MutableStateFlow(getFakeAppDetails(context)),
             state = MutableStateFlow(
                 ResultAppsState(
-                    appDetails = getFakeAppDetails(context),
-                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet())
                 )
             ),
             dismissedHelpMessages = MutableStateFlow(emptySet()),
@@ -159,10 +162,10 @@ private fun DarkPreview() {
             uriQuote = uriQuote,
         )
         HelpShareSourceMessage(
+            appDetails = MutableStateFlow(getFakeAppDetails(context)),
             state = MutableStateFlow(
                 ResultAppsState(
-                    appDetails = getFakeAppDetails(context),
-                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet())
                 )
             ),
             dismissedHelpMessages = MutableStateFlow(emptySet()),

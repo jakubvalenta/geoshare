@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.formatters.CoordinateFormatter
@@ -60,6 +61,7 @@ import page.ooooo.geoshare.ui.theme.defaultLinkStyles
 
 @Composable
 fun ResultCoordinates(
+    appDetails: StateFlow<AppDetails>,
     state: StateFlow<ResultCoordinatesState>,
     point: Point,
     pointCount: Int,
@@ -95,6 +97,7 @@ fun ResultCoordinates(
                     onSavePoint = onSavePoint,
                 )
                 ResultCoordinatesChips(
+                    appDetails = appDetails,
                     state = state,
                     onExecute = { output -> onExecute(output.toAction(point)) },
                 )
@@ -233,9 +236,11 @@ private fun ResultCoordinatesBox(
 
 @Composable
 private fun ResultCoordinatesChips(
+    appDetails: StateFlow<AppDetails>,
     state: StateFlow<ResultCoordinatesState>,
     onExecute: (output: Output<Point>) -> Unit,
 ) {
+    val appDetails by appDetails.collectAsStateWithLifecycle()
     val state by state.collectAsStateWithLifecycle()
 
     if (state.chipsOutputs.isNotEmpty()) {
@@ -244,9 +249,9 @@ private fun ResultCoordinatesChips(
                 key(output.id) {
                     StyledChip(
                         onClick = { onExecute(output) },
-                        label = { Text(output.label(state.appDetails)) },
+                        label = { Text(output.label(appDetails)) },
                         modifier = Modifier.testTag("geoShareResultChip_${output.id}"),
-                        icon = output.getIcon(state.appDetails)?.let {
+                        icon = output.getIcon(appDetails)?.let {
                             { IconFromDescriptor(it, contentDescription = null) }
                         },
                     )
@@ -292,12 +297,8 @@ private fun DefaultPreview() {
                 uriQuote = uriQuote,
             )
             ResultCoordinates(
-                state = MutableStateFlow(
-                    ResultCoordinatesState(
-                        appDetails = getFakeAppDetails(context),
-                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))),
                 point = coordinateConverter.toGCJ02(WGS84Point.ForbiddenCity),
                 pointCount = 1,
                 pointIndex = 0,
@@ -329,12 +330,8 @@ private fun DarkPreview() {
                 uriQuote = uriQuote,
             )
             ResultCoordinates(
-                state = MutableStateFlow(
-                    ResultCoordinatesState(
-                        appDetails = getFakeAppDetails(context),
-                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))),
                 point = coordinateConverter.toGCJ02(WGS84Point.ForbiddenCity),
                 pointCount = 1,
                 pointIndex = 0,
@@ -366,12 +363,8 @@ private fun SeveralPointsPreview() {
                 uriQuote = uriQuote,
             )
             ResultCoordinates(
-                state = MutableStateFlow(
-                    ResultCoordinatesState(
-                        appDetails = getFakeAppDetails(context),
-                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))),
                 point = WGS84Point(NaivePoint.example.copy(source = Source.HTML_NOT_SEMANTIC)),
                 pointCount = 2,
                 pointIndex = 1,
@@ -403,12 +396,8 @@ private fun NameOnlyPreview() {
                 uriQuote = uriQuote,
             )
             ResultCoordinates(
-                state = MutableStateFlow(
-                    ResultCoordinatesState(
-                        appDetails = getFakeAppDetails(context),
-                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))),
                 point = WGS84Point(name = "Berlin, Germany", z = 13.0, source = Source.URI),
                 pointCount = 1,
                 pointIndex = 0,
@@ -440,12 +429,8 @@ private fun CoordinateFormatPreview() {
                 uriQuote = uriQuote,
             )
             ResultCoordinates(
-                state = MutableStateFlow(
-                    ResultCoordinatesState(
-                        appDetails = getFakeAppDetails(context),
-                        chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))),
                 point = WGS84Point(NaivePoint.genRandomPoint(name = "Berlin, Germany", z = 13.0)),
                 pointCount = 1,
                 pointIndex = 0,

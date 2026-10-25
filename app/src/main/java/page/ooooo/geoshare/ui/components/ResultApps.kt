@@ -47,6 +47,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
 fun ResultApps(
+    appDetails: StateFlow<AppDetails>,
     state: StateFlow<ResultAppsState>,
     points: Points,
     source: StateFlow<String>,
@@ -57,6 +58,7 @@ fun ResultApps(
 ) {
     val lastPoint = points.lastOrNull() ?: return
 
+    val appDetails by appDetails.collectAsStateWithLifecycle()
     val state by state.collectAsStateWithLifecycle()
     val source by source.collectAsStateWithLifecycle()
 
@@ -66,7 +68,7 @@ fun ResultApps(
             state.appsOutputs.mapAppsOutputs.forEach { appOutputs ->
                 key(appOutputs.packageName) {
                     ResultAppIcon(
-                        appDetails = state.appDetails,
+                        appDetails = appDetails,
                         appOutputs = appOutputs,
                         lastPoint = lastPoint,
                         points = points,
@@ -79,10 +81,10 @@ fun ResultApps(
                 }
             }
             // Share item
-            state.appsOutputs.shareOutputs?.let { shareOutputs ->
+            state.shareOutputs?.let { shareOutputs ->
                 key("share") {
                     ResultShareIcon(
-                        appDetails = state.appDetails,
+                        appDetails = appDetails,
                         shareOutputs = shareOutputs,
                         lastPoint = lastPoint,
                         points = points,
@@ -102,7 +104,7 @@ fun ResultApps(
                 state.appsOutputs.messagingAppsOutputs.forEach { appOutputs ->
                     key(appOutputs.packageName) {
                         ResultAppIcon(
-                            appDetails = state.appDetails,
+                            appDetails = appDetails,
                             appOutputs = appOutputs,
                             iconSize = iconSize,
                             lastPoint = lastPoint,
@@ -223,12 +225,8 @@ private fun DefaultPreview() {
                 uriQuote = uriQuote,
             )
             ResultApps(
-                state = MutableStateFlow(
-                    ResultAppsState(
-                        appDetails = getFakeAppDetails(context),
-                        appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -254,12 +252,8 @@ private fun DarkPreview() {
                 uriQuote = uriQuote,
             )
             ResultApps(
-                state = MutableStateFlow(
-                    ResultAppsState(
-                        appDetails = getFakeAppDetails(context),
-                        appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -285,12 +279,8 @@ private fun SmallPreview() {
                 uriQuote = uriQuote,
             )
             ResultApps(
-                state = MutableStateFlow(
-                    ResultAppsState(
-                        appDetails = getFakeAppDetails(context),
-                        appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -316,12 +306,8 @@ private fun TabletPreview() {
                 uriQuote = uriQuote,
             )
             ResultApps(
-                state = MutableStateFlow(
-                    ResultAppsState(
-                        appDetails = getFakeAppDetails(context),
-                        appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -353,12 +339,8 @@ private fun LoadingPreview() {
                 )
             }
             ResultApps(
-                state = MutableStateFlow(
-                    ResultAppsState(
-                        appDetails = getFakeAppDetails(context),
-                        appsOutputs = outputRepository.getAppsOutputs(activities, emptySet()),
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(activities, emptySet()))),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},

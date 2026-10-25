@@ -30,7 +30,11 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppOutputs
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.MimeType
 import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.TextActivity
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.android.UriScheme
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
@@ -42,9 +46,11 @@ import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
+import page.ooooo.geoshare.data.outputs.OpenUnknownUriOutput
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
 import page.ooooo.geoshare.data.outputs.ResourceIconDescriptor
+import page.ooooo.geoshare.data.outputs.SendStringOutput
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.ResultSheetState
 import page.ooooo.geoshare.ui.theme.AppTheme
@@ -52,6 +58,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSheet(
+    appDetails: StateFlow<AppDetails>,
     state: StateFlow<ResultSheetState?>,
     initialSheetValue: SheetValue = SheetValue.Hidden,
     onDismissRequest: () -> Unit,
@@ -194,13 +201,15 @@ private fun ResultSheet(
 
 @Composable
 private fun <T> ResultSheetDefaultContent(
-    appDetails: AppDetails,
+    appDetails: StateFlow<AppDetails>,
     outputs: List<Output<T>>,
     title: String?,
     value: T,
     onExecute: (action: Action<*>) -> Unit,
     onHide: () -> Unit,
 ) {
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+
     SheetSection(title = title) {
         outputs.zipWithNextFirstNull { prevOutput, output ->
             val enabled = output.isEnabled(value)
@@ -225,13 +234,15 @@ private fun <T> ResultSheetDefaultContent(
 
 @Composable
 private fun <T> ResultSheetOpenPointContent(
-    appDetails: AppDetails,
+    appDetails: StateFlow<AppDetails>,
     appsOutputs: List<AppOutputs<Output<T>>>,
     title: String?,
     value: T,
     onExecute: (action: Action<*>) -> Unit,
     onHide: () -> Unit,
 ) {
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+
     SheetSection(title = title) {
         appsOutputs.forEach { appOutputs ->
             SheetListItem(
@@ -251,13 +262,15 @@ private fun <T> ResultSheetOpenPointContent(
 
 @Composable
 private fun ResultSheetSourceContent(
-    appDetails: AppDetails,
+    appDetails: StateFlow<AppDetails>,
     appsOutputs: List<AppOutputs<Output<String>>>,
     copyOutput: Output<String>,
     value: String,
     onHide: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+
     SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
         OneLineSheetListItem(
             headlineText = copyOutput.getDescription(value).orEmpty(),
@@ -307,9 +320,9 @@ private fun CopyPointPreview() {
                 uriQuote = uriQuote,
             )
             ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
                 state = MutableStateFlow(
                     ResultSheetState.PointCopy(
-                        appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 0,
                         pointCount = 2,
@@ -342,9 +355,9 @@ private fun DarkCopyPointPreview() {
                 uriQuote = uriQuote,
             )
             ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
                 state = MutableStateFlow(
                     ResultSheetState.PointCopy(
-                        appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 0,
                         pointCount = 2,
@@ -384,9 +397,9 @@ private fun OpenPointPreview() {
                 )
             }
             ResultSheet(
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
                 state = MutableStateFlow(
                     ResultSheetState.PointOpen(
-                        appDetails = getFakeAppDetails(context),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 2,
                         pointCount = 3,
@@ -426,9 +439,9 @@ private fun OpenPointLoadingPreview() {
                 )
             }
             ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
                 state = MutableStateFlow(
                     ResultSheetState.PointOpen(
-                        appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 2,
                         pointCount = 3,
@@ -461,9 +474,9 @@ private fun SavePointPreview() {
                 uriQuote = uriQuote,
             )
             ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
                 state = MutableStateFlow(
                     ResultSheetState.PointSave(
-                        appDetails = emptyMap(),
                         point = WGS84Point(NaivePoint.example),
                         pointIndex = 2,
                         pointCount = 3,
@@ -496,15 +509,105 @@ private fun SavePointsPreview() {
                 uriQuote = uriQuote,
             )
             ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
                 state = MutableStateFlow(
                     ResultSheetState.PointsSave(
-                        appDetails = emptyMap(),
                         points = persistentListOf(
                             WGS84Point(NaivePoint.genRandomPoint()),
                             WGS84Point(NaivePoint.genRandomPoint()),
                             WGS84Point(NaivePoint.example),
                         ),
                         outputs = outputRepository.pointsSaveOutputs,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun SharePointsPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.PointsShare(
+                        points = persistentListOf(
+                            WGS84Point(NaivePoint.genRandomPoint()),
+                            WGS84Point(NaivePoint.genRandomPoint()),
+                            WGS84Point(NaivePoint.example),
+                        ),
+                        outputs = outputRepository.pointsShareOutputs,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun ShareSource() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.SourceShare(
+                        source = source,
+                        appsOutputs = listOf(
+                            AppOutputs(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                defaultOutput = OpenUnknownUriOutput(
+                                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                            AppOutputs(
+                                packageName = PackageNames.CONVERSATIONS,
+                                defaultOutput = SendStringOutput(
+                                    TextActivity(
+                                        packageName = PackageNames.CONVERSATIONS,
+                                        mimeType = MimeType.TEXT_PLAIN,
+                                    )
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                        ),
+                        copyOutput = outputRepository.sourceCopyOutput,
                     )
                 ),
                 initialSheetValue = SheetValue.Expanded,

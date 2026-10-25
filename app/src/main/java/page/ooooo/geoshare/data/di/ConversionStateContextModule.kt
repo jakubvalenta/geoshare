@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import page.ooooo.geoshare.data.InputRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.state.ConversionStateContext
 import page.ooooo.geoshare.data.uri.UriQuote
@@ -32,12 +32,12 @@ object ConversionStateContextModule {
         inputRepository: InputRepository,
         log: Log,
         uriQuote: UriQuote,
-        userPreferencesRepository: UserPreferencesRepository,
+        userPreferenceRepository: UserPreferenceRepository,
     ): ConversionStateContext =
         ConversionStateContext(
             inputs = inputRepository.all,
             resources = context.resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
             log = log,
             uriQuote = uriQuote,
         )

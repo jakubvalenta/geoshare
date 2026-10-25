@@ -18,7 +18,7 @@ import page.ooooo.geoshare.data.di.FakeGeoShareGoogleMapsAddressServer
 import page.ooooo.geoshare.data.di.FakeInputRepository
 import page.ooooo.geoshare.data.di.FakeKeyStoreTools
 import page.ooooo.geoshare.data.di.FakeServerRepository
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.di.FakeUserPreferenceRepository
 import page.ooooo.geoshare.data.geo.GCJ02MainlandChinaPoint
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.log.FakeLog
@@ -79,10 +79,10 @@ class GoogleMapsPlaceApiInputTest : InputTest {
         on { getSelectedGoogleMapsPlace() } doReturn server
     }
     private val uriQuote = FakeUriQuote
-    private val userPreferencesRepository = FakeUserPreferencesRepository()
+    private val userPreferenceRepository = FakeUserPreferenceRepository()
     private val input = GoogleMapsPlaceApiInput(
         serverRepository = serverRepository,
-        serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+        serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository),
         googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
         uriQuote = uriQuote,
     )
@@ -94,7 +94,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
         }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )
@@ -142,7 +142,7 @@ class GoogleMapsPlaceApiInputTest : InputTest {
         val engine = MockEngine { throw NotImplementedError() }
         val input = GoogleMapsPlaceApiInput(
             serverRepository = serverRepository,
-            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferencesRepository),
+            serverHttpClientFactory = ServerHttpClientFactory(engine, keyStoreTools, log, userPreferenceRepository),
             googleMapsHtmlInput = { FakeInputRepository.googleMapsHtmlInput },
             uriQuote = uriQuote,
         )

@@ -30,7 +30,7 @@ import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.data.toOutput
 import page.ooooo.geoshare.ui.AutomationOption
 import page.ooooo.geoshare.ui.SelectedAutomationOptionState
@@ -46,7 +46,7 @@ fun UserPreferenceAutomationDelayListItem(
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     selected: Boolean,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -84,7 +84,7 @@ fun UserPreferenceAutomationDelayControls(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
     UserPreferenceControls(
@@ -135,11 +135,10 @@ private fun ListItemPreview() {
                 UserPreferenceAutomationDelayListItem(
                     state = MutableStateFlow(
                         SelectedAutomationOptionState(
-                            appDetails = emptyMap(),
                             option = AutomationOption(
                                 automation = SavePointsGpxAutomation,
                                 output = SavePointsGpxAutomation.toOutput(coordinateConverter),
-                            ),
+                            )
                         )
                     ),
                     index = 0,
@@ -152,7 +151,7 @@ private fun ListItemPreview() {
                         token = "test_purchased",
                     ),
                     selected = false,
-                    values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                    values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                     onClick = {},
                 )
             }
@@ -172,11 +171,10 @@ private fun DarkListItemPreview() {
                 UserPreferenceAutomationDelayListItem(
                     state = MutableStateFlow(
                         SelectedAutomationOptionState(
-                            appDetails = emptyMap(),
                             option = AutomationOption(
                                 automation = SavePointsGpxAutomation,
                                 output = SavePointsGpxAutomation.toOutput(coordinateConverter),
-                            ),
+                            )
                         )
                     ),
                     index = 0,
@@ -189,7 +187,7 @@ private fun DarkListItemPreview() {
                         token = "test_purchased",
                     ),
                     selected = false,
-                    values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                    values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                     onClick = {},
                 )
             }
@@ -207,7 +205,7 @@ private fun ControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.Purchased(
@@ -231,7 +229,7 @@ private fun DarkControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),
@@ -258,7 +256,7 @@ private fun TabletControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),
@@ -285,7 +283,7 @@ private fun NotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.NotPurchased,
@@ -304,7 +302,7 @@ private fun DarkNotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),
@@ -326,7 +324,7 @@ private fun TabletNotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),

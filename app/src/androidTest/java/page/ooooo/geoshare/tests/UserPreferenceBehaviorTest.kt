@@ -21,7 +21,7 @@ import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.Finish
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
-class UserPreferencesBehaviorTest {
+class UserPreferenceBehaviorTest {
     @Test
     fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormatAsWGS84() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext

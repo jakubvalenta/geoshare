@@ -58,6 +58,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.getLocation
 import page.ooooo.geoshare.data.android.hasLocationPermission
 import page.ooooo.geoshare.data.billing.AutomationFeature
@@ -184,7 +185,7 @@ fun MainScreen(
                 is BasicActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = actionState.action.execute(actionContext)
-                    if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
+                    if (userPreferenceViewModel.getFinish().shouldAppFinish(actionResult)) {
                         onFinish()
                     }
                     mainViewModel.completeBasicAction(actionResult)
@@ -209,7 +210,7 @@ fun MainScreen(
                 is FileActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = actionState.action.execute(actionState.uri, actionContext)
-                    if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
+                    if (userPreferenceViewModel.getFinish().shouldAppFinish(actionResult)) {
                         onFinish()
                     }
                     mainViewModel.completeFileAction(actionResult)
@@ -247,7 +248,7 @@ fun MainScreen(
                 is LocationActionReady -> {
                     val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
                     val actionResult = actionState.action.execute(actionState.location, actionContext)
-                    if (userPreferenceViewModel.values.value.finish.shouldAppFinish(actionResult)) {
+                    if (userPreferenceViewModel.getFinish().shouldAppFinish(actionResult)) {
                         onFinish()
                     }
                     mainViewModel.completeLocationAction(actionResult)
@@ -259,6 +260,7 @@ fun MainScreen(
     MainScreen(
         conversionState = conversionState,
         actionState = actionState,
+        appDetails = mainViewModel.appDetails,
         billingAppNameResId = billingViewModel.billingAppNameResId,
         billingFeatures = billingViewModel.billingFeatures,
         billingStatus = billingViewModel.billingStatus,
@@ -270,7 +272,7 @@ fun MainScreen(
         linkMessage = linkViewModel.message,
         placeholderUris = inputViewModel.placeholderUris,
         resultAppsState = mainViewModel.resultAppsState,
-        resultCoordinatesState = mainViewModel.resultCoordinateState,
+        resultCoordinatesState = mainViewModel.resultCoordinatesState,
         resultLinksState = mainViewModel.resultLinksState,
         resultPointsState = mainViewModel.resultPointsState,
         resultSheetState = mainViewModel.resultSheetState,
@@ -338,6 +340,7 @@ fun MainScreen(
 private fun MainScreen(
     conversionState: ConversionState,
     actionState: ActionState,
+    appDetails: StateFlow<AppDetails>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
@@ -478,6 +481,7 @@ private fun MainScreen(
                                     is ConversionState.HasResult -> {
                                         conversionState.points.lastOrNull()?.let { point ->
                                             ResultCoordinates(
+                                                appDetails = appDetails,
                                                 state = resultCoordinatesState,
                                                 point = point,
                                                 pointCount = conversionState.points.size,
@@ -492,6 +496,7 @@ private fun MainScreen(
                                             ) {
                                                 if (conversionState.points.size > 1) {
                                                     ResultPoints(
+                                                        appDetails = appDetails,
                                                         state = resultPointsState,
                                                         points = conversionState.points,
                                                         coordinateConverter = coordinateConverter,
@@ -513,6 +518,7 @@ private fun MainScreen(
                                             )
                                         } else {
                                             HelpShareSourceMessage(
+                                                appDetails = appDetails,
                                                 state = resultAppsState,
                                                 dismissedHelpMessages = dismissedHelpMessages,
                                                 sourceComesFromIntent = sourceComesFromIntent,
@@ -605,6 +611,7 @@ private fun MainScreen(
                     {
                         item(key = "result_apps", contentType = "result_apps") {
                             ResultApps(
+                                appDetails = appDetails,
                                 state = resultAppsState,
                                 points = conversionState.points,
                                 source = source,
@@ -665,7 +672,7 @@ private fun MainScreen(
             supportingTitle = if (conversionState is ConversionState.HasResult) {
                 {
                     ResultTitle(
-                        state = resultAppsState,
+                        appDetails = appDetails,
                         actionState = actionState,
                         billingFeatures = billingFeatures,
                         billingStatus = billingStatus,
@@ -686,6 +693,7 @@ private fun MainScreen(
 
     @OptIn(ExperimentalMaterial3Api::class)
     ResultSheet(
+        appDetails = appDetails,
         state = resultSheetState,
         onExecute = onExecute,
         onDismissRequest = onHideSheet,
@@ -760,6 +768,7 @@ private fun DefaultPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
@@ -825,6 +834,7 @@ private fun DarkPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
@@ -890,6 +900,7 @@ private fun SmallPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
@@ -955,6 +966,7 @@ private fun TabletPreview() {
         MainScreen(
             conversionState = ConversionState.Initial,
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
@@ -1039,6 +1051,7 @@ private fun SucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1058,17 +1071,16 @@ private fun SucceededPreview() {
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             resultAppsState = MutableStateFlow(
                 ResultAppsState(
-                    appDetails = getFakeAppDetails(context),
-                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet())
                 )
             ),
-            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultCoordinatesState = MutableStateFlow(
+                ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))
+            ),
             resultLinksState = MutableStateFlow(
-                ResultLinksState(
-                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
-                )
+                ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
             ),
-            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultPointsState = MutableStateFlow(ResultPointsState(chipsOutputs = outputRepository.pointsChipsOutputs)),
             resultSheetState = MutableStateFlow(null),
             source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1139,6 +1151,7 @@ private fun DarkSucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1158,17 +1171,16 @@ private fun DarkSucceededPreview() {
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             resultAppsState = MutableStateFlow(
                 ResultAppsState(
-                    appDetails = getFakeAppDetails(context),
-                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet())
                 )
             ),
-            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultCoordinatesState = MutableStateFlow(
+                ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))
+            ),
             resultLinksState = MutableStateFlow(
-                ResultLinksState(
-                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
-                )
+                ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
             ),
-            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultPointsState = MutableStateFlow(ResultPointsState(chipsOutputs = outputRepository.pointsChipsOutputs)),
             resultSheetState = MutableStateFlow(null),
             source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1238,6 +1250,7 @@ private fun SmallSucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1257,17 +1270,16 @@ private fun SmallSucceededPreview() {
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             resultAppsState = MutableStateFlow(
                 ResultAppsState(
-                    appDetails = getFakeAppDetails(context),
-                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet())
                 )
             ),
-            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultCoordinatesState = MutableStateFlow(
+                ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))
+            ),
             resultLinksState = MutableStateFlow(
-                ResultLinksState(
-                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
-                )
+                ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
             ),
-            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultPointsState = MutableStateFlow(ResultPointsState(chipsOutputs = outputRepository.pointsChipsOutputs)),
             resultSheetState = MutableStateFlow(null),
             source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(true),
@@ -1338,6 +1350,7 @@ private fun TabletSucceededPreview() {
                 ),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1357,17 +1370,16 @@ private fun TabletSucceededPreview() {
             placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
             resultAppsState = MutableStateFlow(
                 ResultAppsState(
-                    appDetails = getFakeAppDetails(context),
-                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()),
+                    appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet())
                 )
             ),
-            resultCoordinatesState = MutableStateFlow(ResultCoordinatesState()),
+            resultCoordinatesState = MutableStateFlow(
+                ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(defaultFakeLinks))
+            ),
             resultLinksState = MutableStateFlow(
-                ResultLinksState(
-                    linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks)
-                )
+                ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
             ),
-            resultPointsState = MutableStateFlow(ResultPointsState()),
+            resultPointsState = MutableStateFlow(ResultPointsState(chipsOutputs = outputRepository.pointsChipsOutputs)),
             resultSheetState = MutableStateFlow(null),
             source = MutableStateFlow(source),
             sourceComesFromIntent = MutableStateFlow(false),
@@ -1423,6 +1435,7 @@ private fun ErrorPreview() {
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1499,6 +1512,7 @@ private fun DarkErrorPreview() {
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1575,6 +1589,7 @@ private fun TabletErrorPreview() {
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1652,6 +1667,7 @@ private fun WarningPreview() {
                 warning = true,
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1729,6 +1745,7 @@ private fun DarkWarningPreview() {
                 warning = true,
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1810,6 +1827,7 @@ private fun LoadingIndicatorPreview() {
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1891,6 +1909,7 @@ private fun DarkLoadingIndicatorPreview() {
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -1970,6 +1989,7 @@ private fun TabletLoadingIndicatorPreview() {
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2048,6 +2068,7 @@ private fun WebViewPreview() {
                 results = emptyMap(),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2126,6 +2147,7 @@ private fun DarkWebViewPreview() {
                 results = emptyMap(),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2204,6 +2226,7 @@ private fun TabletWebViewPreview() {
                 results = emptyMap(),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(
@@ -2281,6 +2304,7 @@ private fun EmptyPreview() {
                 points = persistentListOf(),
             ),
             actionState = ActionState.Initial,
+            appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
             billingStatus = MutableStateFlow(

@@ -22,12 +22,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val userPreferencesValues by userPreferenceViewModel.values.collectAsStateWithLifecycle()
+            val dynamicColor by userPreferenceViewModel.dynamicColor.collectAsStateWithLifecycle()
 
             // Notice that the UI can flicker when starting the app, because we load the dynamic color preference
             // asynchronously, and then recompose the theme if the preference is on. We could cover that with a splash
             // screen, but it feels as an overkill, because we expect few users to turn the dynamic color preference on.
-            AppTheme(dynamicColor = userPreferencesValues.dynamicColor) {
+            AppTheme(dynamicColor = dynamicColor) {
                 MainNavigation(billingViewModel)
             }
         }

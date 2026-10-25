@@ -98,7 +98,6 @@ data class AppsOutputs(
     val mapAppsOutputs: List<AppOutputs<Output<*>>> = emptyList(),
     val messagingAppsOutputs: List<AppOutputs<Output<*>>> = emptyList(),
     val exampleAppOutputs: AppOutputs<Output<*>>? = null,
-    val shareOutputs: ShareOutputs? = null,
 )
 
 data class LinkOutputs(
@@ -183,7 +182,6 @@ class OutputRepository @Inject constructor(
                 AppsOutputs(
                     mapAppsOutputs = mapAppsOutputs,
                     messagingAppsOutputs = messagingActivities.toOutputsForApps(hiddenApps),
-                    shareOutputs = shareOutputs,
                     exampleAppOutputs = PackageNames.examples.firstNotNullOfOrNull { packageName ->
                         mapAppsOutputs.firstOrNull { appOutputs -> appOutputs.packageName == packageName }
                     },

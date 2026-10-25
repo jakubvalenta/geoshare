@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -63,33 +64,35 @@ fun ResultLinks(
 
     // Links
     if (state.linksOutputs.isNotEmpty()) {
-        ResultHeadline(stringResource(R.string.links_title)) {
-            FilledIconButton(
-                { onNavigateToLinkScreen() },
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                ),
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.conversion_succeeded_apps_links_configure),
-                    Modifier.requiredSize(24.dp),
-                )
-            }
-        }
-        ResultGrid { itemWidth ->
-            state.linksOutputs.forEach { linkOutputs ->
-                key(linkOutputs.group) {
-                    ResultLinkIcon(
-                        iconSize = iconSize,
-                        lastPoint = lastPoint,
-                        linkOutputs = linkOutputs,
-                        points = points,
-                        source = source,
-                        width = itemWidth,
-                        onExecute = onExecute,
-                        onDisableLinkGroup = { onDisableLinkGroup(linkOutputs.group) },
+        Column {
+            ResultHeadline(stringResource(R.string.links_title)) {
+                FilledIconButton(
+                    { onNavigateToLinkScreen() },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    ),
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = stringResource(R.string.conversion_succeeded_apps_links_configure),
+                        Modifier.requiredSize(24.dp),
                     )
+                }
+            }
+            ResultGrid { itemWidth ->
+                state.linksOutputs.forEach { linkOutputs ->
+                    key(linkOutputs.group) {
+                        ResultLinkIcon(
+                            iconSize = iconSize,
+                            lastPoint = lastPoint,
+                            linkOutputs = linkOutputs,
+                            points = points,
+                            source = source,
+                            width = itemWidth,
+                            onExecute = onExecute,
+                            onDisableLinkGroup = { onDisableLinkGroup(linkOutputs.group) },
+                        )
+                    }
                 }
             }
         }

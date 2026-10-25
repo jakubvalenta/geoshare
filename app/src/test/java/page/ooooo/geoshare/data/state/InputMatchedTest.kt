@@ -7,7 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.di.FakeUserPreferenceRepository
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.BasicOfflineInput
@@ -20,7 +20,7 @@ import page.ooooo.geoshare.data.inputs.WebViewInput
 import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.network.FetchTools
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 
 class InputMatchedTest {
     private val log = FakeLog
@@ -41,13 +41,13 @@ class InputMatchedTest {
 
     @Test
     fun transition_whenPermissionIsAlways_returnsPermissionGrantedAndPassesPermissionParam() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, Permission.ALWAYS, results)
         assertEquals(
@@ -58,13 +58,13 @@ class InputMatchedTest {
 
     @Test
     fun transition_whenPermissionIsAsk_returnsPermissionRequested() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, Permission.ASK, results)
         assertEquals(
@@ -75,13 +75,13 @@ class InputMatchedTest {
 
     @Test
     fun transition_whenPermissionIsNever_returnsPermissionDenied() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, Permission.NEVER, results)
         assertEquals(
@@ -93,13 +93,13 @@ class InputMatchedTest {
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAlways_returnsPermissionGrantedAndSetsPermissionParam() =
         runTest {
-            val userPreferencesRepository = FakeUserPreferencesRepository(
-                UserPreferencesValues(connectionPermission = Permission.ALWAYS)
+            val userPreferenceRepository = FakeUserPreferenceRepository(
+                UserPreferenceValues(connectionPermission = Permission.ALWAYS)
             )
             val stateContext = ConversionStateContext(
                 log = log,
                 resources = resources,
-                userPreferencesRepository = userPreferencesRepository,
+                userPreferenceRepository = userPreferenceRepository,
             )
             val state = InputMatched(source, matchedInput, permission = null, results)
             assertEquals(
@@ -110,13 +110,13 @@ class InputMatchedTest {
 
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsAsk_returnsPermissionRequested() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, permission = null, results)
         assertEquals(
@@ -127,13 +127,13 @@ class InputMatchedTest {
 
     @Test
     fun transition_whenPermissionIsNullAndPreferencePermissionIsNever_returnsPermissionDenied() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.NEVER)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.NEVER)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, permission = null, results)
         assertEquals(
@@ -149,13 +149,13 @@ class InputMatchedTest {
             override val group = DebugInputGroup
         }
         val matchedInput = MatchedInput(input, source)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, Permission.NEVER, results)
         assertEquals(
@@ -175,13 +175,13 @@ class InputMatchedTest {
             }
         }
         val matchedInput = MatchedInput(input, source)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, Permission.NEVER, results)
         assertEquals(
@@ -206,13 +206,13 @@ class InputMatchedTest {
             }
         }
         val matchedInput = MatchedInput(input, source)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, Permission.NEVER, results)
         assertEquals(
@@ -237,13 +237,13 @@ class InputMatchedTest {
             }
         }
         val matchedInput = MatchedInput(input, source)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext = ConversionStateContext(
             log = log,
             resources = resources,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = InputMatched(source, matchedInput, Permission.NEVER, results)
         assertEquals(

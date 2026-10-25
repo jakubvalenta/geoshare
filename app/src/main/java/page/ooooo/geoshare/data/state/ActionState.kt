@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.timeout
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.Billing
 import page.ooooo.geoshare.data.billing.BillingStatus
@@ -56,7 +56,7 @@ data class ActionStateContext(
     val coordinateConverter: CoordinateConverter,
     val linkRepository: LinkRepository,
     val log: Log = DefaultLog,
-    val userPreferencesRepository: UserPreferencesRepository,
+    val userPreferenceRepository: UserPreferenceRepository,
 )
 
 data class AutomationRequested(
@@ -66,7 +66,7 @@ data class AutomationRequested(
     @OptIn(FlowPreview::class)
     override suspend fun transition(stateContext: ActionStateContext): ActionState? {
         val lastPoint = points.lastOrNull() ?: return null
-        val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
+        val automation = stateContext.userPreferenceRepository.getValue(AutomationPreference)
         if (automation is NoopAutomation) {
             return null
         }
@@ -82,7 +82,7 @@ data class AutomationRequested(
 
                         is BillingStatus.Purchased -> {
                             // If billing status appeared within timeout, cache it
-                            stateContext.userPreferencesRepository.setValue(
+                            stateContext.userPreferenceRepository.setValue(
                                 CachedPurchasePreference,
                                 CachedPurchase(productId = it.product.id, token = it.token),
                             )
@@ -95,7 +95,7 @@ data class AutomationRequested(
         } catch (_: TimeoutCancellationException) {
             // If billing status didn't appear, try to read it from cache
             stateContext.log.w(TAG, "Billing status didn't appear within $billingStatusTimeout")
-            stateContext.userPreferencesRepository.getValue(CachedPurchasePreference)
+            stateContext.userPreferenceRepository.getValue(CachedPurchasePreference)
                 ?.let { cachedPurchase ->
                     stateContext.billing.products.firstOrNull { product -> cachedPurchase.productId == product.id }
                         ?.let { product ->
@@ -128,7 +128,7 @@ data class AutomationRequested(
                 is StringOutput -> NoopAction
             }
             if (output is Output.HasAutomationDelay) {
-                val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
+                val delay = stateContext.userPreferenceRepository.getValue(AutomationDelayPreference)
                 return ActionWaiting(action, output, isAutomation = true, delay = delay)
             }
             return ActionReady(action, isAutomation = true)
