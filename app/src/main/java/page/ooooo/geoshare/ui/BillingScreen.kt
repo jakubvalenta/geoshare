@@ -108,8 +108,8 @@ fun BillingScreen(
         billingRefundableDuration = billingViewModel.billingRefundableDuration,
         billingStatus = billingViewModel.billingStatus,
         onBack = onBack,
-        onConsumePurchases = { billingViewModel.consumePurchases() },
-        onDismissMessage = { billingViewModel.dismissMessage() },
+        onConsumePurchases = billingViewModel::consumePurchases,
+        onDismissMessage = billingViewModel::dismissMessage,
         onLaunchBillingFlow = { offerToken -> billingViewModel.launchBillingFlow(context as Activity, offerToken) },
         onManageBillingProduct = { product -> billingViewModel.manageBillingProduct(context as Activity, product) },
     )

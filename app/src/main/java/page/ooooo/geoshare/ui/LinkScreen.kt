@@ -43,7 +43,6 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -96,7 +95,6 @@ fun LinkScreen(
     viewModel: LinkViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val resources = LocalResources.current
 
     val all by viewModel.all.collectAsStateWithLifecycle()
     val billingAppNameResId = billingViewModel.billingAppNameResId
@@ -123,27 +121,27 @@ fun LinkScreen(
         srs = viewModel.srs,
         type = viewModel.type,
         onBack = onBack,
-        onDelete = { viewModel.delete(resources) },
-        onDisable = { viewModel.disable(it) },
-        onDismissMessage = { viewModel.dismissMessage() },
-        onEnable = { viewModel.enable(it) },
+        onDelete = viewModel::delete,
+        onDisable = viewModel::disable,
+        onDismissMessage = viewModel::dismissMessage,
+        onEnable = viewModel::enable,
         onNavigateTo = {
             coroutineScope.launch {
                 viewModel.navigateTo(it)
             }
         },
         onNavigateToBillingScreen = onNavigateToBillingScreen,
-        onRestoreInitialData = { viewModel.restoreInitialData(resources) },
-        onSaveForm = { viewModel.saveForm(resources) },
-        onSetAppEnabled = { viewModel.setAppEnabled(it) },
-        onSetChipEnabled = { viewModel.setChipEnabled(it) },
-        onSetCoordsUriTemplate = { viewModel.setCoordsUriTemplate(it) },
-        onSetGroup = { viewModel.setGroup(it) },
-        onSetName = { viewModel.setName(it) },
-        onSetNameUriTemplate = { viewModel.setNameUriTemplate(it) },
-        onSetSheetEnabled = { viewModel.setSheetEnabled(it) },
-        onSetSrs = { viewModel.setSrs(it) },
-        onSetType = { viewModel.setType(it) },
+        onRestoreInitialData = viewModel::restoreInitialData,
+        onSaveForm = viewModel::saveForm,
+        onSetAppEnabled = viewModel::setAppEnabled,
+        onSetChipEnabled = viewModel::setChipEnabled,
+        onSetCoordsUriTemplate = viewModel::setCoordsUriTemplate,
+        onSetGroup = viewModel::setGroup,
+        onSetName = viewModel::setName,
+        onSetNameUriTemplate = viewModel::setNameUriTemplate,
+        onSetSheetEnabled = viewModel::setSheetEnabled,
+        onSetSrs = viewModel::setSrs,
+        onSetType = viewModel::setType,
     )
 }
 

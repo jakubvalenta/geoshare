@@ -72,7 +72,7 @@ interface ConversionState : State<ConversionStateContext> {
         val lastAttempt: Attempt<RecoverableNetworkException>?
     }
 
-    object Initial : ConversionState {
+    data object Initial : ConversionState {
         override fun toString() = "Initial"
     }
 }

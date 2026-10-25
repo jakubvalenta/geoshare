@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.TextActivity
@@ -9,9 +10,9 @@ class SendStringOutput(
 ) : StringOutput, Output.HasActivity<TextActivity> {
     override val id = "SendStringOutput(activity=$activity)"
 
-    override suspend fun execute(value: String, actionContext: ActionContext) =
+    override suspend fun execute(value: String, context: Context) =
         activity
-            .launch(actionContext.context, value)
+            .launch(context, value)
             .toActionResult(openedApp = true)
 
     @Composable

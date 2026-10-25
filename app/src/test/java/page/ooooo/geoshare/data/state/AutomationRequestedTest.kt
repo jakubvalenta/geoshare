@@ -59,6 +59,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = mock(),
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -76,6 +77,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = mock(),
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -94,6 +96,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -116,6 +119,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -142,6 +146,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -176,6 +181,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -207,6 +213,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -233,6 +240,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -274,6 +282,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -306,6 +315,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -347,6 +357,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -383,6 +394,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -415,6 +427,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -445,6 +458,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -474,6 +488,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
@@ -510,6 +525,7 @@ class AutomationRequestedTest {
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,

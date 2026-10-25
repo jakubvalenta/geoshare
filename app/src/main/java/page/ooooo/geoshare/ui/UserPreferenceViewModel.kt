@@ -1,10 +1,11 @@
 package page.ooooo.geoshare.ui
 
-import android.content.res.Resources
+import android.content.Context
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,7 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,8 +36,6 @@ import page.ooooo.geoshare.data.preferences.BasicAutomation
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.CoordinateFormatPreference
 import page.ooooo.geoshare.data.preferences.DynamicColorPreference
-import page.ooooo.geoshare.data.preferences.Finish
-import page.ooooo.geoshare.data.preferences.FinishPreference
 import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.preferences.LinkAutomation
 import page.ooooo.geoshare.data.preferences.NoopAutomation
@@ -69,6 +67,7 @@ data class HiddenAppsOptionsState(
 
 @HiltViewModel
 class UserPreferenceViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     appRepository: AppRepository,
     linkRepository: LinkRepository,
     private val coordinateConverter: CoordinateConverter,
@@ -161,11 +160,6 @@ class UserPreferenceViewModel @Inject constructor(
                 DynamicColorPreference.loading,
             )
 
-    // Finish
-
-    suspend fun getFinish(): Finish =
-        userPreferenceRepository.values.map { it.finish }.firstOrNull() ?: FinishPreference.default
-
     // Hidden apps
 
     val selectedHiddenApps: StateFlow<SelectedHiddenAppsState> =
@@ -206,14 +200,14 @@ class UserPreferenceViewModel @Inject constructor(
         }
     }
 
-    fun hideApp(resources: Resources, packageName: String) {
+    fun hideApp(packageName: String) {
         editUserPreferences { preferences ->
             HiddenAppsPreference.setValue(
                 preferences,
                 HiddenAppsPreference.getValue(preferences).orEmpty() + packageName,
             )
         }
-        _message.value = Message(resources.getString(R.string.user_preferences_apps_message_hidden))
+        _message.value = Message(context.resources.getString(R.string.user_preferences_apps_message_hidden))
     }
 
     fun dismissMessage() {

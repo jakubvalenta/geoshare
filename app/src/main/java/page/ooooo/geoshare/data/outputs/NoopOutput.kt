@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
@@ -8,7 +9,7 @@ import page.ooooo.geoshare.data.android.AppDetails
 object NoopOutput : StringOutput {
     override val id = "NoopOutput"
 
-    override suspend fun execute(value: String, actionContext: ActionContext) = ActionResult.SUCCEEDED
+    override suspend fun execute(value: String, context: Context) = ActionResult.SUCCEEDED
 
     @Composable
     override fun label(appDetails: AppDetails) =

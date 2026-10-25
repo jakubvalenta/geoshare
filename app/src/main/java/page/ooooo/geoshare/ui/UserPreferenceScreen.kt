@@ -119,9 +119,9 @@ fun UserPreferenceScreen(
         onNavigateToBillingScreen = onNavigateToBillingScreen,
         onNavigateToLinkScreen = onNavigateToLinkScreen,
         onNavigateToServerScreen = onNavigateToServerScreen,
-        onSelectServerGoogleMapsAddress = { serverViewModel.selectServerGoogleMapsAddress(it?.uid) },
-        onSelectServerGoogleMapsPlace = { serverViewModel.selectServerGoogleMapsPlace(it?.uid) },
-        onSelectServerSearch = { serverViewModel.selectServerSearch(it?.uid) },
+        onSelectServerGoogleMapsAddress = serverViewModel::selectServerGoogleMapsAddress,
+        onSelectServerGoogleMapsPlace = serverViewModel::selectServerGoogleMapsPlace,
+        onSelectServerSearch = serverViewModel::selectServerSearch,
         onValueChange = { transform: (preferences: MutablePreferences) -> Unit ->
             viewModel.editUserPreferences(transform)
         },
@@ -148,9 +148,9 @@ private fun UserPreferenceScreen(
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToLinkScreen: () -> Unit,
     onNavigateToServerScreen: (uid: Int?) -> Unit,
-    onSelectServerGoogleMapsAddress: (server: Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (server: Server?) -> Unit,
-    onSelectServerSearch: (server: Server?) -> Unit,
+    onSelectServerGoogleMapsAddress: (uid: Int?) -> Unit,
+    onSelectServerGoogleMapsPlace: (uid: Int?) -> Unit,
+    onSelectServerSearch: (uid: Int?) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -448,9 +448,9 @@ private fun UserPreferenceDetailPane(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToServerScreen: (uid: Int?) -> Unit,
-    onSelectServerGoogleMapsAddress: (server: Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (server: Server?) -> Unit,
-    onSelectServerSearch: (server: Server?) -> Unit,
+    onSelectServerGoogleMapsAddress: (uid: Int?) -> Unit,
+    onSelectServerGoogleMapsPlace: (uid: Int?) -> Unit,
+    onSelectServerSearch: (uid: Int?) -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
 ) {
     val values by values.collectAsStateWithLifecycle()

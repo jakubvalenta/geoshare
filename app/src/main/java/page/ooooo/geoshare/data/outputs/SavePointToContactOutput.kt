@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.runtime.Composable
@@ -24,8 +25,8 @@ class SavePointToContactOutput @Inject constructor(
 
     override val id = "SavePointToContactOutput"
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
-        actionContext.context.insertOrEditContactAddress(
+    override suspend fun execute(value: Point, context: Context) =
+        context.insertOrEditContactAddress(
             CoordinateFormatter.formatDecCoords(
                 coordinateConverter.toWGS84(value)
             ),

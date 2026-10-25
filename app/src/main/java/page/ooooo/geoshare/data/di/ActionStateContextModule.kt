@@ -1,9 +1,11 @@
 package page.ooooo.geoshare.data.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.UserPreferenceRepository
@@ -19,6 +21,7 @@ object ActionStateContextModule {
     @Provides
     @ViewModelScoped
     fun provideActionStateContext(
+        @ApplicationContext context: Context,
         billing: Billing,
         coordinateConverter: CoordinateConverter,
         linkRepository: LinkRepository,
@@ -27,6 +30,7 @@ object ActionStateContextModule {
     ): ActionStateContext =
         ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,

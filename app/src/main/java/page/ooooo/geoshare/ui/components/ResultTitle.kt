@@ -83,7 +83,7 @@ import kotlin.time.DurationUnit
 @Composable
 fun ResultTitle(
     appDetails: StateFlow<AppDetails>,
-    actionState: ActionState,
+    actionState: StateFlow<ActionState>,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
     modifier: Modifier = Modifier,
@@ -94,6 +94,7 @@ fun ResultTitle(
     var counter by retain { mutableStateOf(Duration.ZERO) }
 
     val appDetails by appDetails.collectAsStateWithLifecycle()
+    val actionState by actionState.collectAsStateWithLifecycle()
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
 
     // TODO Don't animate when state is completed
@@ -265,7 +266,7 @@ private fun ActionCompletedPreview() {
         Surface {
             ResultTitle(
                 appDetails = MutableStateFlow(emptyMap()),
-                actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
+                actionState = MutableStateFlow(ActionCompleted(actionResult = ActionResult.SUCCEEDED)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -290,7 +291,7 @@ private fun DarkActionCompletedPreview() {
         Surface {
             ResultTitle(
                 appDetails = MutableStateFlow(emptyMap()),
-                actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
+                actionState = MutableStateFlow(ActionCompleted(actionResult = ActionResult.SUCCEEDED)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -316,7 +317,7 @@ private fun ActionCompletedFeatureNotAvailablePreview() {
             Column {
                 ResultTitle(
                     appDetails = MutableStateFlow(emptyMap()),
-                    actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
+                    actionState = MutableStateFlow(ActionCompleted(actionResult = ActionResult.SUCCEEDED)),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                     animationsEnabled = false,
@@ -337,7 +338,7 @@ private fun DarkActionCompletedFeatureNotAvailablePreview() {
             Column {
                 ResultTitle(
                     appDetails = MutableStateFlow(emptyMap()),
-                    actionState = ActionCompleted(actionResult = ActionResult.SUCCEEDED),
+                    actionState = MutableStateFlow(ActionCompleted(actionResult = ActionResult.SUCCEEDED)),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                     animationsEnabled = false,
@@ -366,11 +367,13 @@ private fun ActionWaitingPreview() {
             )
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = ActionWaiting(
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    output = output,
-                    isAutomation = true,
-                    delay = 3.seconds,
+                actionState = MutableStateFlow(
+                    ActionWaiting(
+                        action = output.toAction(WGS84Point(NaivePoint.example)),
+                        output = output,
+                        isAutomation = true,
+                        delay = 3.seconds,
+                    )
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -405,11 +408,13 @@ private fun DarkActionWaitingPreview() {
             )
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = ActionWaiting(
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    output = output,
-                    isAutomation = true,
-                    delay = 3.seconds,
+                actionState = MutableStateFlow(
+                    ActionWaiting(
+                        action = output.toAction(WGS84Point(NaivePoint.example)),
+                        output = output,
+                        isAutomation = true,
+                        delay = 3.seconds,
+                    )
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -444,9 +449,11 @@ private fun LocationPermissionReceivedPreview() {
             )
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = LocationPermissionReceived(
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = false,
+                actionState = MutableStateFlow(
+                    LocationPermissionReceived(
+                        action = output.toAction(WGS84Point(NaivePoint.example)),
+                        isAutomation = false,
+                    )
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -481,9 +488,11 @@ private fun DarkLocationPermissionReceivedPreview() {
             )
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = LocationPermissionReceived(
-                    action = output.toAction(WGS84Point(NaivePoint.example)),
-                    isAutomation = false,
+                actionState = MutableStateFlow(
+                    LocationPermissionReceived(
+                        action = output.toAction(WGS84Point(NaivePoint.example)),
+                        isAutomation = false,
+                    )
                 ),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
@@ -513,7 +522,7 @@ private fun SucceededPreview() {
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = ActionSucceeded(actionResult = ActionResult.SUCCEEDED, output = output),
+                actionState = MutableStateFlow(ActionSucceeded(actionResult = ActionResult.SUCCEEDED, output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -542,7 +551,7 @@ private fun DarkSucceededPreview() {
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = ActionSucceeded(actionResult = ActionResult.SUCCEEDED, output = output),
+                actionState = MutableStateFlow(ActionSucceeded(actionResult = ActionResult.SUCCEEDED, output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -571,7 +580,7 @@ private fun FailedPreview() {
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = ActionFailed(output = output),
+                actionState = MutableStateFlow(ActionFailed(output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -600,7 +609,7 @@ private fun DarkFailedPreview() {
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                actionState = ActionFailed(output = output),
+                actionState = MutableStateFlow(ActionFailed(output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(

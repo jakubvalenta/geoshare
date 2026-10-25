@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,7 +31,6 @@ import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
@@ -82,22 +82,19 @@ import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.data.network.ConnectTimeoutNetworkException
 import page.ooooo.geoshare.data.outputs.Action
-import page.ooooo.geoshare.data.outputs.ActionContext
 import page.ooooo.geoshare.data.outputs.LocationAction
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.shouldAppFinish
+import page.ooooo.geoshare.data.state.ActionCompleted
 import page.ooooo.geoshare.data.state.ActionState
+import page.ooooo.geoshare.data.state.ActivityShouldFinish
 import page.ooooo.geoshare.data.state.Attempt
-import page.ooooo.geoshare.data.state.BasicActionReady
 import page.ooooo.geoshare.data.state.ConversionFailed
 import page.ooooo.geoshare.data.state.ConversionState
 import page.ooooo.geoshare.data.state.ConversionSucceeded
 import page.ooooo.geoshare.data.state.ExtendedStateLog
-import page.ooooo.geoshare.data.state.FileActionReady
 import page.ooooo.geoshare.data.state.FileUriRequested
-import page.ooooo.geoshare.data.state.LocationActionReady
 import page.ooooo.geoshare.data.state.LocationPermissionReceived
 import page.ooooo.geoshare.data.state.LocationRationaleConfirmed
 import page.ooooo.geoshare.data.state.LocationRationaleRequested
@@ -155,111 +152,11 @@ fun MainScreen(
     linkViewModel: LinkViewModel = hiltViewModel(),
     userPreferenceViewModel: UserPreferenceViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
-    val clipboard = LocalClipboard.current
-    val resources = LocalResources.current
-    val coroutineScope = rememberCoroutineScope()
-
     val conversionState by mainViewModel.conversionState.collectAsStateWithLifecycle()
-    val actionState by mainViewModel.actionState.collectAsStateWithLifecycle()
-
-    // Action
-
-    var locationJob by remember { mutableStateOf<Job?>(null) }
-    val locationPermissionRequest =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            mainViewModel.receiveLocationPermission()
-        }
-    val saveFileLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
-                mainViewModel.receiveFileUri(uri)
-            } ?: mainViewModel.cancelFileUriRequest()
-        }
-
-    LaunchedEffect(actionState) {
-        actionState.let { actionState ->
-            when (actionState) {
-                // Basic action
-
-                is BasicActionReady -> {
-                    val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
-                    val actionResult = actionState.action.execute(actionContext)
-                    if (userPreferenceViewModel.getFinish().shouldAppFinish(actionResult)) {
-                        onFinish() // TODO Don't finish if conversion is running
-                    }
-                    mainViewModel.completeBasicAction(actionResult)
-                }
-
-                // File action
-
-                is FileUriRequested -> {
-                    try {
-                        saveFileLauncher.launch(
-                            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                                addCategory(Intent.CATEGORY_OPENABLE)
-                                type = actionState.action.mimeType
-                                putExtra(Intent.EXTRA_TITLE, actionState.action.getFilename(resources))
-                            }
-                        )
-                    } catch (_: ActivityNotFoundException) {
-                        mainViewModel.cancelFileUriRequest()
-                    }
-                }
-
-                is FileActionReady -> {
-                    val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
-                    val actionResult = actionState.action.execute(actionState.uri, actionContext)
-                    if (userPreferenceViewModel.getFinish().shouldAppFinish(actionResult)) {
-                        onFinish()
-                    }
-                    mainViewModel.completeFileAction(actionResult)
-                }
-
-                // Location action
-
-                is LocationRationaleRequested -> {
-                    if (context.hasLocationPermission()) {
-                        mainViewModel.skipLocationRationale(actionState.action, actionState.isAutomation)
-                    } else {
-                        mainViewModel.showLocationRationale(actionState.action, actionState.isAutomation)
-                    }
-                }
-
-                is LocationRationaleConfirmed -> {
-                    locationPermissionRequest.launch(
-                        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-                    )
-                }
-
-                is LocationPermissionReceived -> {
-                    locationJob?.cancel()
-                    locationJob = coroutineScope.launch(Dispatchers.IO) {
-                        val location = try {
-                            context.getLocation()
-                        } catch (_: CancellationException) {
-                            mainViewModel.cancelLocationFinding()
-                            return@launch
-                        }
-                        mainViewModel.receiveLocation(actionState.action, actionState.isAutomation, location)
-                    }
-                }
-
-                is LocationActionReady -> {
-                    val actionContext = ActionContext(context = context, clipboard = clipboard, resources = resources)
-                    val actionResult = actionState.action.execute(actionState.location, actionContext)
-                    if (userPreferenceViewModel.getFinish().shouldAppFinish(actionResult)) {
-                        onFinish()
-                    }
-                    mainViewModel.completeLocationAction(actionResult)
-                }
-            }
-        }
-    }
 
     MainScreen(
         conversionState = conversionState,
-        actionState = actionState,
+        actionState = mainViewModel.actionState,
         appDetails = mainViewModel.appDetails,
         billingAppNameResId = billingViewModel.billingAppNameResId,
         billingFeatures = billingViewModel.billingFeatures,
@@ -281,24 +178,19 @@ fun MainScreen(
         start = mainViewModel.conversionStart,
         stateLog = mainViewModel.extendedConversionStateLog,
         userPreferenceMessage = userPreferenceViewModel.message,
-        onCancelAction = {
-            locationJob?.cancel()
-            mainViewModel.cancelAction()
-        },
-        onCancelConversion = { mainViewModel.cancelConversion() },
-        onCopyPoint = { point, pointCount, pointIndex -> mainViewModel.copyPoint(point, pointCount, pointIndex) },
-        onDenyAction = { doNotAsk -> mainViewModel.denyAction(doNotAsk) },
-        onDenyConversion = { doNotAsk -> mainViewModel.deny(doNotAsk) },
-        onDisableLinkGroup = { group -> linkViewModel.disableGroup(resources, group) },
-        onDismissHelpMessage = { helpMessage -> helpViewModel.dismissHelpMessage(helpMessage) },
-        onDismissLinkMessage = { linkViewModel.dismissMessage() },
-        onDismissUserPreferenceMessage = { userPreferenceViewModel.dismissMessage() },
-        onExecute = { action -> mainViewModel.startAction(action) },
-        onGrantAction = { doNotAsk -> mainViewModel.grantAction(doNotAsk) },
-        onGrantConversion = { doNotAsk -> mainViewModel.grant(doNotAsk) },
-        onHideApp = { packageName -> userPreferenceViewModel.hideApp(resources, packageName) },
-        onHideSheet = { mainViewModel.hideSheet() },
-        onOpenPoint = { point, pointCount, pointIndex -> mainViewModel.openPoint(point, pointCount, pointIndex) },
+        onCancelAction = mainViewModel::cancelAction,
+        onCancelConversion = mainViewModel::cancelConversion,
+        onCopyPoint = mainViewModel::copyPoint,
+        onDenyConversion = mainViewModel::deny,
+        onDisableLinkGroup = linkViewModel::disableGroup,
+        onDismissHelpMessage = helpViewModel::dismissHelpMessage,
+        onDismissLinkMessage = linkViewModel::dismissMessage,
+        onDismissUserPreferenceMessage = userPreferenceViewModel::dismissMessage,
+        onExecute = mainViewModel::startAction,
+        onGrantConversion = mainViewModel::grant,
+        onHideApp = userPreferenceViewModel::hideApp,
+        onHideSheet = mainViewModel::hideSheet,
+        onOpenPoint = mainViewModel::openPoint,
         onNavigateToAboutScreen = {
             mainViewModel.cancelAction()
             onNavigateToAboutScreen()
@@ -323,15 +215,29 @@ fun MainScreen(
             mainViewModel.cancelAction()
             onNavigateToUserPreferencesScreen(groupId)
         },
-        onReset = { mainViewModel.reset() },
-        onRetry = { mainViewModel.retry() },
-        onSavePoint = { point, pointCount, pointIndex -> mainViewModel.savePoint(point, pointCount, pointIndex) },
-        onSavePoints = { points -> mainViewModel.savePoints(points) },
-        onSharePoints = { points -> mainViewModel.sharePoints(points) },
-        onShareSource = { source -> mainViewModel.shareSource(source) },
-        onSetSource = { mainViewModel.setSource(it) },
-        onSetRandomSource = { mainViewModel.setRandomSource() },
+        onReset = mainViewModel::reset,
+        onRetry = mainViewModel::retry,
+        onSavePoint = mainViewModel::savePoint,
+        onSavePoints = mainViewModel::savePoints,
+        onSharePoints = mainViewModel::sharePoints,
+        onShareSource = mainViewModel::shareSource,
+        onSetSource = mainViewModel::setSource,
+        onSetRandomSource = mainViewModel::setRandomSource,
         onSubmit = { mainViewModel.start(false) },
+    )
+
+    MainAction(
+        actionState = mainViewModel.actionState,
+        onCancelFileUriRequest = mainViewModel::cancelFileUriRequest,
+        onCancelLocationFinding = mainViewModel::cancelLocationFinding,
+        onDenyAction = mainViewModel::denyAction,
+        onFinish = onFinish,
+        onGrantAction = mainViewModel::grantAction,
+        onReceiveFileUri = mainViewModel::receiveFileUri,
+        onReceiveLocation = mainViewModel::receiveLocation,
+        onReceiveLocationPermission = mainViewModel::receiveLocationPermission,
+        onShowLocationRationale = mainViewModel::showLocationRationale,
+        onSkipLocationRationale = mainViewModel::skipLocationRationale,
     )
 }
 
@@ -339,7 +245,7 @@ fun MainScreen(
 @Composable
 private fun MainScreen(
     conversionState: ConversionState,
-    actionState: ActionState,
+    actionState: StateFlow<ActionState>,
     appDetails: StateFlow<AppDetails>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
@@ -364,14 +270,12 @@ private fun MainScreen(
     onCancelAction: () -> Unit,
     onCancelConversion: () -> Unit,
     onCopyPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
-    onDenyAction: (Boolean) -> Unit,
     onDenyConversion: (Boolean) -> Unit,
     onDisableLinkGroup: (String?) -> Unit,
     onDismissHelpMessage: (helpMessage: HelpMessage) -> Unit,
     onDismissLinkMessage: () -> Unit,
     onDismissUserPreferenceMessage: () -> Unit,
     onExecute: (Action<*>) -> Unit,
-    onGrantAction: (Boolean) -> Unit,
     onGrantConversion: (Boolean) -> Unit,
     onHideApp: (String) -> Unit,
     onHideSheet: () -> Unit,
@@ -729,9 +633,97 @@ private fun MainScreen(
                 )
             }
     }
+}
 
-    when (actionState) {
-        is LocationRationaleShown ->
+@Composable
+private fun MainAction(
+    actionState: StateFlow<ActionState>,
+    onCancelFileUriRequest: () -> Unit,
+    onCancelLocationFinding: () -> Unit,
+    onDenyAction: (doNotAsk: Boolean) -> Unit,
+    onFinish: () -> Unit,
+    onGrantAction: (doNotAsk: Boolean) -> Unit,
+    onReceiveFileUri: (uri: Uri) -> Unit,
+    onReceiveLocation: (action: LocationAction<*>, isAutomation: Boolean, location: Point?) -> Unit,
+    onReceiveLocationPermission: () -> Unit,
+    onShowLocationRationale: (action: LocationAction<*>, isAutomation: Boolean) -> Unit,
+    onSkipLocationRationale: (action: LocationAction<*>, isAutomation: Boolean) -> Unit,
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val resources = LocalResources.current
+
+    val actionState by actionState.collectAsStateWithLifecycle()
+    var locationJob by remember { mutableStateOf<Job?>(null) }
+    val locationPermissionRequest =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            onReceiveLocationPermission()
+        }
+    val saveFileLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            result.data?.data?.takeIf { result.resultCode == Activity.RESULT_OK }?.let { uri ->
+                onReceiveFileUri(uri)
+            } ?: onCancelFileUriRequest()
+        }
+
+    LaunchedEffect(actionState) {
+        actionState.let { actionState ->
+            when (actionState) {
+                is ActionCompleted -> {
+                    // Cancel location finding when is action is canceled (or somehow completes)
+                    locationJob?.cancel()
+                }
+
+                is ActivityShouldFinish -> {
+                    onFinish()
+                }
+
+                is FileUriRequested -> {
+                    try {
+                        saveFileLauncher.launch(
+                            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = actionState.action.mimeType
+                                putExtra(Intent.EXTRA_TITLE, actionState.action.getFilename(resources))
+                            }
+                        )
+                    } catch (_: ActivityNotFoundException) {
+                        onCancelFileUriRequest()
+                    }
+                }
+
+                is LocationRationaleRequested -> {
+                    if (context.hasLocationPermission()) {
+                        onSkipLocationRationale(actionState.action, actionState.isAutomation)
+                    } else {
+                        onShowLocationRationale(actionState.action, actionState.isAutomation)
+                    }
+                }
+
+                is LocationRationaleConfirmed -> {
+                    locationPermissionRequest.launch(
+                        arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+                    )
+                }
+
+                is LocationPermissionReceived -> {
+                    locationJob?.cancel()
+                    locationJob = coroutineScope.launch(Dispatchers.IO) {
+                        val location = try {
+                            context.getLocation()
+                        } catch (_: CancellationException) {
+                            onCancelLocationFinding()
+                            return@launch
+                        }
+                        onReceiveLocation(actionState.action, actionState.isAutomation, location)
+                    }
+                }
+            }
+        }
+    }
+
+    actionState.let { actionState ->
+        if (actionState is LocationRationaleShown) {
             ConfirmationDialog(
                 title = stringResource(R.string.conversion_succeeded_location_rationale_dialog_title),
                 confirmText = stringResource(R.string.conversion_permission_common_grant),
@@ -752,6 +744,7 @@ private fun MainScreen(
                     )
                 }
             }
+        }
     }
 }
 
@@ -767,7 +760,7 @@ private fun DefaultPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             conversionState = ConversionState.Initial,
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -792,14 +785,12 @@ private fun DefaultPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -833,7 +824,7 @@ private fun DarkPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             conversionState = ConversionState.Initial,
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -858,14 +849,12 @@ private fun DarkPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -899,7 +888,7 @@ private fun SmallPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             conversionState = ConversionState.Initial,
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -924,14 +913,12 @@ private fun SmallPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -965,7 +952,7 @@ private fun TabletPreview() {
         val timeSource = TestTimeSource()
         MainScreen(
             conversionState = ConversionState.Initial,
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -990,14 +977,12 @@ private fun TabletPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1050,7 +1035,7 @@ private fun SucceededPreview() {
                     ),
                 ),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1090,14 +1075,12 @@ private fun SucceededPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1150,7 +1133,7 @@ private fun DarkSucceededPreview() {
                     ),
                 ),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1190,14 +1173,12 @@ private fun DarkSucceededPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1249,7 +1230,7 @@ private fun SmallSucceededPreview() {
                     ),
                 ),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1289,14 +1270,12 @@ private fun SmallSucceededPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1349,7 +1328,7 @@ private fun TabletSucceededPreview() {
                     ),
                 ),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(getFakeAppDetails(context)),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1389,14 +1368,12 @@ private fun TabletSucceededPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1434,7 +1411,7 @@ private fun ErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1466,14 +1443,12 @@ private fun ErrorPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1511,7 +1486,7 @@ private fun DarkErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1543,14 +1518,12 @@ private fun DarkErrorPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1588,7 +1561,7 @@ private fun TabletErrorPreview() {
                 source = source,
                 message = stringResource(R.string.conversion_failed_reason_no_points),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1620,14 +1593,12 @@ private fun TabletErrorPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1666,7 +1637,7 @@ private fun WarningPreview() {
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1698,14 +1669,12 @@ private fun WarningPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1744,7 +1713,7 @@ private fun DarkWarningPreview() {
                 message = stringResource(R.string.conversion_failed_unsupported_source_google_search),
                 warning = true,
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1776,14 +1745,12 @@ private fun DarkWarningPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1826,7 +1793,7 @@ private fun LoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1858,14 +1825,12 @@ private fun LoadingIndicatorPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1908,7 +1873,7 @@ private fun DarkLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -1940,14 +1905,12 @@ private fun DarkLoadingIndicatorPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -1988,7 +1951,7 @@ private fun TabletLoadingIndicatorPreview() {
                 results = emptyMap(),
                 lastAttempt = Attempt(2, ConnectTimeoutNetworkException(Exception())),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2020,14 +1983,12 @@ private fun TabletLoadingIndicatorPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -2067,7 +2028,7 @@ private fun WebViewPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2099,14 +2060,12 @@ private fun WebViewPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -2146,7 +2105,7 @@ private fun DarkWebViewPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2178,14 +2137,12 @@ private fun DarkWebViewPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -2225,7 +2182,7 @@ private fun TabletWebViewPreview() {
                 permission = Permission.ALWAYS,
                 results = emptyMap(),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2257,14 +2214,12 @@ private fun TabletWebViewPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},
@@ -2303,7 +2258,7 @@ private fun EmptyPreview() {
                 matchedInput = MatchedInput(FakeInputRepository.googleMapsShortLinkInput, source),
                 points = persistentListOf(),
             ),
-            actionState = ActionState.Initial,
+            actionState = MutableStateFlow(ActionState.Initial),
             appDetails = MutableStateFlow(emptyMap()),
             billingAppNameResId = R.string.app_name,
             billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
@@ -2335,14 +2290,12 @@ private fun EmptyPreview() {
             onCancelAction = {},
             onCancelConversion = {},
             onCopyPoint = { _, _, _ -> },
-            onDenyAction = {},
             onDenyConversion = {},
             onDisableLinkGroup = {},
             onDismissHelpMessage = {},
             onDismissLinkMessage = {},
             onDismissUserPreferenceMessage = {},
             onExecute = {},
-            onGrantAction = {},
             onGrantConversion = {},
             onHideApp = {},
             onHideSheet = {},

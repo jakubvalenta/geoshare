@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.runtime.Composable
@@ -41,9 +42,9 @@ class SendPointOutput @Inject constructor(
             uriQuote = uriQuote,
         )
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
+    override suspend fun execute(value: Point, context: Context) =
         getUriString(value)
-            ?.let { text -> activity.launch(actionContext.context, text) }
+            ?.let { text -> activity.launch(context, text) }
             .toActionResult(openedApp = true)
 
     @Composable

@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -32,13 +33,13 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
         GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), writer)
     }
 
-    override suspend fun execute(location: Point?, value: Point, actionContext: ActionContext) =
+    override suspend fun execute(location: Point?, value: Point, context: Context) =
         location?.let { location ->
-            File(actionContext.context.filesDir, "routes")
+            File(context.filesDir, "routes")
                 // Don't use a .gpx extension but use .xml instead, because that's what TomTom requires
                 .deleteAllAndWriteFile("${System.currentTimeMillis()}.xml") {
                     write(location, value, this)
-                }?.let { file -> activity.launch(actionContext.context, file, log) }
+                }?.let { file -> activity.launch(context, file, log) }
         }.toActionResult(openedApp = true)
 
     @Composable

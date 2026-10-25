@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import android.content.res.Resources
 import android.net.Uri
 import page.ooooo.geoshare.data.geo.Point
@@ -23,30 +24,30 @@ sealed interface Action<T> {
  * An [Action] that doesn't require anything other than a [value] ([Point] or [Points]) to be executed.
  */
 sealed interface BasicAction<T> : Action<T> {
-    suspend fun execute(actionContext: ActionContext): ActionResult
+    suspend fun execute(context: Context): ActionResult
 
     data class WithPoint(
         override val value: Point,
         override val output: PointOutput.WithoutLocation,
     ) : BasicAction<Point> {
-        override suspend fun execute(actionContext: ActionContext) =
-            output.execute(value, actionContext)
+        override suspend fun execute(context: Context) =
+            output.execute(value, context)
     }
 
     data class WithPoints(
         override val value: Points,
         override val output: PointsOutput.WithoutLocation,
     ) : BasicAction<Points> {
-        override suspend fun execute(actionContext: ActionContext) =
-            output.execute(value, actionContext)
+        override suspend fun execute(context: Context) =
+            output.execute(value, context)
     }
 
     data class WithString(
         override val value: String,
         override val output: StringOutput,
     ) : BasicAction<String> {
-        override suspend fun execute(actionContext: ActionContext) =
-            output.execute(value, actionContext)
+        override suspend fun execute(context: Context) =
+            output.execute(value, context)
     }
 }
 
@@ -58,7 +59,7 @@ sealed interface FileAction<T> : Action<T> {
 
     val mimeType: String
 
-    suspend fun execute(uri: Uri, actionContext: ActionContext): ActionResult
+    suspend fun execute(uri: Uri, context: Context): ActionResult
 
     data class WithPoint(
         override val value: Point,
@@ -68,8 +69,8 @@ sealed interface FileAction<T> : Action<T> {
 
         override val mimeType = output.mimeType
 
-        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
-            output.execute(uri, value, actionContext)
+        override suspend fun execute(uri: Uri, context: Context) =
+            output.execute(uri, value, context)
     }
 
     data class WithPoints(
@@ -80,8 +81,8 @@ sealed interface FileAction<T> : Action<T> {
 
         override val mimeType = output.mimeType
 
-        override suspend fun execute(uri: Uri, actionContext: ActionContext) =
-            output.execute(uri, value, actionContext)
+        override suspend fun execute(uri: Uri, context: Context) =
+            output.execute(uri, value, context)
     }
 }
 
@@ -89,22 +90,22 @@ sealed interface FileAction<T> : Action<T> {
  * An [Action] that requires a [value] ([Point] or [Points]) and current device location [Point] to be executed.
  */
 sealed interface LocationAction<T> : Action<T> {
-    suspend fun execute(location: Point, actionContext: ActionContext): ActionResult
+    suspend fun execute(location: Point, context: Context): ActionResult
 
     data class WithPoint(
         override val value: Point,
         override val output: PointOutput.WithLocation,
     ) : LocationAction<Point> {
-        override suspend fun execute(location: Point, actionContext: ActionContext) =
-            output.execute(location, value, actionContext)
+        override suspend fun execute(location: Point, context: Context) =
+            output.execute(location, value, context)
     }
 
     data class WithPoints(
         override val value: Points,
         override val output: PointsOutput.WithLocation,
     ) : LocationAction<Points> {
-        override suspend fun execute(location: Point, actionContext: ActionContext) =
-            output.execute(location, value, actionContext)
+        override suspend fun execute(location: Point, context: Context) =
+            output.execute(location, value, context)
     }
 }
 

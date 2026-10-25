@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.state
 
+import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
@@ -46,13 +47,14 @@ interface ActionState : State<ActionStateContext> {
         override suspend fun deny(stateContext: ActionStateContext, doNotAsk: Boolean): ActionState
     }
 
-    object Initial : ActionState {
+    data object Initial : ActionState {
         override fun toString() = "Initial"
     }
 }
 
 data class ActionStateContext(
     val billing: Billing,
+    val context: Context,
     val coordinateConverter: CoordinateConverter,
     val linkRepository: LinkRepository,
     val log: Log = DefaultLog,
@@ -166,35 +168,17 @@ data class ActionReady(
     val isAutomation: Boolean,
 ) : ActionState {
     override suspend fun transition(stateContext: ActionStateContext): ActionState = when (action) {
-        is BasicAction -> BasicActionReady(action, isAutomation)
+        is BasicAction -> ActionRan(
+            action = action,
+            actionResult = action.execute(stateContext.context),
+            isAutomation = isAutomation,
+        )
+
         is FileAction -> FileUriRequested(action, isAutomation)
         is LocationAction -> LocationRationaleRequested(action, isAutomation)
     }
 
     override fun toString() = "ActionReady(action=$action, isAutomation=$isAutomation)"
-}
-
-data class BasicActionReady(
-    val action: BasicAction<*>,
-    val isAutomation: Boolean,
-) : ActionState {
-    override fun toString() = "BasicActionReady(action=$action, isAutomation=$isAutomation)"
-}
-
-data class FileActionReady(
-    val action: FileAction<*>,
-    val isAutomation: Boolean,
-    val uri: Uri,
-) : ActionState {
-    override fun toString() = "FileActionReady(action=$action, isAutomation=$isAutomation, uri=$uri)"
-}
-
-data class LocationActionReady(
-    val action: LocationAction<*>,
-    val isAutomation: Boolean,
-    val location: Point,
-) : ActionState {
-    override fun toString() = "LocationActionReady(action=$action, isAutomation=$isAutomation, location=$location)"
 }
 
 data class ActionRan(
@@ -317,6 +301,21 @@ data class FileUriRequested(
     override fun toString() = "FileUriRequested(action=$action, isAutomation=$isAutomation)"
 }
 
+data class FileUriReceived(
+    val action: FileAction<*>,
+    val isAutomation: Boolean,
+    val uri: Uri,
+) : ActionState {
+    override suspend fun transition(stateContext: ActionStateContext) =
+        ActionRan(
+            action = action,
+            actionResult = action.execute(uri, stateContext.context),
+            isAutomation = isAutomation,
+        )
+
+    override fun toString() = "FileUriReceived(action=$action, isAutomation=$isAutomation, uri=$uri)"
+}
+
 data class LocationRationaleRequested(
     val action: LocationAction<*>,
     val isAutomation: Boolean,
@@ -359,7 +358,11 @@ data class LocationReceived(
     override suspend fun transition(stateContext: ActionStateContext): ActionState = if (location == null) {
         LocationFindingFailed(ActionResult.FAILED)
     } else {
-        LocationActionReady(action, isAutomation, location)
+        ActionRan(
+            action = action,
+            actionResult = action.execute(location, stateContext.context),
+            isAutomation = isAutomation,
+        )
     }
 
     override fun toString() = "LocationReceived(action=$action, isAutomation=$isAutomation, location=$location)"
@@ -378,4 +381,8 @@ data class LocationFindingFailed(
     }
 
     override fun toString() = "LocationFindingFailed(actionResult=$actionResult)"
+}
+
+data object ActivityShouldFinish : ActionState {
+    override fun toString() = "ActivityShouldFinish"
 }

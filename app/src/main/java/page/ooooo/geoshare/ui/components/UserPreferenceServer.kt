@@ -68,9 +68,9 @@ fun UserPreferenceServerControls(
     selectedServers: StateFlow<SelectedServers>,
     servers: StateFlow<List<Server>>,
     onBack: () -> Unit,
-    onSelectServerGoogleMapsAddress: (server: Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (server: Server?) -> Unit,
-    onSelectServerSearch: (server: Server?) -> Unit,
+    onSelectServerGoogleMapsAddress: (uid: Int?) -> Unit,
+    onSelectServerGoogleMapsPlace: (uid: Int?) -> Unit,
+    onSelectServerSearch: (uid: Int?) -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToServerScreen: (uid: Int?) -> Unit,
     wide: Boolean,
@@ -98,7 +98,7 @@ fun UserPreferenceServerControls(
             noneDescription = { stringResource(R.string.server_list_none_html) },
             optionGroups = optionGroups,
             onNavigateToServerScreen = onNavigateToServerScreen,
-            onSelect = onSelectServerGoogleMapsAddress,
+            onSelect = { server -> onSelectServerGoogleMapsAddress(server?.uid) },
         )
         userPreferenceServerDivider(group = "google_maps_place")
         userPreferenceServerControl(
@@ -108,7 +108,7 @@ fun UserPreferenceServerControls(
             noneDescription = { stringResource(R.string.server_list_none_html) },
             optionGroups = optionGroups,
             onNavigateToServerScreen = onNavigateToServerScreen,
-            onSelect = onSelectServerGoogleMapsPlace,
+            onSelect = { server -> onSelectServerGoogleMapsPlace(server?.uid) },
         )
         if (BuildConfig.DEBUG) {
             userPreferenceServerDivider(group = "search")
@@ -119,7 +119,7 @@ fun UserPreferenceServerControls(
                 noneDescription = { stringResource(R.string.server_list_search_none_description) },
                 optionGroups = optionGroups,
                 onNavigateToServerScreen = onNavigateToServerScreen,
-                onSelect = onSelectServerSearch,
+                onSelect = { server -> onSelectServerSearch(server?.uid) },
             )
         }
         item(key = "edit", contentType = "text_button") {

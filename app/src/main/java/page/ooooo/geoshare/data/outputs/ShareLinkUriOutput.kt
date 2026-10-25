@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
@@ -27,9 +28,9 @@ class ShareLinkUriOutput @Inject constructor(
             uriQuote = uriQuote,
         )
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
+    override suspend fun execute(value: Point, context: Context) =
         getUriString(value)?.let { uriString ->
-            actionContext.context.openUriInDefaultApp(uriString)
+            context.openUriInDefaultApp(uriString)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
     override fun isEnabled(value: Point) =

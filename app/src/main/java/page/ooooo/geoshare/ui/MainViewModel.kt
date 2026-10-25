@@ -48,22 +48,22 @@ import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.ActionResult
 import page.ooooo.geoshare.data.outputs.LocationAction
 import page.ooooo.geoshare.data.outputs.Output
+import page.ooooo.geoshare.data.preferences.FinishPreference
+import page.ooooo.geoshare.data.preferences.shouldAppFinish
 import page.ooooo.geoshare.data.state.ActionCompleted
-import page.ooooo.geoshare.data.state.ActionRan
 import page.ooooo.geoshare.data.state.ActionReady
 import page.ooooo.geoshare.data.state.ActionState
 import page.ooooo.geoshare.data.state.ActionStateContext
+import page.ooooo.geoshare.data.state.ActivityShouldFinish
 import page.ooooo.geoshare.data.state.AutomationRequested
-import page.ooooo.geoshare.data.state.BasicActionReady
 import page.ooooo.geoshare.data.state.ConversionFailed
 import page.ooooo.geoshare.data.state.ConversionState
 import page.ooooo.geoshare.data.state.ConversionStateContext
 import page.ooooo.geoshare.data.state.ConversionSucceeded
 import page.ooooo.geoshare.data.state.ExtendedStateLog
 import page.ooooo.geoshare.data.state.ExtendedStateLogItem
-import page.ooooo.geoshare.data.state.FileActionReady
+import page.ooooo.geoshare.data.state.FileUriReceived
 import page.ooooo.geoshare.data.state.FileUriRequested
-import page.ooooo.geoshare.data.state.LocationActionReady
 import page.ooooo.geoshare.data.state.LocationPermissionReceived
 import page.ooooo.geoshare.data.state.LocationRationaleConfirmed
 import page.ooooo.geoshare.data.state.LocationRationaleShown
@@ -284,16 +284,26 @@ class MainViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    init {
+        // Finish activity when action completes and conversion is not in progress
+        _actionState
+            .filterIsInstance<ActionCompleted>()
+            .onEach { actionState ->
+                if (_conversionState.value is ConversionState.HasResult) {
+                    val finish = userPreferenceRepository.values.map { it.finish }.firstOrNull()
+                        ?: FinishPreference.default
+                    if (finish.shouldAppFinish(actionState.actionResult)) {
+                        transitionAction { ActivityShouldFinish }
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
     // Any action
 
     fun startAction(action: Action<*>) {
         transitionAction { ActionReady(action, isAutomation = false) }
-    }
-
-    fun completeBasicAction(actionResult: ActionResult) {
-        (_actionState.value as? BasicActionReady)?.apply {
-            transitionAction { ActionRan(action, actionResult, isAutomation) }
-        }
     }
 
     fun grantAction(doNotAsk: Boolean) {
@@ -316,19 +326,13 @@ class MainViewModel @Inject constructor(
 
     fun receiveFileUri(uri: Uri) {
         (_actionState.value as? FileUriRequested)?.apply {
-            transitionAction { FileActionReady(action, isAutomation, uri) }
+            transitionAction { FileUriReceived(action, isAutomation, uri) }
         }
     }
 
     fun cancelFileUriRequest() {
         (_actionState.value as? FileUriRequested)?.apply {
             transitionAction { ActionCompleted(ActionResult.FAILED) }
-        }
-    }
-
-    fun completeFileAction(actionResult: ActionResult) {
-        (_actionState.value as? FileActionReady)?.apply {
-            transitionAction { ActionRan(action, actionResult, isAutomation) }
         }
     }
 
@@ -355,12 +359,6 @@ class MainViewModel @Inject constructor(
     fun cancelLocationFinding() {
         (_actionState.value as? LocationPermissionReceived)?.apply {
             transitionAction { ActionCompleted(ActionResult.FAILED) }
-        }
-    }
-
-    fun completeLocationAction(actionResult: ActionResult) {
-        (_actionState.value as? LocationActionReady)?.apply {
-            transitionAction { ActionRan(action, actionResult, isAutomation) }
         }
     }
 

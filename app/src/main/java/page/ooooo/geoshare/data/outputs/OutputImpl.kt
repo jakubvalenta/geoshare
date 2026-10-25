@@ -1,16 +1,19 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.getSystemService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.android.UriActivity
-import page.ooooo.geoshare.data.android.copy
 import page.ooooo.geoshare.data.android.openFileWithChooser
 import page.ooooo.geoshare.data.android.openUriWithChooser
 import page.ooooo.geoshare.data.android.writeToContentProvider
@@ -32,10 +35,10 @@ sealed interface CopyPointTextOutput :
     override fun isEnabled(value: Point) =
         !getText(value).isNullOrEmpty()
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
+    override suspend fun execute(value: Point, context: Context) =
         getText(value)
             ?.let { text ->
-                actionContext.clipboard.copy(text)
+                context.getSystemService<ClipboardManager>()?.setPrimaryClip(ClipData.newPlainText(null, text))
                 true
             }
             .toActionResult()
@@ -62,9 +65,9 @@ sealed interface OpenPointUriOutput :
 
     fun getUriString(value: Point): String? = null
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
+    override suspend fun execute(value: Point, context: Context) =
         getUriString(value)
-            ?.let { uriString -> activity.launch(actionContext.context, uriString) }
+            ?.let { uriString -> activity.launch(context, uriString) }
             .toActionResult(openedApp = true)
 
     override fun getIcon(appDetails: AppDetails) =
@@ -106,12 +109,12 @@ sealed interface OpenPointsFileOutput :
 
     fun write(value: Points, writer: Appendable)
 
-    override suspend fun execute(value: Points, actionContext: ActionContext) =
-        File(actionContext.context.filesDir, "points")
+    override suspend fun execute(value: Points, context: Context) =
+        File(context.filesDir, "points")
             .deleteAllAndWriteFile("${System.currentTimeMillis()}.gpx") {
                 write(value, this)
             }
-            ?.let { file -> activity.launch(actionContext.context, file, log) }
+            ?.let { file -> activity.launch(context, file, log) }
             .toActionResult(openedApp = true)
 
     override fun getIcon(appDetails: AppDetails) =
@@ -154,8 +157,8 @@ sealed interface SavePointFileOutput :
 
     fun write(value: Point, writer: Appendable)
 
-    override suspend fun execute(uri: Uri, value: Point, actionContext: ActionContext) = withContext(Dispatchers.IO) {
-        actionContext.context.writeToContentProvider(uri) {
+    override suspend fun execute(uri: Uri, value: Point, context: Context) = withContext(Dispatchers.IO) {
+        context.writeToContentProvider(uri) {
             write(value, this)
         }
             .toActionResult()
@@ -195,8 +198,8 @@ sealed interface SavePointsFileOutput :
 
     fun write(value: Points, writer: Appendable)
 
-    override suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext) = withContext(Dispatchers.IO) {
-        actionContext.context.writeToContentProvider(uri) {
+    override suspend fun execute(uri: Uri, value: Points, context: Context) = withContext(Dispatchers.IO) {
+        context.writeToContentProvider(uri) {
             write(value, this)
         }
             .toActionResult()
@@ -234,9 +237,9 @@ sealed interface SharePointUriOutput :
 
     fun getUriString(value: Point): String? = null
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
+    override suspend fun execute(value: Point, context: Context) =
         getUriString(value)
-            ?.let { uriString -> actionContext.context.openUriWithChooser(uriString) }
+            ?.let { uriString -> context.openUriWithChooser(uriString) }
             .toActionResult(openedApp = true)
 
     @Composable
@@ -261,12 +264,12 @@ sealed interface SharePointsFileOutput :
 
     fun write(value: Points, writer: Appendable)
 
-    override suspend fun execute(value: Points, actionContext: ActionContext) =
-        File(actionContext.context.filesDir, "points")
+    override suspend fun execute(value: Points, context: Context) =
+        File(context.filesDir, "points")
             .deleteAllAndWriteFile("${System.currentTimeMillis()}.gpx") {
                 write(value, this)
             }
-            ?.let { file -> actionContext.context.openFileWithChooser(file) }
+            ?.let { file -> context.openFileWithChooser(file) }
             .toActionResult(openedApp = true)
 
     override fun getMenuIcon(appDetails: AppDetails) =
