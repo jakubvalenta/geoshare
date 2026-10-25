@@ -96,6 +96,7 @@ fun ResultTitle(
     val appDetails by appDetails.collectAsStateWithLifecycle()
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
 
+    // TODO Don't animate when state is completed
     AnimatedMessage(
         state = actionState,
         isMessageShown = { state -> state != null },
@@ -189,9 +190,7 @@ fun ResultTitle(
                 }
             }
 
-            is ActionCompleted,
-            null,
-                -> ResultMessageRow {
+            else -> ResultMessageRow {
                 Text(
                     stringResource(R.string.open_with),
                     style = MaterialTheme.typography.headlineSmall,
@@ -239,6 +238,7 @@ private fun RowScope.ResultMessageText(
     contentColor: Color = contentColorFor(containerColor),
 ) {
     val spacing = LocalSpacing.current
+
     Row(
         modifier
             .weight(1f)

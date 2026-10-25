@@ -126,6 +126,7 @@ sealed interface ResultSheetState {
 
     class SourceShare(
         val source: String,
+        val appDetailsForSource: AppDetails,
         val appsOutputs: List<AppOutputs<Output<String>>>,
         val copyOutput: Output<String>,
     ) : ResultSheetState
@@ -493,10 +494,21 @@ class MainViewModel @Inject constructor(
     fun shareSource(source: String) {
         resultSheetJob?.cancel()
         resultSheetJob = viewModelScope.launch {
-            val activities = appRepository.queryActivitiesForUri(source)
+            // First load only activities and outputs
+            val activitiesForUri = appRepository.queryActivitiesForUri(source)
+            val appsOutputs = outputRepository.getSourceAppsOutputs(activitiesForUri)
             _resultSheetState.value = ResultSheetState.SourceShare(
                 source = source,
-                appsOutputs = outputRepository.getSourceAppsOutputs(activities),
+                appDetailsForSource = emptyMap(),
+                appsOutputs = appsOutputs,
+                copyOutput = outputRepository.sourceCopyOutput,
+            )
+            // Then load app details
+            val appDetailsForSource = appRepository.queryAppDetails(activitiesForUri)
+            _resultSheetState.value = ResultSheetState.SourceShare(
+                source = source,
+                appDetailsForSource = appDetailsForSource,
+                appsOutputs = appsOutputs,
                 copyOutput = outputRepository.sourceCopyOutput,
             )
         }

@@ -23,6 +23,7 @@ interface AppRepository {
     val activities: StateFlow<List<AppActivity>?>
     val appDetails: StateFlow<AppDetails?>
     fun queryActivitiesForUri(uriString: String): List<AppActivity>
+    suspend fun queryAppDetails(activities: List<AppActivity>): AppDetails
 }
 
 class DefaultAppRepository @Inject constructor(
@@ -41,4 +42,7 @@ class DefaultAppRepository @Inject constructor(
 
     override fun queryActivitiesForUri(uriString: String): List<AppActivity> =
         context.packageManager.queryActivitiesForUri(uriString)
+
+    override suspend fun queryAppDetails(activities: List<AppActivity>): AppDetails =
+        context.packageManager.queryAppDetails(activities.getPackageNames())
 }

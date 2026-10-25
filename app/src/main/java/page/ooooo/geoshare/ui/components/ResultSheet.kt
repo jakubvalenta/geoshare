@@ -153,7 +153,7 @@ fun ResultSheet(
                 onDismissRequest = onDismissRequest,
             ) { onHide ->
                 ResultSheetSourceContent(
-                    appDetails = appDetails,
+                    appDetailsForSource = appDetailsForSource,
                     appsOutputs = appsOutputs,
                     copyOutput = copyOutput,
                     value = source,
@@ -262,15 +262,13 @@ private fun <T> ResultSheetOpenPointContent(
 
 @Composable
 private fun ResultSheetSourceContent(
-    appDetails: StateFlow<AppDetails>,
+    appDetailsForSource: AppDetails,
     appsOutputs: List<AppOutputs<Output<String>>>,
     copyOutput: Output<String>,
     value: String,
     onHide: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
 ) {
-    val appDetails by appDetails.collectAsStateWithLifecycle()
-
     SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
         OneLineSheetListItem(
             headlineText = copyOutput.getDescription(value).orEmpty(),
@@ -286,13 +284,13 @@ private fun ResultSheetSourceContent(
             appsOutputs.forEach { appOutputs ->
                 key(appOutputs.defaultOutput.id) {
                     SheetListItem(
-                        headlineText = appDetails[appOutputs.packageName]?.label.orEmpty(),
-                        modifier = Modifier.testTag("geoShareConversionUriSheetItem_${appOutputs.defaultOutput.id}"),
+                        headlineText = appDetailsForSource[appOutputs.packageName]?.label.orEmpty(),
+                        modifier = Modifier.testTag("geoShareResultSheetItem_${appOutputs.defaultOutput.id}"),
                         onClick = {
                             onHide()
                             onExecute(appOutputs.defaultOutput.toAction(value))
                         },
-                        icon = appOutputs.defaultOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                        icon = appOutputs.defaultOutput.getIcon(appDetailsForSource) ?: PlaceholderIconDescriptor,
                     )
                 }
             }
@@ -568,7 +566,7 @@ private fun SharePointsPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-private fun ShareSource() {
+private fun ShareSourcePreview() {
     AppTheme {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
@@ -588,6 +586,61 @@ private fun ShareSource() {
                 state = MutableStateFlow(
                     ResultSheetState.SourceShare(
                         source = source,
+                        appDetailsForSource = getFakeAppDetails(context),
+                        appsOutputs = listOf(
+                            AppOutputs(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                defaultOutput = OpenUnknownUriOutput(
+                                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                            AppOutputs(
+                                packageName = PackageNames.CONVERSATIONS,
+                                defaultOutput = SendStringOutput(
+                                    TextActivity(
+                                        packageName = PackageNames.CONVERSATIONS,
+                                        mimeType = MimeType.TEXT_PLAIN,
+                                    )
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                        ),
+                        copyOutput = outputRepository.sourceCopyOutput,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun ShareSourceLoadingPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.SourceShare(
+                        source = source,
+                        appDetailsForSource = emptyMap(),
                         appsOutputs = listOf(
                             AppOutputs(
                                 packageName = PackageNames.OSMAND_PLUS,

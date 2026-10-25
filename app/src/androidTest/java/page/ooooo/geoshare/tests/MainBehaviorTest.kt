@@ -129,7 +129,7 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = SendStringOutput(TextActivity(messagingAppPackageName, MimeType.TEXT_PLAIN))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             .click()
 
         // Opens the messaging app
@@ -157,7 +157,7 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             .click()
 
         // Google Maps shows precise location
@@ -187,7 +187,7 @@ class MainBehaviorTest {
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
         onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             // Tap an app while the conversion is still running. This is an imperfect test scenario, because there's a
             // small chance that the conversion finishes before we tap the app.
             .click()
