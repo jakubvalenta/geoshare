@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="not_available">Pole saadaval</string>
+    <string name="billing_feature_all">Kõik põhiversiooni võimalused</string>
+    <string name="billing_feature_custom_link_description">Ava asukoht oma lemmik- (või privaatsel) veebikaardil.</string>
+    <string name="billing_intro_not_purchased">Uuenda Pro-versiooniks</string>
+</resources>
