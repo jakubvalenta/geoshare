@@ -75,7 +75,6 @@ fun AnimatedPlaceholderTextField(
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     contentPadding: PaddingValues = contentPaddingWithoutLabel(),
 ) {
-    // TODO Fix animated placeholder overflowing supporting text
     val interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val mergedTextStyle = remember(enabled, isError, isFocused) {
@@ -112,12 +111,10 @@ fun AnimatedPlaceholderTextField(
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier
-                .defaultMinSize(
-                    minWidth = TextFieldDefaults.MinWidth,
-                    minHeight = TextFieldDefaults.MinHeight,
-                )
-                .clipToBounds(),
+            modifier = modifier.defaultMinSize(
+                minWidth = TextFieldDefaults.MinWidth,
+                minHeight = TextFieldDefaults.MinHeight,
+            ),
             enabled = enabled,
             textStyle = mergedTextStyle,
             singleLine = false,
@@ -129,7 +126,13 @@ fun AnimatedPlaceholderTextField(
                 OutlinedTextFieldDefaults.DecorationBox(
                     value = value,
                     innerTextField = {
-                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+                        Box(
+                            Modifier
+                                .clipToBounds()
+                                .fillMaxWidth()
+                                .padding(contentPadding),
+                            contentAlignment = Alignment.CenterStart,
+                        ) {
                             if (!isFocused && value.isEmpty() && placeholders.isNotEmpty()) {
                                 AnimatedContent(
                                     targetState = currentPlaceholderIndex,
@@ -159,7 +162,7 @@ fun AnimatedPlaceholderTextField(
                     trailingIcon = trailingIcon,
                     supportingText = supportingText,
                     colors = colors,
-                    contentPadding = contentPadding,
+                    contentPadding = PaddingValues.Zero,
                     container = {
                         OutlinedTextFieldDefaults.Container(
                             enabled = enabled,
@@ -192,6 +195,7 @@ private fun DefaultPreview() {
                     "geo:50.123456,-120.123456?q=50.123456,-120.123456(Dropped%20pin)",
                 ),
                 modifier = Modifier.padding(15.dp),
+                supportingText = { Text("My supporting text") },
             )
         }
     }
