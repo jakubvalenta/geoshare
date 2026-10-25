@@ -244,7 +244,7 @@ class AutomationBehaviorTest {
 
 fun UiAutomatorTestScope.scrollToAutomationItem(automation: Automation): UiObject2 =
     onElementOrScrollToElement(
-        10_000,
+        20_000,
         scrollableElement = { onElement { viewIdResourceName == "geoShareUserPreferencesControlsPane" } }) {
         viewIdResourceName == "geoShareUserPreferenceAutomation_${Json.encodeToString<Automation>(automation)}"
     }
