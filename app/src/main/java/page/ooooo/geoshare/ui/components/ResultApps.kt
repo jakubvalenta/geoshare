@@ -65,21 +65,23 @@ fun ResultApps(
     Column(modifier) {
         // Map apps
         ResultGrid { itemWidth ->
-            state.appsOutputs.mapAppsOutputs.forEach { appOutputs ->
-                key(appOutputs.packageName) {
-                    ResultAppIcon(
-                        appDetails = appDetails,
-                        appOutputs = appOutputs,
-                        lastPoint = lastPoint,
-                        points = points,
-                        iconSize = iconSize,
-                        source = source,
-                        width = itemWidth,
-                        onExecute = onExecute,
-                        onHideApp = { onHideApp(appOutputs.packageName) },
-                    )
+            state.appsOutputs.mapAppsOutputs
+                .sortedBy { appDetails[it.packageName]?.label }
+                .forEach { appOutputs ->
+                    key(appOutputs.packageName) {
+                        ResultAppIcon(
+                            appDetails = appDetails,
+                            appOutputs = appOutputs,
+                            lastPoint = lastPoint,
+                            points = points,
+                            iconSize = iconSize,
+                            source = source,
+                            width = itemWidth,
+                            onExecute = onExecute,
+                            onHideApp = { onHideApp(appOutputs.packageName) },
+                        )
+                    }
                 }
-            }
             // Share item
             state.shareOutputs?.let { shareOutputs ->
                 key("share") {
@@ -101,21 +103,23 @@ fun ResultApps(
         if (state.appsOutputs.messagingAppsOutputs.isNotEmpty()) {
             ResultHeadline(stringResource(R.string.output_send))
             ResultGrid { itemWidth ->
-                state.appsOutputs.messagingAppsOutputs.forEach { appOutputs ->
-                    key(appOutputs.packageName) {
-                        ResultAppIcon(
-                            appDetails = appDetails,
-                            appOutputs = appOutputs,
-                            iconSize = iconSize,
-                            lastPoint = lastPoint,
-                            points = points,
-                            source = source,
-                            width = itemWidth,
-                            onExecute = onExecute,
-                            onHideApp = { onHideApp(appOutputs.packageName) },
-                        )
+                state.appsOutputs.messagingAppsOutputs
+                    .sortedBy { appDetails[it.packageName]?.label }
+                    .forEach { appOutputs ->
+                        key(appOutputs.packageName) {
+                            ResultAppIcon(
+                                appDetails = appDetails,
+                                appOutputs = appOutputs,
+                                iconSize = iconSize,
+                                lastPoint = lastPoint,
+                                points = points,
+                                source = source,
+                                width = itemWidth,
+                                onExecute = onExecute,
+                                onHideApp = { onHideApp(appOutputs.packageName) },
+                            )
+                        }
                     }
-                }
             }
         }
     }
@@ -226,7 +230,14 @@ private fun DefaultPreview() {
             )
             ResultApps(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
+                state = MutableStateFlow(
+                    ResultAppsState(
+                        appsOutputs = outputRepository.getAppsOutputs(
+                            fakeActivities,
+                            emptySet()
+                        )
+                    )
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -253,7 +264,14 @@ private fun DarkPreview() {
             )
             ResultApps(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
+                state = MutableStateFlow(
+                    ResultAppsState(
+                        appsOutputs = outputRepository.getAppsOutputs(
+                            fakeActivities,
+                            emptySet()
+                        )
+                    )
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -280,7 +298,14 @@ private fun SmallPreview() {
             )
             ResultApps(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
+                state = MutableStateFlow(
+                    ResultAppsState(
+                        appsOutputs = outputRepository.getAppsOutputs(
+                            fakeActivities,
+                            emptySet()
+                        )
+                    )
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -307,7 +332,14 @@ private fun TabletPreview() {
             )
             ResultApps(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(fakeActivities, emptySet()))),
+                state = MutableStateFlow(
+                    ResultAppsState(
+                        appsOutputs = outputRepository.getAppsOutputs(
+                            fakeActivities,
+                            emptySet()
+                        )
+                    )
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
@@ -340,7 +372,14 @@ private fun LoadingPreview() {
             }
             ResultApps(
                 appDetails = MutableStateFlow(getFakeAppDetails(context)),
-                state = MutableStateFlow(ResultAppsState(appsOutputs = outputRepository.getAppsOutputs(activities, emptySet()))),
+                state = MutableStateFlow(
+                    ResultAppsState(
+                        appsOutputs = outputRepository.getAppsOutputs(
+                            activities,
+                            emptySet()
+                        )
+                    )
+                ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
                 source = MutableStateFlow(""),
                 onExecute = {},
