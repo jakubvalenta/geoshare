@@ -5,6 +5,8 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -20,6 +22,7 @@ import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.Finish
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
+import kotlin.time.Duration.Companion.seconds
 
 class UserPreferenceBehaviorTest {
     @Test
@@ -108,7 +111,10 @@ class UserPreferenceBehaviorTest {
             }
                 .click()
         }
-        quickWaitForStableInActiveWindow()
+        runBlocking {
+            // Wait for automation success message to disappear and the activity to finish
+            delay(3.1.seconds)
+        }
 
         // App is not visible
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { packageName == BuildConfig.APPLICATION_ID })

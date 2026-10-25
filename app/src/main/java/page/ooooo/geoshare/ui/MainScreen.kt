@@ -89,7 +89,7 @@ import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.state.ActionCompleted
 import page.ooooo.geoshare.data.state.ActionState
-import page.ooooo.geoshare.data.state.ActivityShouldFinish
+import page.ooooo.geoshare.data.state.ActivityFinishingRequested
 import page.ooooo.geoshare.data.state.Attempt
 import page.ooooo.geoshare.data.state.BasicActionReady
 import page.ooooo.geoshare.data.state.ConversionFailed
@@ -684,7 +684,7 @@ private fun MainAction(
                     locationJob?.cancel()
                 }
 
-                is ActivityShouldFinish -> {
+                is ActivityFinishingRequested -> {
                     onFinish()
                 }
 

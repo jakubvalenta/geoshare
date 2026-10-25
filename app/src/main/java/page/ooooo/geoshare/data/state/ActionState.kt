@@ -391,6 +391,6 @@ data class LocationFindingFailed(
     override fun toString() = "LocationFindingFailed(actionResult=$actionResult)"
 }
 
-data object ActivityShouldFinish : ActionState {
-    override fun toString() = "ActivityShouldFinish"
+data object ActivityFinishingRequested : ActionState {
+    override fun toString() = "ActivityFinishingRequested"
 }

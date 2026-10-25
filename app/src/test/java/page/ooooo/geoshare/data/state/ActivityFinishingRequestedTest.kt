@@ -5,12 +5,12 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class ActivityShouldFinishTest {
+class ActivityFinishingRequestedTest {
     private val actionStateContext: ActionStateContext = mock()
 
     @Test
     fun transition_returnsNull() = runTest {
-        val state = ActivityShouldFinish
+        val state = ActivityFinishingRequested
         assertNull(state.transition(actionStateContext))
     }
 }

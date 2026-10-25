@@ -60,7 +60,7 @@ import page.ooooo.geoshare.data.state.ActionState
 import page.ooooo.geoshare.data.state.ActionStateContext
 import page.ooooo.geoshare.data.state.ActionSucceeded
 import page.ooooo.geoshare.data.state.ActionWaiting
-import page.ooooo.geoshare.data.state.ActivityShouldFinish
+import page.ooooo.geoshare.data.state.ActivityFinishingRequested
 import page.ooooo.geoshare.data.state.AutomationRequested
 import page.ooooo.geoshare.data.state.BasicActionReady
 import page.ooooo.geoshare.data.state.ConversionFailed
@@ -314,7 +314,7 @@ class MainViewModel @Inject constructor(
                     val finish = userPreferenceRepository.values.map { it.finish }.firstOrNull()
                         ?: FinishPreference.default
                     if (finish.shouldAppFinish(actionState.actionResult)) {
-                        transitionAction { ActivityShouldFinish }
+                        transitionAction { ActivityFinishingRequested }
                     }
                 }
             }
@@ -476,7 +476,7 @@ class MainViewModel @Inject constructor(
             .map { actionState ->
                 when (actionState) {
                     ActionState.Initial -> null
-                    ActivityShouldFinish -> null
+                    ActivityFinishingRequested -> null
                     is ActionAutomationFailed -> ResultTitleState.ActionAutomationFailed(actionState.output)
                     is ActionAutomationSucceeded -> ResultTitleState.ActionAutomationSucceeded(actionState.output)
                     is ActionCompleted -> null
