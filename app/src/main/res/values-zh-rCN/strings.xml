@@ -130,8 +130,8 @@
     <string name="network_exception_unresolved_address">无法解析的地址</string>
     <string name="faq_how_headline">工作原理</string>
     <string name="faq_how_text_4_preferences_button">偏好设置</string>
-    <string name="faq_how_text_1">%1$s 将地图链接转换为其他地图应用可以打开的 geo: 链接。要创建 geo: 链接，需要地理坐标。%1$s 从地图 URL 中提取它们。</string>
-    <string name="faq_how_text_2">然而，并非所有地图 URL 都包含坐标。在这种情况下，%1$s 将提示您获得连接到地图服务（Google 地图、Apple 地图等）的权限并从以下位置检索坐标：</string>
+    <string name="faq_how_text_1">%1$s 将地图链接转换为其他地图应用可以打开的 geo: 链接。要创建 geo: 链接，需要地理坐标。%1$s 从地图 URL 中读取它们。</string>
+    <string name="faq_how_text_2">然而，并非所有地图 URL 都包含坐标。在这种情况下，%1$s 将提示您获得连接到地图服务（Google 地图、Apple 地图等）的权限并从以下位置读取坐标：</string>
     <string name="faq_how_text_2_item_http">HTTP 标头</string>
     <string name="faq_how_text_2_item_html">HTML 文档</string>
     <string name="faq_how_text_3">如果您不允许连接到地图服务，%1$s 会根据具体链接类型，创建包含地名而非坐标的 geo: 链接，或直接停止转换。</string>
@@ -218,7 +218,7 @@
     <string name="conversion_failed_reason_timeout">超时</string>
     <string name="network_exception_too_many_requests">请求过多</string>
     <string name="licenses">许可</string>
-    <string name="conversion_succeeded_check_experimental">由于采用了实验性的提取方法，位置可能不准确。</string>
+    <string name="conversion_succeeded_check_experimental">由于对这个地图链接的支持是实验性的，位置可能不准确。</string>
     <string name="conversion_succeeded_check_map_center">位置可能是地图中心点，而非精准标记点。</string>
     <string name="conversion_succeeded_check_srs">由于坐标系转换，位置可能不准确。</string>
     <string name="srs_description_mainland_china">中国内地</string>
@@ -260,7 +260,7 @@
     <string name="server_challenge_url">挑战 URL</string>
     <string name="server_delete_text">服务器“%1$s”将被永久删除。</string>
     <string name="server_list_google_maps_address_title">Google 地图地址</string>
-    <string name="server_list_none_html">从 HTML 中提取坐标（实验）</string>
+    <string name="server_list_none_html">从 HTML 中读取坐标（实验性）</string>
     <string name="server_list_google_maps_place_title">Google 地图地点 ID</string>
     <string name="server_list_none">不使用 API 服务器</string>
     <string name="faq_how_text_2_item_api">或者该地图服务的 API</string>
@@ -291,7 +291,7 @@
     <string name="billing_terms_of_service">服务条款</string>
     <string name="converter_google_navigation_uri_name">Google 导航 URI</string>
     <string name="faq_name_only_title">无法找到坐标，使用地名</string>
-    <string name="faq_name_only_text_1">%1$s 只能从某些地图链接中提取地名，例如“乞力马扎罗山”。当您在其他地图应用中打开此位置时，它可能会显示与原始链接不同的位置，因为可能存在多个同名地点。</string>
+    <string name="faq_name_only_text_1">%1$s 只能从某些地图链接读取地名，例如“乞力马扎罗山”。当您在其他地图应用中打开此位置时，它可能会显示与原始链接不同的位置，因为可能存在多个同名地点。</string>
     <string name="network_exception_webview">WebView 异常</string>
     <string name="network_exception_too_many_requests_wait">请求过多，请等待 %1$d 秒</string>
     <string name="user_preferences_dynamic_color_title">动态配色</string>
