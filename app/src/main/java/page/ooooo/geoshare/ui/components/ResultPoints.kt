@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
@@ -152,6 +153,7 @@ private fun ResultPointsBox(
     coordinateConverter: CoordinateConverter,
     coordinateFormat: StateFlow<CoordinateFormat>,
     initialExpanded: Boolean = false,
+    pageSize: Int = 10,
     onCopyPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
     onOpenPoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
     onSavePoint: (point: Point, pointCount: Int, pointIndex: Int) -> Unit,
@@ -160,10 +162,10 @@ private fun ResultPointsBox(
 ) {
     val spacing = LocalSpacing.current
 
-    // TODO Why does ResultPointsBox expand so slow?
     val coordinateFormat by coordinateFormat.collectAsStateWithLifecycle()
     var expanded by retain { mutableStateOf(initialExpanded) }
     val pointCount = points.size
+    var limit by retain { mutableIntStateOf(pageSize) }
 
     Column {
         Row(
@@ -206,18 +208,32 @@ private fun ResultPointsBox(
             exit = shrinkVertically(),
         ) {
             Column(Modifier.padding(top = spacing.tiny)) {
-                points.forEachIndexed { pointIndex, point ->
-                    ResultPoint(
-                        point = point,
-                        pointCount = pointCount,
-                        pointIndex = pointIndex,
-                        coordinateConverter = coordinateConverter,
-                        coordinateFormat = coordinateFormat,
-                        onCopyPoint = onCopyPoint,
-                        onOpenPoint = onOpenPoint,
-                        onSavePoint = onSavePoint,
-                    )
-                    HorizontalDivider()
+                points
+                    .take(limit)
+                    .forEachIndexed { pointIndex, point ->
+                        ResultPoint(
+                            point = point,
+                            pointCount = pointCount,
+                            pointIndex = pointIndex,
+                            coordinateConverter = coordinateConverter,
+                            coordinateFormat = coordinateFormat,
+                            onCopyPoint = onCopyPoint,
+                            onOpenPoint = onOpenPoint,
+                            onSavePoint = onSavePoint,
+                        )
+                        HorizontalDivider()
+                    }
+                if (limit < points.size) {
+                    Button(
+                        { limit += pageSize },
+                        Modifier.padding(horizontal = spacing.windowPadding, vertical = spacing.tiny),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            contentColor = MaterialTheme.colorScheme.onTertiary,
+                        ),
+                    ) {
+                        Text(stringResource(R.string.load_more))
+                    }
                 }
             }
         }
@@ -322,7 +338,7 @@ private fun ResultPoint(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
 @Composable
 private fun DefaultPreview() {
     AppTheme {
@@ -349,6 +365,17 @@ private fun DefaultPreview() {
                         name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
+                    WGS84Point(45.4772309, 9.2295862, source = Source.API),
+                    WGS84Point(45.4772270, 9.2292124, source = Source.API),
+                    WGS84Point(45.4776002, 9.2293737, source = Source.API),
+                    WGS84Point(45.4774959, 9.2295256, source = Source.API),
+                    WGS84Point(45.4774770, 9.2295534, source = Source.API),
+                    WGS84Point(45.4773774, 9.2295549, source = Source.API),
+                    WGS84Point(45.4774959, 9.2293841, source = Source.API),
+                    WGS84Point(45.4773606, 9.2295265, source = Source.API),
+                    WGS84Point(45.4774817, 9.2293589, source = Source.API),
+                    WGS84Point(45.4773591, 9.2293890, source = Source.API),
+                    WGS84Point(45.4773774, 9.2293573, source = Source.API),
                 ),
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
@@ -365,7 +392,11 @@ private fun DefaultPreview() {
     }
 }
 
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    showBackground = true,
+    device = "spec:width=1080px,height=3200px,dpi=440",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun DarkPreview() {
     AppTheme {
@@ -392,6 +423,17 @@ private fun DarkPreview() {
                         name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                         "RAI - Romantic & Intimate, Calea Victoriei 202 București, Bucuresti 010098",
                     ),
+                    WGS84Point(45.4772309, 9.2295862, source = Source.API),
+                    WGS84Point(45.4772270, 9.2292124, source = Source.API),
+                    WGS84Point(45.4776002, 9.2293737, source = Source.API),
+                    WGS84Point(45.4774959, 9.2295256, source = Source.API),
+                    WGS84Point(45.4774770, 9.2295534, source = Source.API),
+                    WGS84Point(45.4773774, 9.2295549, source = Source.API),
+                    WGS84Point(45.4774959, 9.2293841, source = Source.API),
+                    WGS84Point(45.4773606, 9.2295265, source = Source.API),
+                    WGS84Point(45.4774817, 9.2293589, source = Source.API),
+                    WGS84Point(45.4773591, 9.2293890, source = Source.API),
+                    WGS84Point(45.4773774, 9.2293573, source = Source.API),
                 ),
                 coordinateConverter = coordinateConverter,
                 coordinateFormat = MutableStateFlow(CoordinateFormat.DEC),
