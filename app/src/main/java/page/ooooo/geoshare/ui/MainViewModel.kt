@@ -170,9 +170,6 @@ class MainViewModel @Inject constructor(
 
     // Source
 
-    private val _error = savedStateHandle.getMutableStateFlow<String?>("error", null)
-    val error: StateFlow<String?> = _error.asStateFlow()
-
     private val _source = savedStateHandle.getMutableStateFlow("source", "")
     val source: StateFlow<String> = _source.asStateFlow()
 
@@ -180,7 +177,6 @@ class MainViewModel @Inject constructor(
     val sourceComesFromIntent: StateFlow<Boolean> = _sourceComesFromIntent.asStateFlow()
 
     fun setSource(newSource: String) {
-        _error.value = null
         _source.value = newSource
     }
 
@@ -226,10 +222,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun start(sourceComesFromIntent: Boolean) {
-        if (_source.value.isEmpty()) {
-            _error.value = context.resources.getString(R.string.conversion_failed_missing_url)
-            return
-        }
         _sourceComesFromIntent.value = sourceComesFromIntent
         transitionConversion(clearLog = true) { SourceReceived(_source.value) }
     }

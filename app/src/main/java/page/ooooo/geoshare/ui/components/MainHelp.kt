@@ -47,6 +47,7 @@ fun MainHelp(
             Text(stringResource(R.string.faq_title))
         }
         TextButton(onSetRandomSource) {
+            // Notice that setting random source doesn't reset the "Missing URL" error. It's fine.
             Icon(
                 painterResource(R.drawable.ifl_24px),
                 null,
