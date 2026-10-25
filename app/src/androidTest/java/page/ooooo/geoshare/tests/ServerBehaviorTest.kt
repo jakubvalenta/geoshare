@@ -13,7 +13,7 @@ import page.ooooo.geoshare.ui.UserPreferenceGroupId
 
 class ServerBehaviorTest {
     @Test
-    fun allowsInsertingServer() = uiAutomator { // FIXME
+    fun allowsInsertingServer() = uiAutomator {
         // Launch app
         launchApplication()
         waitForAppToBeVisible()

@@ -119,7 +119,7 @@ class OutputRepositoryTest {
     }
 
     @Test
-    fun getPointOpenOutputs_returnsFirstOutputForEachPassedActivity() {
+    fun getPointOpenOutputs_returnsFirstSinglePointOutputForEachPassedActivity() {
         assertEquals(
             listOf(
                 AppOutputs(
@@ -167,18 +167,51 @@ class OutputRepositoryTest {
             ),
             outputRepository.getPointOpenOutputs(
                 listOf(
-                    // TODO Test filtering first activity that is for a single point
                     UriActivity(PackageNames.TEST, UriScheme.GEO),
+                    FileActivity(PackageNames.GOOGLE_MAPS, FileType.GPX), // Will be ignored, because it's for multiple points
                     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
                     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_NAVIGATION),
                     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_STREET_VIEW),
-                    FileActivity(PackageNames.GOOGLE_MAPS, FileType.GPX),
                     UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
                     UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
                     TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                     FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
                 ),
-                emptySet(), // TODO Test hidden apps
+                emptySet(),
+            ),
+        )
+    }
+
+    @Test
+    fun getPointOpenOutputs_doesNotReturnOutputsForHiddenApps() {
+        assertEquals(
+            listOf(
+                AppOutputs(
+                    packageName = PackageNames.TEST,
+                    defaultOutput = OpenDisplayGeoUriOutput(
+                        UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter, uriQuote
+                    ),
+                    allOutputs = emptyList(),
+                ),
+                AppOutputs(
+                    packageName = PackageNames.TOMTOM,
+                    defaultOutput = OpenRouteOnePointGpxOutput(
+                        FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT), coordinateConverter, log
+                    ),
+                    allOutputs = emptyList(),
+                ),
+            ),
+            outputRepository.getPointOpenOutputs(
+                listOf(
+                    UriActivity(PackageNames.TEST, UriScheme.GEO),
+                    UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
+                    UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_NAVIGATION),
+                    FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+                ),
+                setOf(
+                    PackageNames.GOOGLE_MAPS,
+                    PackageNames.MAGIC_EARTH,
+                ),
             ),
         )
     }
