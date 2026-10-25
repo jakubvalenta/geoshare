@@ -135,8 +135,8 @@
     <string name="network_exception_unknown">Неизвестна грешка</string>
     <string name="network_exception_unresolved_address">Нерешен адрес</string>
     <string name="faq_how_headline">Как работи</string>
-    <string name="faq_how_text_1">%1$s преобразува връзките към картите в geo: връзки, които могат да се отварят от други приложения за карти. За да се създаде гео: връзка, са необходими географски координати. %1$s ги извлича от URL адреса на картата.</string>
-    <string name="faq_how_text_2">Въпреки това, не всички URL адреси на картите съдържат координати. В такива случаи %1$s ще ви поиска разрешение да се свържете с картата (Google Maps, Apple Maps и др.) и да получите координатите от:</string>
+    <string name="faq_how_text_1">%1$s преобразува връзките към картата в geo: връзки, които могат да бъдат отворени от други приложения за карти. За да се създаде geo: връзка, са необходими географски координати. %1$s ги чете от URL адреса на картата.</string>
+    <string name="faq_how_text_2">Не всички URL адреси на карти обаче включват координати. В такива случаи %1$s ще ви поиска разрешение за свързване с картографската услуга (Google Maps, Apple Maps и др.) и ще прочете координатите от:</string>
     <string name="faq_how_text_2_item_http">или HTTP заглавия</string>
     <string name="faq_how_text_2_item_html">или HTML документ</string>
     <string name="faq_how_text_3">Ако не разрешите свързването с картографската услуга, %1$s създава geo: връзка с име на място вместо координати или спира, в зависимост от конкретната връзка.</string>
@@ -223,7 +223,7 @@
     <string name="conversion_failed_reason_timeout">Изтичане на времето</string>
     <string name="network_exception_too_many_requests">Твърде много заявки</string>
     <string name="licenses">Лицензи</string>
-    <string name="conversion_succeeded_check_experimental">Местоположението може да е неточно поради експериментален метод на извличане.</string>
+    <string name="conversion_succeeded_check_experimental">Местоположението може да е неточно, тъй като поддръжката за тази връзка към картата е експериментална.</string>
     <string name="conversion_succeeded_check_map_center">Местоположението може да е центърът на картата, а не маркер.</string>
     <string name="conversion_succeeded_check_srs">Местоположението може да е неточно поради преобразуване на координатната система.</string>
     <string name="srs_description_mainland_china">Континентален Китай</string>
@@ -254,7 +254,7 @@
     <string name="server_invalid">Задаване на идентификационни данни</string>
     <string name="server_list_description">Когато е разрешена връзка с картографска услуга, %1$s използва API сървъри, за да преобразува определени връзки в координати. Изберете дали да използвате официални сървъри със собствени идентификационни данни, прокси сървъри или никакви.</string>
     <string name="server_list_google_maps_address_title">Адреси в Google Карти</string>
-    <string name="server_list_none_html">Извличане на координати от HTML (експериментално)</string>
+    <string name="server_list_none_html">Четене на координати от HTML (експериментално)</string>
     <string name="server_list_google_maps_place_title">Идентификатори на места в Google Карти</string>
     <string name="server_list_none">Не използвайте API сървър</string>
     <string name="server_list_search_none_description">Търсенето няма да е достъпно</string>
@@ -297,7 +297,7 @@
     <string name="conversion_succeeded_check_name_only_points">Неуспешно намиране на координати за някои точки.</string>
     <string name="converter_google_navigation_uri_name">URI адрес за Google навигация</string>
     <string name="faq_name_only_title">Неуспешно намиране на координати, използва се име на място</string>
-    <string name="faq_name_only_text_1">%1$s може да извлича само име на място, например „Планината Килиманджаро“, от определени връзки към картата. Когато отворите това местоположение в друго приложение за карти, то може да показва различно място от оригиналната връзка, тъй като може да съществуват няколко места с едно и също име.</string>
+    <string name="faq_name_only_text_1">%1$s може да чете само име на място, например „Планината Килиманджаро“, от определени връзки към картата. Когато отворите това местоположение в друго приложение за карти, то може да показва различно място от оригиналната връзка, тъй като може да съществуват няколко места с едно и също име.</string>
     <string name="faq_name_only_text_2">Точките, обозначени само по име, не са включени в GPX маршрутите.</string>
     <string name="network_exception_webview">Изключение за WebView</string>
     <string name="network_exception_too_many_requests_wait">Твърде много заявки, изчакайте %1$ds</string>
