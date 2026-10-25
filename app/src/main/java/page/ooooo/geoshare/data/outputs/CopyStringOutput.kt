@@ -13,8 +13,9 @@ object CopyStringOutput : StringOutput, Output.HasSuccessText {
     override val id = "CopyStringOutput"
 
     override suspend fun execute(value: String, context: Context) =
-        context.getSystemService<ClipboardManager>()?.setPrimaryClip(ClipData.newPlainText(null, value))
-            .let { true }
+        context.getSystemService<ClipboardManager>()
+            ?.setPrimaryClip(ClipData.newPlainText(null, value))
+            ?.let { true }
             .toActionResult()
 
     @Composable

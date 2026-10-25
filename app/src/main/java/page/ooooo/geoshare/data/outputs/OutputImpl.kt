@@ -36,12 +36,12 @@ sealed interface CopyPointTextOutput :
         !getText(value).isNullOrEmpty()
 
     override suspend fun execute(value: Point, context: Context) =
-        getText(value)
-            ?.let { text ->
-                context.getSystemService<ClipboardManager>()?.setPrimaryClip(ClipData.newPlainText(null, text))
-                true
-            }
-            .toActionResult()
+        getText(value)?.let { text ->
+            context.getSystemService<ClipboardManager>()
+                ?.setPrimaryClip(ClipData.newPlainText(null, text))
+                ?.let { true }
+        }
+        .toActionResult()
 
     override fun getDescription(value: Point) =
         getText(value)
