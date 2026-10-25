@@ -5,7 +5,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.android.FileActivity
@@ -15,10 +14,10 @@ import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.FakeLog
-import page.ooooo.geoshare.data.outputs.ActionResult
-import page.ooooo.geoshare.data.outputs.BasicAction
+import page.ooooo.geoshare.data.outputs.CopyCoordsDecOutput
 import page.ooooo.geoshare.data.outputs.OpenRouteOnePointGpxOutput
 import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.data.uri.FakeUriQuote
 
 class ActionReadyTest {
     private val context: Context = mock()
@@ -28,16 +27,14 @@ class ActionReadyTest {
     private val actionStateContext: ActionStateContext = mock {
         on { context } doReturn context
     }
+    private val uriQuote = FakeUriQuote
 
     @Test
-    fun transition_whenActionIsCopyCoordsDec_executesActionAndReturnsActionRan() = runTest {
-        val actionResult = ActionResult.SUCCEEDED
-        val action: BasicAction.WithPoint = mock {
-            on { execute(any()) } doReturn actionResult
-        }
+    fun transition_whenActionIsCopyCoordsDec_returnsBasicActionReady() = runTest {
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val state = ActionReady(action, isAutomation = true)
         assertEquals(
-            ActionRan(action, actionResult, isAutomation = true),
+            BasicActionReady(action, isAutomation = true),
             state.transition(actionStateContext),
         )
     }

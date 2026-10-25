@@ -168,17 +168,44 @@ data class ActionReady(
     val isAutomation: Boolean,
 ) : ActionState {
     override suspend fun transition(stateContext: ActionStateContext): ActionState = when (action) {
-        is BasicAction -> ActionRan(
-            action = action,
-            actionResult = action.execute(stateContext.context),
-            isAutomation = isAutomation,
-        )
-
+        is BasicAction -> BasicActionReady(action, isAutomation)
         is FileAction -> FileUriRequested(action, isAutomation)
         is LocationAction -> LocationRationaleRequested(action, isAutomation)
     }
 
     override fun toString() = "ActionReady(action=$action, isAutomation=$isAutomation)"
+}
+
+data class BasicActionReady(
+    val action: BasicAction<*>,
+    val isAutomation: Boolean,
+) : ActionState {
+    suspend fun execute(context: Context): ActionState =
+        ActionRan(action = action, actionResult = action.execute(context), isAutomation = isAutomation)
+
+    override fun toString() = "BasicActionReady(action=$action, isAutomation=$isAutomation)"
+}
+
+data class FileActionReady(
+    val action: FileAction<*>,
+    val isAutomation: Boolean,
+    val uri: Uri,
+) : ActionState {
+    suspend fun execute(context: Context): ActionState =
+        ActionRan(action = action, actionResult = action.execute(uri, context), isAutomation = isAutomation)
+
+    override fun toString() = "FileActionReady(action=$action, isAutomation=$isAutomation, uri=$uri)"
+}
+
+data class LocationActionReady(
+    val action: LocationAction<*>,
+    val isAutomation: Boolean,
+    val location: Point,
+) : ActionState {
+    suspend fun execute(context: Context): ActionState =
+        ActionRan(action = action, actionResult = action.execute(location, context), isAutomation = isAutomation)
+
+    override fun toString() = "LocationActionReady(action=$action, isAutomation=$isAutomation, location=$location)"
 }
 
 data class ActionRan(
@@ -301,21 +328,6 @@ data class FileUriRequested(
     override fun toString() = "FileUriRequested(action=$action, isAutomation=$isAutomation)"
 }
 
-data class FileUriReceived(
-    val action: FileAction<*>,
-    val isAutomation: Boolean,
-    val uri: Uri,
-) : ActionState {
-    override suspend fun transition(stateContext: ActionStateContext) =
-        ActionRan(
-            action = action,
-            actionResult = action.execute(uri, stateContext.context),
-            isAutomation = isAutomation,
-        )
-
-    override fun toString() = "FileUriReceived(action=$action, isAutomation=$isAutomation, uri=$uri)"
-}
-
 data class LocationRationaleRequested(
     val action: LocationAction<*>,
     val isAutomation: Boolean,
@@ -358,11 +370,7 @@ data class LocationReceived(
     override suspend fun transition(stateContext: ActionStateContext): ActionState = if (location == null) {
         LocationFindingFailed(ActionResult.FAILED)
     } else {
-        ActionRan(
-            action = action,
-            actionResult = action.execute(location, stateContext.context),
-            isAutomation = isAutomation,
-        )
+        LocationActionReady(action, isAutomation, location)
     }
 
     override fun toString() = "LocationReceived(action=$action, isAutomation=$isAutomation, location=$location)"

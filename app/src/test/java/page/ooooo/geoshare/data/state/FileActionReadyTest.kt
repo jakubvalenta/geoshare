@@ -12,23 +12,20 @@ import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.outputs.ActionResult
 import page.ooooo.geoshare.data.outputs.FileAction
 
-class FileUriReceivedTest {
+class FileActionReadyTest {
     private val context: Context = mock()
-    private val actionStateContext: ActionStateContext = mock {
-        on { context } doReturn context
-    }
 
     @Test
-    fun transition_executesActionAndReturnsActionRan() = runTest {
+    fun execute_executesActionAndReturnsActionRan() = runTest {
         val uri: Uri = mock()
         val actionResult = ActionResult.SUCCEEDED
         val action: FileAction.WithPoint = mock {
             on { execute(eq(uri), any()) } doReturn actionResult
         }
-        val state = FileUriReceived(action, isAutomation = true, uri = uri)
+        val state = FileActionReady(action, isAutomation = true, uri = uri)
         assertEquals(
             ActionRan(action, actionResult, isAutomation = true),
-            state.transition(actionStateContext),
+            state.execute(context),
         )
     }
 }

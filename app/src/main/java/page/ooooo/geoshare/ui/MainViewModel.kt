@@ -56,14 +56,16 @@ import page.ooooo.geoshare.data.state.ActionState
 import page.ooooo.geoshare.data.state.ActionStateContext
 import page.ooooo.geoshare.data.state.ActivityShouldFinish
 import page.ooooo.geoshare.data.state.AutomationRequested
+import page.ooooo.geoshare.data.state.BasicActionReady
 import page.ooooo.geoshare.data.state.ConversionFailed
 import page.ooooo.geoshare.data.state.ConversionState
 import page.ooooo.geoshare.data.state.ConversionStateContext
 import page.ooooo.geoshare.data.state.ConversionSucceeded
 import page.ooooo.geoshare.data.state.ExtendedStateLog
 import page.ooooo.geoshare.data.state.ExtendedStateLogItem
-import page.ooooo.geoshare.data.state.FileUriReceived
+import page.ooooo.geoshare.data.state.FileActionReady
 import page.ooooo.geoshare.data.state.FileUriRequested
+import page.ooooo.geoshare.data.state.LocationActionReady
 import page.ooooo.geoshare.data.state.LocationPermissionReceived
 import page.ooooo.geoshare.data.state.LocationRationaleConfirmed
 import page.ooooo.geoshare.data.state.LocationRationaleShown
@@ -322,11 +324,32 @@ class MainViewModel @Inject constructor(
         actionJob?.cancel()
     }
 
+    // Basic action
+
+    /**
+     * Provide activity [context] from the UI to the action, because the application context available in ViewModel
+     * cannot be used to start another activity in the same task.
+     */
+    fun executeBasicAction(context: Context) {
+        (_actionState.value as? BasicActionReady)?.apply {
+            transitionAction { execute(context) }
+        }
+    }
+
     // File action
 
     fun receiveFileUri(uri: Uri) {
         (_actionState.value as? FileUriRequested)?.apply {
-            transitionAction { FileUriReceived(action, isAutomation, uri) }
+            transitionAction { FileActionReady(action, isAutomation, uri) }
+        }
+    }
+
+    /**
+     * See [executeBasicAction]
+     */
+    fun executeFileAction(context: Context) {
+        (_actionState.value as? FileActionReady)?.apply {
+            transitionAction { execute(context) }
         }
     }
 
@@ -354,6 +377,15 @@ class MainViewModel @Inject constructor(
 
     fun receiveLocation(action: LocationAction<*>, isAutomation: Boolean, location: Point?) {
         transitionAction { LocationReceived(action, isAutomation, location) }
+    }
+
+    /**
+     * See [executeBasicAction]
+     */
+    fun executeLocationAction(context: Context) {
+        (_actionState.value as? LocationActionReady)?.apply {
+            transitionAction { execute(context) }
+        }
     }
 
     fun cancelLocationFinding() {

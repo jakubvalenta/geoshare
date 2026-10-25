@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -90,11 +91,14 @@ import page.ooooo.geoshare.data.state.ActionCompleted
 import page.ooooo.geoshare.data.state.ActionState
 import page.ooooo.geoshare.data.state.ActivityShouldFinish
 import page.ooooo.geoshare.data.state.Attempt
+import page.ooooo.geoshare.data.state.BasicActionReady
 import page.ooooo.geoshare.data.state.ConversionFailed
 import page.ooooo.geoshare.data.state.ConversionState
 import page.ooooo.geoshare.data.state.ConversionSucceeded
 import page.ooooo.geoshare.data.state.ExtendedStateLog
+import page.ooooo.geoshare.data.state.FileActionReady
 import page.ooooo.geoshare.data.state.FileUriRequested
+import page.ooooo.geoshare.data.state.LocationActionReady
 import page.ooooo.geoshare.data.state.LocationPermissionReceived
 import page.ooooo.geoshare.data.state.LocationRationaleConfirmed
 import page.ooooo.geoshare.data.state.LocationRationaleRequested
@@ -231,6 +235,9 @@ fun MainScreen(
         onCancelFileUriRequest = mainViewModel::cancelFileUriRequest,
         onCancelLocationFinding = mainViewModel::cancelLocationFinding,
         onDenyAction = mainViewModel::denyAction,
+        onExecuteBasicAction = mainViewModel::executeBasicAction,
+        onExecuteFileAction = mainViewModel::executeFileAction,
+        onExecuteLocationAction = mainViewModel::executeLocationAction,
         onFinish = onFinish,
         onGrantAction = mainViewModel::grantAction,
         onReceiveFileUri = mainViewModel::receiveFileUri,
@@ -641,6 +648,9 @@ private fun MainAction(
     onCancelFileUriRequest: () -> Unit,
     onCancelLocationFinding: () -> Unit,
     onDenyAction: (doNotAsk: Boolean) -> Unit,
+    onExecuteBasicAction: (context: Context) -> Unit,
+    onExecuteFileAction: (context: Context) -> Unit,
+    onExecuteLocationAction: (context: Context) -> Unit,
     onFinish: () -> Unit,
     onGrantAction: (doNotAsk: Boolean) -> Unit,
     onReceiveFileUri: (uri: Uri) -> Unit,
@@ -678,6 +688,14 @@ private fun MainAction(
                     onFinish()
                 }
 
+                // Basic action
+
+                is BasicActionReady -> {
+                    onExecuteBasicAction(context)
+                }
+
+                // File action
+
                 is FileUriRequested -> {
                     try {
                         saveFileLauncher.launch(
@@ -691,6 +709,12 @@ private fun MainAction(
                         onCancelFileUriRequest()
                     }
                 }
+
+                is FileActionReady -> {
+                    onExecuteFileAction(context)
+                }
+
+                // Location action
 
                 is LocationRationaleRequested -> {
                     if (context.hasLocationPermission()) {
@@ -717,6 +741,10 @@ private fun MainAction(
                         }
                         onReceiveLocation(actionState.action, actionState.isAutomation, location)
                     }
+                }
+
+                is LocationActionReady -> {
+                    onExecuteLocationAction(context)
                 }
             }
         }
