@@ -308,7 +308,7 @@ to `fastlane/metadata`, edit the `copyEnabledMetadata` task in
 6. Then install `optipng` and optimize all the screenshot PNG files:
 
     ```shell
-    find ./fastlane/metadata/android/en-US/images -name '*.png' -exec optipng -preserve '{}' \;
+    find ./fastlane/metadata_src/android/en-US/images -name '*.png' -exec optipng -preserve '{}' \;
     find ./fastlane/metadata_pro/android/en-US/images -name '*.png' -exec optipng -preserve '{}' \;
     ```
 
