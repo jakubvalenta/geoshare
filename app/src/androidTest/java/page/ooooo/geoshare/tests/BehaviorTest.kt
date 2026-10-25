@@ -885,7 +885,7 @@ fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
 
 sealed interface TestServer {
     data class Configured(val server: Server) : TestServer
-    object None : TestServer
+    data object None : TestServer
 }
 
 sealed interface TestServerParams {
@@ -902,7 +902,7 @@ sealed interface TestServerParams {
         override fun toString() = name
     }
 
-    object None : TestServerParams {
+    data object None : TestServerParams {
         override fun toString() = "No server"
     }
 }
