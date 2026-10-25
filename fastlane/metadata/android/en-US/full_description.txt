@@ -37,9 +37,9 @@ When you like Google Maps for finding places, but you prefer a different app for
 
 - Shows the <b>geographic coordinates</b> of a map link and allows copying them to clipboard in various formats, for example as a geo: link.
 - Shows all points of a <b>place list</b> link.
-- Allows performing an action <b>automatically</b> when a map link is processed.
+- Allows performing an action <b>automatically</b> when a map link is processed. (Pro feature)
 - Allows <b>launching navigation</b> in all apps that support it, including TomTom.
-- Allows opening a location in <b>web maps</b>, pre-installed ones or your own.
+- Allows opening a location in <b>web maps</b>, pre-installed ones or your own. (Pro feature)
 - Allows saving a location as a <b>GPX file</b>.
 - Allows sending a location via a <b>messaging app</b>.
 - Allows saving a location to a <b>contact</b>.
