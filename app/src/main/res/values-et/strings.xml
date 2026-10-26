@@ -74,4 +74,14 @@
     <string name="help_welcome_text">Kas sul on kaardilink valmis? Sisesta see vormi ja vajuta nuppu „ %1$s “.</string>
     <string name="help_welcome_title">Tere tulemast</string>
     <string name="input_kagi_maps_name">Kagi Maps</string>
+    <string name="input_kagi_maps_warning_account">Asukohtade tunnustega lingid pole toetatud, kuna nende kasutamiseks on vaja Kagi kasutajakontot.</string>
+    <string name="input_waze_warning_route_empty">Teekond on tühi. Proovi avada uuesti Waze, oota asukoha tuvastamist ja jaga teekonda uuesti.</string>
+    <string name="input_waze_warning_route_expired">Teekond on aegunud.</string>
+    <string name="main_source_open">Ava algne link</string>
+    <string name="nav_menu_content_description">Menüü</string>
+    <string name="nav_back_content_description">Tagasi avalehele</string>
+    <string name="intro_how_to_share_google_maps_screenshot_place">Paigutatud märk</string>
+    <string name="conversion_succeeded_apps_headline">Ava rakendusega</string>
+    <string name="conversion_succeeded_apps_links_configure">Seadista veebikaarte</string>
+    <string name="intro_open_by_default_google_maps_caption">Esmalt ava „Seadistused“ ➞ „Rakendused“ ➞ „Kaardid“ ➞ „ %1$s “ ja lülita selles rakenduses linkide avamine välja.</string>
 </resources>

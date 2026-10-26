@@ -37,9 +37,9 @@ Kui sulle meeldib Google Mapsi kasutada kohtade leidmiseks, kuid tee juhatamisek
 
 - Näitab kaardilingi <b>geograafilisi koordinaate</b> ja võimaldab neid kopeerida lõikelauale erinevates vormingutes, näiteks geo: lingina.
 - Näitab kõiki <b>kohtade loendi</b> lingi punkte.
-- Võimaldab kaardilingi töötlemisels teostada toimingut <b>automaatselt</b>.
+- Võimaldab kaardilingi töötlemisel teostada toimingut <b>automaatselt</b> (kaasneb Pro-paketiga).
 - Võimaldab <b>tee juhatamise alustamist</b> kõigis seda toetavates rakendustes, sealhulgas TomTomis.
-- Võimaldab avada asukoha <b>veebikaartidel</b>, olgu need siis eelpaigaldatud või sinu enda omad.
+- Võimaldab avada asukoha <b>veebikaartidel</b>, olgu need siis eelpaigaldatud või sinu enda omad (kaasneb Pro-paketiga).
 - Võimaldab salvestada asukoha <b>GPX-failina</b>.
 - Võimaldab saata asukoha <b>sõnumirakenduse</b> kaudu.
 - Võimaldab salvestada asukoha <b>kontakti</b> juurde.
