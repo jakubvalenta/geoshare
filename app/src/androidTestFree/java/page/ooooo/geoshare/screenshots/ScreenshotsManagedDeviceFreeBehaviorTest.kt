@@ -67,7 +67,6 @@ import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.submitMainForm
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.tests.waitForToastToDisappear
-import page.ooooo.geoshare.tests.withNetworkOff
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import java.util.UUID
