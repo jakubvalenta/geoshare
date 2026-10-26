@@ -21,7 +21,7 @@
     <string name="billing_terms_of_service">kasutustingimused</string>
     <string name="conversion_connecting">Ühendan teenusega %1$s…</string>
     <string name="conversion_permission">Kas ühendad teenusega %1$s?</string>
-    <string name="conversion_succeeded_share">Jaga</string>
+    <string name="share">Jaga</string>
     <string name="conversion_succeeded_skip">Kopeeri algne link</string>
     <string name="donation_button">Toeta meid Ko-fi kaudu</string>
     <string name="donation_description">Kas see rakendus aitab sul aega säästa?</string>
