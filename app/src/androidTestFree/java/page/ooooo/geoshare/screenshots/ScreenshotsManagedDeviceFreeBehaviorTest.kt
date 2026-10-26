@@ -887,4 +887,15 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
             )
         }
     }
+
+    fun <R> UiAutomatorTestScope.withNetworkOff(block: () -> R): R {
+        device.executeShellCommand("svc wifi disable")
+        device.executeShellCommand("svc data disable")
+        try {
+            return block()
+        } finally {
+            device.executeShellCommand("svc wifi enable")
+            device.executeShellCommand("svc data enable")
+        }
+    }
 }

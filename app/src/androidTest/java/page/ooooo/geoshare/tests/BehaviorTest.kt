@@ -1085,17 +1085,6 @@ fun UiAutomatorTestScope.saveScreenshot(name: String, scale: Float = 0.5f) {
     }
 }
 
-fun <R> UiAutomatorTestScope.withNetworkOff(block: () -> R): R {
-    device.executeShellCommand("svc wifi disable")
-    device.executeShellCommand("svc data disable")
-    try {
-        return block()
-    } finally {
-        device.executeShellCommand("svc wifi enable")
-        device.executeShellCommand("svc data enable")
-    }
-}
-
 /**
  * Run [block] and if it throws [AssertionError], then run it one more time.
  */
