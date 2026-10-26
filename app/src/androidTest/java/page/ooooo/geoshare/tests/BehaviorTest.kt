@@ -346,31 +346,33 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
 ) = assertConversionSucceeds(persistentListOf(expectedPoint), fallbackNames, accurate, timeoutMs)
 
 fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
-    // Wait for Google Maps
-    onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+    try {
+        // Assert Google Maps content
+        onElement { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+    } catch (_: ElementNotFoundException) {
+        // If there is a location permission dialog, confirm it
+        if (isSystemPermissionShown(500)) {
+            grantSystemPermission()
+        }
 
-    // If there is a location permission dialog, confirm it
-    if (isSystemPermissionShown(1_000)) {
-        grantSystemPermission()
-    }
-
-    // If there is a Google Maps sign in screen, skip it
-    onElementOrNull(3_000) {
-        packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
-            "Make it your map",
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée",
-        )
-    }?.let {
-        onElement {
-            packageName == PackageNames.GOOGLE_MAPS && textAsString()?.lowercase() in setOf(
-                "skip",
-                "ignorer",
+        // If there is a Google Maps sign in screen, skip it
+        onElementOrNull(500) {
+            packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
+                "Make it your map",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée",
             )
-        }.click()
-    }
+        }?.let {
+            onElement {
+                packageName == PackageNames.GOOGLE_MAPS && textAsString()?.lowercase() in setOf(
+                    "skip",
+                    "ignorer",
+                )
+            }.click()
+        }
 
-    // Verify Google Maps content
-    onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+        // Assert Google Maps content again
+        onElement { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+    }
 }
 
 fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, timeoutMs: Long = NETWORK_TIMEOUT) {
