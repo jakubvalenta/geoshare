@@ -69,7 +69,7 @@
     <string name="conversion_succeeded_save_gpx_failed">GPX-faili salvestamine ei õnnestunud</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s väljund %2$s.gpx</string>
     <string name="help_share_source_text">Paljudes kaardirakendustes saad kasutada jagamisnuppu %1$s ja sellest avada asukoha rakendusega %2$s.</string>
-    <string name="help_share_source_title">GeoShare\'i käivitamine kaardirakendusest</string>
+    <string name="help_share_source_title">GeoShare’i käivitamine kaardirakendusest</string>
     <string name="help_welcome_action">Või kopeeri see näide:</string>
     <string name="help_welcome_text">Kas sul on kaardilink valmis? Sisesta see vormi ja vajuta nuppu „ %1$s “.</string>
     <string name="help_welcome_title">Tere tulemast</string>
