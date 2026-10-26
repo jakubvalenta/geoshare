@@ -245,7 +245,6 @@
     <string name="conversion_failed_reason_exception">Exceção desconhecida</string>
     <string name="faq_how_text_2_item_api">ou a API do mapa</string>
     <string name="faq_privacy_text_server">Para alguns links de mapa, o %1$s fala com um servidor remoto, o %3$s que é de código aberto. E então, esse servidor fala com a API do mapa (como a API do Google Maps). O %2$s não mantém registros dos links de mapa. Para aplicar uma taxa de limite, ele guarda uma chave pública que identifica seu dispositivo, e separadamente seu endereço IP por um tempo limitado.</string>
-    <string name="faq_privacy_text_html">Para alguns links de mapa, o %1$s carrega a página viva do mapa e executa JavaScript. Isto ocorre em um ambiente restrito, que bloqueia scripts de rastreamento e não armazena cookies.</string>
     <string name="conversion_failed_unsupported_source_place_list">Listas de lugares não são suportadas</string>
     <string name="network_exception_connect_exception">Conexão recusada</string>
     <string name="network_exception_unauthorized">Não autorizado</string>

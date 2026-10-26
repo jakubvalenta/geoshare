@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">ou la page web en direct, y compris JavaScript</string>
+    <string name="faq_privacy_text_html">Pour certains liens vers des cartes, %1$s charge la page Web en direct du service de cartographie et exécute son code JavaScript. Cela se produit dans un environnement restreint, qui bloque les scripts de suivi et ne stocke pas de cookies.</string>
 </resources>

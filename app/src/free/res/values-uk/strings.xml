@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">або з вебсторінки в режимі реального часу, що включає JavaScript</string>
+    <string name="faq_privacy_text_html">Для деяких посилань на мапи %1$s завантажує живу вебсторінку сервісу ммап та виконує його JavaScript. Це відбувається у обмеженому середовищі, яке блокує скрипти відстеження та не зберігає cookies.</string>
 </resources>

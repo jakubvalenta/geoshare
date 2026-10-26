@@ -268,7 +268,6 @@
     <string name="conversion_failed_reason_exception">استثناء غير معروف</string>
     <string name="faq_how_text_2_item_api">أو واجهة برمجة التطبيقات (API) لخدمة الخرائط</string>
     <string name="faq_privacy_text_server">بالنسبة لبعض روابط الخرائط، يقوم %1$s بالاتصال بخادم بعيد، %3$s المفتوح المصدر. ثم يقوم هذا الخادم بالاتصال API خدمة الخرائط (مثل API خرائط Google). لا يحتفظ %2$s بسجلات لروابط الخرائط. ولتطبيق الحد الأقصى لعدد الطلبات، يقوم بتخزين مفتاح عام يحدد جهازك وعنوان IP الخاص بك بشكل منفصل لفترة محدودة.</string>
-    <string name="faq_privacy_text_html">بالنسبة لبعض روابط الخرائط، يقوم %1$s بتحميل صفحة الويب المباشرة لخدمة الخرائط وتنفيذ جافا سكريبت الخاصة بها. ويحدث ذلك في بيئة مقيدة، تعمل على حظر نصوص التتبع ولا تقوم بتخزين ملفات تعريف الارتباط.</string>
     <string name="conversion_failed_unsupported_source_place_list">قوائم المواقع غير مدعومة</string>
     <string name="network_exception_connect_exception">رُفض الاتصال</string>
     <string name="network_exception_unauthorized">غير مصرح به</string>

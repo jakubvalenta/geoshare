@@ -1,5 +1,7 @@
 package page.ooooo.geoshare.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -63,7 +65,9 @@ fun FaqHowItWorksText(
 private fun DefaultPreview() {
     AppTheme {
         Surface {
-            FaqHowItWorksText(onNavigateToUserPreferencesScreen = {})
+            Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)) {
+                FaqHowItWorksText(onNavigateToUserPreferencesScreen = {})
+            }
         }
     }
 }

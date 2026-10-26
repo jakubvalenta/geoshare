@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">o la página web en vivo incluyendo JavaScript</string>
+    <string name="faq_privacy_text_html">En el caso de algunos enlaces a mapas, %1$s carga la página web en tiempo real del servicio de mapas y ejecuta su código JavaScript. Esto ocurre en un entorno restringido, que bloquea los scripts de seguimiento y no almacena cookies.</string>
 </resources>

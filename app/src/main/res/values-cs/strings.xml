@@ -251,7 +251,6 @@
     <string name="conversion_failed_reason_exception">Neznámá výjimka</string>
     <string name="faq_how_text_2_item_api">nebo API mapové služby</string>
     <string name="faq_privacy_text_server">V případě některých odkazů zavolá %1$s vzdálený server, %3$s, který je open-source. Tento server poté zavolá API mapové služby (např. Google Maps API). %2$s neukládá záznamy o zpracovaných mapových odkazech. Z důvodu omezení frekvence požadavků, ukládá server veřejný klíč, který identifikuje vaše zařízení, a odděleně od něj IP adresu, po omezenou dobu.</string>
-    <string name="faq_privacy_text_html">V případě některých odkazů načte %1$s webovou stránku mapové služby a spustí její JavaScript. To se provede v omezeném prostředí, které blokuje sledovací skripty a neukládá cookies.</string>
     <string name="conversion_failed_unsupported_source_place_list">Seznamy míst nejsou podporovány</string>
     <string name="network_exception_connect_exception">Spojení zamítnuto</string>
     <string name="network_exception_unauthorized">Přístup nepovolen</string>

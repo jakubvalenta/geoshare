@@ -220,7 +220,6 @@
     <string name="faq_name_only_text_2">Puntos especificados solo por nombre no son incluidos en las rutas GPX.</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="faq_privacy_text_server">En el caso de algunos enlaces de mapas, %1$s realiza una llamada a un servidor remoto, el servidor de código abierto %3$s. A continuación, este servidor realiza una llamada a la API del servicio de mapas (por ejemplo, la API de Google Maps). %2$s no guarda registros de los enlaces de mapas. Para aplicar la limitación de frecuencia, almacena una clave pública que identifica su dispositivo y, por separado, su dirección IP durante un tiempo limitado.</string>
-    <string name="faq_privacy_text_html">En el caso de algunos enlaces a mapas, %1$s carga la página web en tiempo real del servicio de mapas y ejecuta su código JavaScript. Esto ocurre en un entorno restringido, que bloquea los scripts de seguimiento y no almacena cookies.</string>
     <string name="user_preferences_connection_option_always">Conceder</string>
     <string name="user_preferences_connection_option_never">Nunca conceder</string>
     <string name="user_preferences_coordinate_format_description">Elija el formato en el que se mostrarán todas las coordenadas geográficas en toda la aplicación.</string>

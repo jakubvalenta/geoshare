@@ -252,7 +252,6 @@
     <string name="conversion_failed_reason_exception">Невідоме виключення</string>
     <string name="faq_how_text_2_item_api">або API мапографічного сервісу</string>
     <string name="faq_privacy_text_server">Для деяких посилань на мапи %1$s звертається до віддаленого сервера з відкритим вихідним кодом %3$s. Цей сервер, у свою чергу, здійснює виклик API сервісу мап (наприклад, Google Maps API). %2$s не зберігає журналів посилань на мапи. Для застосування обмеження швидкості він зберігає публічний ключ, який ідентифікує ваш пристрій, а окремо — вашу IP-адресу протягом обмеженого часу.</string>
-    <string name="faq_privacy_text_html">Для деяких посилань на мапи %1$s завантажує живу вебсторінку сервісу ммап та виконує його JavaScript. Це відбувається у обмеженому середовищі, яке блокує скрипти відстеження та не зберігає cookies.</string>
     <string name="conversion_failed_unsupported_source_place_list">Списки місць не підтримуються</string>
     <string name="network_exception_connect_exception">Відмовлено у з’єднанні</string>
     <string name="network_exception_unauthorized">Неавторизовано</string>

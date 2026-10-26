@@ -49,6 +49,7 @@ import page.ooooo.geoshare.data.android.openSettingsOpenByDefaultForPackage
 import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.ui.components.ExpandablePane
 import page.ooooo.geoshare.ui.components.FaqHowItWorksText
+import page.ooooo.geoshare.ui.components.FaqPrivacyText
 import page.ooooo.geoshare.ui.components.NavigationBackButton
 import page.ooooo.geoshare.ui.components.ParagraphText
 import page.ooooo.geoshare.ui.components.ScreenshotOpenByDefault
@@ -119,8 +120,6 @@ private fun FaqScreen(
     ) { innerPadding ->
         val context = LocalContext.current
         val appName = stringResource(R.string.app_name)
-        val appServerName = stringResource(R.string.app_server_name)
-        val appServerUrl = stringResource(R.string.app_server_url)
         LazyColumn(
             Modifier
                 .widthIn(max = 600.dp)
@@ -168,23 +167,7 @@ private fun FaqScreen(
                     onSetExpandedItemId = { expandedItemId = it },
                     title = stringResource(R.string.faq_privacy_headline),
                 ) {
-                    ParagraphText(
-                        stringResource(R.string.faq_privacy_text, appName)
-                    )
-                    ParagraphText(
-                        annotatedStringResource(
-                            R.string.faq_privacy_text_server,
-                            tertiaryLinkStyles(),
-                            FormatArg.Text(appName),
-                            FormatArg.Text(appServerName),
-                            FormatArg.Link(appServerName) {
-                                context.openUriInDefaultApp(appServerUrl)
-                            },
-                        )
-                    )
-                    ParagraphText(
-                        stringResource(R.string.faq_privacy_text_html, appName)
-                    )
+                    FaqPrivacyText(onOpenUriInDefaultApp = context::openUriInDefaultApp)
                 }
             }
             item(key = "privacy_divider", contentType = "faq_divider") {

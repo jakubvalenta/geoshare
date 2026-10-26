@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">包含 JavaScript 的实时网页</string>
+    <string name="faq_privacy_text_html">对于一些地图链接，%1$s 加载地图服务的实时网页并执行其 JavaScript。这一动作发生在受限环境中，会拦截跟踪脚本且不存储 cookies。</string>
 </resources>

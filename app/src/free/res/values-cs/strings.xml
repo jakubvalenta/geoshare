@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">nebo z živé webové stránky včetně JavaScriptu</string>
+    <string name="faq_privacy_text_html">V případě některých odkazů načte %1$s webovou stránku mapové služby a spustí její JavaScript. To se provede v omezeném prostředí, které blokuje sledovací skripty a neukládá cookies.</string>
 </resources>

@@ -254,7 +254,6 @@
     <string name="conversion_failed_reason_exception">Неизвестное исключение</string>
     <string name="faq_how_text_2_item_api">либо API картографического сервиса</string>
     <string name="faq_privacy_text_server">Для некоторых ссылок на карты %1$s обращается к удалённому серверу %3$s с открытым исходным кодом. Затем этот сервер вызывает API картографического сервиса (например, API Google Maps). %2$s не ведёт журналы ссылок на карты. Для применения ограничения скорости он сохраняет открытый ключ, который идентифицирует ваше устройство, и отдельно ваш IP-адрес в течение ограниченного времени.</string>
-    <string name="faq_privacy_text_html">Для некоторых ссылок на карты %1$s загружает активную web-страницу картографического сервиса и выполняет её JavaScript. Это происходит в ограниченной среде, которая блокирует скрипты отслеживания и не сохраняет файлы cookie.</string>
     <string name="conversion_failed_unsupported_source_place_list">Списки мест не поддерживаются</string>
     <string name="network_exception_connect_exception">подключение отклонено</string>
     <string name="network_exception_unauthorized">не выполнена авторизация</string>

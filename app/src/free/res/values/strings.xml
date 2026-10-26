@@ -2,4 +2,5 @@
 <resources>
     <string name="input_google_maps_web_view_name" translatable="false">Google Maps (WebView)</string>
     <string name="faq_how_text_2_item_web">or the live web page including JavaScript</string>
+    <string name="faq_privacy_text_html">For some map links, %1$s loads the live web page of the map service and executes its JavaScript. This happens in a restricted environment, which blocks tracking scripts and doesn’t store cookies.</string>
 </resources>
