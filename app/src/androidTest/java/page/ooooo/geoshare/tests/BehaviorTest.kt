@@ -1014,6 +1014,7 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
             saveServerForm()
 
             // Go back to server preferences
+            quickWaitForStableInActiveWindow() // Wait to prevent stale object exception
             onElement { viewIdResourceName == "geoShareBack" }.click()
 
             // Select the server
