@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">ya da JavaScript içeren canlı web sayfası</string>
+    <string name="faq_privacy_text_html">Bazı harita bağlantıları için, %1$s harita servisinin canlı web sayfasını yükler ve JavaScript kodunu çalıştırır. Bu işlem, izleme komut dosyalarını engelleyen ve çerezleri saklamayan kısıtlı bir ortamda gerçekleşir.</string>
 </resources>

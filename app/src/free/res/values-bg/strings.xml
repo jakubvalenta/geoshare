@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">или на живо уеб страница, включваща JavaScript</string>
+    <string name="faq_privacy_text_html">За някои връзки към карти, %1$s зарежда активната уеб страница на картографската услуга и изпълнява нейния JavaScript. Това се случва в ограничена среда, която блокира скриптове за проследяване и не съхранява „бисквитки“.</string>
 </resources>

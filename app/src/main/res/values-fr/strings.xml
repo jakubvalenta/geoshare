@@ -245,7 +245,6 @@
     <string name="conversion_failed_reason_exception">Exception inconnue</string>
     <string name="faq_how_text_2_item_api">ou l’API du service de cartographie</string>
     <string name="faq_privacy_text_server">Pour certains liens vers des cartes, %1$s fait appel à un serveur distant, le logiciel libre %3$s. Ce serveur interroge ensuite l’API du service de cartographie (par exemple, l’API Google Maps). %2$s ne conserve pas de journaux relatifs aux liens vers les cartes. Afin d’appliquer une limitation de débit, il stocke une clé publique qui identifie votre appareil ainsi que, séparément, votre adresse IP pendant une durée limitée.</string>
-    <string name="faq_privacy_text_html">Pour certains liens vers des cartes, %1$s charge la page Web en direct du service de cartographie et exécute son code JavaScript. Cela se produit dans un environnement restreint, qui bloque les scripts de suivi et ne stocke pas de cookies.</string>
     <string name="conversion_failed_unsupported_source_place_list">Les listes de lieux ne sont pas prises en charge</string>
     <string name="network_exception_connect_exception">Connexion refusée</string>
     <string name="network_exception_unauthorized">Non autorisé</string>

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">либо полной web-страницы, включая JavaScript</string>
+    <string name="faq_privacy_text_html">Для некоторых ссылок на карты %1$s загружает активную web-страницу картографического сервиса и выполняет её JavaScript. Это происходит в ограниченной среде, которая блокирует скрипты отслеживания и не сохраняет файлы cookie.</string>
 </resources>

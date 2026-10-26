@@ -64,8 +64,10 @@ navigation, you can easily switch from Google Maps to your favorite
   clipboard in various formats, for example as a geo: link.
 - Shows all points of a **place list** link.
 - Allows performing an action **automatically** when a map link is processed.
+  (Pro feature)
 - Allows **launching navigation** in all apps that support it, including TomTom.
 - Allows opening a location in **web maps**, pre-installed ones or your own.
+  (Pro feature)
 - Allows saving a location as a **GPX file**.
 - Allows sending a location via a **messaging app**.
 - Allows saving a location to a **contact**.
@@ -105,7 +107,7 @@ Maps, etc.)** and read the coordinates from:
   `Location: https://google.com/maps/@40.78,-73.96,19z`
 - or HTML document, e.g.
   `<meta property="place:location:latitude" content="40.78">`
-- or the API of the map service, e.g.
+- or the API of the map service (directly or via a proxy server), e.g.
   `GET https://geocode.googleapis.com/v4/geocode/address/…`
 - or the live web page including JavaScript.
 

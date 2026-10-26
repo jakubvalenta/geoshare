@@ -238,7 +238,6 @@
     <string name="conversion_failed_reason_exception">Неизвестно изключение</string>
     <string name="faq_how_text_2_item_api">или API на картографската услуга</string>
     <string name="faq_privacy_text_server">За някои връзки към карти, %1$s извиква отдалечен сървър, %3$s с отворен код. След това този сървър извиква API на картографската услуга (напр. API на Google Maps). %2$s не пази лог файлове на връзки към карти. За да приложи ограничаване на скоростта, той съхранява публичен ключ, който идентифицира вашето устройство и отделно вашия IP адрес за ограничено време.</string>
-    <string name="faq_privacy_text_html">За някои връзки към карти, %1$s зарежда активната уеб страница на картографската услуга и изпълнява нейния JavaScript. Това се случва в ограничена среда, която блокира скриптове за проследяване и не съхранява „бисквитки“.</string>
     <string name="conversion_failed_unsupported_source_place_list">Списъците с места не се поддържат</string>
     <string name="network_exception_connect_exception">Връзката е отказана</string>
     <string name="network_exception_unauthorized">Неоторизирано</string>
