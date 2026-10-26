@@ -263,7 +263,7 @@
     <string name="server_list_none_html">从 HTML 中读取坐标（实验性）</string>
     <string name="server_list_google_maps_place_title">Google 地图地点 ID</string>
     <string name="server_list_none">不使用 API 服务器</string>
-    <string name="faq_how_text_2_item_api">或者该地图服务的 API</string>
+    <string name="faq_how_text_2_item_api">或者该地图服务的 API（直接或通过代理服务器）</string>
     <string name="faq_privacy_text_server">对于一些地图链接，%1$s 调用远程服务器，开源的 %3$s。此服务器然后调用地图服务 API（如 Google 地图 API）。%2$s 不保留地图链接的记录。为了施加速率限制，它会在有限期限内存储 IP 地址和识别设备的公钥。</string>
     <string name="server_list_description">允许地图服务连接时，%1$s 使用 API 服务器来转换某些链接到坐标。选择用官方服务器（搭配自己的凭证）、代理服务器还是不使用。</string>
     <string name="billing_feature_automation_description">地图链接转换为坐标时自动执行一系列操作以节约时间：打开地图应用、启动导航应用（TomTom、Waze 等）、复制到剪贴板、保存 GPX。</string>
