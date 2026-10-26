@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="billing_manage_error">Google Play avamine ei õnnestunud</string>
+    <string name="billing_offers_error">Pakkumiste laadimine ei õnnestunud</string>
+    <string name="billing_purchase_error_cancelled">Ost on tühistatud</string>
+    <string name="billing_purchase_error_unknown">Ostmine ei õnnestunud</string>
+    <string name="billing_setup_error_unknown">Ostude laadimine ei õnnestunud</string>
+    <string name="conversion_failed_unsupported_source">See link pole toetatud</string>
+    <string name="server_list_none_html">Loe koordinaatide asemel kohanime</string>
 </resources>
