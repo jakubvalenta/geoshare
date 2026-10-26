@@ -162,8 +162,8 @@
     <string name="converter_waze_name">Waze</string>
     <string name="converter_yandex_maps_name">Yandex Maps</string>
     <string name="faq_how_headline">Як це працює</string>
-    <string name="faq_how_text_1">%1$s перетворює посилання на мапу в геопосилання, які можна відкрити в інших мапічних застосунках. Для створення геопосилання потрібні географічні координати. %1$s витягує їх з URL-адреси мапи.</string>
-    <string name="faq_how_text_2">Однак не всі URL-адреси мапмістять координати. У таких випадках %1$s запросить у вас дозвіл на з’єднання зі службами мап (Google Maps, Apple Maps тощо) та отримання координат з:</string>
+    <string name="faq_how_text_1">%1$s перетворює посилання на мапу в геопосилання, які можна відкрити в інших мапічних застосунках. Для створення геопосилання потрібні географічні координати. %1$s читає їх з URL-адреси мапи.</string>
+    <string name="faq_how_text_2">Однак не всі URL-адреси мапмістять координати. У таких випадках %1$s запросить у вас дозвіл на з’єднання зі службами мап (Google Maps, Apple Maps тощо) та читання координат з:</string>
     <string name="faq_how_text_2_item_http">або із заголовків HTTP</string>
     <string name="faq_how_text_2_item_html">або з HTML-документа</string>
     <string name="faq_how_text_3">Якщо ви не дозволяєте з’єднання зі службами мап, то %1$s створює геопосилання з назвою місця замість координат або зупиняється, залежно від конкретного посилання.</string>
@@ -171,7 +171,7 @@
     <string name="faq_how_text_4_preferences_button">налаштувань</string>
     <string name="faq_privacy_headline">Питання приватності</string>
     <string name="faq_privacy_text">Коли це можливо, %1$s конвертує посилання на мапи в автономному режимі. Якщо посилання на мапу потребує онлайн-конвертації, застосунок запитає вас перед з’єднанням із мапографічним сервісом (Google Maps, Apple Maps тощо). Якщо ви дозволите з’єднання, мапографічний сервіс отримає посилання на мапу та зможе бачити вашу IP-адресу.</string>
-    <string name="conversion_succeeded_check_experimental">Розташування може бути неточним через експериментальний метод визначення координат.</string>
+    <string name="conversion_succeeded_check_experimental">Розташування може бути неточним, оскільки підтримка цього посилання на мапу перебуває на експериментальному етапі.</string>
     <string name="conversion_succeeded_check_map_center">Розташуванням може бути центр мапи, а не позначка.</string>
     <string name="conversion_succeeded_check_srs">Розташування може бути неточним через перетворення системи координат.</string>
     <string name="conversion_succeeded_hide">Сховати</string>
@@ -311,7 +311,7 @@
     <string name="conversion_succeeded_check_name_only_points">Не вдалося знайти координати для деяких точок.</string>
     <string name="converter_google_navigation_uri_name">Посилання для навігації Google</string>
     <string name="faq_name_only_title">Не вдалося знайти координати — використовується назва місця</string>
-    <string name="faq_name_only_text_1">%1$s може витягувати з певних посилань на мапи лише назву місця, наприклад, «гора Кіліманджаро». Коли ви відкриєте це місце в іншому мапографічному застосунку, воно може відрізнятися від того, що було в оригінальному посиланні, оскільки може існувати кілька місць з однаковою назвою.</string>
+    <string name="faq_name_only_text_1">%1$s може читати з певних посилань на мапи лише назву місця, наприклад, «гора Кіліманджаро». Коли ви відкриєте це місце в іншому мапографічному застосунку, воно може відрізнятися від того, що було в оригінальному посиланні, оскільки може існувати кілька місць з однаковою назвою.</string>
     <string name="faq_name_only_text_2">Точки, ідентифіковані лише за назвою, не включаються до маршрутів GPX.</string>
     <string name="network_exception_webview">Виняток WebView</string>
     <string name="network_exception_too_many_requests_wait">Забагато запитів, зачекайте %1$d с</string>
