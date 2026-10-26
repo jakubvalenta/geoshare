@@ -107,7 +107,7 @@ Maps, etc.)** and read the coordinates from:
   `Location: https://google.com/maps/@40.78,-73.96,19z`
 - or HTML document, e.g.
   `<meta property="place:location:latitude" content="40.78">`
-- or the API of the map service (directly or via GeoShare proxy server), e.g.
+- or the API of the map service (directly or via a proxy server), e.g.
   `GET https://geocode.googleapis.com/v4/geocode/address/…`
 - or the live web page including JavaScript.
 
