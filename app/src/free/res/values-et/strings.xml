@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="faq_how_text_2_item_web">või reaalajas veebileht, mis sisaldab JavaScripti</string>
+    <string name="faq_privacy_text_html">Mõnede kaardilinkide puhul %1$s laadib kaarditeenusest reaalajas toimiva veebilehe ja käivitab seal JavaScripti. See toimub kontrollitud keskkonnas, mis blokeerib jälitajad ega salvesta küpsiseid.</string>
 </resources>
