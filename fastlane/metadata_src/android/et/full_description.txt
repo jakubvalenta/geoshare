@@ -1,0 +1,54 @@
+Jaga kaardilinki GeoShare'iga ja rakendus avab ta mõne muu paigaldatud kaardirakendusega.
+
+<b>Toetatud kaardilingid</b>
+
+- Google Maps
+- Apple Maps
+- 2GIS
+- Amap (AutoNavi)
+- Baidu Map (beeta)
+- Cartes IGN
+- CoMaps
+- HERE WeGo
+- Kagi Maps
+- Magic Earth
+- MapQuest
+- Maps.me
+- Mapy.com
+- OpenStreetMap
+- Organic Maps
+- OsmAnd
+- Plus Codes (ainult üldine)
+- Urbi
+- Waze
+- Yahoo! Maps
+- Yandex Maps
+- coordinates
+
+GeoShare pole ühegi nimetatud teenusega seotud ega nende pool heakskiidetud.
+
+<b>Kasutusjuhtumite näited</b>
+
+Kui keegi saadab sulle Google Mapsi lingi, kuid sa eelistad kasutada OpenStreetMapi, saad kiiresti <b>avada sama asukoha</b> rakenduses OsmAnd või Organic Maps.
+
+Kui sulle meeldib Google Mapsi kasutada kohtade leidmiseks, kuid tee juhatamiseks eelistad mõnda teist rakendust, saad hõlpsasti Google Mapsilt üle minna oma <b>lemmikrakendusele</b>.
+
+<b>Muud võimalused</b>
+
+- Näitab kaardilingi <b>geograafilisi koordinaate</b> ja võimaldab neid kopeerida lõikelauale erinevates vormingutes, näiteks geo: lingina.
+- Näitab kõiki <b>kohtade loendi</b> lingi punkte.
+- Võimaldab kaardilingi töötlemisels teostada toimingut <b>automaatselt</b>.
+- Võimaldab <b>tee juhatamise alustamist</b> kõigis seda toetavates rakendustes, sealhulgas TomTomis.
+- Võimaldab avada asukoha <b>veebikaartidel</b>, olgu need siis eelpaigaldatud või sinu enda omad.
+- Võimaldab salvestada asukoha <b>GPX-failina</b>.
+- Võimaldab saata asukoha <b>sõnumirakenduse</b> kaudu.
+- Võimaldab salvestada asukoha <b>kontakti</b> juurde.
+- Proovib uuesti, kui <b>internetiühendus on ebastabiilne</b>.
+- Võimaldab <b>kaardilinkide asendamist</b> otse rakendusse, selle asemel et neid rakendusega jagada.
+- Kasutajaliides kohandub <b>tahvelarvutitega</b>.
+
+<b>Kuidas see töötab ja privaatsusküsimused</b>
+
+GeoShare teisendab kaardilingid (nt https://maps.app.goo.gl/...) geo: linkideks, mida saavad avada teised kaardirakendused. Geo:-lingi loomiseks on vaja geograafilisi koordinaate. GeoShare loeb need kaardi võrguaadressist.
+
+Kuid mitte kõik kaardi võrguaadressid ei sisalda koordinaate. Sellistel juhtudel <b>küsib GeoShare sinult luba ühenduda kaarditeenusega (Google Maps, Apple Maps jne)</b> ja loeb koordinaadid HTTP-päistest, HTML-dokumendist või API-st. Täpsema teabe saamiseks vaata rakenduse KKK-lehte.
