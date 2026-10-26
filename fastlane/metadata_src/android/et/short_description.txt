@@ -1,0 +1,1 @@
+Võimalus avada kaardlinke erinevates kaardirakenduses ja kopeerida linke
