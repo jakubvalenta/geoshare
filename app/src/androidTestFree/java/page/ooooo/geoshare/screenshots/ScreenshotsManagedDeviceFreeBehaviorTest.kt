@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.screenshots
 
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.getSystemService
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiAutomatorTestScope
@@ -123,7 +124,6 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         testConversionPermission()
         testConversionResultApps()
         testConversionResultChecks()
-        testConversionResultPointName()
         testConversionResultPoints()
         testMain()
         testInputs()
@@ -399,21 +399,6 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         goBackToMainForm()
     }
 
-    fun testConversionResultPointName() = uiAutomator {
-        shareUri(WGS84Point(52.47254, 13.4345, name = "Marked Location", source = Source.GENERATED))
-
-        // Conversion - Result - Sheet - Page 1 name
-        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
-        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
-            expandSheet()
-            quickWaitForStableInActiveWindow()
-            saveScreenshot("main_strings/conversion_result_sheet_page_1_name")
-            collapseSheet()
-        }
-
-        goBackToMainForm()
-    }
-
     fun testConversionResultPoints() = uiAutomator {
         shareUri("https://www.openstreetmap.org/relation/910699")
         grantConnectionPermission()
@@ -540,6 +525,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         onElement { viewIdResourceName == "geoShareFaqItem_${FaqItemId.PRIVACY}" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/faq_privacy_considerations")
+        saveScreenshot("free_strings/faq_privacy_considerations")
 
         goBackToMainForm()
     }
@@ -872,18 +858,14 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
             viewIdResourceName == "geoShareAppShare"
         }
 
-    private fun isKeyboardOpen(): Boolean {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val inputMethodManager = context.getSystemService(InputMethodManager::class.java)
-        return inputMethodManager.isAcceptingText()
-    }
-
     private fun UiAutomatorTestScope.hideKeyboard() {
-        if (isKeyboardOpen()) {
-            device.executeShellCommand(
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
-                "input keyevent 111"
-            )
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val inputMethodManager = context.getSystemService<InputMethodManager>()
+        requireNotNull(inputMethodManager)
+        if (inputMethodManager.isAcceptingText()) {
+            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+            // Press back to hide keyboard, because it's more reliable than executing the command `input keyevent 111`
+            pressBack()
         }
     }
 

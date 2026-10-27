@@ -1,6 +1,5 @@
 package page.ooooo.geoshare.tests
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.location.Location
@@ -9,6 +8,7 @@ import android.location.provider.ProviderProperties
 import android.os.Build
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.core.content.getSystemService
 import androidx.core.graphics.scale
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.platform.io.PlatformTestStorageRegistry
@@ -866,8 +866,9 @@ fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
         "appops set ${BuildConfig.APPLICATION_ID} android:mock_location allow"
     )
 
-    val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
-    val locationManager: LocationManager = context.getSystemService(LocationManager::class.java)
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    val locationManager = context.getSystemService<LocationManager>()
+    requireNotNull(locationManager)
     val mockProviderName = LocationManager.GPS_PROVIDER
 
     locationManager.addTestProvider(
