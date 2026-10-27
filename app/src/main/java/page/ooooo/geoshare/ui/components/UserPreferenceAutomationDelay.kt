@@ -25,36 +25,36 @@ import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.BillingProduct
 import page.ooooo.geoshare.data.billing.BillingStatus
 import page.ooooo.geoshare.data.billing.Feature
-import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.AutomationDelayPreference
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.data.toOutput
-import page.ooooo.geoshare.ui.AutomationDetail
+import page.ooooo.geoshare.ui.AutomationOption
+import page.ooooo.geoshare.ui.SelectedAutomationOptionState
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.toAutomationDetail
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 @Composable
 fun UserPreferenceAutomationDelayListItem(
+    state: StateFlow<SelectedAutomationOptionState>,
     index: Int,
     count: Int,
-    automationDetail: StateFlow<AutomationDetail>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     selected: Boolean,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val automationDetail by automationDetail.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
+
     val enabled = billingStatus is BillingStatus.Purchased &&
         AutomationFeature in billingFeatures &&
-        automationDetail.output is Output.HasAutomationDelay
+        state.option.output is Output.HasAutomationDelay
 
     SegmentedListItem(
         selected = selected,
@@ -84,7 +84,7 @@ fun UserPreferenceAutomationDelayControls(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
     UserPreferenceControls(
@@ -132,17 +132,17 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(
+                            option = AutomationOption(
+                                automation = SavePointsGpxAutomation,
+                                output = SavePointsGpxAutomation.toOutput(coordinateConverter),
+                            )
+                        )
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation.let { automation ->
-                            automation
-                                .toOutput(coordinateConverter)
-                                .toAutomationDetail(automation, appDetails)
-                        }
-                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -151,7 +151,7 @@ private fun ListItemPreview() {
                         token = "test_purchased",
                     ),
                     selected = false,
-                    values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                    values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                     onClick = {},
                 )
             }
@@ -168,17 +168,17 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationDelayListItem(
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(
+                            option = AutomationOption(
+                                automation = SavePointsGpxAutomation,
+                                output = SavePointsGpxAutomation.toOutput(coordinateConverter),
+                            )
+                        )
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation.let { automation ->
-                            automation
-                                .toOutput(coordinateConverter)
-                                .toAutomationDetail(automation, appDetails)
-                        }
-                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -187,7 +187,7 @@ private fun DarkListItemPreview() {
                         token = "test_purchased",
                     ),
                     selected = false,
-                    values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                    values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                     onClick = {},
                 )
             }
@@ -205,7 +205,7 @@ private fun ControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.Purchased(
@@ -229,7 +229,7 @@ private fun DarkControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),
@@ -256,7 +256,7 @@ private fun TabletControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),
@@ -283,7 +283,7 @@ private fun NotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.NotPurchased,
@@ -302,7 +302,7 @@ private fun DarkNotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),
@@ -324,7 +324,7 @@ private fun TabletNotPurchasedControlsPreview() {
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},
-                values = UserPreferencesValues(
+                values = UserPreferenceValues(
                     automation = SavePointsGpxAutomation,
                     hiddenApps = emptySet(),
                 ),

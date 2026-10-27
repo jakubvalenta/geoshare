@@ -15,6 +15,7 @@ import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.outputs.ActionResult
 import page.ooooo.geoshare.data.outputs.OpenDisplayGeoUriOutput
+import page.ooooo.geoshare.data.uri.FakeUriQuote
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
@@ -22,9 +23,11 @@ import kotlin.time.measureTime
 class ActionWaitingTest {
     private val coordinateConverter: CoordinateConverter = mock()
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val uriQuote = FakeUriQuote
     private val output = OpenDisplayGeoUriOutput(
         UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
         coordinateConverter,
+        uriQuote,
     )
     private val action = output.toAction(points.last())
     private val actionStateContext: ActionStateContext = mock()

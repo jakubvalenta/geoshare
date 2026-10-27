@@ -19,7 +19,7 @@ import javax.inject.Singleton
 @Singleton
 class MapyComUriInput @Inject constructor(
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = MapyComInputGroup
     override val changelog = persistentListOf(
@@ -77,7 +77,7 @@ class MapyComUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://mapy.com/en/zakladni?x={lon}&y={lat}&z={z}")
 
     override fun toString() = "MapsComUriInput"

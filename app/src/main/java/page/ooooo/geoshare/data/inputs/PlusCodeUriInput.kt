@@ -21,7 +21,7 @@ import javax.inject.Singleton
 @Singleton
 class PlusCodeUriInput @Inject constructor(
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = PlusCodeInputGroup
     override val changelog = persistentListOf(
@@ -51,7 +51,7 @@ class PlusCodeUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         PlusCodeFormatter.formatPlusCode(point)?.let {
             "https://plus.codes/${uriQuote.encode(it)}/"
         }

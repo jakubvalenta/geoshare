@@ -24,28 +24,28 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
 import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
 import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
-import page.ooooo.geoshare.ui.HiddenAppDetail
-import page.ooooo.geoshare.ui.HiddenAppsSize
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
+import page.ooooo.geoshare.ui.HiddenAppsOptionsState
+import page.ooooo.geoshare.ui.SelectedHiddenAppsState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import page.ooooo.geoshare.ui.toHiddenAppsDetails
 
 @Composable
 fun UserPreferenceHiddenAppsListItem(
+    state: StateFlow<SelectedHiddenAppsState>,
     index: Int,
     count: Int,
-    hiddenAppsSize: StateFlow<HiddenAppsSize>,
     selected: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val hiddenAppsSize by hiddenAppsSize.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
 
     SegmentedListItem(
         selected = selected,
@@ -54,14 +54,14 @@ fun UserPreferenceHiddenAppsListItem(
         modifier = modifier,
         supportingContent = {
             Text(
-                if (hiddenAppsSize.total == hiddenAppsSize.visible) {
+                if (state.totalCount == state.visibleCount) {
                     stringResource(R.string.user_preferences_apps_visible_all)
                 } else {
                     pluralStringResource(
                         R.plurals.user_preferences_apps_visible_count,
-                        hiddenAppsSize.visible,
-                        hiddenAppsSize.visible,
-                        hiddenAppsSize.total,
+                        state.visibleCount,
+                        state.visibleCount,
+                        state.totalCount,
                     )
                 }
             )
@@ -77,16 +77,18 @@ fun UserPreferenceHiddenAppsListItem(
 
 @Composable
 fun UserPreferenceHiddenAppsControls(
+    appDetails: StateFlow<AppDetails>,
+    state: StateFlow<HiddenAppsOptionsState>,
     billingAppNameResId: Int,
-    hiddenAppsDetails: StateFlow<List<HiddenAppDetail>>,
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
-    val hiddenAppsDetails by hiddenAppsDetails.collectAsStateWithLifecycle()
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
 
     UserPreferenceControls(
         titleResId = R.string.user_preferences_apps_title,
@@ -118,28 +120,29 @@ fun UserPreferenceHiddenAppsControls(
             val spacing = LocalSpacing.current
 
             SegmentedList(
-                values = hiddenAppsDetails,
+                values = state.hiddenApps,
                 modifier = modifier.padding(horizontal = spacing.windowPadding),
-                itemHeadline = { detail -> detail.label.orEmpty() },
-                itemOnClick = { detail -> setValue(detail.packageName, !isChecked(detail.packageName)) },
+                itemHeadline = { packageName -> appDetails[packageName]?.label.orEmpty() },
+                itemOnClick = { packageName -> setValue(packageName, !isChecked(packageName)) },
                 itemEnabled = { enabled },
-                itemLeadingContent = { detail ->
+                itemLeadingContent = { packageName ->
                     {
                         IconFromDescriptor(
-                            detail.icon?.let { DrawableIconDescriptor(it) } ?: PlaceholderIconDescriptor,
+                            appDetails[packageName]?.icon?.let { DrawableIconDescriptor(it) }
+                                ?: PlaceholderIconDescriptor,
                             contentDescription = null,
                             placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                         )
                     }
                 },
-                itemTrailingContent = { detail ->
+                itemTrailingContent = { packageName ->
                     {
                         Switch(
-                            checked = isChecked(detail.packageName),
+                            checked = isChecked(packageName),
                             onCheckedChange = {
-                                setValue(detail.packageName, it)
+                                setValue(packageName, it)
                             },
-                            modifier = Modifier.testTag("geoShareVisibleAppToggle_${detail.packageName}"),
+                            modifier = Modifier.testTag("geoShareVisibleAppToggle_${packageName}"),
                             enabled = enabled,
                         )
                     }
@@ -157,9 +160,9 @@ private fun ListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceHiddenAppsListItem(
+                    state = MutableStateFlow(SelectedHiddenAppsState(totalCount = 3, visibleCount = 1)),
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 1)),
                     selected = false,
                     onClick = {},
                 )
@@ -175,9 +178,9 @@ private fun DarkListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceHiddenAppsListItem(
+                    state = MutableStateFlow(SelectedHiddenAppsState(totalCount = 3, visibleCount = 1)),
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 1)),
                     selected = false,
                     onClick = {},
                 )
@@ -193,9 +196,9 @@ private fun AllListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceHiddenAppsListItem(
+                    state = MutableStateFlow(SelectedHiddenAppsState(totalCount = 3, visibleCount = 3)),
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
                     selected = false,
                     onClick = {},
                 )
@@ -211,9 +214,9 @@ private fun DarkAllListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceHiddenAppsListItem(
+                    state = MutableStateFlow(SelectedHiddenAppsState(totalCount = 3, visibleCount = 3)),
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 3)),
                     selected = false,
                     onClick = {},
                 )
@@ -229,9 +232,9 @@ private fun NoneListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceHiddenAppsListItem(
+                    state = MutableStateFlow(SelectedHiddenAppsState(totalCount = 3, visibleCount = 0)),
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
                     selected = false,
                     onClick = {},
                 )
@@ -247,9 +250,9 @@ private fun DarkNoneListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceHiddenAppsListItem(
+                    state = MutableStateFlow(SelectedHiddenAppsState(totalCount = 3, visibleCount = 0)),
                     index = 0,
                     count = 1,
-                    hiddenAppsSize = MutableStateFlow(HiddenAppsSize(total = 3, visible = 0)),
                     selected = false,
                     onClick = {},
                 )
@@ -264,17 +267,19 @@ private fun ControlsPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceHiddenAppsControls(
-                billingAppNameResId = R.string.app_name_pro,
-                hiddenAppsDetails = MutableStateFlow(
-                    setOf(
-                        PackageNames.COMAPS_FDROID,
-                        PackageNames.ORGANIC_MAPS,
-                        PackageNames.OSMAND_PLUS,
-                    ).toHiddenAppsDetails(appDetails)
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    HiddenAppsOptionsState(
+                        hiddenApps = setOf(
+                            PackageNames.COMAPS_FDROID,
+                            PackageNames.ORGANIC_MAPS,
+                            PackageNames.OSMAND_PLUS,
+                        )
+                    )
                 ),
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                billingAppNameResId = R.string.app_name_pro,
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -290,17 +295,19 @@ private fun DarkControlsPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceHiddenAppsControls(
-                billingAppNameResId = R.string.app_name_pro,
-                hiddenAppsDetails = MutableStateFlow(
-                    setOf(
-                        PackageNames.COMAPS_FDROID,
-                        PackageNames.ORGANIC_MAPS,
-                        PackageNames.OSMAND_PLUS,
-                    ).toHiddenAppsDetails(appDetails)
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    HiddenAppsOptionsState(
+                        hiddenApps = setOf(
+                            PackageNames.COMAPS_FDROID,
+                            PackageNames.ORGANIC_MAPS,
+                            PackageNames.OSMAND_PLUS,
+                        )
+                    )
                 ),
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                billingAppNameResId = R.string.app_name_pro,
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = true,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -316,17 +323,19 @@ private fun TabletControlsPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceHiddenAppsControls(
-                billingAppNameResId = R.string.app_name_pro,
-                hiddenAppsDetails = MutableStateFlow(
-                    setOf(
-                        PackageNames.COMAPS_FDROID,
-                        PackageNames.ORGANIC_MAPS,
-                        PackageNames.OSMAND_PLUS,
-                    ).toHiddenAppsDetails(appDetails)
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    HiddenAppsOptionsState(
+                        hiddenApps = setOf(
+                            PackageNames.COMAPS_FDROID,
+                            PackageNames.ORGANIC_MAPS,
+                            PackageNames.OSMAND_PLUS,
+                        )
+                    )
                 ),
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                billingAppNameResId = R.string.app_name_pro,
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},
@@ -338,67 +347,22 @@ private fun TabletControlsPreview() {
 
 @Preview(showBackground = true)
 @Composable
-private fun LoadingPreview() {
+private fun LoadingControlsPreview() {
     AppTheme {
         Surface {
             UserPreferenceHiddenAppsControls(
-                billingAppNameResId = R.string.app_name_pro,
-                hiddenAppsDetails = MutableStateFlow(
-                    setOf(
-                        PackageNames.COMAPS_FDROID,
-                        PackageNames.ORGANIC_MAPS,
-                        PackageNames.OSMAND_PLUS,
-                    ).toHiddenAppsDetails(emptyMap())
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    HiddenAppsOptionsState(
+                        hiddenApps = setOf(
+                            PackageNames.COMAPS_FDROID,
+                            PackageNames.ORGANIC_MAPS,
+                            PackageNames.OSMAND_PLUS,
+                        )
+                    )
                 ),
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
-                wide = false,
-                onBack = {},
-                onNavigateToBillingScreen = {},
-                onValueChange = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun DarkLoadingPreview() {
-    AppTheme {
-        Surface {
-            UserPreferenceHiddenAppsControls(
                 billingAppNameResId = R.string.app_name_pro,
-                hiddenAppsDetails = MutableStateFlow(
-                    setOf(
-                        PackageNames.COMAPS_FDROID,
-                        PackageNames.ORGANIC_MAPS,
-                        PackageNames.OSMAND_PLUS,
-                    ).toHiddenAppsDetails(emptyMap())
-                ),
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
-                wide = false,
-                onBack = {},
-                onNavigateToBillingScreen = {},
-                onValueChange = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, device = Devices.TABLET)
-@Composable
-private fun TabletLoadingPreview() {
-    AppTheme {
-        Surface {
-            UserPreferenceHiddenAppsControls(
-                billingAppNameResId = R.string.app_name_pro,
-                hiddenAppsDetails = MutableStateFlow(
-                    setOf(
-                        PackageNames.COMAPS_FDROID,
-                        PackageNames.ORGANIC_MAPS,
-                        PackageNames.OSMAND_PLUS,
-                    ).toHiddenAppsDetails(emptyMap())
-                ),
-                values = UserPreferencesValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
+                values = UserPreferenceValues(hiddenApps = setOf(PackageNames.ORGANIC_MAPS)),
                 wide = false,
                 onBack = {},
                 onNavigateToBillingScreen = {},

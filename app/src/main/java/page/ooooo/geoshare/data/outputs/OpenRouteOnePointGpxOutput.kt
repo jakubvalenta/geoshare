@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.formatters.GpxFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -23,11 +24,7 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     override val activity: FileActivity,
     private val coordinateConverter: CoordinateConverter,
     private val log: Log,
-) :
-    PointOutput.WithLocation,
-    Output.HasActivity<FileActivity>,
-    Output.HasErrorText,
-    Output.HasAutomationDelay,
+) : PointOutput.WithLocation, Output.HasActivity<FileActivity>, Output.HasErrorText, Output.HasAutomationDelay,
     Output.HasAutomationErrorText {
 
     override val id = "OpenRouteOnePointGpxOutput(activity=$activity)"
@@ -36,26 +33,22 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
         GpxFormatter.writeGpxRoute(coordinateConverter.toWGS84(persistentListOf(location, value)), writer)
     }
 
-    override suspend fun execute(location: Point?, value: Point, actionContext: ActionContext) =
+    override suspend fun execute(location: Point?, value: Point, context: Context) =
         location?.let { location ->
-            File(actionContext.context.filesDir, "routes")
+            File(context.filesDir, "routes")
                 // Don't use a .gpx extension but use .xml instead, because that's what TomTom requires
                 .deleteAllAndWriteFile("${System.currentTimeMillis()}.xml") {
                     write(location, value, this)
-                }
-                ?.let { file -> activity.launch(actionContext.context, file, log) }
-        }
-            .toActionResult(openedApp = true)
+                }?.let { file -> activity.launch(context, file, log) }
+        }.toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
-        stringResource(R.string.output_open_navigation)
+    override fun label(appDetails: AppDetails) = stringResource(R.string.output_open_navigation)
 
-    override fun getIcon(appDetail: AppDetail?) =
-        appDetail?.let { DrawableIconDescriptor(it.icon) }
+    override fun getIcon(appDetails: AppDetails) =
+        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
-        ResourceIconDescriptor(R.drawable.navigation_24px)
+    override fun getMenuIcon(appDetails: AppDetails) = ResourceIconDescriptor(R.drawable.navigation_24px)
 
     @Composable
     override fun permissionText() = stringResource(
@@ -64,28 +57,28 @@ class OpenRouteOnePointGpxOutput @Inject constructor(
     )
 
     @Composable
-    override fun errorText(appDetail: AppDetail?) =
-        stringResource(
-            R.string.conversion_succeeded_open_app_failed,
-            appDetail?.label.orEmpty(),
-        )
+    override fun errorText(appDetails: AppDetails) = stringResource(
+        R.string.conversion_succeeded_open_app_failed,
+        appDetails[activity.packageName]?.label.orEmpty(),
+    )
 
     @Composable
-    override fun automationLabel(appDetail: AppDetail?) =
-        stringResource(R.string.conversion_succeeded_open_app_navigate_to, appDetail?.label.orEmpty())
+    override fun automationLabel(appDetails: AppDetails) = stringResource(
+        R.string.conversion_succeeded_open_app_navigate_to, appDetails[activity.packageName]?.label.orEmpty()
+    )
 
     @Composable
-    override fun automationErrorText(appDetail: AppDetail?) =
-        stringResource(R.string.conversion_automation_open_app_failed, appDetail?.label.orEmpty())
+    override fun automationErrorText(appDetails: AppDetails) = stringResource(
+        R.string.conversion_automation_open_app_failed, appDetails[activity.packageName]?.label.orEmpty()
+    )
 
     @Composable
-    override fun automationWaitingText(counterSec: Int, appDetail: AppDetail?) =
-        pluralStringResource(
-            R.plurals.conversion_automation_open_app_waiting,
-            counterSec,
-            appDetail?.label.orEmpty(),
-            counterSec,
-        )
+    override fun automationWaitingText(counterSec: Int, appDetails: AppDetails) = pluralStringResource(
+        R.plurals.conversion_automation_open_app_waiting,
+        counterSec,
+        appDetails[activity.packageName]?.label.orEmpty(),
+        counterSec,
+    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

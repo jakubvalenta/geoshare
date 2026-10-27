@@ -10,8 +10,8 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import page.ooooo.geoshare.data.DefaultUserPreferencesRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.DefaultUserPreferenceRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.log.FakeLog
 import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.preferences.AutomationDelayPreference
@@ -30,7 +30,7 @@ import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.preferences.NoopAutomation
 import page.ooooo.geoshare.data.preferences.Permission
 import page.ooooo.geoshare.data.preferences.UserPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,18 +42,18 @@ interface UserPreferencesModule {
     @Singleton
     @Binds
     fun bindUserPreferencesRepository(
-        userPreferencesRepository: DefaultUserPreferencesRepository,
-    ): UserPreferencesRepository
+        userPreferenceRepository: DefaultUserPreferenceRepository,
+    ): UserPreferenceRepository
 }
 
-class FakeUserPreferencesRepository(
-    initialValues: UserPreferencesValues = defaultFakeUserPreferences,
+class FakeUserPreferenceRepository(
+    initialValues: UserPreferenceValues = defaultFakeUserPreferences,
     val log: Log = FakeLog,
-) : UserPreferencesRepository {
+) : UserPreferenceRepository {
     private val _preferences: MutableStateFlow<Preferences> = MutableStateFlow(preferencesOf())
 
     override val values = _preferences.map {
-        UserPreferencesValues(
+        UserPreferenceValues(
             automation = AutomationPreference.getValue(it),
             automationDelay = AutomationDelayPreference.getValue(it),
             cachedServerToken = CachedServerTokenPreference.getValue(it),
@@ -98,7 +98,7 @@ class FakeUserPreferencesRepository(
     }
 }
 
-val defaultFakeUserPreferences = UserPreferencesValues(
+val defaultFakeUserPreferences = UserPreferenceValues(
     automation = NoopAutomation,
     automationDelay = 5.seconds,
     cachedServerToken = null,

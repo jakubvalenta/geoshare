@@ -42,6 +42,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.android.UriActivity
 import page.ooooo.geoshare.data.android.UriScheme
@@ -55,14 +56,8 @@ import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.outputs.OpenDisplayGeoUriOutput
 import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
-import page.ooooo.geoshare.ui.ActionAutomationFailedDetail
-import page.ooooo.geoshare.ui.ActionAutomationSucceededDetail
-import page.ooooo.geoshare.ui.ActionDetail
-import page.ooooo.geoshare.ui.ActionFailedDetail
-import page.ooooo.geoshare.ui.ActionSucceededDetail
-import page.ooooo.geoshare.ui.ActionWaitingDetail
-import page.ooooo.geoshare.ui.LocationFindingFailedDetail
-import page.ooooo.geoshare.ui.LocationPermissionReceivedDetail
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
+import page.ooooo.geoshare.ui.ResultTitleState
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -72,21 +67,23 @@ import kotlin.time.DurationUnit
 
 @Composable
 fun ResultTitle(
-    actionDetail: StateFlow<ActionDetail?>,
+    appDetails: StateFlow<AppDetails>,
+    state: StateFlow<ResultTitleState?>,
     billingFeatures: List<Feature>,
     billingStatus: StateFlow<BillingStatus>,
     modifier: Modifier = Modifier,
     animationsEnabled: Boolean = true,
-    onCancel: () -> Unit,
+    onCancelAction: () -> Unit,
     onNavigateToUserPreferencesScreen: (groupId: UserPreferenceGroupId?) -> Unit,
 ) {
-    val actionDetail by actionDetail.collectAsStateWithLifecycle()
     var counter by retain { mutableStateOf(Duration.ZERO) }
 
+    val appDetails by appDetails.collectAsStateWithLifecycle()
     val billingStatus by billingStatus.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
 
     AnimatedMessage(
-        state = actionDetail,
+        state = state,
         isMessageShown = { state -> state != null },
         modifier = modifier
             .fillMaxWidth()
@@ -94,7 +91,7 @@ fun ResultTitle(
         animationsEnabled = animationsEnabled,
     ) { targetState ->
         when (targetState) {
-            is ActionWaitingDetail -> ResultMessageRow {
+            is ResultTitleState.ActionWaiting -> ResultMessageRow {
                 LaunchedEffect(Unit) {
                     counter = targetState.delay
                     while (counter.isPositive()) {
@@ -103,11 +100,11 @@ fun ResultTitle(
                     }
                 }
                 ResultMessageText(
-                    targetState.automationWaitingText(counter.toInt(DurationUnit.SECONDS)),
+                    targetState.output.automationWaitingText(counter.toInt(DurationUnit.SECONDS), appDetails),
                     Modifier.testTag("geoShareResultAutomationCounter"),
                 )
                 FilledIconButton(
-                    onCancel,
+                    onCancelAction,
                     Modifier.testTag("geoShareResultAutomationCancel"),
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = MaterialTheme.colorScheme.tertiary,
@@ -121,37 +118,37 @@ fun ResultTitle(
                 }
             }
 
-            is ActionSucceededDetail -> ResultMessageRow {
+            is ResultTitleState.ActionSucceeded -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.successText(),
+                    targetState.output.successText(appDetails),
                     Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
-            is ActionFailedDetail -> ResultMessageRow {
+            is ResultTitleState.ActionFailed -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.errorText(),
+                    targetState.output.errorText(appDetails),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                 )
             }
 
-            is ActionAutomationSucceededDetail -> ResultMessageRow {
+            is ResultTitleState.ActionAutomationSucceeded -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.automationSuccessText(),
+                    targetState.output.automationSuccessText(appDetails),
                     Modifier.testTag("geoShareResultMessageSuccess"),
                 )
             }
 
-            is ActionAutomationFailedDetail -> ResultMessageRow {
+            is ResultTitleState.ActionAutomationFailed -> ResultMessageRow {
                 ResultMessageText(
-                    targetState.automationErrorText(),
+                    targetState.output.automationErrorText(appDetails),
                     Modifier.testTag("geoShareResultMessageError"),
                     containerColor = MaterialTheme.colorScheme.errorContainer,
                 )
             }
 
-            is LocationFindingFailedDetail -> ResultMessageRow {
+            is ResultTitleState.LocationFindingFailed -> ResultMessageRow {
                 ResultMessageText(
                     stringResource(R.string.conversion_succeeded_location_failed),
                     Modifier.testTag("geoShareResultMessageError"),
@@ -159,13 +156,13 @@ fun ResultTitle(
                 )
             }
 
-            is LocationPermissionReceivedDetail -> ResultMessageRow {
+            is ResultTitleState.LocationPermissionReceived -> ResultMessageRow {
                 ResultMessageText(
                     stringResource(R.string.conversion_succeeded_location_loading_indicator_title),
                     Modifier.testTag("geoShareResultSmallLoadingIndicatorMessage"),
                 )
                 FilledIconButton(
-                    onCancel,
+                    onCancelAction,
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = MaterialTheme.colorScheme.tertiary,
                         contentColor = MaterialTheme.colorScheme.onTertiary,
@@ -178,13 +175,16 @@ fun ResultTitle(
                 }
             }
 
-            null -> ResultMessageRow {
+            else -> ResultMessageRow {
+                val notPurchased = AutomationFeature in billingFeatures &&
+                    billingStatus !is BillingStatus.Loading &&
+                    billingStatus !is BillingStatus.Purchased
                 Text(
-                    stringResource(R.string.conversion_succeeded_apps_headline),
+                    stringResource(R.string.open_with),
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 FeatureBadged(
-                    enabled = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
+                    enabled = notPurchased,
                     badge = { modifier ->
                         FeatureBadgeSmall(
                             { onNavigateToUserPreferencesScreen(UserPreferenceGroupId.AUTOMATION) },
@@ -226,13 +226,13 @@ private fun RowScope.ResultMessageText(
     contentColor: Color = contentColorFor(containerColor),
 ) {
     val spacing = LocalSpacing.current
+
     Row(
         modifier
             .weight(1f)
             .background(containerColor, MaterialTheme.shapes.extraSmall)
             .fillMaxHeight()
-            .padding(horizontal = spacing.small),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = spacing.small), verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text,
@@ -252,7 +252,8 @@ private fun ActionCompletedPreview() {
     AppTheme {
         Surface {
             ResultTitle(
-                actionDetail = MutableStateFlow(null),
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(null),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -263,7 +264,7 @@ private fun ActionCompletedPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -276,7 +277,8 @@ private fun DarkActionCompletedPreview() {
     AppTheme {
         Surface {
             ResultTitle(
-                actionDetail = MutableStateFlow(null),
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(null),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -287,7 +289,7 @@ private fun DarkActionCompletedPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -301,11 +303,12 @@ private fun ActionCompletedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 ResultTitle(
-                    actionDetail = MutableStateFlow(null),
+                    appDetails = MutableStateFlow(emptyMap()),
+                    state = MutableStateFlow(null),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                     animationsEnabled = false,
-                    onCancel = {},
+                    onCancelAction = {},
                     onNavigateToUserPreferencesScreen = {},
                 )
                 Spacer(Modifier.height(15.dp))
@@ -321,11 +324,12 @@ private fun DarkActionCompletedFeatureNotAvailablePreview() {
         Surface {
             Column {
                 ResultTitle(
-                    actionDetail = MutableStateFlow(null),
+                    appDetails = MutableStateFlow(emptyMap()),
+                    state = MutableStateFlow(null),
                     billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                     billingStatus = MutableStateFlow(BillingStatus.NotPurchased),
                     animationsEnabled = false,
-                    onCancel = {},
+                    onCancelAction = {},
                     onNavigateToUserPreferencesScreen = {},
                 )
                 Spacer(Modifier.height(15.dp))
@@ -342,19 +346,15 @@ private fun ActionWaitingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val uriQuote = DefaultUriQuote
             val output = OpenDisplayGeoUriOutput(
                 UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
                 coordinateConverter,
+                uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultTitle(
-                actionDetail = MutableStateFlow(
-                    ActionWaitingDetail(
-                        appDetail = output.getAppDetail(appDetails),
-                        delay = 3.seconds,
-                        output = output,
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.ActionWaiting(delay = 3.seconds, output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -365,7 +365,7 @@ private fun ActionWaitingPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -380,19 +380,15 @@ private fun DarkActionWaitingPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val uriQuote = DefaultUriQuote
             val output = OpenDisplayGeoUriOutput(
                 UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO),
                 coordinateConverter,
+                uriQuote,
             )
-            val appDetails = getFakeAppDetails(context)
             ResultTitle(
-                actionDetail = MutableStateFlow(
-                    ActionWaitingDetail(
-                        appDetail = output.getAppDetail(appDetails),
-                        delay = 3.seconds,
-                        output = output,
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.ActionWaiting(delay = 3.seconds, output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -403,7 +399,7 @@ private fun DarkActionWaitingPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -415,8 +411,10 @@ private fun DarkActionWaitingPreview() {
 private fun LocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
             ResultTitle(
-                actionDetail = MutableStateFlow(LocationPermissionReceivedDetail),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.LocationPermissionReceived),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -427,7 +425,7 @@ private fun LocationPermissionReceivedPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -439,8 +437,10 @@ private fun LocationPermissionReceivedPreview() {
 private fun DarkLocationPermissionReceivedPreview() {
     AppTheme {
         Surface {
+            val context = LocalContext.current
             ResultTitle(
-                actionDetail = MutableStateFlow(LocationPermissionReceivedDetail),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.LocationPermissionReceived),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -451,7 +451,7 @@ private fun DarkLocationPermissionReceivedPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -468,12 +468,8 @@ private fun SucceededPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                actionDetail = MutableStateFlow(
-                    ActionSucceededDetail(
-                        appDetail = null,
-                        output = output,
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.ActionSucceeded(output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -484,7 +480,7 @@ private fun SucceededPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -493,7 +489,7 @@ private fun SucceededPreview() {
 
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarSucceededPreview() {
+private fun DarkSucceededPreview() {
     AppTheme {
         Surface {
             val context = LocalContext.current
@@ -501,12 +497,8 @@ private fun DarSucceededPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                actionDetail = MutableStateFlow(
-                    ActionSucceededDetail(
-                        appDetail = null,
-                        output = output,
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.ActionSucceeded(output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -517,7 +509,7 @@ private fun DarSucceededPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -534,12 +526,8 @@ private fun FailedPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                actionDetail = MutableStateFlow(
-                    ActionFailedDetail(
-                        appDetail = null,
-                        output = output,
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.ActionFailed(output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -550,7 +538,7 @@ private fun FailedPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }
@@ -567,12 +555,8 @@ private fun DarkFailedPreview() {
             val coordinateConverter = CoordinateConverter(geometries)
             val output = SavePointsGpxOutput(coordinateConverter)
             ResultTitle(
-                actionDetail = MutableStateFlow(
-                    ActionFailedDetail(
-                        appDetail = null,
-                        output = output,
-                    )
-                ),
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(ResultTitleState.ActionFailed(output = output)),
                 billingFeatures = listOf(AutomationFeature, CustomLinkFeature),
                 billingStatus = MutableStateFlow(
                     BillingStatus.Purchased(
@@ -583,7 +567,7 @@ private fun DarkFailedPreview() {
                     )
                 ),
                 animationsEnabled = false,
-                onCancel = {},
+                onCancelAction = {},
                 onNavigateToUserPreferencesScreen = {},
             )
         }

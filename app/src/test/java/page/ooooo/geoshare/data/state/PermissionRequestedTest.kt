@@ -8,14 +8,14 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import page.ooooo.geoshare.data.di.FakeInputRepository
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.di.FakeUserPreferenceRepository
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.MatchedInput
 import page.ooooo.geoshare.data.inputs.ParseResult
 import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 
 class PermissionRequestedTest {
     private val source = "https://maps.app.goo.gl/foo"
@@ -34,11 +34,11 @@ class PermissionRequestedTest {
 
     @Test
     fun grant_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsPermissionGranted() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext: ConversionStateContext = mock {
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferenceRepository } doReturn userPreferenceRepository
         }
         val state = PermissionRequested(source, matchedInput, results)
         assertEquals(
@@ -47,17 +47,17 @@ class PermissionRequestedTest {
         )
         assertEquals(
             Permission.ASK,
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
+            userPreferenceRepository.getValue(ConnectionPermissionPreference),
         )
     }
 
     @Test
     fun grant_whenDoNotAskIsTrue_savesPreferenceAndReturnsPermissionGranted() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext: ConversionStateContext = mock {
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferenceRepository } doReturn userPreferenceRepository
         }
         val state = PermissionRequested(source, matchedInput, results)
         assertEquals(
@@ -66,17 +66,17 @@ class PermissionRequestedTest {
         )
         assertEquals(
             Permission.ALWAYS,
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
+            userPreferenceRepository.getValue(ConnectionPermissionPreference),
         )
     }
 
     @Test
     fun deny_whenDoNotAskIsFalse_doesNotSavePreferenceAndReturnsPermissionDenied() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext: ConversionStateContext = mock {
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferenceRepository } doReturn userPreferenceRepository
         }
         val state = PermissionRequested(source, matchedInput, results)
         assertEquals(
@@ -85,17 +85,17 @@ class PermissionRequestedTest {
         )
         assertEquals(
             Permission.ASK,
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
+            userPreferenceRepository.getValue(ConnectionPermissionPreference),
         )
     }
 
     @Test
     fun deny_whenDoNotIsAskIsTrue_savesPreferenceAndReturnsPermissionDenied() = runTest {
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(connectionPermission = Permission.ASK)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(connectionPermission = Permission.ASK)
         )
         val stateContext: ConversionStateContext = mock {
-            on { this@on.userPreferencesRepository } doReturn userPreferencesRepository
+            on { this@on.userPreferenceRepository } doReturn userPreferenceRepository
         }
         val state = PermissionRequested(source, matchedInput, results)
         assertEquals(
@@ -104,7 +104,7 @@ class PermissionRequestedTest {
         )
         assertEquals(
             Permission.NEVER,
-            userPreferencesRepository.getValue(ConnectionPermissionPreference),
+            userPreferenceRepository.getValue(ConnectionPermissionPreference),
         )
     }
 }

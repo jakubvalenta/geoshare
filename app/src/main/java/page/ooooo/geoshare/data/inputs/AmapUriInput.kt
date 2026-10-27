@@ -18,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class AmapUriInput @Inject constructor(
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = AmapInputGroup
     override val changelog = persistentListOf(
@@ -61,7 +61,7 @@ class AmapUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://wb.amap.com/?q={lat}%2C{lon}")
 
     override fun toString() = "AmapUriInput"

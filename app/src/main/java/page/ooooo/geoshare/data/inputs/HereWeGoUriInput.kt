@@ -20,7 +20,7 @@ import kotlin.io.encoding.Base64
 @Singleton
 class HereWeGoUriInput @Inject constructor(
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = HereWeGoInputGroup
     override val changelog = persistentListOf(
@@ -72,7 +72,7 @@ class HereWeGoUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://wego.here.com/?map={lat}%2C{lon},{z}")
 
     override fun toString() = "HereWegoUriInput"

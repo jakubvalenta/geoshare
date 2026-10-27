@@ -43,7 +43,9 @@ fun Screenshot(
     content: @Composable (scale: Float) -> Unit,
 ) {
     val spacing = LocalSpacing.current
+
     var currentSizePx by remember { mutableStateOf(IntSize.Zero) }
+
     Box(
         Modifier
             .sizeIn(maxWidth = 400.dp)

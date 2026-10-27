@@ -3,11 +3,11 @@ package page.ooooo.geoshare.data.billing
 import androidx.compose.runtime.Immutable
 
 sealed interface BillingStatus {
-    object Loading : BillingStatus
+    data object Loading : BillingStatus
 
-    object Pending : BillingStatus
+    data object Pending : BillingStatus
 
-    object NotPurchased : BillingStatus
+    data object NotPurchased : BillingStatus
 
     @Immutable
     data class Purchased(

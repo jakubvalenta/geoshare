@@ -30,10 +30,10 @@ class ConversionActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val userPreferencesValues by userPreferenceViewModel.values.collectAsStateWithLifecycle()
+            val dynamicColor by userPreferenceViewModel.dynamicColor.collectAsStateWithLifecycle()
 
             // See MainActivity.onCreate()
-            AppTheme(dynamicColor = userPreferencesValues.dynamicColor) {
+            AppTheme(dynamicColor = dynamicColor) {
                 MainNavigation(
                     billingViewModel,
                     mainViewModel,

@@ -20,7 +20,7 @@ import javax.inject.Singleton
 class OpenStreetMapUriInput @Inject constructor(
     private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = OpenStreetMapInputGroup
     override val changelog = persistentListOf(
@@ -129,7 +129,7 @@ class OpenStreetMapUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://www.openstreetmap.org/#map={z}/{lat}/{lon}")
 
     override fun toString() = "OpenStreetMapUriInput"

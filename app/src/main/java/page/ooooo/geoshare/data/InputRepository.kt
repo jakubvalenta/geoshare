@@ -123,17 +123,17 @@ interface InputRepository {
             googleMapsUriInput,
             appleMapsUriInput,
             *all
-                .filterIsInstance<Input.HasRandomUri>()
+                .filterIsInstance<Input.HasRandomSource>()
                 .shuffled()
                 .toTypedArray()
         )
-            .mapNotNull { it.genRandomUri(randomPoint) }
+            .mapNotNull { it.genRandomSource(randomPoint) }
 
-    fun genRandomUri(randomPoint: Point): String? =
+    fun genRandomSource(randomPoint: Point): String? =
         all
-            .filterIsInstance<Input.HasRandomUri>()
+            .filterIsInstance<Input.HasRandomSource>()
             .shuffled()
-            .firstNotNullOfOrNull { it.genRandomUri(randomPoint) }
+            .firstNotNullOfOrNull { it.genRandomSource(randomPoint) }
 }
 
 @Singleton

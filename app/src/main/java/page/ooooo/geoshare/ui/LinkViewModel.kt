@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.ui
 
-import android.content.res.Resources
+import android.content.Context
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,12 +18,15 @@ import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.LinkType
+import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Srs
 import page.ooooo.geoshare.data.message.Message
 import javax.inject.Inject
 
 @HiltViewModel
 class LinkViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    val coordinateConverter: CoordinateConverter,
     private val linkRepository: LinkRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -113,7 +117,7 @@ class LinkViewModel @Inject constructor(
     private val _nameUriTemplate = savedStateHandle.getMutableStateFlow("linkNameUriTemplate", default.nameUriTemplate)
     val nameUriTemplate: StateFlow<String> = _nameUriTemplate.asStateFlow()
 
-    fun saveForm(resources: Resources) {
+    fun saveForm() {
         _destination.value?.let { destination ->
             if (destination == -1) {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -130,7 +134,7 @@ class LinkViewModel @Inject constructor(
                             nameUriTemplate = _nameUriTemplate.value,
                         )
                     )
-                    _message.value = Message(resources.getString(R.string.links_message_inserted))
+                    _message.value = Message(context.resources.getString(R.string.links_message_inserted))
                     // Navigate after saving, because we reset form fields during navigation
                     navigateTo(null)
                 }
@@ -151,7 +155,7 @@ class LinkViewModel @Inject constructor(
                                 nameUriTemplate = _nameUriTemplate.value,
                             )
                         )
-                        _message.value = Message(resources.getString(R.string.links_message_updated))
+                        _message.value = Message(context.resources.getString(R.string.links_message_updated))
                         // Navigate after saving, because we reset form fields during navigation
                         navigateTo(null)
                     }
@@ -162,14 +166,14 @@ class LinkViewModel @Inject constructor(
 
     // Methods
 
-    fun delete(resources: Resources) {
+    fun delete() {
         _destination.value?.let { destination ->
             if (destination != -1) {
                 val item = all.value.firstOrNull { it.uid == destination }
                 if (item != null) {
                     viewModelScope.launch(Dispatchers.IO) {
                         linkRepository.delete(item)
-                        _message.value = Message(resources.getString(R.string.links_message_deleted))
+                        _message.value = Message(context.resources.getString(R.string.links_message_deleted))
                         navigateTo(null)
                     }
                 }
@@ -189,10 +193,10 @@ class LinkViewModel @Inject constructor(
         }
     }
 
-    fun disableGroup(resources: Resources, group: String?) {
+    fun disableGroup(group: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             linkRepository.disableGroup(group)
-            _message.value = Message(resources.getString(R.string.links_message_disabled_group))
+            _message.value = Message(context.resources.getString(R.string.links_message_disabled_group))
         }
     }
 
@@ -232,10 +236,10 @@ class LinkViewModel @Inject constructor(
         _coordsUriTemplate.value = newCoordsUriTemplate
     }
 
-    fun restoreInitialData(resources: Resources) {
+    fun restoreInitialData() {
         viewModelScope.launch(Dispatchers.IO) {
             linkRepository.restoreInitialData()
-            _message.value = Message(resources.getString(R.string.links_message_factory_reset))
+            _message.value = Message(context.resources.getString(R.string.links_message_factory_reset))
         }
     }
 

@@ -25,7 +25,7 @@ import javax.inject.Singleton
 class UrbiUriInput @Inject constructor(
     private val urbiHtmlInput: dagger.Lazy<UrbiHtmlInput>,
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = UrbiInputGroup
     override val changelog = persistentListOf(
@@ -95,7 +95,7 @@ class UrbiUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://maps.urbi.ae/dubai/geo/{lon}%2C{lat}?m={lon}%2C{lat}%2F{z}")
 
     override fun toString() = "UrbiUriInput"

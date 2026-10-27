@@ -36,7 +36,7 @@
     <string name="about_text"><![CDATA[<p>%1$s est une application gratuite et open source distribuée sous licence <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPL 3.0</a> ou ultérieure.</p><br><p>Vous trouverez le code sur <a href="https://github.com/jakubvalenta/geoshare">GitHub</a>, où vous pouvez également <a href="https://github.com/jakubvalenta/geoshare/issues">signaler des problèmes</a>.</p><br><p>Vos commentaires sont les bienvenus. Vous pouvez me contacter à <a href="mailto:%2$s">%2$s</a>.</p>]]></string>
     <string name="conversion_permission_common_text">Le lien %1$s ne contient pas de coordonnées. %2$s doit se connecter au service de cartographie pour les obtenir.</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Repère placé</string>
-    <string name="conversion_succeeded_apps_headline">Ouvrir avec</string>
+    <string name="open_with">Ouvrir avec</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Maps</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Choisir comment ouvrir les liens Web pour cette appli</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_the_app">Dans l’application</string>
@@ -64,7 +64,7 @@
     <string name="converter_geo_name">geo:</string>
     <string name="conversion_succeeded_save_gpx">Enregistrer les points GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s résultat %2$s.gpx</string>
-    <string name="conversion_succeeded_share">Partager</string>
+    <string name="share">Partager</string>
     <string name="conversion_succeeded_point_number">point %1$d</string>
     <string name="inputs_all">Tous les services de cartographie</string>
     <string name="inputs_recent">Récemment ajoutés</string>
@@ -189,7 +189,7 @@
     <string name="links_form_enabled_option_sheet">Afficher dans le menu Copier</string>
     <string name="links_form_group">Groupe</string>
     <string name="links_form_name">Nom</string>
-    <string name="links_form_save">Enregistrer</string>
+    <string name="save">Enregistrer</string>
     <string name="links_form_srs">Système de coordonnées</string>
     <string name="links_form_type">Icône du menu contextuel</string>
     <string name="links_form_uri_template_coords">Modèle d’URL</string>

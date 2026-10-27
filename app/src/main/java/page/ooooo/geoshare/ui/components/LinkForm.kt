@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.LinkType
@@ -60,11 +60,13 @@ import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Srs
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.outputs.CopyLinkUriOutput
+import page.ooooo.geoshare.data.outputs.IconDescriptor
 import page.ooooo.geoshare.data.outputs.ShareLinkUriOutput
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
+import page.ooooo.geoshare.data.uri.UriQuote
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LinkForm(
     appEnabled: StateFlow<Boolean>,
@@ -90,7 +92,9 @@ fun LinkForm(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     initialExpanded: Boolean = false,
+    uriQuote: UriQuote = DefaultUriQuote,
 ) {
+    val appDetails: AppDetails = emptyMap() // Link outputs never require app details
     val context = LocalContext.current
     val spacing = LocalSpacing.current
 
@@ -104,34 +108,18 @@ fun LinkForm(
     val sheetEnabled by sheetEnabled.collectAsStateWithLifecycle()
     val srs by srs.collectAsStateWithLifecycle()
     val type by type.collectAsStateWithLifecycle()
-    val link = remember(
-        appEnabled,
-        chipEnabled,
-        coordsUriTemplate,
-        group,
-        name,
-        nameUriTemplate,
-        sheetEnabled,
-        srs,
-        type,
-    ) {
-        Link(
-            group = group,
-            name = name,
-            srs = srs,
-            type = type,
-            appEnabled = appEnabled,
-            chipEnabled = chipEnabled,
-            sheetEnabled = sheetEnabled,
-            coordsUriTemplate = coordsUriTemplate,
-            nameUriTemplate = nameUriTemplate,
-        )
-    }
-    val isValid = remember(name, coordsUriTemplate) {
-        name.isNotEmpty() && coordsUriTemplate.isNotEmpty()
-    }
-    val copyOutput = remember(link) { CopyLinkUriOutput(link, coordinateConverter) }
-    val shareOutput = remember(link) { ShareLinkUriOutput(link, coordinateConverter) }
+    val link = Link(
+        group = group,
+        name = name,
+        srs = srs,
+        type = type,
+        appEnabled = appEnabled,
+        chipEnabled = chipEnabled,
+        sheetEnabled = sheetEnabled,
+        coordsUriTemplate = coordsUriTemplate,
+        nameUriTemplate = nameUriTemplate,
+    )
+    val isValid = name.isNotEmpty() && coordsUriTemplate.isNotEmpty()
 
     Column(modifier) {
         TextField(
@@ -233,29 +221,10 @@ fun LinkForm(
                 modifier = Modifier.testTag("geoShareLinkFormAppEnabled"),
                 enabled = enabled,
             ) {
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall)
-                        .padding(vertical = spacing.tiny)
-                ) {
-                    AppIcon(
-                        label = link.groupOrName,
-                        menu = { _, _ -> },
-                        onClick = {},
-                        modifier = Modifier.width(100.dp),
-                        enabled = false,
-                    ) {
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
-                            IconFromDescriptor(
-                                shareOutput.getIcon(null),
-                                contentDescription = null,
-                                size = 46.dp,
-                                inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                            )
-                        }
-                    }
-                }
+                AppEnabledBox(
+                    label = link.groupOrName,
+                    icon = ShareLinkUriOutput(link, coordinateConverter, uriQuote).getIcon(appDetails),
+                )
             }
             HorizontalDivider()
             LinkFormCheckbox(
@@ -265,18 +234,12 @@ fun LinkForm(
                 modifier = Modifier.testTag("geoShareLinkFormSheetEnabled"),
                 enabled = enabled,
             ) {
-                Surface(shape = BottomSheetDefaults.ExpandedShape) {
-                    Column {
-                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            BottomSheetDefaults.DragHandle()
-                        }
-                        SheetListItem(
-                            headlineText = copyOutput.label(null),
-                            supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
-                            icon = copyOutput.getIcon(null),
-                        )
-                    }
-                }
+                val copyOutput = CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+                SheetEnabledBox(
+                    headlineText = copyOutput.label(appDetails),
+                    supportingText = copyOutput.getDescription(WGS84Point(NaivePoint.example)),
+                    icon = copyOutput.getIcon(appDetails),
+                )
             }
             HorizontalDivider()
             LinkFormCheckbox(
@@ -286,26 +249,12 @@ fun LinkForm(
                 modifier = Modifier.testTag("geoShareLinkFormChipEnabled"),
                 enabled = enabled,
             ) {
-                Surface(
-                    Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.extraSmall,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                ) {
-                    // Row prevents the chip from filling the whole container width
-                    Row(Modifier.padding(horizontal = spacing.small, vertical = spacing.tiny)) {
-                        StyledChip(
-                            label = { Text(copyOutput.label(null)) },
-                            modifier = Modifier.widthIn(min = 150.dp),
-                            icon = {
-                                IconFromDescriptor(
-                                    link.icon,
-                                    contentDescription = null,
-                                )
-                            },
-                            onClick = { onSetChipEnabled(!chipEnabled) },
-                        )
-                    }
-                }
+                val copyOutput = CopyLinkUriOutput(link, coordinateConverter, uriQuote)
+                ChipEnabledBox(
+                    label = copyOutput.label(appDetails),
+                    icon = link.icon,
+                    onClick = { onSetChipEnabled(!chipEnabled) },
+                )
             }
         }
         ExpandablePane(
@@ -413,13 +362,13 @@ fun LinkForm(
                             shape = ShapeDefaults.Large,
                             color = MaterialTheme.colorScheme.surfaceContainerHighest,
                         ) {
+                            val shareOutput = ShareLinkUriOutput(link.copy(type = value), coordinateConverter, uriQuote)
                             DropdownMenuItem(
-                                text = { Text(shareOutput.label(null)) },
+                                text = { Text(shareOutput.label(appDetails)) },
                                 onClick = { onSetType(value) },
                                 leadingIcon = {
                                     IconFromDescriptor(
-                                        ShareLinkUriOutput(link.copy(type = value), coordinateConverter)
-                                            .getMenuIcon(null),
+                                        shareOutput.getMenuIcon(appDetails),
                                         contentDescription = null,
                                     )
                                 },
@@ -431,7 +380,7 @@ fun LinkForm(
         }
         HorizontalDivider(Modifier.padding(vertical = spacing.medium))
         LargeButton(
-            stringResource(R.string.links_form_save),
+            stringResource(R.string.save),
             Modifier.testTag("geoShareLinkFormSave"),
             enabled = enabled && isValid,
         ) {
@@ -465,6 +414,73 @@ private fun LinkFormCheckbox(
         Column(verticalArrangement = Arrangement.spacedBy(spacing.tiny)) {
             Text(label, style = MaterialTheme.typography.bodyMedium)
             content()
+        }
+    }
+}
+
+@Composable
+private fun AppEnabledBox(label: String, icon: IconDescriptor) {
+    val spacing = LocalSpacing.current
+
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.extraSmall)
+            .padding(vertical = spacing.tiny)
+    ) {
+        AppIcon(
+            label = label,
+            menu = { _, _ -> },
+            onClick = {},
+            modifier = Modifier.width(100.dp),
+            enabled = false,
+        ) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
+                IconFromDescriptor(
+                    icon,
+                    contentDescription = null,
+                    size = 46.dp,
+                    inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SheetEnabledBox(headlineText: String, supportingText: String?, icon: IconDescriptor) {
+    Surface(shape = BottomSheetDefaults.ExpandedShape) {
+        Column {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                BottomSheetDefaults.DragHandle()
+            }
+            SheetListItem(
+                headlineText = headlineText,
+                supportingText = supportingText,
+                icon = icon,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ChipEnabledBox(label: String, icon: IconDescriptor, onClick: () -> Unit) {
+    val spacing = LocalSpacing.current
+
+    Surface(
+        Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraSmall,
+        color = MaterialTheme.colorScheme.secondaryContainer,
+    ) {
+        // Row prevents the chip from filling the whole container width
+        Row(Modifier.padding(horizontal = spacing.small, vertical = spacing.tiny)) {
+            StyledChip(
+                label = { Text(label) },
+                modifier = Modifier.widthIn(min = 150.dp),
+                icon = { IconFromDescriptor(icon, contentDescription = null) },
+                onClick = onClick,
+            )
         }
     }
 }

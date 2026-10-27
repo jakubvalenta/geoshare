@@ -23,7 +23,7 @@ class GoogleMapsUriInput @Inject constructor(
     private val googleMapsPlaceApiInput: dagger.Lazy<GoogleMapsPlaceApiInput>,
     private val googleMapsPlaceListInput: dagger.Lazy<GoogleMapsPlaceListInput>,
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = GoogleMapsInputGroup
     override val changelog = persistentListOf(
@@ -60,7 +60,7 @@ class GoogleMapsUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(
             point,
             listOf(

@@ -105,10 +105,8 @@ fun StyledListDetailPaneScaffold(
 ) {
     val layoutDirection = LocalLayoutDirection.current
 
-    val wide = remember(scaffoldState) {
-        scaffoldState.targetState.primary == PaneAdaptedValue.Expanded &&
-            scaffoldState.targetState.secondary == PaneAdaptedValue.Expanded
-    }
+    val wide = scaffoldState.targetState.primary == PaneAdaptedValue.Expanded &&
+        scaffoldState.targetState.secondary == PaneAdaptedValue.Expanded
     val insetPadding = WindowInsets.safeDrawing.asPaddingValues()
 
     ListDetailPaneScaffold(

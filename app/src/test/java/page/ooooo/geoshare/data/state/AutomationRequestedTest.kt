@@ -21,7 +21,7 @@ import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.di.FakeBilling
 import page.ooooo.geoshare.data.di.FakeGoogleMapsDisplayLink
 import page.ooooo.geoshare.data.di.FakeLinkRepository
-import page.ooooo.geoshare.data.di.FakeUserPreferencesRepository
+import page.ooooo.geoshare.data.di.FakeUserPreferenceRepository
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
@@ -37,7 +37,8 @@ import page.ooooo.geoshare.data.preferences.NoopAutomation
 import page.ooooo.geoshare.data.preferences.OpenDisplayGeoUriAutomation
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
 import page.ooooo.geoshare.data.preferences.ShareLinkUriAutomation
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
+import page.ooooo.geoshare.data.uri.FakeUriQuote
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,20 +48,22 @@ class AutomationRequestedTest {
     private val linkRepository: LinkRepository = FakeLinkRepository()
     private val log = FakeLog
     private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
+    private val uriQuote = FakeUriQuote
 
     @Test
     fun transition_whenPointsAreEmpty_returnsNull() = runTest {
         val points = persistentListOf<WGS84Point>()
         val automation = CopyCoordsDecAutomation
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = mock(),
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertNull(state.transition(stateContext))
@@ -69,15 +72,16 @@ class AutomationRequestedTest {
     @Test
     fun transition_whenUserPreferenceAutomationIsNoop_returnsNull() = runTest {
         val automation = NoopAutomation
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = mock(),
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertNull(state.transition(stateContext))
@@ -87,63 +91,66 @@ class AutomationRequestedTest {
     fun transition_whenBillingStatusIsLoadingAndCachedProductIdIsNotSet_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
         val billing = FakeBilling(context)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertNull(state.transition(stateContext))
-        assertNull(userPreferencesRepository.getValue(CachedPurchasePreference))
+        assertNull(userPreferenceRepository.getValue(CachedPurchasePreference))
     }
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIsAnUnknownProduct_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
         val billing = FakeBilling(context)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(
                 automation = automation,
                 cachedPurchase = CachedPurchase(productId = "spam", token = "spam_purchased"),
             )
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertNull(state.transition(stateContext))
         assertEquals(
             CachedPurchase(productId = "spam", token = "spam_purchased"),
-            userPreferencesRepository.getValue(CachedPurchasePreference),
+            userPreferenceRepository.getValue(CachedPurchasePreference),
         )
     }
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndCachedProductIsAKnownProduct_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(context)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(
                 automation = automation,
                 cachedPurchase = CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
             )
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertEquals(
@@ -152,7 +159,7 @@ class AutomationRequestedTest {
         )
         assertEquals(
             CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
-            userPreferencesRepository.getValue(CachedPurchasePreference),
+            userPreferenceRepository.getValue(CachedPurchasePreference),
         )
     }
 
@@ -169,28 +176,29 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             ),
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertNull(state.transition(stateContext))
         assertEquals(
             CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
-            userPreferencesRepository.getValue(CachedPurchasePreference),
+            userPreferenceRepository.getValue(CachedPurchasePreference),
         )
     }
 
     @Test
     fun transition_whenBillingStatusContainsAutomationFeature_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(
             context,
             initialStatus = BillingStatus.Purchased(
@@ -200,15 +208,16 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             )
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertEquals(
@@ -217,24 +226,25 @@ class AutomationRequestedTest {
         )
         assertEquals(
             CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
-            userPreferencesRepository.getValue(CachedPurchasePreference),
+            userPreferenceRepository.getValue(CachedPurchasePreference),
         )
     }
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedWithinTimeout_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(context)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points, billingStatusTimeout = 3.seconds)
         val res = async {
@@ -256,7 +266,7 @@ class AutomationRequestedTest {
         )
         assertEquals(
             CachedPurchase(productId = "fake_one_time", token = "test_purchased"),
-            userPreferencesRepository.getValue(CachedPurchasePreference),
+            userPreferenceRepository.getValue(CachedPurchasePreference),
         )
     }
 
@@ -267,15 +277,16 @@ class AutomationRequestedTest {
             context,
             initialStatus = BillingStatus.NotPurchased,
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points, billingStatusTimeout = 3.seconds)
         val res = async {
@@ -292,22 +303,23 @@ class AutomationRequestedTest {
         )
         advanceUntilIdle()
         assertNull(res.await())
-        assertNull(userPreferencesRepository.getValue(CachedPurchasePreference))
+        assertNull(userPreferenceRepository.getValue(CachedPurchasePreference))
     }
 
     @Test
     fun transition_whenBillingStatusIsLoadingAndItBecomesPurchasedAfterTimeout_returnsNull() = runTest {
         val automation = CopyCoordsDecAutomation
         val billing = FakeBilling(context)
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points, billingStatusTimeout = 3.seconds)
         val res = async {
@@ -324,13 +336,13 @@ class AutomationRequestedTest {
         )
         advanceUntilIdle()
         assertNull(res.await())
-        assertNull(userPreferencesRepository.getValue(CachedPurchasePreference))
+        assertNull(userPreferenceRepository.getValue(CachedPurchasePreference))
     }
 
     @Test
     fun transition_whenUserPreferenceAutomationIsCopyCoords_returnsActionReady() = runTest {
         val automation = CopyCoordsDecAutomation
-        val action = CopyCoordsDecOutput(coordinateConverter).toAction(points.last())
+        val action = CopyCoordsDecOutput(coordinateConverter, uriQuote).toAction(points.last())
         val billing = FakeBilling(
             context,
             initialStatus = BillingStatus.Purchased(
@@ -340,15 +352,16 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             )
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertEquals(
@@ -363,6 +376,7 @@ class AutomationRequestedTest {
         val output = OpenDisplayGeoUriOutput(
             UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
             coordinateConverter,
+            uriQuote,
         )
         val action = output.toAction(points.last())
         val delay = 2.seconds
@@ -375,15 +389,16 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             )
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation, automationDelay = delay)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertEquals(
@@ -395,7 +410,7 @@ class AutomationRequestedTest {
     @Test
     fun transition_whenUserPreferenceAutomationIsOpenLink_returnsActionWaiting() = runTest {
         val automation = ShareLinkUriAutomation(FakeGoogleMapsDisplayLink.uuid)
-        val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter)
+        val output = ShareLinkUriOutput(FakeGoogleMapsDisplayLink, coordinateConverter, uriQuote)
         val action = output.toAction(points.last())
         val delay = 2.seconds
         val billing = FakeBilling(
@@ -407,15 +422,16 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             )
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation, automationDelay = delay)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertEquals(
@@ -437,15 +453,16 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             )
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation, automationDelay = delay)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertNull(state.transition(stateContext))
@@ -466,15 +483,16 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             )
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation, automationDelay = delay)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertEquals(
@@ -489,6 +507,7 @@ class AutomationRequestedTest {
         val output = OpenDisplayGeoUriOutput(
             UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
             coordinateConverter,
+            uriQuote,
         )
         val action = output.toAction(points.last())
         val delay = 2.seconds
@@ -501,15 +520,16 @@ class AutomationRequestedTest {
                 token = "test_purchased",
             )
         )
-        val userPreferencesRepository = FakeUserPreferencesRepository(
-            UserPreferencesValues(automation = automation, automationDelay = delay)
+        val userPreferenceRepository = FakeUserPreferenceRepository(
+            UserPreferenceValues(automation = automation, automationDelay = delay)
         )
         val stateContext = ActionStateContext(
             billing = billing,
+            context = context,
             coordinateConverter = coordinateConverter,
             linkRepository = linkRepository,
             log = log,
-            userPreferencesRepository = userPreferencesRepository,
+            userPreferenceRepository = userPreferenceRepository,
         )
         val state = AutomationRequested(points)
         assertEquals(

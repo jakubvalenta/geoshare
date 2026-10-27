@@ -21,12 +21,12 @@ import page.ooooo.geoshare.data.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.preferences.FinishPreference
 import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.preferences.UserPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import java.io.IOException
 import javax.inject.Inject
 
-interface UserPreferencesRepository {
-    val values: Flow<UserPreferencesValues>
+interface UserPreferenceRepository {
+    val values: Flow<UserPreferenceValues>
 
     suspend fun <T> getValue(userPreference: UserPreference<T>): T
 
@@ -35,9 +35,9 @@ interface UserPreferencesRepository {
     suspend fun edit(transform: (preferences: MutablePreferences) -> Unit)
 }
 
-class DefaultUserPreferencesRepository @Inject constructor(
+class DefaultUserPreferenceRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-) : UserPreferencesRepository {
+) : UserPreferenceRepository {
     override val values =
         dataStore.data.catch { exception ->
             if (exception is IOException) {
@@ -46,7 +46,7 @@ class DefaultUserPreferencesRepository @Inject constructor(
                 throw exception
             }
         }.map {
-            UserPreferencesValues(
+            UserPreferenceValues(
                 automation = AutomationPreference.getValue(it),
                 automationDelay = AutomationDelayPreference.getValue(it),
                 cachedPurchase = CachedPurchasePreference.getValue(it),

@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -280,10 +281,9 @@ private fun InputsDetailPane(
     val appName = stringResource(R.string.app_name)
     val maxWidth = 600.dp
 
-    val (group, changelog) = remember(currentGroupId) {
-        allChangelogsByGroup.entries.firstOrNull { (group) -> group.id == currentGroupId }
-    } ?: return
-    var changelogDetails by remember(changelog) {
+    val (group, changelog) = allChangelogsByGroup.entries.firstOrNull { (group) -> group.id == currentGroupId }
+        ?: return
+    var changelogDetails by retain(changelog) {
         mutableStateOf(getChangelogDetails(changelog, context.packageManager))
     }
     val settingsLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {

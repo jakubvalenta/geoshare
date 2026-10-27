@@ -1,9 +1,10 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.openUriInDefaultApp
 import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.formatters.UriFormatter
@@ -15,10 +16,11 @@ import javax.inject.Inject
 class ShareLinkUriOutput @Inject constructor(
     val link: Link,
     private val coordinateConverter: CoordinateConverter,
+    private val uriQuote: UriQuote,
 ) : SharePointUriOutput {
     override val id = "ShareLinkUriOutput(link.uuid=${link.uuid})"
 
-    override fun getUriString(value: Point, uriQuote: UriQuote) =
+    override fun getUriString(value: Point) =
         UriFormatter.formatUriString(
             coordinateConverter.toSrs(value, link.srs),
             link.coordsUriTemplate,
@@ -26,22 +28,22 @@ class ShareLinkUriOutput @Inject constructor(
             uriQuote = uriQuote,
         )
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
-        getUriString(value, actionContext.uriQuote)?.let { uriString ->
-            actionContext.context.openUriInDefaultApp(uriString)
+    override suspend fun execute(value: Point, context: Context) =
+        getUriString(value)?.let { uriString ->
+            context.openUriInDefaultApp(uriString)
         }.let { success -> if (success == true) ActionResult.SUCCEEDED_AND_OPENED_APP else ActionResult.FAILED }
 
-    override fun isEnabled(value: Point, uriQuote: UriQuote) =
-        !getUriString(value, uriQuote).isNullOrEmpty()
+    override fun isEnabled(value: Point) =
+        !getUriString(value).isNullOrEmpty()
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_open_link, link.name)
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
+    override fun getMenuIcon(appDetails: AppDetails) =
         link.menuIcon
 
-    override fun getIcon(appDetail: AppDetail?) =
+    override fun getIcon(appDetails: AppDetails) =
         link.icon
 
     override fun equals(other: Any?): Boolean {

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.formatters.GpxFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Point
@@ -30,7 +30,7 @@ class SavePointGpxOutput @Inject constructor(
     }
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_gpx_point_save)
 
     override fun equals(other: Any?): Boolean {

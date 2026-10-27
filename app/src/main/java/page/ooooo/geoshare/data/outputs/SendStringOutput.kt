@@ -1,7 +1,8 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.runtime.Composable
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.TextActivity
 
 class SendStringOutput(
@@ -9,17 +10,17 @@ class SendStringOutput(
 ) : StringOutput, Output.HasActivity<TextActivity> {
     override val id = "SendStringOutput(activity=$activity)"
 
-    override suspend fun execute(value: String, actionContext: ActionContext) =
+    override suspend fun execute(value: String, context: Context) =
         activity
-            .launch(actionContext.context, value)
+            .launch(context, value)
             .toActionResult(openedApp = true)
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
-        appDetail?.label.orEmpty()
+    override fun label(appDetails: AppDetails) =
+        appDetails[activity.packageName]?.label.orEmpty()
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
-        appDetail?.let { DrawableIconDescriptor(it.icon) }
+    override fun getMenuIcon(appDetails: AppDetails) =
+        appDetails[activity.packageName]?.let { DrawableIconDescriptor(it.icon) }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

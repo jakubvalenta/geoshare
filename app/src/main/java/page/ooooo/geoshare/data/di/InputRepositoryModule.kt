@@ -133,12 +133,12 @@ object FakeInputRepository : InputRepository {
     private val log = FakeLog
     private val serverRepository = FakeServerRepository()
     private val uriQuote = FakeUriQuote
-    private val userPreferencesRepository = FakeUserPreferencesRepository()
+    private val userPreferenceRepository = FakeUserPreferenceRepository()
     private val serverHttpClientFactory = ServerHttpClientFactory(
         engine = engine,
         keyStoreTools = FakeKeyStoreTools(),
         log = log,
-        userPreferencesRepository = userPreferencesRepository,
+        userPreferenceRepository = userPreferenceRepository,
     )
 
     override val amapShortLinkInput = AmapShortLinkInput(

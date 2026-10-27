@@ -22,7 +22,7 @@ import page.ooooo.geoshare.data.preferences.CachedPurchasePreference
 import page.ooooo.geoshare.data.preferences.CachedServerTokenPreference
 import page.ooooo.geoshare.data.preferences.ChangelogShownForVersionCodePreference
 import page.ooooo.geoshare.data.preferences.DismissedHelpMessagesPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
@@ -54,7 +54,7 @@ fun UserPreferenceDeveloperOptionsControls(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
     val spacing = LocalSpacing.current

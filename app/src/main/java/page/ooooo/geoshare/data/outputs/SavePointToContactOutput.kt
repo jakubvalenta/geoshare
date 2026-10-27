@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.insertOrEditContactAddress
 import page.ooooo.geoshare.data.formatters.CoordinateFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -24,26 +25,26 @@ class SavePointToContactOutput @Inject constructor(
 
     override val id = "SavePointToContactOutput"
 
-    override suspend fun execute(value: Point, actionContext: ActionContext) =
-        actionContext.context.insertOrEditContactAddress(
+    override suspend fun execute(value: Point, context: Context) =
+        context.insertOrEditContactAddress(
             CoordinateFormatter.formatDecCoords(
                 coordinateConverter.toWGS84(value)
             ),
         ).let { success -> if (success) ActionResult.SUCCEEDED else ActionResult.FAILED }
 
     @Composable
-    override fun label(appDetail: AppDetail?) =
+    override fun label(appDetails: AppDetails) =
         stringResource(R.string.output_save_to_contact)
 
-    override fun getMenuIcon(appDetail: AppDetail?) =
+    override fun getMenuIcon(appDetails: AppDetails) =
         ImageVectorIconDescriptor(Icons.Default.AccountBox)
 
     @Composable
-    override fun errorText(appDetail: AppDetail?) =
+    override fun errorText(appDetails: AppDetails) =
         stringResource(R.string.output_save_to_contact_failed)
 
     @Composable
-    override fun automationErrorText(appDetail: AppDetail?) =
+    override fun automationErrorText(appDetails: AppDetails) =
         stringResource(R.string.output_save_to_contact_automation_failed)
 
     override fun equals(other: Any?): Boolean {

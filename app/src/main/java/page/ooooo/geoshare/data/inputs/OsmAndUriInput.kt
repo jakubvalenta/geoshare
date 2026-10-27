@@ -19,7 +19,7 @@ import javax.inject.Singleton
 @Singleton
 class OsmAndUriInput @Inject constructor(
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = OsmAndInputGroup
     override val changelog = persistentListOf(
@@ -64,7 +64,7 @@ class OsmAndUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://osmand.net/map?pin={lat}%2C{lon}")
 
     override fun toString() = "OsmAndUriInput"

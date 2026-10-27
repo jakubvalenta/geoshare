@@ -68,7 +68,7 @@ fun ConversionStateLogList(
     stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
     animationsEnabled: Boolean = true,
     initialItemsExpanded: Boolean = false,
-    onUriClick: (uriString: String) -> Unit,
+    onShareSource: (source: String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
@@ -95,7 +95,7 @@ fun ConversionStateLogList(
                                     item = item,
                                     animationsEnabled = animationsEnabled && enterAnimationFinished,
                                     initialExpanded = initialItemsExpanded,
-                                    onUriClick = onUriClick,
+                                    onShareSource = onShareSource,
                                 )
                             }
                             if (index < stateLog.size - 1) {
@@ -116,7 +116,7 @@ private fun ConversionStateLogListItem(
     animationsEnabled: Boolean = true,
     iconSize: Dp = 16.dp,
     initialExpanded: Boolean = false,
-    onUriClick: (uriString: String) -> Unit,
+    onShareSource: (source: String) -> Unit,
 ) {
     val resources = LocalResources.current
     val spacing = LocalSpacing.current
@@ -173,7 +173,7 @@ private fun ConversionStateLogListItem(
                     modifier = Modifier
                         .padding(start = iconSize + spacing.tiny)
                         .graphicsLayer { alpha = 0.9f }
-                        .clickable { onUriClick(uriString) },
+                        .clickable { onShareSource(uriString) },
                     color = LocalContentColor.current.copy(alpha = 0.9f),
                     textDecoration = TextDecoration.Underline,
                     overflow = TextOverflow.Ellipsis,
@@ -264,7 +264,7 @@ private fun DefaultPreview() {
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
                 animationsEnabled = false,
                 initialItemsExpanded = true,
-                onUriClick = {},
+                onShareSource = {},
             )
         }
     }
@@ -282,7 +282,7 @@ private fun DarkPreview() {
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
                 animationsEnabled = false,
                 initialItemsExpanded = true,
-                onUriClick = {},
+                onShareSource = {},
             )
         }
     }

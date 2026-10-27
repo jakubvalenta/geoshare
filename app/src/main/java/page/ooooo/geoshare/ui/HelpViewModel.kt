@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.message.Message
 import page.ooooo.geoshare.data.preferences.DismissedHelpMessagesPreference
 import page.ooooo.geoshare.data.preferences.HelpMessage
@@ -19,13 +19,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HelpViewModel @Inject constructor(
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
 ) : ViewModel() {
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message.asStateFlow()
 
-    val dismissedHelpMessages: StateFlow<Set<HelpMessage>?> = userPreferencesRepository.values
+    val dismissedHelpMessages: StateFlow<Set<HelpMessage>?> = userPreferenceRepository.values
         .map { it.dismissedHelpMessages }
         .stateIn(
             viewModelScope,
@@ -35,7 +35,7 @@ class HelpViewModel @Inject constructor(
 
     fun dismissHelpMessage(helpMessage: HelpMessage) {
         viewModelScope.launch(Dispatchers.IO) {
-            userPreferencesRepository.edit { preferences ->
+            userPreferenceRepository.edit { preferences ->
                 DismissedHelpMessagesPreference.setValue(
                     preferences,
                     DismissedHelpMessagesPreference.getValue(preferences).orEmpty() + helpMessage,

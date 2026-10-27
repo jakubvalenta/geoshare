@@ -1,12 +1,11 @@
 package page.ooooo.geoshare.ui
 
-import android.content.res.Resources
-import android.graphics.drawable.Drawable
-import androidx.compose.runtime.Composable
+import android.content.Context
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,79 +13,92 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppRepository
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.database.Link
 import page.ooooo.geoshare.data.database.findByUUID
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.message.Message
-import page.ooooo.geoshare.data.outputs.IconDescriptor
 import page.ooooo.geoshare.data.outputs.NoopOutput
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.ActivityAutomation
 import page.ooooo.geoshare.data.preferences.Automation
 import page.ooooo.geoshare.data.preferences.AutomationPreference
 import page.ooooo.geoshare.data.preferences.BasicAutomation
+import page.ooooo.geoshare.data.preferences.CoordinateFormat
+import page.ooooo.geoshare.data.preferences.CoordinateFormatPreference
+import page.ooooo.geoshare.data.preferences.DynamicColorPreference
 import page.ooooo.geoshare.data.preferences.HiddenAppsPreference
 import page.ooooo.geoshare.data.preferences.LinkAutomation
 import page.ooooo.geoshare.data.preferences.NoopAutomation
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.data.toOutput
 import javax.inject.Inject
 
-data class AutomationDetail(
-    private val appDetail: AppDetail?,
-    val automation: Automation,
-    val icon: IconDescriptor?,
-    val output: Output,
-) {
-    @Composable
-    fun label(): String = output.automationLabel(appDetail)
-
-    @Composable
-    fun description(): String? = output.automationDescription()
-}
-
-data class HiddenAppDetail(
-    val label: String?,
-    val icon: Drawable?,
-    val packageName: String,
+data class AutomationOption(
+    val automation: Automation = NoopAutomation,
+    val output: Output<*> = NoopOutput,
 )
 
-data class HiddenAppsSize(
-    val total: Int,
-    val visible: Int,
+data class SelectedAutomationOptionState(
+    val option: AutomationOption = AutomationOption(),
+)
+
+data class AutomationOptionsState(
+    val optionGroups: List<List<AutomationOption>> = emptyList(),
+)
+
+data class SelectedHiddenAppsState(
+    val totalCount: Int = 0,
+    val visibleCount: Int = 0,
+)
+
+data class HiddenAppsOptionsState(
+    val hiddenApps: Set<String> = emptySet(),
 )
 
 @HiltViewModel
 class UserPreferenceViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     appRepository: AppRepository,
     linkRepository: LinkRepository,
     private val coordinateConverter: CoordinateConverter,
     private val log: Log,
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
 ) : ViewModel() {
 
     private val _message = MutableStateFlow<Message?>(null)
     val message: StateFlow<Message?> = _message.asStateFlow()
 
-    val values: StateFlow<UserPreferencesValues> =
-        userPreferencesRepository.values
+    val values: StateFlow<UserPreferenceValues> =
+        userPreferenceRepository.values
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                UserPreferencesValues(),
+                UserPreferenceValues(),
             )
 
-    val automationDetail: StateFlow<AutomationDetail> =
-        userPreferencesRepository.values
+    val appDetails: StateFlow<AppDetails> =
+        appRepository.appDetails
+            .filterNotNull()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyMap(),
+            )
+
+    // Automation
+
+    val selectedAutomationOption: StateFlow<SelectedAutomationOptionState> =
+        userPreferenceRepository.values
             .map { it.automation }
             .distinctUntilChanged()
             .combine(linkRepository.all) { automation, links ->
@@ -97,86 +109,105 @@ class UserPreferenceViewModel @Inject constructor(
                         automation.toOutput(coordinateConverter, link)
                     }
                 } ?: NoopOutput
-                automation to output
-            }
-            .combine(appRepository.appDetails) { (automation, output), appDetails ->
-                output.toAutomationDetail(automation, appDetails)
+                SelectedAutomationOptionState(option = AutomationOption(automation, output))
             }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                NoopOutput.toAutomationDetail(NoopAutomation, emptyMap()),
+                SelectedAutomationOptionState(),
             )
-    val automationDetails: StateFlow<List<List<AutomationDetail>>> =
+    val automationOptions: StateFlow<AutomationOptionsState> =
         combine(
-            appRepository.activities,
-            appRepository.appDetails,
-            userPreferencesRepository.values
+            appRepository.activities.filterNotNull(),
+            userPreferenceRepository.values
                 .map { it.hiddenApps }
                 .distinctUntilChanged(),
             linkRepository.all,
-        ) { activities, appDetails, hiddenApps, links ->
-            AutomationPreference.getOptionGroups(activities, appDetails, hiddenApps, links)
-                .map { group ->
+        ) { activities, hiddenApps, links ->
+            AutomationOptionsState(
+                optionGroups = AutomationPreference.getOptionGroups(activities, hiddenApps, links).map { group ->
                     group.map { automation ->
-                        when (automation) {
-                            is BasicAutomation -> automation.toOutput(coordinateConverter)
-                            is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                            is LinkAutomation -> links.findByUUID(automation.linkUUID)?.let { link ->
-                                automation.toOutput(coordinateConverter, link)
-                            }
-                        }.toAutomationDetail(automation, appDetails)
+                        AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                     }
                 }
+            )
         }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                emptyList(),
+                AutomationOptionsState(),
             )
-    val hiddenAppsDetails: StateFlow<List<HiddenAppDetail>> =
-        appRepository.activities
-            .map { activities -> HiddenAppsPreference.getOptions(activities) }
-            .combine(appRepository.appDetails) { hiddenApps, appDetails ->
-                hiddenApps.toHiddenAppsDetails(appDetails)
-            }
+
+    // Coordinate format
+
+    val coordinateFormat: StateFlow<CoordinateFormat> =
+        userPreferenceRepository.values
+            .map { it.coordinateFormat }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                emptyList(),
+                CoordinateFormatPreference.loading,
             )
-    val hiddenAppsSize: StateFlow<HiddenAppsSize> =
+
+    // Dynamic color
+
+    val dynamicColor: StateFlow<Boolean> =
+        userPreferenceRepository.values
+            .map { it.dynamicColor }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                DynamicColorPreference.loading,
+            )
+
+    // Hidden apps
+
+    val selectedHiddenApps: StateFlow<SelectedHiddenAppsState> =
         appRepository.activities
+            .filterNotNull()
             .combine(
-                userPreferencesRepository.values
+                userPreferenceRepository.values
                     .map { it.hiddenApps }
                     .distinctUntilChanged()
             ) { activities, hiddenApps ->
-                HiddenAppsSize(
-                    total = activities.size,
-                    visible = (activities.map { it.packageName }.toSet() - (hiddenApps ?: emptySet())).size,
+                SelectedHiddenAppsState(
+                    totalCount = activities.size,
+                    visibleCount = (activities.map { it.packageName }.toSet() - (hiddenApps ?: emptySet())).size,
                 )
             }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5000),
-                HiddenAppsSize(total = 0, visible = 0),
+                SelectedHiddenAppsState(),
             )
+    val hiddenAppsOptions: StateFlow<HiddenAppsOptionsState> =
+        appRepository.activities
+            .filterNotNull()
+            .map { activities ->
+                HiddenAppsOptionsState(hiddenApps = HiddenAppsPreference.getOptions(activities))
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                HiddenAppsOptionsState(),
+            )
+
+    // Methods
 
     fun editUserPreferences(transform: (preferences: MutablePreferences) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            userPreferencesRepository.edit(transform)
+            userPreferenceRepository.edit(transform)
         }
     }
 
-    fun hideApp(resources: Resources, packageName: String) {
+    fun hideApp(packageName: String) {
         editUserPreferences { preferences ->
             HiddenAppsPreference.setValue(
                 preferences,
                 HiddenAppsPreference.getValue(preferences).orEmpty() + packageName,
             )
         }
-        _message.value = Message(resources.getString(R.string.user_preferences_apps_message_hidden))
+        _message.value = Message(context.resources.getString(R.string.user_preferences_apps_message_hidden))
     }
 
     fun dismissMessage() {
@@ -184,25 +215,11 @@ class UserPreferenceViewModel @Inject constructor(
     }
 }
 
-fun Output?.toAutomationDetail(automation: Automation, appDetails: AppDetails): AutomationDetail =
-    (this ?: NoopOutput).run {
-        (this as? Output.HasActivity<*>)?.getAppDetail(appDetails).let { appDetail ->
-            AutomationDetail(
-                appDetail = appDetail,
-                automation = automation,
-                icon = getIcon(appDetail),
-                output = this,
-            )
+fun Automation.toOutput(coordinateConverter: CoordinateConverter, links: List<Link>, log: Log): Output<*> =
+    when (this) {
+        is BasicAutomation -> toOutput(coordinateConverter)
+        is ActivityAutomation -> toOutput(coordinateConverter, log)
+        is LinkAutomation -> links.findByUUID(linkUUID)?.let { link ->
+            toOutput(coordinateConverter, link)
         }
-    }
-
-fun Set<String>.toHiddenAppsDetails(appDetails: AppDetails): List<HiddenAppDetail> =
-    map { packageName ->
-        appDetails[packageName].let { appDetail ->
-            HiddenAppDetail(
-                label = appDetail?.label,
-                icon = appDetail?.icon,
-                packageName = packageName,
-            )
-        }
-    }
+    } ?: NoopOutput

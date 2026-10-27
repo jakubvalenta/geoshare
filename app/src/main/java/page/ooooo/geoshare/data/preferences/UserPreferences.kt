@@ -9,7 +9,6 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.data.android.AppActivity
-import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.android.FileType
 import page.ooooo.geoshare.data.android.TextActivity
@@ -25,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 interface UserPreference<T> {
-    fun getValue(values: UserPreferencesValues): T
+    fun getValue(values: UserPreferenceValues): T
     fun getValue(preferences: Preferences, log: Log = DefaultLog): T
     fun setValue(preferences: MutablePreferences, value: T, log: Log = DefaultLog)
 }
@@ -81,7 +80,7 @@ object ConnectionPermissionPreference : OptionsPreference<Permission> {
     override val default = Permission.ASK
     val loading = default
 
-    override fun getValue(values: UserPreferencesValues) = values.connectionPermission
+    override fun getValue(values: UserPreferenceValues) = values.connectionPermission
 
     override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
         try {
@@ -109,7 +108,7 @@ object CoordinateFormatPreference : OptionsPreference<CoordinateFormat> {
     override val default = CoordinateFormat.DEC
     val loading = default
 
-    override fun getValue(values: UserPreferencesValues) = values.coordinateFormat
+    override fun getValue(values: UserPreferenceValues) = values.coordinateFormat
 
     override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
         try {
@@ -147,7 +146,7 @@ object AutomationPreference : OptionsPreference<Automation> {
         ignoreUnknownKeys = true
     }
 
-    override fun getValue(values: UserPreferencesValues) = values.automation
+    override fun getValue(values: UserPreferenceValues) = values.automation
 
     override fun getValue(preferences: Preferences, log: Log) =
         getValueOrNull(preferences, log)
@@ -210,7 +209,6 @@ object AutomationPreference : OptionsPreference<Automation> {
 
     fun getOptionGroups(
         activities: List<AppActivity>,
-        appDetails: AppDetails,
         hiddenApps: Set<String>?,
         links: List<Link>,
     ): List<List<Automation>> = listOfNotNull(
@@ -237,7 +235,6 @@ object AutomationPreference : OptionsPreference<Automation> {
         activities
             .groupBy { activity -> activity.packageName }
             .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
-            .toSortedMap(compareBy(nullsLast()) { packageName -> appDetails[packageName]?.label })
             .flatMap { (_, activities) ->
                 activities
                     .sorted()
@@ -313,7 +310,7 @@ object AutomationDelayPreference : DurationPreference {
     override val minSec = 0
     override val maxSec = 60
 
-    override fun getValue(values: UserPreferencesValues) = values.automationDelay
+    override fun getValue(values: UserPreferenceValues) = values.automationDelay
 }
 
 object CachedPurchasePreference : TextPreference<CachedPurchase?> {
@@ -342,7 +339,7 @@ object CachedPurchasePreference : TextPreference<CachedPurchase?> {
             default
         }
 
-    override fun getValue(values: UserPreferencesValues) = values.cachedPurchase
+    override fun getValue(values: UserPreferenceValues) = values.cachedPurchase
 
     private const val TAG = "CachedPurchasePreference"
 }
@@ -373,7 +370,7 @@ object CachedServerTokenPreference : TextPreference<CachedServerToken?> {
             default
         }
 
-    override fun getValue(values: UserPreferencesValues) = values.cachedServerToken
+    override fun getValue(values: UserPreferenceValues) = values.cachedServerToken
 
     private const val TAG = "CachedServerTokenPreference"
 }
@@ -383,7 +380,7 @@ object DynamicColorPreference : OptionsPreference<Boolean> {
     override val default = false
     val loading = default
 
-    override fun getValue(values: UserPreferencesValues) = values.dynamicColor
+    override fun getValue(values: UserPreferenceValues) = values.dynamicColor
 
     override fun getValue(preferences: Preferences, log: Log) =
         preferences[key]?.toBooleanStrict() ?: default
@@ -407,7 +404,7 @@ object FinishPreference : OptionsPreference<Finish> {
     override val default = Finish.AFTER_ACTION_SUCCEEDED_AND_OPENED_APP
     val loading = Finish.NEVER
 
-    override fun getValue(values: UserPreferencesValues) = values.finish
+    override fun getValue(values: UserPreferenceValues) = values.finish
 
     override fun getValue(preferences: Preferences, log: Log) = preferences[key]?.let {
         try {
@@ -489,7 +486,7 @@ object DismissedHelpMessagesPreference : TextPreference<Set<HelpMessage>?> {
             default
         }
 
-    override fun getValue(values: UserPreferencesValues) = values.dismissedHelpMessages
+    override fun getValue(values: UserPreferenceValues) = values.dismissedHelpMessages
 
     private const val TAG = "DismissedHelpMessagePreference"
 }
@@ -499,7 +496,7 @@ object HiddenAppsPreference : SetPreference {
     override val default: Set<String> = emptySet()
     val loading = null
 
-    override fun getValue(values: UserPreferencesValues) = values.hiddenApps
+    override fun getValue(values: UserPreferenceValues) = values.hiddenApps
 
     fun getOptions(activities: List<AppActivity>): Set<String> = activities.getPackageNames()
 }
@@ -509,10 +506,10 @@ object ChangelogShownForVersionCodePreference : NullableIntPreference {
     override val default = BuildConfig.VERSION_CODE
     val loading = null
 
-    override fun getValue(values: UserPreferencesValues) = values.changelogShownForVersionCode
+    override fun getValue(values: UserPreferenceValues) = values.changelogShownForVersionCode
 }
 
-data class UserPreferencesValues(
+data class UserPreferenceValues(
     val automation: Automation = AutomationPreference.loading,
     val automationDelay: Duration = AutomationDelayPreference.loading,
     val cachedServerToken: CachedServerToken? = CachedServerTokenPreference.loading,

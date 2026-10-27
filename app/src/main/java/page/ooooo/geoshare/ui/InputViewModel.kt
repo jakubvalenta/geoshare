@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import page.ooooo.geoshare.BuildConfig
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.InputRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.inputs.InputChangelogItem
@@ -30,8 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class InputViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    val inputRepository: InputRepository,
-    private val userPreferencesRepository: UserPreferencesRepository,
+    private val inputRepository: InputRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
 ) : ViewModel() {
 
     private val allChangelogsByGroupFlow: Flow<Map<InputGroup, ImmutableList<InputChangelogItem>>> =
@@ -50,7 +50,7 @@ class InputViewModel @Inject constructor(
                 emptyMap(),
             )
     val recentChangelogsByGroup: StateFlow<Map<InputGroup, ImmutableList<InputChangelogItem>>> =
-        userPreferencesRepository.values
+        userPreferenceRepository.values
             .mapNotNull { values -> values.changelogShownForVersionCode }
             .combine(allChangelogsByGroupFlow) { changelogShownForVersionCode, allGroups ->
                 allGroups.filterValues { changelog ->
@@ -88,21 +88,12 @@ class InputViewModel @Inject constructor(
                 emptyList(),
             )
 
-    fun genRandomUri(): String? =
-        inputRepository.genRandomUri(
-            WGS84Point(
-                NaivePoint.genRandomPoint(
-                    name = context.resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place)
-                )
-            )
-        )
-
     fun setChangelogShown() {
         val newestInputAddedInVersionCode = inputRepository.all
             .maxOfOrNull { input -> input.changelog.maxOfOrNull { it.addedInVersionCode } ?: BuildConfig.VERSION_CODE }
             ?: BuildConfig.VERSION_CODE
         viewModelScope.launch {
-            userPreferencesRepository.setValue(
+            userPreferenceRepository.setValue(
                 ChangelogShownForVersionCodePreference,
                 newestInputAddedInVersionCode,
             )

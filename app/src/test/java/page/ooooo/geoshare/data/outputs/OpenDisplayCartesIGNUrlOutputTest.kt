@@ -17,15 +17,14 @@ class OpenDisplayCartesIGNUrlOutputTest {
     private val coordinateConverter = CoordinateConverter(mockGeometries)
     private val uriQuote = FakeUriQuote
     private val activity = UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN)
-    private val output = OpenDisplayCartesIGNUrlOutput(activity, coordinateConverter)
+    private val output = OpenDisplayCartesIGNUrlOutput(activity, coordinateConverter, uriQuote)
 
     @Test
     fun getUriString_whenPointIsWGS84AndWithinMainlandChina_returnsUrlWithConvertedCoordinates() {
         assertEquals(
             "https://cartes-ign.ign.fr?lng=121.4709921&lat=31.2304417&z=3.14",
             output.getUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793, z = 3.14, source = Source.GENERATED),
-                uriQuote,
+                WGS84Point(31.23044166868017, 121.47099209401793, z = 3.14, source = Source.GENERATED)
             ),
         )
     }
@@ -35,8 +34,7 @@ class OpenDisplayCartesIGNUrlOutputTest {
         assertEquals(
             "https://cartes-ign.ign.fr?lng=121.4709921&lat=31.2304417&z=3.14",
             output.getUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106, z = 3.14, source = Source.GENERATED),
-                uriQuote,
+                GCJ02Point(31.22850685422705, 121.47552456472106, z = 3.14, source = Source.GENERATED)
             ),
         )
     }
@@ -45,8 +43,7 @@ class OpenDisplayCartesIGNUrlOutputTest {
     fun getUriString_whenPointDoesNotHaveCoordinates_returnsNull() {
         assertNull(
             output.getUriString(
-                GCJ02Point(name = "foo bar", source = Source.GENERATED),
-                uriQuote,
+                GCJ02Point(name = "foo bar", source = Source.GENERATED)
             )
         )
     }

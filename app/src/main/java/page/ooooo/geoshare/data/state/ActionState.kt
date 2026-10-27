@@ -1,5 +1,6 @@
 package page.ooooo.geoshare.data.state
 
+import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
@@ -9,7 +10,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.timeout
 import page.ooooo.geoshare.data.LinkRepository
-import page.ooooo.geoshare.data.UserPreferencesRepository
+import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.Billing
 import page.ooooo.geoshare.data.billing.BillingStatus
@@ -40,23 +41,24 @@ import page.ooooo.geoshare.data.toOutput
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-interface ActionState : State<ActionStateContext> {
+sealed interface ActionState : State<ActionStateContext> {
     interface HasPermission : State.HasPermission<ActionStateContext> {
         override suspend fun grant(stateContext: ActionStateContext, doNotAsk: Boolean): ActionState
         override suspend fun deny(stateContext: ActionStateContext, doNotAsk: Boolean): ActionState
     }
 
-    object Initial : ActionState {
+    data object Initial : ActionState {
         override fun toString() = "Initial"
     }
 }
 
 data class ActionStateContext(
     val billing: Billing,
+    val context: Context,
     val coordinateConverter: CoordinateConverter,
     val linkRepository: LinkRepository,
     val log: Log = DefaultLog,
-    val userPreferencesRepository: UserPreferencesRepository,
+    val userPreferenceRepository: UserPreferenceRepository,
 )
 
 data class AutomationRequested(
@@ -66,7 +68,7 @@ data class AutomationRequested(
     @OptIn(FlowPreview::class)
     override suspend fun transition(stateContext: ActionStateContext): ActionState? {
         val lastPoint = points.lastOrNull() ?: return null
-        val automation = stateContext.userPreferencesRepository.getValue(AutomationPreference)
+        val automation = stateContext.userPreferenceRepository.getValue(AutomationPreference)
         if (automation is NoopAutomation) {
             return null
         }
@@ -82,7 +84,7 @@ data class AutomationRequested(
 
                         is BillingStatus.Purchased -> {
                             // If billing status appeared within timeout, cache it
-                            stateContext.userPreferencesRepository.setValue(
+                            stateContext.userPreferenceRepository.setValue(
                                 CachedPurchasePreference,
                                 CachedPurchase(productId = it.product.id, token = it.token),
                             )
@@ -95,7 +97,7 @@ data class AutomationRequested(
         } catch (_: TimeoutCancellationException) {
             // If billing status didn't appear, try to read it from cache
             stateContext.log.w(TAG, "Billing status didn't appear within $billingStatusTimeout")
-            stateContext.userPreferencesRepository.getValue(CachedPurchasePreference)
+            stateContext.userPreferenceRepository.getValue(CachedPurchasePreference)
                 ?.let { cachedPurchase ->
                     stateContext.billing.products.firstOrNull { product -> cachedPurchase.productId == product.id }
                         ?.let { product ->
@@ -128,7 +130,7 @@ data class AutomationRequested(
                 is StringOutput -> NoopAction
             }
             if (output is Output.HasAutomationDelay) {
-                val delay = stateContext.userPreferencesRepository.getValue(AutomationDelayPreference)
+                val delay = stateContext.userPreferenceRepository.getValue(AutomationDelayPreference)
                 return ActionWaiting(action, output, isAutomation = true, delay = delay)
             }
             return ActionReady(action, isAutomation = true)
@@ -178,6 +180,9 @@ data class BasicActionReady(
     val action: BasicAction<*>,
     val isAutomation: Boolean,
 ) : ActionState {
+    suspend fun execute(context: Context): ActionState =
+        ActionRan(action = action, actionResult = action.execute(context), isAutomation = isAutomation)
+
     override fun toString() = "BasicActionReady(action=$action, isAutomation=$isAutomation)"
 }
 
@@ -186,6 +191,9 @@ data class FileActionReady(
     val isAutomation: Boolean,
     val uri: Uri,
 ) : ActionState {
+    suspend fun execute(context: Context): ActionState =
+        ActionRan(action = action, actionResult = action.execute(uri, context), isAutomation = isAutomation)
+
     override fun toString() = "FileActionReady(action=$action, isAutomation=$isAutomation, uri=$uri)"
 }
 
@@ -194,6 +202,9 @@ data class LocationActionReady(
     val isAutomation: Boolean,
     val location: Point,
 ) : ActionState {
+    suspend fun execute(context: Context): ActionState =
+        ActionRan(action = action, actionResult = action.execute(location, context), isAutomation = isAutomation)
+
     override fun toString() = "LocationActionReady(action=$action, isAutomation=$isAutomation, location=$location)"
 }
 
@@ -378,4 +389,8 @@ data class LocationFindingFailed(
     }
 
     override fun toString() = "LocationFindingFailed(actionResult=$actionResult)"
+}
+
+data object ActivityFinishingRequested : ActionState {
+    override fun toString() = "ActivityFinishingRequested"
 }

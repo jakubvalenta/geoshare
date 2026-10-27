@@ -1,31 +1,39 @@
 package page.ooooo.geoshare.data.outputs
 
+import android.content.Context
 import android.content.res.Resources
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import page.ooooo.geoshare.data.android.AppActivity
-import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Points
-import page.ooooo.geoshare.data.uri.DefaultUriQuote
-import page.ooooo.geoshare.data.uri.UriQuote
 
-sealed interface Output {
+sealed interface Output<T> {
     /**
      * A unique id of the output and its parameters. Used as a LazyList key, testTag, etc.
      */
     val id: String
 
+    fun toAction(value: T): Action<T>
+
+    /**
+     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
+     */
+    @Suppress("SameReturnValue")
+    fun isEnabled(value: T): Boolean = true
+
     @Composable
-    fun label(appDetail: AppDetail?): String
+    fun label(appDetails: AppDetails): String
 
-    fun getMenuIcon(appDetail: AppDetail?): IconDescriptor?
+    fun getDescription(value: T): String? = null
 
-    fun getIcon(appDetail: AppDetail?): IconDescriptor? = getMenuIcon(appDetail)
+    fun getMenuIcon(appDetails: AppDetails): IconDescriptor?
+
+    fun getIcon(appDetails: AppDetails): IconDescriptor? = getMenuIcon(appDetails)
 
     @Composable
-    fun automationLabel(appDetail: AppDetail?): String = label(appDetail)
+    fun automationLabel(appDetails: AppDetails): String = label(appDetails)
 
     @Composable
     fun automationDescription(): String? = null
@@ -33,54 +41,42 @@ sealed interface Output {
     interface HasActivity<T : AppActivity> {
         @Suppress("EmptyMethod")
         val activity: T
-
-        fun getAppDetail(appDetails: AppDetails): AppDetail? =
-            activity.packageName.let { appDetails[it] }
     }
 
     interface HasErrorText {
         @Composable
-        fun errorText(appDetail: AppDetail?): String
+        fun errorText(appDetails: AppDetails): String
     }
 
     interface HasSuccessText {
         @Composable
-        fun successText(appDetail: AppDetail?): String
+        fun successText(appDetails: AppDetails): String
     }
 
     interface HasAutomationErrorText {
         @Composable
-        fun automationErrorText(appDetail: AppDetail?): String
+        fun automationErrorText(appDetails: AppDetails): String
     }
 
     interface HasAutomationSuccessText {
         @Composable
-        fun automationSuccessText(appDetail: AppDetail?): String
+        fun automationSuccessText(appDetails: AppDetails): String
     }
 
     interface HasAutomationDelay {
         @Composable
-        fun automationWaitingText(counterSec: Int, appDetail: AppDetail?): String
+        fun automationWaitingText(counterSec: Int, appDetails: AppDetails): String
     }
 }
 
-sealed interface PointOutput : Output {
-    fun toAction(value: Point): Action<Point>
-
-    fun getDescription(value: Point, uriQuote: UriQuote = DefaultUriQuote): String? = null
-
-    /**
-     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
-     */
-    fun isEnabled(value: Point, uriQuote: UriQuote = DefaultUriQuote): Boolean = true
-
+sealed interface PointOutput : Output<Point> {
     /**
      * Output that takes a single [Point].
      *
      * Example: Copy point coordinates, Open point in an app
      */
     sealed interface WithoutLocation : PointOutput {
-        suspend fun execute(value: Point, actionContext: ActionContext): ActionResult
+        suspend fun execute(value: Point, context: Context): ActionResult
 
         override fun toAction(value: Point) = BasicAction.WithPoint(value, this)
     }
@@ -96,7 +92,7 @@ sealed interface PointOutput : Output {
         val mimeType: String
 
         @Suppress("SameReturnValue")
-        suspend fun execute(uri: Uri, value: Point, actionContext: ActionContext): ActionResult
+        suspend fun execute(uri: Uri, value: Point, context: Context): ActionResult
 
         override fun toAction(value: Point) = FileAction.WithPoint(value, this)
     }
@@ -107,7 +103,7 @@ sealed interface PointOutput : Output {
      * Example: Share a route from current location to a point
      */
     sealed interface WithLocation : PointOutput {
-        suspend fun execute(location: Point?, value: Point, actionContext: ActionContext): ActionResult
+        suspend fun execute(location: Point?, value: Point, context: Context): ActionResult
 
         override fun toAction(value: Point) = LocationAction.WithPoint(value, this)
 
@@ -116,25 +112,14 @@ sealed interface PointOutput : Output {
     }
 }
 
-sealed interface PointsOutput : Output {
-    fun toAction(value: Points): Action<Points>
-
-    @Suppress("SameReturnValue")
-    fun getDescription(value: Points, uriQuote: UriQuote = DefaultUriQuote): String? = null
-
-    /**
-     * Returns true if the output can be executed for the given [value] and should be visible in the UI.
-     */
-    @Suppress("SameReturnValue")
-    fun isEnabled(value: Points): Boolean = true
-
+sealed interface PointsOutput : Output<Points> {
     /**
      * Output that takes a [Point] list.
      *
      * Example: Open GPX route in an app
      */
     sealed interface WithoutLocation : PointsOutput {
-        suspend fun execute(value: Points, actionContext: ActionContext): ActionResult
+        suspend fun execute(value: Points, context: Context): ActionResult
 
         override fun toAction(value: Points) = BasicAction.WithPoints(value, this)
     }
@@ -150,7 +135,7 @@ sealed interface PointsOutput : Output {
         val mimeType: String
 
         @Suppress("SameReturnValue")
-        suspend fun execute(uri: Uri, value: Points, actionContext: ActionContext): ActionResult
+        suspend fun execute(uri: Uri, value: Points, context: Context): ActionResult
 
         override fun toAction(value: Points) = FileAction.WithPoints(value, this)
     }
@@ -161,7 +146,7 @@ sealed interface PointsOutput : Output {
      * Example: Share route from current location to last point
      */
     sealed interface WithLocation : PointsOutput {
-        suspend fun execute(location: Point?, value: Points, actionContext: ActionContext): ActionResult
+        suspend fun execute(location: Point?, value: Points, context: Context): ActionResult
 
         override fun toAction(value: Points) = LocationAction.WithPoints(value, this)
 
@@ -170,25 +155,20 @@ sealed interface PointsOutput : Output {
     }
 }
 
-sealed interface StringOutput : Output {
-    fun getDescription(value: String, uriQuote: UriQuote = DefaultUriQuote): String? = null
+sealed interface StringOutput : Output<String> {
+    override fun toAction(value: String) = BasicAction.WithString(value, this)
 
-    suspend fun execute(value: String, actionContext: ActionContext): ActionResult
-
-    @Suppress("SameReturnValue")
-    fun isEnabled(value: String, uriQuote: UriQuote = DefaultUriQuote): Boolean = true
-
-    fun toAction(value: String) = BasicAction.WithString(value, this)
+    suspend fun execute(value: String, context: Context): ActionResult
 }
 
-fun Output.toAction(point: Point, points: Points, source: String): Action<*> =
+fun Output<*>.toAction(point: Point, points: Points, source: String): Action<*> =
     when (this) {
         is PointOutput -> toAction(point)
         is PointsOutput -> toAction(points)
         is StringOutput -> toAction(source)
     }
 
-fun Output.isEnabled(point: Point, points: Points, source: String): Boolean =
+fun Output<*>.isEnabled(point: Point, points: Points, source: String): Boolean =
     when (this) {
         is PointOutput -> isEnabled(point)
         is PointsOutput -> isEnabled(points)

@@ -1,11 +1,12 @@
 package page.ooooo.geoshare.ui
 
-import android.content.res.Resources
+import android.content.Context
 import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,6 +30,7 @@ data class SelectedServers(
 
 @HiltViewModel
 class ServerViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val serverRepository: ServerRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -132,7 +134,7 @@ class ServerViewModel @Inject constructor(
     private val _urlTemplate = savedStateHandle.getMutableStateFlow("serverUrlTemplate", default.urlTemplate)
     val urlTemplate: StateFlow<String> = _urlTemplate.asStateFlow()
 
-    fun saveForm(resources: Resources) {
+    fun saveForm() {
         _destination.value?.let { destination ->
             if (destination == -1) {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -149,7 +151,7 @@ class ServerViewModel @Inject constructor(
                             registerUrl = _registerUrl.value,
                         )
                     )
-                    _message.value = Message(resources.getString(R.string.server_message_inserted))
+                    _message.value = Message(context.resources.getString(R.string.server_message_inserted))
                     // Navigate after saving, because we reset form fields during navigation
                     navigateTo(null)
                 }
@@ -170,7 +172,7 @@ class ServerViewModel @Inject constructor(
                                 registerUrl = _registerUrl.value,
                             )
                         )
-                        _message.value = Message(resources.getString(R.string.server_message_updated))
+                        _message.value = Message(context.resources.getString(R.string.server_message_updated))
                         // Navigate after saving, because we reset form fields during navigation
                         navigateTo(null)
                     }
@@ -181,14 +183,14 @@ class ServerViewModel @Inject constructor(
 
     // Methods
 
-    fun delete(resources: Resources) {
+    fun delete() {
         _destination.value?.let { destination ->
             if (destination != -1) {
                 val item = all.value.firstOrNull { it.uid == destination }
                 if (item != null) {
                     viewModelScope.launch(Dispatchers.IO) {
                         serverRepository.delete(item)
-                        _message.value = Message(resources.getString(R.string.server_message_deleted))
+                        _message.value = Message(context.resources.getString(R.string.server_message_deleted))
                         navigateTo(null)
                     }
                 }
@@ -250,10 +252,10 @@ class ServerViewModel @Inject constructor(
         _urlTemplate.value = newUrlTemplate
     }
 
-    fun restoreInitialData(resources: Resources) {
+    fun restoreInitialData() {
         viewModelScope.launch(Dispatchers.IO) {
             serverRepository.restoreInitialData()
-            _message.value = Message(resources.getString(R.string.server_message_factory_reset))
+            _message.value = Message(context.resources.getString(R.string.server_message_factory_reset))
         }
     }
 

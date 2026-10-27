@@ -234,7 +234,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     // Card
     onElement(timeoutMs) {
         when (viewIdResourceName) {
-            "geoShareResultLastPointName" -> true
+            "geoShareResultName" -> true
             "geoShareConversionErrorMessage" -> throw AssertionError("Conversion failed: ${textAsString()}")
             else -> false
         }
@@ -251,7 +251,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
             setOf("Coordinates", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Coordonnées")
         }
         onElement {
-            if (viewIdResourceName == "geoShareResultLastPointName") {
+            if (viewIdResourceName == "geoShareResultName") {
                 assertTrue(
                     """Expected "${textAsString()}" to equal one of ${expectedNames.joinToString()}""",
                     textAsString() in expectedNames,
@@ -277,7 +277,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
             }
         }
         onElement {
-            if (viewIdResourceName == "geoShareResultLastPointCoordinates") {
+            if (viewIdResourceName == "geoShareResultCoordinates") {
                 assertTrue(
                     """Expected "${textAsString()}" to equal one of ${expectedCoordinatesOptions.joinToString()}""",
                     textAsString() in expectedCoordinatesOptions,
@@ -315,7 +315,7 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     }
 
     // Source
-    onElement { viewIdResourceName == "geoShareResultLastPointSource_${lastPoint.source}" }
+    onElement { viewIdResourceName == "geoShareResultSource_${lastPoint.source}" }
 
     // All points
     if (expectedPoints.size > 1) {
@@ -346,31 +346,33 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
 ) = assertConversionSucceeds(persistentListOf(expectedPoint), fallbackNames, accurate, timeoutMs)
 
 fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: AccessibilityNodeInfo.() -> Boolean) {
-    // Wait for Google Maps
-    onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS }
+    try {
+        // Assert Google Maps content
+        onElement { packageName == PackageNames.GOOGLE_MAPS && this.block() }
+    } catch (_: ElementNotFoundException) {
+        // If there is a location permission dialog, confirm it
+        if (isSystemPermissionShown(500)) {
+            grantSystemPermission()
+        }
 
-    // If there is a Google Maps sign in screen, skip it
-    onElementOrNull(3_000) {
-        packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
-            "Make it your map",
-            @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée",
-        )
-    }?.let {
-        onElement {
-            packageName == PackageNames.GOOGLE_MAPS && textAsString()?.lowercase() in setOf(
-                "skip",
-                "ignorer",
+        // If there is a Google Maps sign in screen, skip it
+        onElementOrNull(500) {
+            packageName == PackageNames.GOOGLE_MAPS && textAsString() in setOf(
+                "Make it your map",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Profitez d'une carte personnalisée",
             )
-        }.click()
-    }
+        }?.let {
+            onElement {
+                packageName == PackageNames.GOOGLE_MAPS && textAsString()?.lowercase() in setOf(
+                    "skip",
+                    "ignorer",
+                )
+            }.click()
+        }
 
-    // If there is a location permission dialog, confirm it
-    if (isSystemPermissionShown(1_000)) {
-        grantSystemPermission()
+        // Assert Google Maps content again
+        onElement { packageName == PackageNames.GOOGLE_MAPS && this.block() }
     }
-
-    // Verify Google Maps content
-    onElement(20_000) { packageName == PackageNames.GOOGLE_MAPS && this.block() }
 }
 
 fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, timeoutMs: Long = NETWORK_TIMEOUT) {
@@ -672,10 +674,6 @@ fun UiObject2.expandSheet() {
     swipe(Direction.UP, 1f)
 }
 
-fun UiObject2.longScrollSheet(direction: Direction = Direction.DOWN) {
-    scroll(direction, 10f)
-}
-
 fun UiAutomatorTestScope.chooseFile() {
     if (onElementOrNull(3_000) { textAsString() in setOf("Recent", "Récents") } != null) {
         // If we happen to be in the Recent folder, go to Downloads, because it's not possible to save a file to Recent
@@ -889,7 +887,7 @@ fun UiAutomatorTestScope.mockLocation(block: MockLocationScope.() -> Unit) {
 
 sealed interface TestServer {
     data class Configured(val server: Server) : TestServer
-    object None : TestServer
+    data object None : TestServer
 }
 
 sealed interface TestServerParams {
@@ -906,7 +904,7 @@ sealed interface TestServerParams {
         override fun toString() = name
     }
 
-    object None : TestServerParams {
+    data object None : TestServerParams {
         override fun toString() = "No server"
     }
 }
@@ -1016,6 +1014,7 @@ fun UiAutomatorTestScope.configureServer(testServer: TestServer) {
             saveServerForm()
 
             // Go back to server preferences
+            quickWaitForStableInActiveWindow() // Wait to prevent stale object exception
             onElement { viewIdResourceName == "geoShareBack" }.click()
 
             // Select the server
@@ -1086,17 +1085,6 @@ fun UiAutomatorTestScope.saveScreenshot(name: String, scale: Float = 0.5f) {
             scale((scale * width).roundToInt(), (scale * height).roundToInt(), false)
                 .compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, it)
         }
-    }
-}
-
-fun <R> UiAutomatorTestScope.withNetworkOff(block: () -> R): R {
-    device.executeShellCommand("svc wifi disable")
-    device.executeShellCommand("svc data disable")
-    try {
-        return block()
-    } finally {
-        device.executeShellCommand("svc wifi enable")
-        device.executeShellCommand("svc data enable")
     }
 }
 

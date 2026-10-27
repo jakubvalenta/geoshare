@@ -16,15 +16,14 @@ class OpenStreetViewGoogleUriOutputTest {
     private val coordinateConverter = CoordinateConverter(mockGeometries)
     private val uriQuote = FakeUriQuote
     private val activity = UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_STREET_VIEW)
-    private val output = OpenStreetViewGoogleUriOutput(activity, coordinateConverter)
+    private val output = OpenStreetViewGoogleUriOutput(activity, coordinateConverter, uriQuote)
 
     @Test
     fun getUriString_whenPointIsWGS84AndWithinMainlandChinaAndPackageNameRequiresGCJ02MainlandChina_returnsUriWithConvertedCoordinates() {
         assertEquals(
             "google.streetview:cbll=31.2285067,121.475524",
             output.getUriString(
-                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED),
-                uriQuote,
+                WGS84Point(31.23044166868017, 121.47099209401793, source = Source.GENERATED)
             ),
         )
     }
@@ -34,8 +33,7 @@ class OpenStreetViewGoogleUriOutputTest {
         assertEquals(
             "google.streetview:cbll=31.2285069,121.4755246",
             output.getUriString(
-                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED),
-                uriQuote,
+                GCJ02Point(31.22850685422705, 121.47552456472106, source = Source.GENERATED)
             ),
         )
     }

@@ -3,7 +3,7 @@
     <string name="conversion_succeeded_copy_coordinates">Koordinatları kopyala</string>
     <string name="conversion_succeeded_copy_link">%1$s bağlantısını kopyala</string>
     <string name="conversion_succeeded_open_app_display">Noktayı %1$s’de göster</string>
-    <string name="conversion_succeeded_share">Paylaş</string>
+    <string name="share">Paylaş</string>
     <string name="conversion_succeeded_skip">Orijinal bağlantıyı kopyala</string>
     <string name="nav_menu_content_description">Menü</string>
     <string name="nav_back_content_description">Ana ekrana dön</string>
@@ -92,7 +92,7 @@
     <string name="conversion_succeeded_save_gpx_filename">%1$s sonuç %2$s.gpx</string>
     <string name="donation_button">Ko-fi üzerinden bağış yapın</string>
     <string name="donation_description">Bu uygulama size zaman kazandırıyor mu?</string>
-    <string name="conversion_succeeded_apps_headline">Şununla aç</string>
+    <string name="open_with">Şununla aç</string>
     <string name="intro_open_by_default_app_caption">Sonra Ayarlar ➞ Uygulamalar ➞ %1$s ➞ %2$s, bağlantıların uygulamada açılmasını etkinleştirin ve %3$s’ye tıklayın.</string>
     <string name="output_gpx_location_permission">%1$s mevcut konumunuzdan başlayan bir rota oluşturacaktır.</string>
     <string name="output_gpx_route_share">GPX rotasını paylaş</string>
@@ -200,7 +200,7 @@
     <string name="links_form_enabled_option_sheet">Kopyala menüsünde göster</string>
     <string name="links_form_group">Grup</string>
     <string name="links_form_name">İsim</string>
-    <string name="links_form_save">Kaydet</string>
+    <string name="save">Kaydet</string>
     <string name="links_form_srs">Koordinat sistemi</string>
     <string name="links_form_type">Bağlam menüsü simgesi</string>
     <string name="links_form_uri_template_coords">URL şablonu</string>

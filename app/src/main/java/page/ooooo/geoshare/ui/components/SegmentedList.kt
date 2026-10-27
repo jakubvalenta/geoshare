@@ -27,7 +27,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
 fun <T> SegmentedList(
-    values: List<T>,
+    values: Collection<T>,
     modifier: Modifier = Modifier,
     itemHeadline: @Composable (value: T) -> String,
     itemIsSelected: (value: T) -> Boolean = { false },

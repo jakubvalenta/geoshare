@@ -52,8 +52,9 @@
     <string name="conversion_succeeded_save_gpx_failed">Failed to save GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s result %2$s.gpx</string>
     <string name="conversion_succeeded_save_gpx_succeeded">Saved GPX file</string>
-    <string name="conversion_succeeded_share">Share</string>
+    <string name="share">Share</string>
     <string name="conversion_succeeded_skip">Copy original link</string>
+    <string name="copy">Copy</string>
     <string name="copyright" translatable="false">© %1$s</string>
     <string name="donation_button">Donate on Ko-fi</string>
     <string name="donation_description">Does this app save you time?</string>
@@ -96,7 +97,7 @@
     <string name="nav_menu_content_description">Menu</string>
     <string name="nav_back_content_description">Back to main screen</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Dropped pin</string>
-    <string name="conversion_succeeded_apps_headline">Open with</string>
+    <string name="open_with">Open with</string>
     <string name="conversion_succeeded_apps_links_configure">Configure web maps</string>
     <string name="intro_open_by_default_google_maps_caption">First, go to Settings ➞ Apps ➞ Maps ➞ %1$s and turn off the opening of links in this app.</string>
     <string name="intro_open_by_default_google_maps_content_description">Screenshot of Google Maps’ Open by default settings</string>
@@ -280,7 +281,7 @@
     <string name="links_form_enabled_option_sheet">Show in the copy menu</string>
     <string name="links_form_group">Group</string>
     <string name="links_form_name">Name</string>
-    <string name="links_form_save">Save</string>
+    <string name="save">Save</string>
     <string name="links_form_srs">Coordinate system</string>
     <string name="links_form_test_china" translatable="false">Test Forbidden City</string>
     <string name="links_form_test_world" translatable="false">Test Kilimanjaro</string>
@@ -298,6 +299,7 @@
     <string name="links_restore_initial_data_title">Reset web maps to factory defaults?</string>
     <string name="links_title">Web maps</string>
     <string name="links_update">Edit web map</string>
+    <string name="load_more">Load more</string>
     <string name="network_exception_connect_exception">Connection refused</string>
     <string name="network_exception_connect_timeout">Connect timeout</string>
     <string name="network_exception_content_convert">Invalid response content</string>

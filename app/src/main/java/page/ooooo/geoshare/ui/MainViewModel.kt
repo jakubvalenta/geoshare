@@ -1,12 +1,13 @@
 package page.ooooo.geoshare.ui
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,23 +15,41 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.AppOutputs
 import page.ooooo.geoshare.data.AppRepository
-import page.ooooo.geoshare.data.android.AppDetail
+import page.ooooo.geoshare.data.AppsOutputs
+import page.ooooo.geoshare.data.InputRepository
+import page.ooooo.geoshare.data.LinkOutputs
+import page.ooooo.geoshare.data.LinkRepository
+import page.ooooo.geoshare.data.OutputRepository
+import page.ooooo.geoshare.data.ShareOutputs
+import page.ooooo.geoshare.data.UserPreferenceRepository
+import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.getUriString
 import page.ooooo.geoshare.data.extensions.zipWithNextLastNull
+import page.ooooo.geoshare.data.geo.CoordinateConverter
+import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.Point
+import page.ooooo.geoshare.data.geo.Points
+import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.Log
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.ActionResult
 import page.ooooo.geoshare.data.outputs.LocationAction
 import page.ooooo.geoshare.data.outputs.Output
+import page.ooooo.geoshare.data.preferences.FinishPreference
+import page.ooooo.geoshare.data.preferences.shouldAppFinish
 import page.ooooo.geoshare.data.state.ActionAutomationFailed
 import page.ooooo.geoshare.data.state.ActionAutomationSucceeded
 import page.ooooo.geoshare.data.state.ActionCompleted
@@ -41,6 +60,7 @@ import page.ooooo.geoshare.data.state.ActionState
 import page.ooooo.geoshare.data.state.ActionStateContext
 import page.ooooo.geoshare.data.state.ActionSucceeded
 import page.ooooo.geoshare.data.state.ActionWaiting
+import page.ooooo.geoshare.data.state.ActivityFinishingRequested
 import page.ooooo.geoshare.data.state.AutomationRequested
 import page.ooooo.geoshare.data.state.BasicActionReady
 import page.ooooo.geoshare.data.state.ConversionFailed
@@ -55,6 +75,7 @@ import page.ooooo.geoshare.data.state.LocationActionReady
 import page.ooooo.geoshare.data.state.LocationFindingFailed
 import page.ooooo.geoshare.data.state.LocationPermissionReceived
 import page.ooooo.geoshare.data.state.LocationRationaleConfirmed
+import page.ooooo.geoshare.data.state.LocationRationaleRequested
 import page.ooooo.geoshare.data.state.LocationRationaleShown
 import page.ooooo.geoshare.data.state.LocationReceived
 import page.ooooo.geoshare.data.state.SourceReceived
@@ -65,61 +86,88 @@ import javax.inject.Inject
 import kotlin.time.ComparableTimeMark
 import kotlin.time.Duration
 
-sealed interface ActionDetail
+data class ResultAppsState(
+    val appsOutputs: AppsOutputs = AppsOutputs(),
+    val shareOutputs: ShareOutputs? = null,
+)
 
-data class ActionWaitingDetail(
-    private val appDetail: AppDetail?,
-    val delay: Duration,
-    private val output: Output.HasAutomationDelay,
-) : ActionDetail {
-    @Composable
-    fun automationWaitingText(counterSec: Int): String = output.automationWaitingText(counterSec, appDetail)
+data class ResultCoordinatesState(
+    val chipsOutputs: List<Output<Point>> = emptyList(),
+)
+
+data class ResultLinksState(
+    val linksOutputs: List<LinkOutputs> = emptyList(),
+)
+
+data class ResultPointsState(
+    val chipsOutputs: List<Output<Points>> = emptyList(),
+)
+
+sealed interface ResultSheetState {
+    class PointCopy(
+        val point: Point,
+        val pointIndex: Int,
+        val pointCount: Int,
+        val outputs: List<Output<Point>>,
+    ) : ResultSheetState
+
+    class PointOpen(
+        val point: Point,
+        val pointIndex: Int,
+        val pointCount: Int,
+        val appsOutputs: List<AppOutputs<Output<Point>>>,
+    ) : ResultSheetState
+
+    class PointSave(
+        val point: Point,
+        val pointIndex: Int,
+        val pointCount: Int,
+        val outputs: List<Output<Point>>,
+    ) : ResultSheetState
+
+    class PointsSave(
+        val points: Points,
+        val outputs: List<Output<Points>>,
+    ) : ResultSheetState
+
+    class PointsShare(
+        val points: Points,
+        val outputs: List<Output<Points>>,
+    ) : ResultSheetState
+
+    class SourceShare(
+        val source: String,
+        val appDetailsForSource: AppDetails,
+        val appsOutputs: List<AppOutputs<Output<String>>>,
+        val copyOutput: Output<String>,
+    ) : ResultSheetState
 }
 
-data class ActionSucceededDetail(
-    private val appDetail: AppDetail?,
-    private val output: Output.HasSuccessText,
-) : ActionDetail {
-    @Composable
-    fun successText(): String = output.successText(appDetail)
+sealed interface ResultTitleState {
+    class ActionWaiting(val delay: Duration, val output: Output.HasAutomationDelay) : ResultTitleState
+    class ActionSucceeded(val output: Output.HasSuccessText) : ResultTitleState
+    class ActionFailed(val output: Output.HasErrorText) : ResultTitleState
+    class ActionAutomationSucceeded(val output: Output.HasAutomationSuccessText) : ResultTitleState
+    class ActionAutomationFailed(val output: Output.HasAutomationErrorText) : ResultTitleState
+    data object LocationFindingFailed : ResultTitleState
+    data object LocationPermissionReceived : ResultTitleState
 }
-
-data class ActionFailedDetail(
-    private val appDetail: AppDetail?,
-    private val output: Output.HasErrorText,
-) : ActionDetail {
-    @Composable
-    fun errorText(): String = output.errorText(appDetail)
-}
-
-data class ActionAutomationSucceededDetail(
-    private val appDetail: AppDetail?,
-    private val output: Output.HasAutomationSuccessText,
-) : ActionDetail {
-    @Composable
-    fun automationSuccessText(): String = output.automationSuccessText(appDetail)
-}
-
-data class ActionAutomationFailedDetail(
-    private val appDetail: AppDetail?,
-    private val output: Output.HasAutomationErrorText,
-) : ActionDetail {
-    @Composable
-    fun automationErrorText(): String = output.automationErrorText(appDetail)
-}
-
-object LocationFindingFailedDetail : ActionDetail
-
-object LocationPermissionReceivedDetail : ActionDetail
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val actionStateContext: ActionStateContext,
+    private val appRepository: AppRepository,
     private val conversionStateContext: ConversionStateContext,
+    private val inputRepository: InputRepository,
+    private val linkRepository: LinkRepository,
     private val log: Log,
-    appRepository: AppRepository,
+    private val outputRepository: OutputRepository,
+    private val userPreferenceRepository: UserPreferenceRepository,
     savedStateHandle: SavedStateHandle,
+    val coordinateConverter: CoordinateConverter,
 ) : ViewModel() {
+
     // Source
 
     private val _source = savedStateHandle.getMutableStateFlow("source", "")
@@ -127,6 +175,20 @@ class MainViewModel @Inject constructor(
 
     private val _sourceComesFromIntent = savedStateHandle.getMutableStateFlow("sourceComesFromIntent", false)
     val sourceComesFromIntent: StateFlow<Boolean> = _sourceComesFromIntent.asStateFlow()
+
+    fun setSource(newSource: String) {
+        _source.value = newSource
+    }
+
+    fun setRandomSource() {
+        inputRepository.genRandomSource(
+            WGS84Point(
+                NaivePoint.genRandomPoint(
+                    name = context.resources.getString(R.string.intro_how_to_share_google_maps_screenshot_place)
+                )
+            )
+        )?.let { newSource -> setSource(newSource) }
+    }
 
     // Conversion
 
@@ -159,90 +221,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    // Action
-
-    private var _actionState: MutableStateFlow<ActionState> = MutableStateFlow(ActionState.Initial)
-    val actionState: StateFlow<ActionState> = _actionState.asStateFlow()
-    private var actionJob: Job? = null
-    private val actionExceptionHandler = CoroutineExceptionHandler { _, tr ->
-        log.e(TAG, "Exception when transitioning state", tr)
-        val newState = ActionCompleted(ActionResult.FAILED)
-        _actionState.value = newState
-    }
-    val actionDetail: StateFlow<ActionDetail?> = _actionState
-        .combine(appRepository.appDetails) { currentState, appDetails ->
-            when (currentState) {
-                is ActionWaiting -> ActionWaitingDetail(
-                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
-                    currentState.delay,
-                    currentState.output,
-                )
-
-                is ActionSucceeded -> ActionSucceededDetail(
-                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
-                    currentState.output,
-                )
-
-                is ActionFailed -> ActionFailedDetail(
-                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
-                    currentState.output,
-                )
-
-                is ActionAutomationSucceeded -> ActionAutomationSucceededDetail(
-                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
-                    currentState.output,
-                )
-
-                is ActionAutomationFailed -> ActionAutomationFailedDetail(
-                    (currentState.output as? Output.HasActivity<*>)?.getAppDetail(appDetails),
-                    currentState.output,
-                )
-
-                is LocationFindingFailed -> LocationFindingFailedDetail
-
-                is LocationPermissionReceived -> LocationPermissionReceivedDetail
-
-                else -> null
-            }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
-    private fun transitionAction(newState: (suspend () -> ActionState)) {
-        actionJob?.cancel()
-        actionJob = viewModelScope.launch(actionExceptionHandler) {
-            val newState = newState()
-            _actionState.value = newState
-            log.d(TAG, "Set action state to $newState")
-            newState.transitionRecursively(actionStateContext) { newState ->
-                log.d(TAG, "Transitioned action state to $newState")
-                _actionState.value = newState as ActionState
-            }
-        }
-    }
-
-    init {
-        // Start automation when conversion succeeds
-        _conversionState
-            .filterIsInstance<ConversionSucceeded>()
-            .onEach { conversionState ->
-                transitionAction { AutomationRequested(conversionState.points) }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    // Conversion state log
-
-    private var _conversionStateLog: MutableStateFlow<StateLog<ConversionState>> = MutableStateFlow(emptyList())
-    val conversionStateLog: StateFlow<StateLog<ConversionState>> = _conversionStateLog.asStateFlow()
-    val extendedConversionStateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>> = _conversionStateLog
-        .map { it.toExtendedLog() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-    val conversionStart: StateFlow<ComparableTimeMark?> = conversionStateLog
-        .map { it.firstOrNull()?.start }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
-    // Methods
-
     fun start(sourceComesFromIntent: Boolean) {
         _sourceComesFromIntent.value = sourceComesFromIntent
         transitionConversion(clearLog = true) { SourceReceived(_source.value) }
@@ -270,26 +248,75 @@ class MainViewModel @Inject constructor(
 
     fun retry() {
         (_conversionState.value as? ConversionState.HasSource)?.apply {
-            transitionConversion {
-                SourceReceived(source)
+            transitionConversion { SourceReceived(source) }
+        }
+    }
+
+    // Conversion state log
+
+    private var _conversionStateLog: MutableStateFlow<StateLog<ConversionState>> = MutableStateFlow(emptyList())
+    private val conversionStateLog: StateFlow<StateLog<ConversionState>> = _conversionStateLog.asStateFlow()
+    val extendedConversionStateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>> = _conversionStateLog
+        .map { it.toExtendedLog() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val conversionStart: StateFlow<ComparableTimeMark?> = conversionStateLog
+        .map { it.firstOrNull()?.start }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    // Action
+
+    private var _actionState: MutableStateFlow<ActionState> = MutableStateFlow(ActionState.Initial)
+    val actionState: StateFlow<ActionState> = _actionState.asStateFlow()
+    private var actionJob: Job? = null
+    private val actionExceptionHandler = CoroutineExceptionHandler { _, tr ->
+        log.e(TAG, "Exception when transitioning state", tr)
+        val newState = ActionCompleted(ActionResult.FAILED)
+        _actionState.value = newState
+    }
+
+    private fun transitionAction(newState: (suspend () -> ActionState)) {
+        actionJob?.cancel()
+        actionJob = viewModelScope.launch(actionExceptionHandler) {
+            val newState = newState()
+            _actionState.value = newState
+            log.d(TAG, "Set action state to $newState")
+            newState.transitionRecursively(actionStateContext) { newState ->
+                log.d(TAG, "Transitioned action state to $newState")
+                _actionState.value = newState as ActionState
             }
         }
     }
 
-    fun setSource(newSource: String) {
-        _source.value = newSource
+    init {
+        // Start automation when conversion succeeds
+        _conversionState
+            .filterIsInstance<ConversionSucceeded>()
+            .onEach { conversionState ->
+                transitionAction { AutomationRequested(conversionState.points) }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    init {
+        // Finish activity when action completes and conversion is not in progress
+        _actionState
+            .filterIsInstance<ActionCompleted>()
+            .onEach { actionState ->
+                if (_conversionState.value is ConversionState.HasResult) {
+                    val finish = userPreferenceRepository.values.map { it.finish }.firstOrNull()
+                        ?: FinishPreference.default
+                    if (finish.shouldAppFinish(actionState.actionResult)) {
+                        transitionAction { ActivityFinishingRequested }
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     // Any action
 
     fun startAction(action: Action<*>) {
         transitionAction { ActionReady(action, isAutomation = false) }
-    }
-
-    fun completeBasicAction(actionResult: ActionResult) {
-        (_actionState.value as? BasicActionReady)?.apply {
-            transitionAction { ActionRan(action, actionResult, isAutomation) }
-        }
     }
 
     fun grantAction(doNotAsk: Boolean) {
@@ -308,6 +335,18 @@ class MainViewModel @Inject constructor(
         actionJob?.cancel()
     }
 
+    // Basic action
+
+    /**
+     * Provide activity [context] from the UI to the action, because the application context available in ViewModel
+     * cannot be used to start another activity in the same task.
+     */
+    fun executeBasicAction(context: Context) {
+        (_actionState.value as? BasicActionReady)?.apply {
+            transitionAction { execute(context) }
+        }
+    }
+
     // File action
 
     fun receiveFileUri(uri: Uri) {
@@ -316,15 +355,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun cancelFileUriRequest() {
-        (_actionState.value as? FileUriRequested)?.apply {
-            transitionAction { ActionCompleted(ActionResult.FAILED) }
+    /**
+     * See [executeBasicAction]
+     */
+    fun executeFileAction(context: Context) {
+        (_actionState.value as? FileActionReady)?.apply {
+            transitionAction { execute(context) }
         }
     }
 
-    fun completeFileAction(actionResult: ActionResult) {
-        (_actionState.value as? FileActionReady)?.apply {
-            transitionAction { ActionRan(action, actionResult, isAutomation) }
+    fun cancelFileUriRequest() {
+        (_actionState.value as? FileUriRequested)?.apply {
+            transitionAction { ActionCompleted(ActionResult.FAILED) }
         }
     }
 
@@ -348,16 +390,208 @@ class MainViewModel @Inject constructor(
         transitionAction { LocationReceived(action, isAutomation, location) }
     }
 
+    /**
+     * See [executeBasicAction]
+     */
+    fun executeLocationAction(context: Context) {
+        (_actionState.value as? LocationActionReady)?.apply {
+            transitionAction { execute(context) }
+        }
+    }
+
     fun cancelLocationFinding() {
         (_actionState.value as? LocationPermissionReceived)?.apply {
             transitionAction { ActionCompleted(ActionResult.FAILED) }
         }
     }
 
-    fun completeLocationAction(actionResult: ActionResult) {
-        (_actionState.value as? LocationActionReady)?.apply {
-            transitionAction { ActionRan(action, actionResult, isAutomation) }
+    // Result
+
+    val appDetails: StateFlow<AppDetails> =
+        appRepository.appDetails
+            .filterNotNull()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyMap(),
+            )
+
+    val resultAppsState: StateFlow<ResultAppsState> =
+        appRepository.activities
+            .filterNotNull()
+            .combine(
+                userPreferenceRepository.values
+                    .map { it.hiddenApps }
+                    .distinctUntilChanged()
+            ) { activities, hiddenApps ->
+                ResultAppsState(
+                    appsOutputs = outputRepository.getAppsOutputs(activities, hiddenApps),
+                    shareOutputs = outputRepository.shareOutputs,
+                )
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                ResultAppsState(),
+            )
+
+    val resultCoordinatesState: StateFlow<ResultCoordinatesState> =
+        linkRepository.all
+            .map { links ->
+                ResultCoordinatesState(chipsOutputs = outputRepository.getPointChipsOutputs(links))
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                ResultCoordinatesState(),
+            )
+
+    val resultPointsState: StateFlow<ResultPointsState> =
+        flow { emit(ResultPointsState(chipsOutputs = outputRepository.pointsChipsOutputs)) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                ResultPointsState(),
+            )
+
+    val resultLinksState: StateFlow<ResultLinksState> =
+        linkRepository.all
+            .map { links -> ResultLinksState(outputRepository.getLinksOutputs(links)) }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                ResultLinksState(),
+            )
+
+    val resultTitleState: StateFlow<ResultTitleState?> =
+        actionState
+            .map { actionState ->
+                when (actionState) {
+                    ActionState.Initial -> null
+                    ActivityFinishingRequested -> null
+                    is ActionAutomationFailed -> ResultTitleState.ActionAutomationFailed(actionState.output)
+                    is ActionAutomationSucceeded -> ResultTitleState.ActionAutomationSucceeded(actionState.output)
+                    is ActionCompleted -> null
+                    is ActionFailed -> ResultTitleState.ActionFailed(actionState.output)
+                    is ActionRan -> null
+                    is ActionReady -> null
+                    is ActionSucceeded -> ResultTitleState.ActionSucceeded(actionState.output)
+                    is ActionWaiting -> ResultTitleState.ActionWaiting(actionState.delay, actionState.output)
+                    is AutomationRequested -> null
+                    is BasicActionReady -> null
+                    is FileActionReady -> null
+                    is FileUriRequested -> null
+                    is LocationActionReady -> null
+                    is LocationFindingFailed -> ResultTitleState.LocationFindingFailed
+                    is LocationPermissionReceived -> ResultTitleState.LocationPermissionReceived
+                    is LocationRationaleConfirmed -> null
+                    is LocationRationaleRequested -> null
+                    is LocationRationaleShown -> null
+                    is LocationReceived -> null
+                }
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                null,
+            )
+
+    private var resultSheetJob: Job? = null
+
+    private val _resultSheetState: MutableStateFlow<ResultSheetState?> = MutableStateFlow(null)
+    val resultSheetState: StateFlow<ResultSheetState?> = _resultSheetState.asStateFlow()
+
+    fun copyPoint(point: Point, pointCount: Int, pointIndex: Int) {
+        cancelAction()
+        resultSheetJob?.cancel()
+        resultSheetJob = viewModelScope.launch {
+            val links = linkRepository.all.firstOrNull() ?: emptyList()
+            _resultSheetState.value = ResultSheetState.PointCopy(
+                point = point,
+                pointIndex = pointIndex,
+                pointCount = pointCount,
+                outputs = outputRepository.getPointCopyOutputs(links),
+            )
         }
+    }
+
+    fun openPoint(point: Point, pointCount: Int, pointIndex: Int) {
+        cancelAction()
+        resultSheetJob?.cancel()
+        resultSheetJob = viewModelScope.launch {
+            val activities = appRepository.activities.filterNotNull().firstOrNull() ?: emptyList()
+            val hiddenApps = userPreferenceRepository.values.map { it.hiddenApps }.firstOrNull() ?: emptySet()
+            _resultSheetState.value = ResultSheetState.PointOpen(
+                point = point,
+                pointIndex = pointIndex,
+                pointCount = pointCount,
+                appsOutputs = outputRepository.getPointOpenOutputs(activities, hiddenApps),
+            )
+        }
+    }
+
+    fun savePoint(point: Point, pointCount: Int, pointIndex: Int) {
+        cancelAction()
+        resultSheetJob?.cancel()
+        resultSheetJob = viewModelScope.launch {
+            _resultSheetState.value = ResultSheetState.PointSave(
+                point = point,
+                pointIndex = pointIndex,
+                pointCount = pointCount,
+                outputs = outputRepository.pointSaveOutputs,
+            )
+        }
+    }
+
+    fun savePoints(points: Points) {
+        cancelAction()
+        resultSheetJob?.cancel()
+        resultSheetJob = viewModelScope.launch {
+            _resultSheetState.value = ResultSheetState.PointsSave(
+                points = points,
+                outputs = outputRepository.pointsSaveOutputs,
+            )
+        }
+    }
+
+    fun sharePoints(points: Points) {
+        cancelAction()
+        resultSheetJob?.cancel()
+        resultSheetJob = viewModelScope.launch {
+            _resultSheetState.value = ResultSheetState.PointsShare(
+                points = points,
+                outputs = outputRepository.pointsShareOutputs,
+            )
+        }
+    }
+
+    fun shareSource(source: String) {
+        // Notice that sharing source does not cancel action
+        resultSheetJob?.cancel()
+        resultSheetJob = viewModelScope.launch {
+            // First load only activities and outputs
+            val activitiesForUri = appRepository.queryActivitiesForUri(source)
+            val appsOutputs = outputRepository.getSourceAppsOutputs(activitiesForUri)
+            _resultSheetState.value = ResultSheetState.SourceShare(
+                source = source,
+                appDetailsForSource = emptyMap(),
+                appsOutputs = appsOutputs,
+                copyOutput = outputRepository.sourceCopyOutput,
+            )
+            // Then load app details
+            val appDetailsForSource = appRepository.queryAppDetails(activitiesForUri)
+            _resultSheetState.value = ResultSheetState.SourceShare(
+                source = source,
+                appDetailsForSource = appDetailsForSource,
+                appsOutputs = appsOutputs,
+                copyOutput = outputRepository.sourceCopyOutput,
+            )
+        }
+    }
+
+    fun hideSheet() {
+        resultSheetJob?.cancel()
+        _resultSheetState.value = null
     }
 
     // Lifecycle
@@ -368,7 +602,7 @@ class MainViewModel @Inject constructor(
     }
 
     private companion object {
-        private const val TAG = "ConversionViewModel"
+        private const val TAG = "MainViewModel"
     }
 }
 

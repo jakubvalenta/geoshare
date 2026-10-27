@@ -24,7 +24,7 @@ class OpenRouteOnePointGpxOutputTest {
         val actionResult = output.execute(
             location = null,
             value = WGS84Point(1.0, 2.0, name = "My destination", source = Source.GENERATED),
-            actionContext = mock(),
+            context = mock(),
         )
         assertEquals(ActionResult.FAILED, actionResult)
     }

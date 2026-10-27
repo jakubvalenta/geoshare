@@ -22,26 +22,26 @@ class OpenDisplayGeoUriOutputTest {
         // WGS-84
         assertEquals(
             "geo:31.2304417,121.4709921",
-            OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter)
-                .getUriString(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.TEST, UriScheme.GEO), coordinateConverter, uriQuote)
+                .getUriString(point),
         )
         // GCJ-02
         assertEquals(
             "geo:31.2285067,121.475524?q=31.2285067,121.475524",
-            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO), coordinateConverter)
-                .getUriString(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO), coordinateConverter, uriQuote)
+                .getUriString(point),
         )
         // GCJ-02
         assertEquals(
             "geo:31.2285067,121.475524?q=31.2285067,121.475524",
-            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GMAPS_WV, UriScheme.GEO), coordinateConverter)
-                .getUriString(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GMAPS_WV, UriScheme.GEO), coordinateConverter, uriQuote)
+                .getUriString(point),
         )
         // GCJ-02
         assertEquals(
             "geo:31.2285067,121.475524?q=31.2285067,121.475524",
-            OpenDisplayGeoUriOutput(UriActivity(PackageNames.AMAP, UriScheme.GEO), coordinateConverter)
-                .getUriString(point, uriQuote),
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.AMAP, UriScheme.GEO), coordinateConverter, uriQuote)
+                .getUriString(point),
         )
     }
 
@@ -75,8 +75,8 @@ class OpenDisplayGeoUriOutputTest {
         ).forEach { (packageName, expectedGeoUriString) ->
             assertEquals(
                 expectedGeoUriString,
-                OpenDisplayGeoUriOutput(UriActivity(packageName, UriScheme.GEO), coordinateConverter)
-                    .getUriString(point, uriQuote),
+                OpenDisplayGeoUriOutput(UriActivity(packageName, UriScheme.GEO), coordinateConverter, uriQuote)
+                    .getUriString(point),
             )
         }
     }
@@ -85,10 +85,9 @@ class OpenDisplayGeoUriOutputTest {
     fun getUriString_whenPointIsGCJ02AndWithinMainlandChinaAndPackageNameRequiresWGS84_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:39.9191328,116.3254076?q=39.9191328,116.3254076",
-            OpenDisplayGeoUriOutput(UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO), coordinateConverter)
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.OSMAND_PLUS, UriScheme.GEO), coordinateConverter, uriQuote)
                 .getUriString(
-                    GCJ02Point(39.920439, 116.331538, source = Source.GENERATED),
-                    uriQuote,
+                    GCJ02Point(39.920439, 116.331538, source = Source.GENERATED)
                 )
         )
     }
@@ -97,10 +96,9 @@ class OpenDisplayGeoUriOutputTest {
     fun getUriString_whenPointIsGCJ02AndWithinWesternJapanAndPackageNameRequiresGCJ02MainlandChina_returnsUriWithCoordinatesConvertedToWGS84() {
         assertEquals(
             "geo:34.5953404,133.7527361?q=34.5953404,133.7527361",
-            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO), coordinateConverter)
+            OpenDisplayGeoUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO), coordinateConverter, uriQuote)
                 .getUriString(
-                    GCJ02Point(34.5945482, 133.7583428, source = Source.GENERATED),
-                    uriQuote,
+                    GCJ02Point(34.5945482, 133.7583428, source = Source.GENERATED)
                 )
         )
     }

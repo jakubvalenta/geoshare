@@ -6,7 +6,7 @@
     <string name="intro_open_by_default_app_screenshot_add">Добавить</string>
     <string name="nav_back_content_description">Назад на главную</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Поставлен маркер</string>
-    <string name="conversion_succeeded_apps_headline">Открыть с помощью</string>
+    <string name="open_with">Открыть с помощью</string>
     <string name="intro_open_by_default_google_maps_button">Открыть настройки Google Карт</string>
     <string name="intro_open_by_default_google_maps_screenshot_app">Карты</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Выберите способ открытия ссылок для этого приложения</string>
@@ -59,7 +59,7 @@
     <string name="conversion_error_title">Ошибка</string>
     <string name="conversion_succeeded_save_gpx">Сохранить точки как GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s результат %2$s.gpx</string>
-    <string name="conversion_succeeded_share">Поделиться</string>
+    <string name="share">Поделиться</string>
     <string name="conversion_succeeded_point_number">точка %1$d</string>
     <string name="conversion_error_retry">Попробуйте снова</string>
     <string name="inputs_title">Поддерживаемые карты</string>
@@ -195,7 +195,7 @@
     <string name="links_form_enabled_option_sheet">Показывать в меню копирования</string>
     <string name="links_form_group">Группа</string>
     <string name="links_form_name">Имя</string>
-    <string name="links_form_save">Сохранить</string>
+    <string name="save">Сохранить</string>
     <string name="links_form_srs">Система координат</string>
     <string name="links_form_type">Значок контекстного меню</string>
     <string name="links_form_uri_template_coords">Шаблон URL</string>

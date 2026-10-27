@@ -128,8 +128,8 @@ class MainBehaviorTest {
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = SendStringOutput(TextActivity(messagingAppPackageName, MimeType.TEXT_PLAIN))
-        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+        onElement { viewIdResourceName == "geoShareResultSheet" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             .click()
 
         // Opens the messaging app
@@ -156,8 +156,8 @@ class MainBehaviorTest {
         // Open the source sheet and tap an app
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
-        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+        onElement { viewIdResourceName == "geoShareResultSheet" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             .click()
 
         // Google Maps shows precise location
@@ -186,10 +186,10 @@ class MainBehaviorTest {
         // Open the source sheet
         onElement { viewIdResourceName == "geoShareMainSourceButton" }.click()
         val output = OpenUnknownUriOutput(UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.UNKNOWN))
-        onElement { viewIdResourceName == "geoShareConversionUriSheet" }
-            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareConversionUriSheetItem_${output.id}" }
+        onElement { viewIdResourceName == "geoShareResultSheet" }
+            .scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultSheetItem_${output.id}" }
             // Tap an app while the conversion is still running. This is an imperfect test scenario, because there's a
-            // small chance that the conversion finishes before we tap the app.
+            // chance that the conversion finishes before we return back to the app from Google Maps.
             .click()
 
         // Google Maps shows precise location
@@ -319,14 +319,13 @@ class MainBehaviorTest {
     @Test
     fun whenPointIsShared_allowsSavingGpxRoute() = uiAutomator {
         // Share a URI with the app
-        shareUri()
+        shareUri("https://mapy.com/en/turisticka?planovani-trasy&rc=9eJ.Ex5-GG9eY14x5Ls1jBHe8t9emdXcI5&rs=osm&rs=osm&rs=osm&rs=pubt&ri=20227705&ri=120789104&ri=81032078&ri=28872262&mrp=%7B%22c%22%3A121%2C%22dt%22%3A%22%22%2C%22d%22%3Atrue%7D&xc=%5B%5D&rbf=alf&x=13.4308032&y=52.4684951&z=18")
 
         // Open sheet and tap Save GPX
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
-        onElement { viewIdResourceName == "geoShareResultSheet" }.run {
+        onElement { viewIdResourceName == "geoShareResultSavePoints" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToElement(Direction.DOWN) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Save GPX route",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer l’itinéraire GPX",
@@ -354,11 +353,10 @@ class MainBehaviorTest {
         shareUri(point)
 
         // Open sheet and tap Save to contact
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
-        onElement { viewIdResourceName == "geoShareResultSheet" }.run {
+        onElement { viewIdResourceName == "geoShareResultSave" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-            scrollToElement(Direction.DOWN) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Save to contact",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Enregistrer dans les contacts",
@@ -457,6 +455,7 @@ class MainBehaviorTest {
             .onElement { viewIdResourceName == "geoShareHelpMessageDismiss" }
             .click()
         waitForHelpMessageToDisappear()
+        quickWaitForStableInActiveWindow() // Wait to make sure the message really disappears; it's necessary only here for this message for some reason
         assertNull(
             onElementOrNull(500) {
                 viewIdResourceName == "geoShareHelpMessage_${HelpMessage.SHARE_SOURCE}"

@@ -45,6 +45,7 @@ platform :android do
   lane :screenshots do
     gradle(task: "assembleFreeActiveDebug assembleFreeActiveDebugAndroidTest")
     screengrab(
+      output_directory: 'fastlane/metadata_src/android',
       app_apk_path: 'app/build/outputs/apk/freeActive/debug/app-free-active-debug.apk',
       tests_apk_path: 'app/build/outputs/apk/androidTest/freeActive/debug/app-free-active-debug-androidTest.apk',
       app_package_name: 'page.ooooo.geoshare.debug',

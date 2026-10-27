@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.android.AppDetail
 import page.ooooo.geoshare.data.android.FileActivity
 import page.ooooo.geoshare.data.android.FileType
 import page.ooooo.geoshare.data.android.MimeType
@@ -56,8 +54,8 @@ class AutomationPreferenceTest {
                     OpenDisplayMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     OpenNavigationMagicEarthUriAutomation(PackageNames.MAGIC_EARTH),
                     SendPointAutomation(PackageNames.SIGNAL),
-                    OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                     OpenDisplayGeoUriAutomation(PackageNames.TEST),
+                    OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                 ),
                 listOf(
                     ShareLinkUriAutomation(FakeAppleMapsDisplayLink.uuid),
@@ -87,28 +85,6 @@ class AutomationPreferenceTest {
                         TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
                         UriActivity(PackageNames.TEST, UriScheme.GEO),
                         FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
-                    ),
-                    appDetails = mapOf(
-                        PackageNames.MAGIC_EARTH to AppDetail(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            label = "Magic Earth",
-                            icon = mock(),
-                        ),
-                        PackageNames.SIGNAL to AppDetail(
-                            packageName = PackageNames.SIGNAL,
-                            label = "Signal",
-                            icon = mock(),
-                        ),
-                        PackageNames.TEST to AppDetail(
-                            packageName = PackageNames.TEST,
-                            label = "ZZZ sort last",
-                            icon = mock(),
-                        ),
-                        PackageNames.TOMTOM to AppDetail(
-                            packageName = PackageNames.TOMTOM,
-                            label = "TomTom",
-                            icon = mock(),
-                        ),
                     ),
                     hiddenApps = emptySet(),
                     links = defaultFakeLinks,
@@ -141,8 +117,8 @@ class AutomationPreferenceTest {
                     SavePointsGpxAutomation,
                 ),
                 listOf(
-                    OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                     OpenDisplayGeoUriAutomation(PackageNames.TEST),
+                    OpenRouteOnePointGpxAutomation(PackageNames.TOMTOM),
                 ),
             ),
             AutomationPreference
@@ -151,23 +127,6 @@ class AutomationPreferenceTest {
                         UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
                         UriActivity(PackageNames.TEST, UriScheme.GEO),
                         FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
-                    ),
-                    appDetails = mapOf(
-                        PackageNames.MAGIC_EARTH to AppDetail(
-                            packageName = PackageNames.MAGIC_EARTH,
-                            label = "Magic Earth",
-                            icon = mock(),
-                        ),
-                        PackageNames.TEST to AppDetail(
-                            packageName = PackageNames.TEST,
-                            label = "ZZZ sort last",
-                            icon = mock(),
-                        ),
-                        PackageNames.TOMTOM to AppDetail(
-                            packageName = PackageNames.TOMTOM,
-                            label = "TomTom",
-                            icon = mock(),
-                        ),
                     ),
                     hiddenApps = setOf(PackageNames.MAGIC_EARTH),
                     links = emptyList(),
@@ -196,23 +155,6 @@ class AutomationPreferenceTest {
                 UriActivity(PackageNames.TEST, UriScheme.GEO),
                 UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
                 FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
-            ),
-            appDetails = mapOf(
-                PackageNames.MAGIC_EARTH to AppDetail(
-                    packageName = PackageNames.MAGIC_EARTH,
-                    label = "Magic Earth",
-                    icon = mock(),
-                ),
-                PackageNames.TEST to AppDetail(
-                    packageName = PackageNames.TEST,
-                    label = "ZZZ sort last",
-                    icon = mock(),
-                ),
-                PackageNames.TOMTOM to AppDetail(
-                    packageName = PackageNames.TOMTOM,
-                    label = "TomTom",
-                    icon = mock(),
-                ),
             ),
             hiddenApps = emptySet(),
             links = defaultFakeLinks,

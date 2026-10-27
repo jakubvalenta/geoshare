@@ -37,7 +37,7 @@
     <string name="conversion_failed_connection_permission_denied">Tento odkaz není podporován bez spojení s mapovou službou</string>
     <string name="nav_back_content_description">Zpět na hlavní obrazovku</string>
     <string name="intro_how_to_share_google_maps_screenshot_place">Umístěný špendlík</string>
-    <string name="conversion_succeeded_apps_headline">Otevřít v</string>
+    <string name="open_with">Otevřít v</string>
     <string name="intro_open_by_default_google_maps_screenshot_choose">Určete, jak se v této aplikaci mají otevírat webové odkazy</string>
     <string name="intro_open_by_default_google_maps_screenshot_in_your_browser">V prohlížeči</string>
     <plurals name="intro_open_by_default_app_screenshot_links" tools:ignore="MissingQuantity">
@@ -66,7 +66,7 @@
     <string name="conversion_succeeded_save_gpx">Uložit GPX body</string>
     <string name="conversion_succeeded_save_gpx_failed">Nepodařilo se uložit GPX</string>
     <string name="conversion_succeeded_save_gpx_filename">%1$s výsledek %2$s.gpx</string>
-    <string name="conversion_succeeded_share">Sdílet</string>
+    <string name="share">Sdílet</string>
     <string name="conversion_succeeded_point_number">bod %1$d</string>
     <string name="inputs_all">Všechny mapové služby</string>
     <string name="inputs_recent">Nedávno přidané</string>
@@ -198,7 +198,7 @@
     <string name="links_form_enabled_option_sheet">Zobrazit v menu kopírování</string>
     <string name="links_form_group">Skupina</string>
     <string name="links_form_name">Název</string>
-    <string name="links_form_save">Uložit</string>
+    <string name="save">Uložit</string>
     <string name="links_form_srs">Systém souřadnic</string>
     <string name="links_form_type">Ikona v kontextovém menu</string>
     <string name="links_form_uri_template_coords">Šablona URL</string>

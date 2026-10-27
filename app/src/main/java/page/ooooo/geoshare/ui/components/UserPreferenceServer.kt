@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -34,7 +33,7 @@ import page.ooooo.geoshare.data.di.defaultFakeServers
 import page.ooooo.geoshare.data.di.defaultFakeUserPreferences
 import page.ooooo.geoshare.data.preferences.ConnectionPermissionPreference
 import page.ooooo.geoshare.data.preferences.Permission
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.SelectedServers
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
@@ -44,7 +43,7 @@ fun UserPreferenceServerListItem(
     index: Int,
     count: Int,
     selected: Boolean,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -69,9 +68,9 @@ fun UserPreferenceServerControls(
     selectedServers: StateFlow<SelectedServers>,
     servers: StateFlow<List<Server>>,
     onBack: () -> Unit,
-    onSelectServerGoogleMapsAddress: (server: Server?) -> Unit,
-    onSelectServerGoogleMapsPlace: (server: Server?) -> Unit,
-    onSelectServerSearch: (server: Server?) -> Unit,
+    onSelectServerGoogleMapsAddress: (uid: Int?) -> Unit,
+    onSelectServerGoogleMapsPlace: (uid: Int?) -> Unit,
+    onSelectServerSearch: (uid: Int?) -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onNavigateToServerScreen: (uid: Int?) -> Unit,
     wide: Boolean,
@@ -80,7 +79,7 @@ fun UserPreferenceServerControls(
 
     val selectedServers by selectedServers.collectAsStateWithLifecycle()
     val servers by servers.collectAsStateWithLifecycle()
-    val optionGroups = remember(servers) { listOf(listOf(null) + servers) }
+    val optionGroups = listOf(listOf(null) + servers)
 
     UserPreferenceControls(
         titleResId = R.string.server_list_title,
@@ -99,7 +98,7 @@ fun UserPreferenceServerControls(
             noneDescription = { stringResource(R.string.server_list_none_html) },
             optionGroups = optionGroups,
             onNavigateToServerScreen = onNavigateToServerScreen,
-            onSelect = onSelectServerGoogleMapsAddress,
+            onSelect = { server -> onSelectServerGoogleMapsAddress(server?.uid) },
         )
         userPreferenceServerDivider(group = "google_maps_place")
         userPreferenceServerControl(
@@ -109,7 +108,7 @@ fun UserPreferenceServerControls(
             noneDescription = { stringResource(R.string.server_list_none_html) },
             optionGroups = optionGroups,
             onNavigateToServerScreen = onNavigateToServerScreen,
-            onSelect = onSelectServerGoogleMapsPlace,
+            onSelect = { server -> onSelectServerGoogleMapsPlace(server?.uid) },
         )
         if (BuildConfig.DEBUG) {
             userPreferenceServerDivider(group = "search")
@@ -120,7 +119,7 @@ fun UserPreferenceServerControls(
                 noneDescription = { stringResource(R.string.server_list_search_none_description) },
                 optionGroups = optionGroups,
                 onNavigateToServerScreen = onNavigateToServerScreen,
-                onSelect = onSelectServerSearch,
+                onSelect = { server -> onSelectServerSearch(server?.uid) },
             )
         }
         item(key = "edit", contentType = "text_button") {

@@ -41,14 +41,14 @@ fun MainSourceBar(
     logExpanded: Boolean,
     start: StateFlow<ComparableTimeMark?>,
     stateLog: StateFlow<ExtendedStateLog<ConversionState.HasDescription>>,
-    onSelectUri: (uriString: String) -> Unit,
     onSetLogExpanded: (logExpanded: Boolean) -> Unit,
+    onShareSource: (source: String) -> Unit,
 ) {
     Row {
         MainSourceButton(
             conversionState = conversionState,
             modifier = Modifier.weight(1f),
-            onSelectUri = onSelectUri,
+            onShareSource = onShareSource,
         )
         MainSourceTimeButton(
             logExpanded = logExpanded,
@@ -63,12 +63,12 @@ fun MainSourceBar(
 private fun MainSourceButton(
     conversionState: ConversionState,
     modifier: Modifier = Modifier,
-    onSelectUri: (uriString: String) -> Unit,
+    onShareSource: (source: String) -> Unit,
 ) {
     val source = (conversionState as? ConversionState.HasSource)?.source ?: return
     val match = (conversionState as? ConversionState.HasMatchedInput)?.matchedInput?.match
 
-    MainSourceButton(source, match, modifier, onSelectUri)
+    MainSourceButton(source, match, modifier, onShareSource)
 }
 
 @Composable
@@ -76,12 +76,12 @@ private fun MainSourceButton(
     source: String,
     match: String?,
     modifier: Modifier = Modifier,
-    onSelectUri: (uriString: String) -> Unit,
+    onShareSource: (source: String) -> Unit,
 ) {
     val spacing = LocalSpacing.current
 
     Button(
-        { onSelectUri(source) },
+        { onShareSource(source) },
         modifier.testTag("geoShareMainSourceButton"),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -171,8 +171,8 @@ private fun DefaultPreview() {
                 logExpanded = false,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }
@@ -195,8 +195,8 @@ private fun DarkPreview() {
                 logExpanded = false,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource)),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }
@@ -218,8 +218,8 @@ private fun ShortTimePreview() {
                 logExpanded = false,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }
@@ -241,8 +241,8 @@ private fun DarkShortTimePreview() {
                 logExpanded = false,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }
@@ -265,8 +265,8 @@ private fun ExpandedShortTimePreview() {
                 logExpanded = true,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }
@@ -289,8 +289,8 @@ private fun DarkExpandedShortTimePreview() {
                 logExpanded = true,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(fakeStateLog(source, timeSource).take(1)),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }
@@ -317,8 +317,8 @@ private fun TextAndEmptyLogPreview() {
                 logExpanded = false,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }
@@ -345,8 +345,8 @@ private fun DarkSubmittedTextAndEmptyLogPreview() {
                 logExpanded = false,
                 start = MutableStateFlow(timeSource.markNow()),
                 stateLog = MutableStateFlow(emptyList()),
-                onSelectUri = {},
                 onSetLogExpanded = {},
+                onShareSource = {},
             )
         }
     }

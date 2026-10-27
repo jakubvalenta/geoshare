@@ -50,7 +50,6 @@ import page.ooooo.geoshare.tests.goToInputList
 import page.ooooo.geoshare.tests.goToUserPreferencesDetail
 import page.ooooo.geoshare.tests.grantConnectionPermission
 import page.ooooo.geoshare.tests.launchApplication
-import page.ooooo.geoshare.tests.longScrollSheet
 import page.ooooo.geoshare.tests.onElementOrScrollToElement
 import page.ooooo.geoshare.tests.onMainScrollablePane
 import page.ooooo.geoshare.tests.quickWaitForStableInActiveWindow
@@ -61,13 +60,13 @@ import page.ooooo.geoshare.tests.scrollToAppIcon
 import page.ooooo.geoshare.tests.scrollToAutomationItem
 import page.ooooo.geoshare.tests.scrollToBottom
 import page.ooooo.geoshare.tests.scrollToLinkIcon
+import page.ooooo.geoshare.tests.scrollToTop
 import page.ooooo.geoshare.tests.setAppLocales
 import page.ooooo.geoshare.tests.setMainInput
 import page.ooooo.geoshare.tests.shareUri
 import page.ooooo.geoshare.tests.submitMainForm
 import page.ooooo.geoshare.tests.waitForAppToBeVisible
 import page.ooooo.geoshare.tests.waitForToastToDisappear
-import page.ooooo.geoshare.tests.withNetworkOff
 import page.ooooo.geoshare.ui.FaqItemId
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
 import java.util.UUID
@@ -381,19 +380,19 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         // Conversion - Check - Experimental
         shareUri("https://www.google.com/maps/placelists/list/mfmnkPs6RuGyp0HOmXLSKg")
         grantConnectionPermission()
-        onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement(NETWORK_TIMEOUT) { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_experimental")
 
         // Conversion - Check - Map center
         shareUri("https://www.google.com/maps/@52.5067296,13.2599309,11z")
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_map_center")
 
         // Conversion - Check - SRS
         shareUri("https://www.google.com/maps/place/Forbidden+City/@39.9165742,116.3945834,17z/data=!4m7!3m6!1s0x35f052e94515d43d:0x674e2bd4dd3079f!8m2!3d39.9168038!4d116.3971621!15sCg5mb3JiaWRkZW4gY2l0eVoQIg5mb3JiaWRkZW4gY2l0eZIBEnRvdXJpc3RfYXR0cmFjdGlvbuABAA!16zL20vMGowYjI?entry=tts&g_ep=EgoyMDI2MDMwOS4wIPu8ASoASAFQAw%3D%3D&skid=5f340da1-a0d3-4b1c-bc05-7f90cfbd502a")
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_check_srs")
 
@@ -404,12 +403,13 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         shareUri(WGS84Point(52.47254, 13.4345, name = "Marked Location", source = Source.GENERATED))
 
         // Conversion - Result - Sheet - Page 1 name
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
-        val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
-        sheet.expandSheet()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_sheet_page_1_name")
-        sheet.collapseSheet()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            expandSheet()
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_page_1_name")
+            collapseSheet()
+        }
 
         goBackToMainForm()
     }
@@ -419,7 +419,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         grantConnectionPermission()
 
         // Conversion - Result
-        onElement { viewIdResourceName == "geoShareResultLastPointName" }
+        onElement { viewIdResourceName == "geoShareResultName" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result")
 
@@ -438,39 +438,48 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         quickWaitForStableInActiveWindow() // Wait for the log exit animation
 
         // Conversion - Result - Message - Copy success
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Copy coordinates"
-            }
+            onElement { viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Copy coordinates" }
                 .click()
         }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_message_copy_success")
 
-        // Conversion - Result - Sheet - Page 1
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
-        val sheet = onElement { viewIdResourceName == "geoShareResultSheet" }
-        sheet.expandSheet()
-        quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_sheet_page_1")
+        // Conversion - Result - Sheet - Copy point
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            expandSheet()
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_copy_point")
+            collapseSheet()
+        }
 
-        // Conversion - Result - Sheet - Page 2
-        sheet.longScrollSheet() // Speed up scrolling to the item, which is at the bottom of the sheet
-        sheet
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save to contact"
-            }
+        // Conversion - Result - Sheet - Save point
+        onElement { viewIdResourceName == "geoShareResultSave" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_save_point")
+            collapseSheet()
+        }
+
+        // Conversion - Result - Sheet - Share points
+        onElement { viewIdResourceName == "geoShareResultSharePoints" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
+            quickWaitForStableInActiveWindow()
+            saveScreenshot("main_strings/conversion_result_sheet_share_points")
+            collapseSheet()
+        }
+
+        // Conversion - Result - Sheet - Save points
+        onElement { viewIdResourceName == "geoShareResultSavePoints" }.click()
+        onElement { viewIdResourceName == "geoShareResultSheet" }
         quickWaitForStableInActiveWindow()
-        saveScreenshot("main_strings/conversion_result_sheet_page_2")
+        saveScreenshot("main_strings/conversion_result_sheet_save_points")
 
         // Conversion - Result - Save GPX - File chooser
-        sheet
-            .scrollToElement(Direction.DOWN) {
-                viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save GPX route"
-            }
-            .click()
+        onElement { viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() == "Save GPX route" }.click()
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_save_gpx_file_chooser")
 
@@ -482,8 +491,10 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
 
         // Conversion - Result - Points
         onElement { viewIdResourceName == "geoShareResultPoints" }.click() // Expand points pane
+        onMainScrollablePane().scrollToElement(Direction.DOWN) { viewIdResourceName == "geoShareResultPointsLoadMore" }
         quickWaitForStableInActiveWindow()
         saveScreenshot("main_strings/conversion_result_points")
+        onMainScrollablePane().scrollToTop()
         onElement { viewIdResourceName == "geoShareResultPoints" }.click() // Collapse points pane
         quickWaitForStableInActiveWindow() // Wait for the points pane to collapse
 
@@ -873,6 +884,17 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
                 @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
                 "input keyevent 111"
             )
+        }
+    }
+
+    fun <R> UiAutomatorTestScope.withNetworkOff(block: () -> R): R {
+        device.executeShellCommand("svc wifi disable")
+        device.executeShellCommand("svc data disable")
+        try {
+            return block()
+        } finally {
+            device.executeShellCommand("svc wifi enable")
+            device.executeShellCommand("svc data enable")
         }
     }
 }

@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @Singleton
 class CartesIGNUriInput @Inject constructor(
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = CartesIGNInputGroup
     override val changelog = persistentListOf(
@@ -40,7 +40,7 @@ class CartesIGNUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "https://cartes-ign.ign.fr?lng={lon}&lat={lat}&z={z}")
 
     override fun toString() = "CartesIGNUriInput"

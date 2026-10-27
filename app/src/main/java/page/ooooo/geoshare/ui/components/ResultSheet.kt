@@ -2,7 +2,9 @@ package page.ooooo.geoshare.ui.components
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -10,6 +12,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,118 +27,285 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
+import page.ooooo.geoshare.data.AppOutputs
 import page.ooooo.geoshare.data.OutputRepository
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.MimeType
+import page.ooooo.geoshare.data.android.PackageNames
+import page.ooooo.geoshare.data.android.TextActivity
+import page.ooooo.geoshare.data.android.UriActivity
+import page.ooooo.geoshare.data.android.UriScheme
 import page.ooooo.geoshare.data.di.defaultFakeLinks
+import page.ooooo.geoshare.data.di.fakeActivities
+import page.ooooo.geoshare.data.di.getFakeAppDetails
 import page.ooooo.geoshare.data.extensions.zipWithNextFirstNull
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.NaivePoint
-import page.ooooo.geoshare.data.geo.Points
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
-import page.ooooo.geoshare.data.outputs.PointOutput
-import page.ooooo.geoshare.data.outputs.PointsOutput
-import page.ooooo.geoshare.ui.OutputDetail
+import page.ooooo.geoshare.data.outputs.DrawableIconDescriptor
+import page.ooooo.geoshare.data.outputs.OpenUnknownUriOutput
+import page.ooooo.geoshare.data.outputs.Output
+import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
+import page.ooooo.geoshare.data.outputs.ResourceIconDescriptor
+import page.ooooo.geoshare.data.outputs.SendStringOutput
+import page.ooooo.geoshare.data.uri.DefaultUriQuote
+import page.ooooo.geoshare.ui.ResultSheetState
 import page.ooooo.geoshare.ui.theme.AppTheme
-import page.ooooo.geoshare.ui.toOutputDetail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResultSheet(
-    points: Points,
-    selectedPointIndex: Int,
-    initialValue: SheetValue = SheetValue.Hidden,
-    outputsForPoint: StateFlow<List<OutputDetail<PointOutput>>>,
-    outputsForPoints: StateFlow<List<OutputDetail<PointsOutput>>>,
+    appDetails: StateFlow<AppDetails>,
+    state: StateFlow<ResultSheetState?>,
+    initialSheetValue: SheetValue = SheetValue.Hidden,
+    onDismissRequest: () -> Unit,
     onExecute: (action: Action<*>) -> Unit,
-    onSelectPointIndex: (index: Int?) -> Unit,
 ) {
-    val selectedPoint = points.getOrNull(selectedPointIndex) ?: return
+    val state by state.collectAsStateWithLifecycle()
 
+    when (state) {
+        is ResultSheetState.PointCopy -> (state as? ResultSheetState.PointCopy)?.run {
+            ResultSheet(
+                initialSheetValue = initialSheetValue,
+                onDismissRequest = onDismissRequest,
+            ) { onHide ->
+                ResultSheetDefaultContent(
+                    appDetails = appDetails,
+                    value = point,
+                    outputs = outputs,
+                    title = pointTitle(point, pointCount, pointIndex),
+                    onHide = onHide,
+                    onExecute = onExecute,
+                )
+            }
+        }
+
+        is ResultSheetState.PointOpen -> (state as? ResultSheetState.PointOpen)?.run {
+            ResultSheet(
+                initialSheetValue = initialSheetValue,
+                onDismissRequest = onDismissRequest,
+            ) { onHide ->
+                ResultSheetOpenPointContent(
+                    appDetails = appDetails,
+                    appsOutputs = appsOutputs,
+                    value = point,
+                    title = pointTitle(point, pointCount, pointIndex),
+                    onHide = onHide,
+                    onExecute = onExecute,
+                )
+            }
+        }
+
+        is ResultSheetState.PointSave -> (state as? ResultSheetState.PointSave)?.run {
+            ResultSheet(
+                initialSheetValue = initialSheetValue,
+                onDismissRequest = onDismissRequest,
+            ) { onHide ->
+                ResultSheetDefaultContent(
+                    appDetails = appDetails,
+                    value = point,
+                    outputs = outputs,
+                    title = pointTitle(point, pointCount, pointIndex),
+                    onHide = onHide,
+                    onExecute = onExecute,
+                )
+            }
+        }
+
+        is ResultSheetState.PointsSave -> (state as? ResultSheetState.PointsSave)?.run {
+            ResultSheet(
+                initialSheetValue = initialSheetValue,
+                onDismissRequest = onDismissRequest,
+            ) { onHide ->
+                ResultSheetDefaultContent(
+                    appDetails = appDetails,
+                    value = points,
+                    outputs = outputs,
+                    title = stringResource(R.string.conversion_succeeded_point_all, points.size),
+                    onHide = onHide,
+                    onExecute = onExecute,
+                )
+            }
+        }
+
+        is ResultSheetState.PointsShare -> (state as? ResultSheetState.PointsShare)?.run {
+            ResultSheet(
+                initialSheetValue = initialSheetValue,
+                onDismissRequest = onDismissRequest,
+            ) { onHide ->
+                ResultSheetDefaultContent(
+                    appDetails = appDetails,
+                    value = points,
+                    outputs = outputs,
+                    title = stringResource(R.string.conversion_succeeded_point_all, points.size),
+                    onHide = onHide,
+                    onExecute = onExecute,
+                )
+            }
+        }
+
+        is ResultSheetState.SourceShare -> (state as? ResultSheetState.SourceShare)?.run {
+            ResultSheet(
+                initialSheetValue = initialSheetValue,
+                onDismissRequest = onDismissRequest,
+            ) { onHide ->
+                ResultSheetSourceContent(
+                    appDetailsForSource = appDetailsForSource,
+                    appsOutputs = appsOutputs,
+                    copyOutput = copyOutput,
+                    value = source,
+                    onHide = onHide,
+                    onExecute = onExecute,
+                )
+            }
+        }
+
+        null -> {}
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ResultSheet(
+    initialSheetValue: SheetValue = SheetValue.Hidden,
+    onDismissRequest: () -> Unit,
+    content: @Composable (onHide: () -> Unit) -> Unit,
+) {
     val coroutineScope = rememberCoroutineScope()
-    val sheetState = rememberBottomSheetState(initialValue)
+    val sheetState = rememberBottomSheetState(initialSheetValue)
 
-    val outputsForPoint by outputsForPoint.collectAsStateWithLifecycle()
-    val outputsForPoints by outputsForPoints.collectAsStateWithLifecycle()
-
-    fun hide() {
-        coroutineScope
-            .launch {
-                sheetState.hide()
-            }
-            .invokeOnCompletion {
-                if (!sheetState.isVisible) {
-                    onSelectPointIndex(null)
-                }
-            }
-    }
-
-    ModalBottomSheet(
-        onDismissRequest = { onSelectPointIndex(null) },
-        sheetState = sheetState,
-    ) {
-        LazyColumn(
+    ModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
+        Column(
             Modifier
+                .verticalScroll(rememberScrollState())
                 .semantics { testTagsAsResourceId = true }
-                .testTag("geoShareResultSheet"),
+                .testTag("geoShareResultSheet")
         ) {
-            item(key = "point_section", contentType = "sheet_section") {
-                SheetSection(
-                    title = if (points.size > 1) {
-                        stringResource(R.string.conversion_succeeded_point_number, selectedPointIndex + 1)
-                    } else {
-                        null
-                    },
-                ) {
-                    outputsForPoint.zipWithNextFirstNull { prevOutputDetail, outputDetail ->
-                        SheetListItem(
-                            headlineText = outputDetail.label(),
-                            enabled = outputDetail.output.isEnabled(selectedPoint),
-                            onClick = {
-                                hide()
-                                onExecute(outputDetail.output.toAction(selectedPoint))
-                            },
-                            supportingText = outputDetail.output.getDescription(selectedPoint),
-                            icon = outputDetail.icon,
-                            prevIcon = prevOutputDetail?.icon,
-                        )
+            content {
+                coroutineScope
+                    .launch {
+                        sheetState.hide()
                     }
-                }
-            }
-            item(key = "points_section", contentType = "sheet_section") {
-                SheetSection(
-                    title = if (points.size > 1) {
-                        stringResource(R.string.conversion_succeeded_point_all, points.size)
-                    } else {
-                        null
-                    },
-                    first = false,
-                ) {
-                    outputsForPoints.zipWithNextFirstNull { prevOutputDetail, outputDetail ->
-                        SheetListItem(
-                            headlineText = outputDetail.label(),
-                            enabled = outputDetail.output.isEnabled(points),
-                            onClick = {
-                                hide()
-                                onExecute(outputDetail.output.toAction(points))
-                            },
-                            supportingText = outputDetail.output.getDescription(points),
-                            icon = outputDetail.icon,
-                            prevIcon = prevOutputDetail?.icon,
-                        )
+                    .invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            onDismissRequest()
+                        }
                     }
-                }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
 @Composable
-private fun DefaultPreview() {
+private fun <T> ResultSheetDefaultContent(
+    appDetails: StateFlow<AppDetails>,
+    outputs: List<Output<T>>,
+    title: String?,
+    value: T,
+    onExecute: (action: Action<*>) -> Unit,
+    onHide: () -> Unit,
+) {
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+
+    SheetSection(title = title) {
+        outputs.zipWithNextFirstNull { prevOutput, output ->
+            val enabled = output.isEnabled(value)
+            SheetListItem(
+                headlineText = output.label(appDetails),
+                enabled = enabled,
+                onClick = {
+                    onHide()
+                    onExecute(output.toAction(value))
+                },
+                supportingText = if (enabled) {
+                    output.getDescription(value)
+                } else {
+                    stringResource(R.string.not_available)
+                },
+                icon = output.getIcon(appDetails),
+                prevIcon = prevOutput?.getIcon(appDetails),
+            )
+        }
+    }
+}
+
+@Composable
+private fun <T> ResultSheetOpenPointContent(
+    appDetails: StateFlow<AppDetails>,
+    appsOutputs: List<AppOutputs<Output<T>>>,
+    title: String?,
+    value: T,
+    onExecute: (action: Action<*>) -> Unit,
+    onHide: () -> Unit,
+) {
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+
+    SheetSection(title = title) {
+        appsOutputs.forEach { appOutputs ->
+            SheetListItem(
+                headlineText = appDetails[appOutputs.packageName]?.label.orEmpty(),
+                modifier = Modifier.testTag("geoSharePointOpenSheetItem_${appOutputs.defaultOutput.id}"),
+                enabled = appOutputs.defaultOutput.isEnabled(value),
+                onClick = {
+                    onHide()
+                    onExecute(appOutputs.defaultOutput.toAction(value))
+                },
+                icon = appDetails[appOutputs.packageName]?.icon?.let { DrawableIconDescriptor(it) }
+                    ?: PlaceholderIconDescriptor,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ResultSheetSourceContent(
+    appDetailsForSource: AppDetails,
+    appsOutputs: List<AppOutputs<Output<String>>>,
+    copyOutput: Output<String>,
+    value: String,
+    onHide: () -> Unit,
+    onExecute: (action: Action<*>) -> Unit,
+) {
+    SheetSection(title = stringResource(R.string.conversion_succeeded_skip)) {
+        OneLineSheetListItem(
+            headlineText = copyOutput.getDescription(value).orEmpty(),
+            onClick = {
+                onHide()
+                onExecute(copyOutput.toAction(value))
+            },
+            icon = ResourceIconDescriptor(R.drawable.content_copy_24px),
+        )
+    }
+    if (appsOutputs.isNotEmpty()) {
+        SheetSection(title = stringResource(R.string.main_source_open), first = false) {
+            appsOutputs
+                .sortedBy { appOutputs -> appDetailsForSource[appOutputs.packageName]?.label }
+                .forEach { appOutputs ->
+                    key(appOutputs.defaultOutput.id) {
+                        SheetListItem(
+                            headlineText = appDetailsForSource[appOutputs.packageName]?.label.orEmpty(),
+                            modifier = Modifier.testTag("geoShareResultSheetItem_${appOutputs.defaultOutput.id}"),
+                            onClick = {
+                                onHide()
+                                onExecute(appOutputs.defaultOutput.toAction(value))
+                            },
+                            icon = appOutputs.defaultOutput.getIcon(appDetailsForSource) ?: PlaceholderIconDescriptor,
+                        )
+                    }
+                }
+        }
+    }
+}
+
+// Previews
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun CopyPointPreview() {
     AppTheme {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
@@ -143,36 +313,34 @@ private fun DefaultPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
-            val appDetails: AppDetails = emptyMap()
             ResultSheet(
-                points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
-                selectedPointIndex = 1,
-                initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.PointCopy(
+                        point = WGS84Point(NaivePoint.example),
+                        pointIndex = 0,
+                        pointCount = 2,
+                        outputs = outputRepository.getPointCopyOutputs(defaultFakeLinks),
+                    )
                 ),
-                outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
-                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
                 onExecute = {},
-                onSelectPointIndex = {},
             )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(
-    showBackground = true,
-    device = "spec:width=1080px,height=3200px,dpi=440",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DarkPreview() {
+private fun DarkCopyPointPreview() {
     AppTheme {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
@@ -180,32 +348,34 @@ private fun DarkPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
-            val appDetails: AppDetails = emptyMap()
             ResultSheet(
-                points = persistentListOf(WGS84Point(NaivePoint.example), WGS84Point(NaivePoint.genRandomPoint())),
-                selectedPointIndex = 1,
-                initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.PointCopy(
+                        point = WGS84Point(NaivePoint.example),
+                        pointIndex = 0,
+                        pointCount = 2,
+                        outputs = outputRepository.getPointCopyOutputs(defaultFakeLinks),
+                    )
                 ),
-                outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
-                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
                 onExecute = {},
-                onSelectPointIndex = {},
             )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
+@Preview(showBackground = true)
 @Composable
-private fun LastPointPreview() {
+private fun OpenPointPreview() {
     AppTheme {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
@@ -213,36 +383,41 @@ private fun LastPointPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
-            val appDetails: AppDetails = emptyMap()
+            val activities = fakeActivities.filter {
+                it.packageName in setOf(
+                    PackageNames.COMAPS_FDROID,
+                    PackageNames.CONVERSATIONS,
+                    PackageNames.OSMAND_PLUS,
+                )
+            }
             ResultSheet(
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                selectedPointIndex = 0,
-                initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    ResultSheetState.PointOpen(
+                        point = WGS84Point(NaivePoint.example),
+                        pointIndex = 2,
+                        pointCount = 3,
+                        appsOutputs = outputRepository.getPointOpenOutputs(activities, emptySet()),
+                    )
                 ),
-                outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
-                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
                 onExecute = {},
-                onSelectPointIndex = {},
             )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(
-    showBackground = true,
-    device = "spec:width=1080px,height=3200px,dpi=440",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-)
+@Preview(showBackground = true)
 @Composable
-private fun DarkLastPointPreview() {
+private fun OpenPointLoadingPreview() {
     AppTheme {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         Scaffold {
@@ -250,23 +425,249 @@ private fun DarkLastPointPreview() {
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
             val log = DefaultLog
+            val uriQuote = DefaultUriQuote
             val outputRepository = OutputRepository(
                 coordinateConverter = coordinateConverter,
                 log = log,
+                uriQuote = uriQuote,
             )
-            val appDetails: AppDetails = emptyMap()
+            val activities = fakeActivities.filter {
+                it.packageName in setOf(
+                    PackageNames.COMAPS_FDROID,
+                    PackageNames.CONVERSATIONS,
+                    PackageNames.OSMAND_PLUS,
+                )
+            }
             ResultSheet(
-                points = persistentListOf(WGS84Point(NaivePoint.example)),
-                selectedPointIndex = 0,
-                initialValue = SheetValue.Expanded,
-                outputsForPoint = MutableStateFlow(
-                    outputRepository.getOutputsForPoint(defaultFakeLinks).map { it.toOutputDetail(appDetails) }
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.PointOpen(
+                        point = WGS84Point(NaivePoint.example),
+                        pointIndex = 2,
+                        pointCount = 3,
+                        appsOutputs = outputRepository.getPointOpenOutputs(activities, emptySet()),
+                    )
                 ),
-                outputsForPoints = MutableStateFlow(
-                    outputRepository.getOutputsForPoints().map { it.toOutputDetail(appDetails) }
-                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
                 onExecute = {},
-                onSelectPointIndex = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun SavePointPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.PointSave(
+                        point = WGS84Point(NaivePoint.example),
+                        pointIndex = 2,
+                        pointCount = 3,
+                        outputs = outputRepository.pointSaveOutputs,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun SavePointsPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.PointsSave(
+                        points = persistentListOf(
+                            WGS84Point(NaivePoint.genRandomPoint()),
+                            WGS84Point(NaivePoint.genRandomPoint()),
+                            WGS84Point(NaivePoint.example),
+                        ),
+                        outputs = outputRepository.pointsSaveOutputs,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun SharePointsPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.PointsShare(
+                        points = persistentListOf(
+                            WGS84Point(NaivePoint.genRandomPoint()),
+                            WGS84Point(NaivePoint.genRandomPoint()),
+                            WGS84Point(NaivePoint.example),
+                        ),
+                        outputs = outputRepository.pointsShareOutputs,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun ShareSourcePreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.SourceShare(
+                        source = source,
+                        appDetailsForSource = getFakeAppDetails(context),
+                        appsOutputs = listOf(
+                            AppOutputs(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                defaultOutput = OpenUnknownUriOutput(
+                                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                            AppOutputs(
+                                packageName = PackageNames.CONVERSATIONS,
+                                defaultOutput = SendStringOutput(
+                                    TextActivity(
+                                        packageName = PackageNames.CONVERSATIONS,
+                                        mimeType = MimeType.TEXT_PLAIN,
+                                    )
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                        ),
+                        copyOutput = outputRepository.sourceCopyOutput,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun ShareSourceLoadingPreview() {
+    AppTheme {
+        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+        Scaffold {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val log = DefaultLog
+            val uriQuote = DefaultUriQuote
+            val outputRepository = OutputRepository(
+                coordinateConverter = coordinateConverter,
+                log = log,
+                uriQuote = uriQuote,
+            )
+            val source = "https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"
+            ResultSheet(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    ResultSheetState.SourceShare(
+                        source = source,
+                        appDetailsForSource = emptyMap(),
+                        appsOutputs = listOf(
+                            AppOutputs(
+                                packageName = PackageNames.OSMAND_PLUS,
+                                defaultOutput = OpenUnknownUriOutput(
+                                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                            AppOutputs(
+                                packageName = PackageNames.CONVERSATIONS,
+                                defaultOutput = SendStringOutput(
+                                    TextActivity(
+                                        packageName = PackageNames.CONVERSATIONS,
+                                        mimeType = MimeType.TEXT_PLAIN,
+                                    )
+                                ),
+                                allOutputs = emptyList(),
+                            ),
+                        ),
+                        copyOutput = outputRepository.sourceCopyOutput,
+                    )
+                ),
+                initialSheetValue = SheetValue.Expanded,
+                onDismissRequest = {},
+                onExecute = {},
             )
         }
     }

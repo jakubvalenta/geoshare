@@ -21,7 +21,7 @@ import page.ooooo.geoshare.data.geo.NaivePoint
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.CoordinateFormatPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.theme.AppTheme
 
 @Composable
@@ -29,7 +29,7 @@ fun UserPreferenceCoordinateFormatListItem(
     index: Int,
     count: Int,
     selected: Boolean,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -58,7 +58,7 @@ fun UserPreferenceCoordinateFormatControls(
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
     UserPreferenceControls(

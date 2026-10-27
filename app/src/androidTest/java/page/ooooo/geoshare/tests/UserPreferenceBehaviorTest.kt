@@ -5,6 +5,8 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.scrollToElement
 import androidx.test.uiautomator.textAsString
 import androidx.test.uiautomator.uiAutomator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -20,10 +22,11 @@ import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.preferences.CoordinateFormat
 import page.ooooo.geoshare.data.preferences.Finish
 import page.ooooo.geoshare.ui.UserPreferenceGroupId
+import kotlin.time.Duration.Companion.seconds
 
-class UserPreferencesBehaviorTest {
+class UserPreferenceBehaviorTest {
     @Test
-    fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormatInWGS84() = uiAutomator { // FIXME
+    fun whenCoordinateFormatIsSet_showsCoordinatesInThatFormatAsWGS84() = uiAutomator {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val geometries = Geometries(context)
         val coordinateConverter = CoordinateConverter(geometries)
@@ -38,7 +41,7 @@ class UserPreferencesBehaviorTest {
 
         // Shows WGS 84 coordinates in the decimal degrees format
         onElement {
-            if (viewIdResourceName == "geoShareResultLastPointCoordinates") {
+            if (viewIdResourceName == "geoShareResultCoordinates") {
                 assertEquals(
                     CoordinateFormatter.formatDecCoords(coordinateConverter.toWGS84(gcj02Point)),
                     textAsString(),
@@ -56,7 +59,7 @@ class UserPreferencesBehaviorTest {
         // Shows WGS 84 coordinates in the degrees, minutes, seconds format
         val coordinates = goBackToElement(
             2_000 // Increase timeout to prevent coordinate element not found on tablet
-        ) { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+        ) { viewIdResourceName == "geoShareResultCoordinates" }
         assertEquals(
             CoordinateFormatter.formatDegMinSecCoords(coordinateConverter.toWGS84(gcj02Point)),
             coordinates.text,
@@ -73,10 +76,10 @@ class UserPreferencesBehaviorTest {
         assertConversionSucceeds(point)
 
         // Copy coordinates
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToElement(Direction.UP) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Copy coordinates",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
@@ -94,13 +97,13 @@ class UserPreferencesBehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.AFTER_ACTION_SUCCEEDED}" }.click()
 
         // Go back to result screen
-        goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+        goBackToElement { viewIdResourceName == "geoShareResultCoordinates" }
 
         // Copy coordinates again
-        onElement { viewIdResourceName == "geoShareResultLastPointMenu" }.click()
+        onElement { viewIdResourceName == "geoShareResultCopy" }.click()
         onElement { viewIdResourceName == "geoShareResultSheet" }.apply {
             expandSheet()
-            scrollToElement(Direction.UP) {
+            onElement {
                 viewIdResourceName == "geoShareSheetListItemHeadline" && textAsString() in setOf(
                     "Copy coordinates",
                     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Copier les coordonnées",
@@ -108,7 +111,10 @@ class UserPreferencesBehaviorTest {
             }
                 .click()
         }
-        quickWaitForStableInActiveWindow()
+        runBlocking {
+            // Wait for automation success message to disappear and the activity to finish
+            delay(3.5.seconds)
+        }
 
         // App is not visible
         assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { packageName == BuildConfig.APPLICATION_ID })
@@ -147,7 +153,7 @@ class UserPreferencesBehaviorTest {
         onElement { viewIdResourceName == "geoShareUserPreferenceFinish_${Finish.NEVER}" }.click()
 
         // Go back to result screen
-        goBackToElement { viewIdResourceName == "geoShareResultLastPointCoordinates" }
+        goBackToElement { viewIdResourceName == "geoShareResultCoordinates" }
 
         // Open Google Maps
         scrollToAppIcon(PackageNames.GOOGLE_MAPS).clickAppIcon()

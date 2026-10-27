@@ -14,10 +14,10 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-object AboutRoute
+data object AboutRoute
 
 @Serializable
-object BillingRoute
+data object BillingRoute
 
 @Serializable
 data class FaqRoute(val itemId: FaqItemId? = null)
@@ -26,13 +26,13 @@ data class FaqRoute(val itemId: FaqItemId? = null)
 data class InputsRoute(val groupId: String? = null)
 
 @Serializable
-object LicensesRoute
+data object LicensesRoute
 
 @Serializable
-object LinkRoute
+data object LinkRoute
 
 @Serializable
-object MainRoute
+data object MainRoute
 
 @Serializable
 data class ServerRoute(val uid: Int? = null)

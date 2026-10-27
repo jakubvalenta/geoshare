@@ -87,13 +87,10 @@ fun AnimatedPlaceholderTextField(
         colors.placeholderColor(enabled, isError, isFocused)
     }
 
-    val animationDurationMs = remember(placeholderAnimationDuration) {
-        placeholderAnimationDuration.toInt(DurationUnit.MILLISECONDS)
-    }
+    val animationDurationMs = placeholderAnimationDuration.toInt(DurationUnit.MILLISECONDS)
     val placeholderTransition = remember(animationDurationMs) {
         slideInVertically(
             animationSpec = tween(animationDurationMs, easing = LinearEasing),
-
             initialOffsetY = { fullHeight -> 2 * fullHeight }
         ) togetherWith slideOutVertically(
             animationSpec = tween(animationDurationMs, easing = LinearEasing),
@@ -114,12 +111,10 @@ fun AnimatedPlaceholderTextField(
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier
-                .defaultMinSize(
-                    minWidth = TextFieldDefaults.MinWidth,
-                    minHeight = TextFieldDefaults.MinHeight,
-                )
-                .clipToBounds(),
+            modifier = modifier.defaultMinSize(
+                minWidth = TextFieldDefaults.MinWidth,
+                minHeight = TextFieldDefaults.MinHeight,
+            ),
             enabled = enabled,
             textStyle = mergedTextStyle,
             singleLine = false,
@@ -131,7 +126,13 @@ fun AnimatedPlaceholderTextField(
                 OutlinedTextFieldDefaults.DecorationBox(
                     value = value,
                     innerTextField = {
-                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+                        Box(
+                            Modifier
+                                .clipToBounds()
+                                .fillMaxWidth()
+                                .padding(contentPadding),
+                            contentAlignment = Alignment.CenterStart,
+                        ) {
                             if (!isFocused && value.isEmpty() && placeholders.isNotEmpty()) {
                                 AnimatedContent(
                                     targetState = currentPlaceholderIndex,
@@ -161,7 +162,7 @@ fun AnimatedPlaceholderTextField(
                     trailingIcon = trailingIcon,
                     supportingText = supportingText,
                     colors = colors,
-                    contentPadding = contentPadding,
+                    contentPadding = PaddingValues.Zero,
                     container = {
                         OutlinedTextFieldDefaults.Container(
                             enabled = enabled,
@@ -194,6 +195,7 @@ private fun DefaultPreview() {
                     "geo:50.123456,-120.123456?q=50.123456,-120.123456(Dropped%20pin)",
                 ),
                 modifier = Modifier.padding(15.dp),
+                supportingText = { Text("My supporting text") },
             )
         }
     }

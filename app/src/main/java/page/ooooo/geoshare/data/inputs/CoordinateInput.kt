@@ -13,7 +13,7 @@ import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
 
-object CoordinateInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+object CoordinateInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = CoordinatesInputGroup
     override val changelog = persistentListOf(
@@ -120,7 +120,7 @@ object CoordinateInput : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri
         return dec.toScale(6)
     }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(point, "N {lat}, E {lon}")
 
     override fun toString() = "CoordinateInput"

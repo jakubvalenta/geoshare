@@ -30,7 +30,7 @@ import javax.inject.Singleton
 class GoogleNavigationUriInput @Inject constructor(
     private val googleMapsAddressApiInput: dagger.Lazy<GoogleMapsAddressApiInput>,
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = GoogleNavigationUriInputGroup
     override val changelog = persistentListOf(
@@ -77,7 +77,7 @@ class GoogleNavigationUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         GoogleMapsUriFormatter.formatNavigationUriString(point, uriQuote)
 
     override fun toString() = "GoogleNavigationUriInput"

@@ -1,26 +1,31 @@
 package page.ooooo.geoshare.data.state
 
+import android.content.Context
 import android.net.Uri
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import page.ooooo.geoshare.data.geo.CoordinateConverter
-import page.ooooo.geoshare.data.geo.Source
-import page.ooooo.geoshare.data.geo.WGS84Point
-import page.ooooo.geoshare.data.outputs.SavePointsGpxOutput
+import page.ooooo.geoshare.data.outputs.ActionResult
+import page.ooooo.geoshare.data.outputs.FileAction
 
 class FileActionReadyTest {
-    private val coordinateConverter: CoordinateConverter = mock()
-    private val points = persistentListOf(WGS84Point(1.0, 2.0, source = Source.GENERATED))
-    private val actionStateContext: ActionStateContext = mock()
+    private val context: Context = mock()
 
     @Test
-    fun transition_returnsNull() = runTest {
-        val action = SavePointsGpxOutput(coordinateConverter).toAction(points)
-        val fileUri: Uri = mock()
-        val state = FileActionReady(action, isAutomation = true, fileUri)
-        assertNull(state.transition(actionStateContext))
+    fun execute_executesActionAndReturnsActionRan() = runTest {
+        val uri: Uri = mock()
+        val actionResult = ActionResult.SUCCEEDED
+        val action: FileAction.WithPoint = mock {
+            on { execute(eq(uri), any()) } doReturn actionResult
+        }
+        val state = FileActionReady(action, isAutomation = true, uri = uri)
+        assertEquals(
+            ActionRan(action, actionResult, isAutomation = true),
+            state.execute(context),
+        )
     }
 }

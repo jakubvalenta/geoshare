@@ -24,7 +24,6 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,9 +61,7 @@ fun AboutScreen(
     billingViewModel: BillingViewModel,
 ) {
     val billingStatus by billingViewModel.billingStatus.collectAsStateWithLifecycle()
-    val donationVisible = remember(billingStatus) {
-        (billingStatus as? BillingStatus.Purchased)?.product?.type == BillingProduct.Type.DONATION
-    }
+    val donationVisible = (billingStatus as? BillingStatus.Purchased)?.product?.type == BillingProduct.Type.DONATION
 
     AboutScreen(
         donationVisible = donationVisible,

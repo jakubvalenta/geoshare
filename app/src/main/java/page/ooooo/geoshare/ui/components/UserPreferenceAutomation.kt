@@ -31,7 +31,6 @@ import page.ooooo.geoshare.data.billing.AutomationFeature
 import page.ooooo.geoshare.data.billing.BillingProduct
 import page.ooooo.geoshare.data.billing.BillingStatus
 import page.ooooo.geoshare.data.billing.Feature
-import page.ooooo.geoshare.data.database.findByUUID
 import page.ooooo.geoshare.data.di.defaultFakeLinks
 import page.ooooo.geoshare.data.di.fakeActivities
 import page.ooooo.geoshare.data.di.getFakeAppDetails
@@ -39,38 +38,44 @@ import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.NoopOutput
-import page.ooooo.geoshare.data.preferences.ActivityAutomation
+import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.preferences.AutomationPreference
-import page.ooooo.geoshare.data.preferences.BasicAutomation
-import page.ooooo.geoshare.data.preferences.LinkAutomation
 import page.ooooo.geoshare.data.preferences.NoopAutomation
 import page.ooooo.geoshare.data.preferences.SavePointsGpxAutomation
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.data.toOutput
-import page.ooooo.geoshare.ui.AutomationDetail
+import page.ooooo.geoshare.ui.AutomationOption
+import page.ooooo.geoshare.ui.AutomationOptionsState
+import page.ooooo.geoshare.ui.SelectedAutomationOptionState
 import page.ooooo.geoshare.ui.theme.AppTheme
 import page.ooooo.geoshare.ui.theme.LocalSpacing
-import page.ooooo.geoshare.ui.toAutomationDetail
+import page.ooooo.geoshare.ui.toOutput
 
 @Composable
 fun UserPreferenceAutomationListItem(
+    appDetails: StateFlow<AppDetails>,
+    state: StateFlow<SelectedAutomationOptionState>,
     index: Int,
     count: Int,
-    automationDetail: StateFlow<AutomationDetail>,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     selected: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val automationDetail by automationDetail.collectAsStateWithLifecycle()
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
+
+    val notPurchased = AutomationFeature in billingFeatures &&
+        billingStatus !is BillingStatus.Loading &&
+        billingStatus !is BillingStatus.Purchased
 
     SegmentedListItem(
         selected = selected,
         onClick = onClick,
         shapes = ListItemDefaults.segmentedShapes(index, count),
         modifier = modifier,
-        trailingContent = if (AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased) {
+        trailingContent = if (notPurchased) {
             {
                 FeatureBadgeSmall(onClick)
             }
@@ -79,7 +84,8 @@ fun UserPreferenceAutomationListItem(
         },
         supportingContent = {
             AutomationPreferenceValue(
-                automationDetail = automationDetail,
+                appDetails = appDetails,
+                output = state.option.output,
                 descriptionEnabled = false,
             )
         },
@@ -94,17 +100,23 @@ fun UserPreferenceAutomationListItem(
 
 @Composable
 fun UserPreferenceAutomationControls(
-    automationDetails: StateFlow<List<List<AutomationDetail>>>,
+    appDetails: StateFlow<AppDetails>,
+    state: StateFlow<AutomationOptionsState>,
     billingAppNameResId: Int,
     billingFeatures: List<Feature>,
     billingStatus: BillingStatus,
     onBack: () -> Unit,
     onNavigateToBillingScreen: () -> Unit,
     onValueChange: (transform: (preferences: MutablePreferences) -> Unit) -> Unit,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     wide: Boolean,
 ) {
-    val automationDetails by automationDetails.collectAsStateWithLifecycle()
+    val appDetails by appDetails.collectAsStateWithLifecycle()
+    val state by state.collectAsStateWithLifecycle()
+
+    val notPurchased = AutomationFeature in billingFeatures &&
+        billingStatus !is BillingStatus.Loading &&
+        billingStatus !is BillingStatus.Purchased
 
     UserPreferenceControls(
         titleResId = R.string.user_preferences_automation_title,
@@ -113,7 +125,7 @@ fun UserPreferenceAutomationControls(
         description = {
             stringResource(R.string.user_preferences_automation_description)
         },
-        featureNotPurchased = AutomationFeature in billingFeatures && billingStatus !is BillingStatus.Loading && billingStatus !is BillingStatus.Purchased,
+        featureNotPurchased = notPurchased,
         onBack = onBack,
         onNavigateToBillingScreen = onNavigateToBillingScreen,
     ) {
@@ -125,13 +137,17 @@ fun UserPreferenceAutomationControls(
         }
         userPreferenceOptionsControl(
             key = "automation_control",
-            isSelected = { it.automation == selectedValue },
-            onSelect = {
+            isSelected = { option -> option.automation == selectedValue },
+            onSelect = { option ->
                 onValueChange { preferences ->
-                    AutomationPreference.setValue(preferences, it.automation)
+                    AutomationPreference.setValue(preferences, option.automation)
                 }
             },
-            optionGroups = automationDetails,
+            optionGroups = state.optionGroups.map { optionGroup ->
+                optionGroup.sortedBy { option ->
+                    (option.output as? Output.HasActivity<*>)?.let { appDetails[it.activity.packageName]?.label }
+                }
+            },
             enabled = enabled,
             itemTestTag = { option ->
                 val serializedString = try {
@@ -141,9 +157,10 @@ fun UserPreferenceAutomationControls(
                 }
                 "geoShareUserPreferenceAutomation_$serializedString"
             },
-        ) { value, modifier ->
+        ) { option, modifier ->
             AutomationPreferenceValue(
-                automationDetail = value,
+                appDetails = appDetails,
+                output = option.output,
                 modifier = modifier,
             )
         }
@@ -152,22 +169,24 @@ fun UserPreferenceAutomationControls(
 
 @Composable
 private fun AutomationPreferenceValue(
-    automationDetail: AutomationDetail,
+    appDetails: AppDetails,
+    output: Output<*>,
     modifier: Modifier = Modifier,
     descriptionEnabled: Boolean = true,
 ) {
-    val label = automationDetail.label()
-    val description = if (descriptionEnabled) automationDetail.description() else null
     Row(
         modifier,
         horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (automationDetail.icon != null) {
+        val icon = output.getIcon(appDetails)
+        if (icon != null) {
             CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                IconFromDescriptor(automationDetail.icon, contentDescription = null)
+                IconFromDescriptor(icon, contentDescription = null)
             }
         }
+        val label = output.automationLabel(appDetails)
+        val description = if (descriptionEnabled) output.automationDescription() else null
         if (description != null) {
             Column {
                 Text(label)
@@ -192,17 +211,18 @@ private fun ListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationListItem(
+                    appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(
+                            option = AutomationOption(
+                                automation = SavePointsGpxAutomation,
+                                output = SavePointsGpxAutomation.toOutput(coordinateConverter),
+                            )
+                        )
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation.let { automation ->
-                            automation
-                                .toOutput(coordinateConverter)
-                                .toAutomationDetail(automation, appDetails)
-                        }
-                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -227,17 +247,18 @@ private fun DarkListItemPreview() {
                 val context = LocalContext.current
                 val geometries = Geometries(context)
                 val coordinateConverter = CoordinateConverter(geometries)
-                val appDetails = getFakeAppDetails(context)
                 UserPreferenceAutomationListItem(
+                    appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(
+                            option = AutomationOption(
+                                automation = SavePointsGpxAutomation,
+                                output = SavePointsGpxAutomation.toOutput(coordinateConverter),
+                            )
+                        )
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(
-                        SavePointsGpxAutomation.let { automation ->
-                            automation
-                                .toOutput(coordinateConverter)
-                                .toAutomationDetail(automation, appDetails)
-                        }
-                    ),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -260,9 +281,12 @@ private fun NoneListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceAutomationListItem(
+                    appDetails = MutableStateFlow(emptyMap()),
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(option = AutomationOption(NoopAutomation, NoopOutput))
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -285,9 +309,12 @@ private fun DarkNoneListItemPreview() {
         Surface {
             Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
                 UserPreferenceAutomationListItem(
+                    appDetails = MutableStateFlow(emptyMap()),
+                    state = MutableStateFlow(
+                        SelectedAutomationOptionState(option = AutomationOption(NoopAutomation, NoopOutput))
+                    ),
                     index = 0,
                     count = 1,
-                    automationDetail = MutableStateFlow(NoopOutput.toAutomationDetail(NoopAutomation, emptyMap())),
                     billingFeatures = listOf(AutomationFeature),
                     billingStatus = BillingStatus.Purchased(
                         product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
@@ -311,31 +338,26 @@ private fun ControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val links = defaultFakeLinks
             val log = DefaultLog
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
-                automationDetails = MutableStateFlow(
-                    AutomationPreference.getOptionGroups(
-                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
-                        appDetails = appDetails,
-                        hiddenApps = emptySet(),
-                        links = defaultFakeLinks,
-                    )
-                        .map { group ->
-                            group.map { automation ->
-                                when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
-                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
-                                        automation.toOutput(coordinateConverter, link)
-                                    }
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    AutomationOptionsState(
+                        optionGroups = AutomationPreference.getOptionGroups(
+                            activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                            hiddenApps = emptySet(),
+                            links = links,
+                        )
+                            .map { group ->
+                                group.map { automation ->
+                                    AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                                 }
-                                    .toAutomationDetail(automation, appDetails)
                             }
-                        }
+                    )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.Purchased(
@@ -364,80 +386,26 @@ private fun DarkControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val links = defaultFakeLinks
             val log = DefaultLog
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
-                automationDetails = MutableStateFlow(
-                    AutomationPreference.getOptionGroups(
-                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
-                        appDetails = appDetails,
-                        hiddenApps = emptySet(),
-                        links = defaultFakeLinks,
-                    )
-                        .map { group ->
-                            group.map { automation ->
-                                when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
-                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
-                                        automation.toOutput(coordinateConverter, link)
-                                    }
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    AutomationOptionsState(
+                        optionGroups = AutomationPreference.getOptionGroups(
+                            activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                            hiddenApps = emptySet(),
+                            links = links,
+                        )
+                            .map { group ->
+                                group.map { automation ->
+                                    AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                                 }
-                                    .toAutomationDetail(automation, appDetails)
                             }
-                        }
+                    )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
-                wide = true,
-                billingFeatures = listOf(AutomationFeature),
-                billingStatus = BillingStatus.Purchased(
-                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
-                    expired = false,
-                    refundable = true,
-                    token = "test_purchased",
-                ),
-                onBack = {},
-                onNavigateToBillingScreen = {},
-                onValueChange = {},
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
-@Composable
-private fun LoadingControlsPreview() {
-    AppTheme {
-        Surface {
-            val context = LocalContext.current
-            val geometries = Geometries(context)
-            val coordinateConverter = CoordinateConverter(geometries)
-            val log = DefaultLog
-            val appDetails: AppDetails = emptyMap()
-            UserPreferenceAutomationControls(
-                automationDetails = MutableStateFlow(
-                    AutomationPreference.getOptionGroups(
-                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
-                        appDetails = appDetails,
-                        hiddenApps = emptySet(),
-                        links = defaultFakeLinks,
-                    )
-                        .map { group ->
-                            group.map { automation ->
-                                when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
-                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
-                                        automation.toOutput(coordinateConverter, link)
-                                    }
-                                }
-                                    .toAutomationDetail(automation, appDetails)
-                            }
-                        }
-                ),
-                billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.Purchased(
@@ -462,31 +430,26 @@ private fun TabletControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val links = defaultFakeLinks
             val log = DefaultLog
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
-                automationDetails = MutableStateFlow(
-                    AutomationPreference.getOptionGroups(
-                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
-                        appDetails = appDetails,
-                        hiddenApps = emptySet(),
-                        links = defaultFakeLinks,
-                    )
-                        .map { group ->
-                            group.map { automation ->
-                                when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
-                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
-                                        automation.toOutput(coordinateConverter, link)
-                                    }
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    AutomationOptionsState(
+                        optionGroups = AutomationPreference.getOptionGroups(
+                            activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                            hiddenApps = emptySet(),
+                            links = links,
+                        )
+                            .map { group ->
+                                group.map { automation ->
+                                    AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                                 }
-                                    .toAutomationDetail(automation, appDetails)
                             }
-                        }
+                    )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.Purchased(
@@ -511,31 +474,26 @@ private fun NotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val links = defaultFakeLinks
             val log = DefaultLog
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
-                automationDetails = MutableStateFlow(
-                    AutomationPreference.getOptionGroups(
-                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
-                        appDetails = appDetails,
-                        hiddenApps = emptySet(),
-                        links = defaultFakeLinks,
-                    )
-                        .map { group ->
-                            group.map { automation ->
-                                when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
-                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
-                                        automation.toOutput(coordinateConverter, link)
-                                    }
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    AutomationOptionsState(
+                        optionGroups = AutomationPreference.getOptionGroups(
+                            activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                            hiddenApps = emptySet(),
+                            links = links,
+                        )
+                            .map { group ->
+                                group.map { automation ->
+                                    AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                                 }
-                                    .toAutomationDetail(automation, appDetails)
                             }
-                        }
+                    )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.NotPurchased,
@@ -555,31 +513,26 @@ private fun DarkNotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val links = defaultFakeLinks
             val log = DefaultLog
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
-                automationDetails = MutableStateFlow(
-                    AutomationPreference.getOptionGroups(
-                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
-                        appDetails = appDetails,
-                        hiddenApps = emptySet(),
-                        links = defaultFakeLinks,
-                    )
-                        .map { group ->
-                            group.map { automation ->
-                                when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
-                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
-                                        automation.toOutput(coordinateConverter, link)
-                                    }
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    AutomationOptionsState(
+                        optionGroups = AutomationPreference.getOptionGroups(
+                            activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                            hiddenApps = emptySet(),
+                            links = links,
+                        )
+                            .map { group ->
+                                group.map { automation ->
+                                    AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                                 }
-                                    .toAutomationDetail(automation, appDetails)
                             }
-                        }
+                    )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.NotPurchased,
@@ -599,34 +552,73 @@ private fun TabletNotPurchasedControlsPreview() {
             val context = LocalContext.current
             val geometries = Geometries(context)
             val coordinateConverter = CoordinateConverter(geometries)
+            val links = defaultFakeLinks
             val log = DefaultLog
-            val appDetails = getFakeAppDetails(context)
             UserPreferenceAutomationControls(
-                automationDetails = MutableStateFlow(
-                    AutomationPreference.getOptionGroups(
-                        activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
-                        appDetails = appDetails,
-                        hiddenApps = emptySet(),
-                        links = defaultFakeLinks,
-                    )
-                        .map { group ->
-                            group.map { automation ->
-                                when (automation) {
-                                    is BasicAutomation -> automation.toOutput(coordinateConverter)
-                                    is ActivityAutomation -> automation.toOutput(coordinateConverter, log)
-                                    is LinkAutomation -> defaultFakeLinks.findByUUID(automation.linkUUID)?.let { link ->
-                                        automation.toOutput(coordinateConverter, link)
-                                    }
+                appDetails = MutableStateFlow(getFakeAppDetails(context)),
+                state = MutableStateFlow(
+                    AutomationOptionsState(
+                        optionGroups = AutomationPreference.getOptionGroups(
+                            activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                            hiddenApps = emptySet(),
+                            links = links,
+                        )
+                            .map { group ->
+                                group.map { automation ->
+                                    AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
                                 }
-                                    .toAutomationDetail(automation, appDetails)
                             }
-                        }
+                    )
                 ),
                 billingAppNameResId = R.string.app_name_pro,
-                values = UserPreferencesValues(automation = SavePointsGpxAutomation),
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
                 wide = true,
                 billingFeatures = listOf(AutomationFeature),
                 billingStatus = BillingStatus.NotPurchased,
+                onBack = {},
+                onNavigateToBillingScreen = {},
+                onValueChange = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, device = "spec:width=1080px,height=3200px,dpi=440")
+@Composable
+private fun LoadingControlsPreview() {
+    AppTheme {
+        Surface {
+            val context = LocalContext.current
+            val geometries = Geometries(context)
+            val coordinateConverter = CoordinateConverter(geometries)
+            val links = defaultFakeLinks
+            val log = DefaultLog
+            UserPreferenceAutomationControls(
+                appDetails = MutableStateFlow(emptyMap()),
+                state = MutableStateFlow(
+                    AutomationOptionsState(
+                        optionGroups = AutomationPreference.getOptionGroups(
+                            activities = fakeActivities.filter { it.packageName == PackageNames.OSMAND_PLUS },
+                            hiddenApps = emptySet(),
+                            links = links,
+                        )
+                            .map { group ->
+                                group.map { automation ->
+                                    AutomationOption(automation, automation.toOutput(coordinateConverter, links, log))
+                                }
+                            }
+                    )
+                ),
+                billingAppNameResId = R.string.app_name_pro,
+                values = UserPreferenceValues(automation = SavePointsGpxAutomation),
+                wide = true,
+                billingFeatures = listOf(AutomationFeature),
+                billingStatus = BillingStatus.Purchased(
+                    product = BillingProduct("test", BillingProduct.Type.ONE_TIME),
+                    expired = false,
+                    refundable = true,
+                    token = "test_purchased",
+                ),
                 onBack = {},
                 onNavigateToBillingScreen = {},
                 onValueChange = {},

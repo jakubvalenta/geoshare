@@ -20,7 +20,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -33,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.MutablePreferences
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.preferences.TextPreference
-import page.ooooo.geoshare.data.preferences.UserPreferencesValues
+import page.ooooo.geoshare.data.preferences.UserPreferenceValues
 import page.ooooo.geoshare.ui.theme.LocalSpacing
 
 @Composable
@@ -142,7 +141,7 @@ fun <T> LazyListScope.userPreferenceOptionsControl(
 fun <T> LazyListScope.userPreferenceTextControl(
     key: String,
     userPreference: TextPreference<T>,
-    values: UserPreferencesValues,
+    values: UserPreferenceValues,
     onValueChange: ((MutablePreferences) -> Unit) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -150,9 +149,9 @@ fun <T> LazyListScope.userPreferenceTextControl(
     suffix: (@Composable () -> String)? = null,
 ) {
     item(key, contentType = "text_field") {
-        val value = remember(userPreference, values) { userPreference.getValue(values) }
+        val value = userPreference.getValue(values)
         var inputValue by retain { mutableStateOf(userPreference.serialize(value)) }
-        val isValid = remember(userPreference, inputValue) { userPreference.isValid(inputValue) }
+        val isValid = userPreference.isValid(inputValue)
 
         TextField(
             value = inputValue,

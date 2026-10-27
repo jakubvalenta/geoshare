@@ -22,8 +22,8 @@ sealed interface Input {
         fun match(source: String) = pattern.find(source)?.groupOrNull()
     }
 
-    interface HasRandomUri {
-        fun genRandomUri(point: Point): String?
+    interface HasRandomSource {
+        fun genRandomSource(point: Point): String?
     }
 }
 

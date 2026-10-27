@@ -36,7 +36,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -75,7 +74,6 @@ fun ServerScreen(
     viewModel: ServerViewModel = hiltViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val resources = LocalResources.current
 
     LaunchedEffect(initialUid) {
         if (initialUid != null) {
@@ -97,24 +95,24 @@ fun ServerScreen(
         registerUrl = viewModel.registerUrl,
         urlTemplate = viewModel.urlTemplate,
         onBack = onBack,
-        onDelete = { viewModel.delete(resources) },
-        onDismissMessage = { viewModel.dismissMessage() },
+        onDelete = viewModel::delete,
+        onDismissMessage = viewModel::dismissMessage,
         onNavigateTo = {
             coroutineScope.launch {
                 viewModel.navigateTo(it)
             }
         },
-        onRestoreInitialData = { viewModel.restoreInitialData(resources) },
-        onSaveForm = { viewModel.saveForm(resources) },
-        onSetApiKey = { viewModel.setApiKey(it) },
-        onSetApiKeyHeader = { viewModel.setApiKeyHeader(it) },
-        onSetAuthType = { viewModel.setAuthType(it) },
-        onSetChallengeUrl = { viewModel.setChallengeUrl(it) },
-        onSetDescription = { viewModel.setDescription(it) },
-        onSetLoginUrl = { viewModel.setLoginUrl(it) },
-        onSetName = { viewModel.setName(it) },
-        onSetRegisterUrl = { viewModel.setRegisterUrl(it) },
-        onSetUrlTemplate = { viewModel.setUrlTemplate(it) },
+        onRestoreInitialData = viewModel::restoreInitialData,
+        onSaveForm = viewModel::saveForm,
+        onSetApiKey = viewModel::setApiKey,
+        onSetApiKeyHeader = viewModel::setApiKeyHeader,
+        onSetAuthType = viewModel::setAuthType,
+        onSetChallengeUrl = viewModel::setChallengeUrl,
+        onSetDescription = viewModel::setDescription,
+        onSetLoginUrl = viewModel::setLoginUrl,
+        onSetName = viewModel::setName,
+        onSetRegisterUrl = viewModel::setRegisterUrl,
+        onSetUrlTemplate = viewModel::setUrlTemplate,
     )
 }
 

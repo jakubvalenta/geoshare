@@ -22,7 +22,7 @@ import javax.inject.Singleton
 class KagiMapsUriInput @Inject constructor(
     private val openStreetMapApiInput: dagger.Lazy<OpenStreetMapApiInput>,
     private val uriQuote: UriQuote,
-) : BasicOfflineInput, Input.HasPattern, Input.HasRandomUri {
+) : BasicOfflineInput, Input.HasPattern, Input.HasRandomSource {
     override fun getName(resources: Resources) = group.getName(resources)
     override val group = KagiMapsInputGroup
     override val changelog = persistentListOf(
@@ -147,7 +147,7 @@ class KagiMapsUriInput @Inject constructor(
             }
         }
 
-    override fun genRandomUri(point: Point) =
+    override fun genRandomSource(point: Point) =
         UriFormatter.formatUriString(
             point,
             "https://kagi.com/maps/info?q={name}&id=point_{lat}_{lon}&ll={lat}%2C{lon}#{z}/{lat}/{lon}"
