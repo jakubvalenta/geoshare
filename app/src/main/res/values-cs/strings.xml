@@ -162,11 +162,11 @@
     <string name="converter_yandex_maps_name">Mapy Yandex</string>
     <string name="faq_how_headline">Jak to funguje</string>
     <string name="faq_how_text_1">%1$s převádí odkazy na mapy na geo: odkazy, které lze otevřít v jiných mapových aplikacích. Pro vytvoření geo: odkazu jsou potřeba zeměpisné souřadnice, které %1$s přečte z URL.</string>
-    <string name="faq_how_text_2">Avšak ne všechna URL obsahují souřadnice. V takových případech se vás %1$s zeptá, jestli se může spojit s danou mapovou službou (Google Mapy, Apple Mapy atd.) a získat souřadnice:</string>
+    <string name="faq_how_text_2">Ale ne všechna URL obsahují souřadnice. V takových případech se vás %1$s zeptá, jestli se může spojit s danou mapovou službou (Google Mapy, Apple Mapy atd.) a přečíst souřadnice:</string>
     <string name="faq_how_text_2_item_http">buď z HTTP hlaviček</string>
     <string name="faq_how_text_2_item_html">nebo z HTML dokumentu</string>
     <string name="faq_how_text_3">Když spojení s mapovou službou nepovolíte, tak %1$s vytvoří geo: odkaz vedoucí na vyhledávání místa podle názvu, nebo se zastaví, v závislosti na konkrétním odkazu.</string>
-    <string name="faq_how_text_4">Pro trvalé povolení nebo zamítnutí spojení s mapovou službou místo ptaní (výchozí nastavení), jděte do %1$s aplikace.</string>
+    <string name="faq_how_text_4">Pro trvalé povolení nebo zamítnutí spojení s mapovou službou místo zeptání se (výchozí nastavení), jděte do %1$s aplikace.</string>
     <string name="faq_how_text_4_preferences_button">nastavení</string>
     <string name="faq_privacy_headline">Ochrana soukromí</string>
     <string name="faq_privacy_text">Pokud to jde, %1$s převádí odkazy na mapy offline. Když odkaz na mapu vyžaduje převod online, aplikace se vás před spojením s mapovou službou (Google Mapy, Apple Mapy atd.) zeptá. Pokud spojení povolíte, mapová služba získá daný odkaz na mapu a bude moct přečíst vaši IP adresu.</string>
@@ -230,7 +230,7 @@
     <string name="user_preferences_apps_title">Aplikace</string>
     <string name="user_preferences_section_input">Vstup</string>
     <string name="user_preferences_section_output">Výstup</string>
-    <string name="conversion_succeeded_check_experimental">Poloha může být nepřesná kvůli experimentálnímu způsobu zpracování odkazu.</string>
+    <string name="conversion_succeeded_check_experimental">Poloha může být nepřesná, protože podpora tohoto odkazu na mapu je zatím experimentální.</string>
     <string name="conversion_succeeded_check_map_center">Poloha může být střed mapy, ne špendlík.</string>
     <string name="conversion_succeeded_check_srs">Poloha může být nepřesná kvůli převodu systému souřadnic.</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
@@ -249,7 +249,7 @@
     <string name="output_send">Poslat bod</string>
     <string name="output_send_via">Poslat bod pomocí %1$s</string>
     <string name="conversion_failed_reason_exception">Neznámá výjimka</string>
-    <string name="faq_how_text_2_item_api">nebo API mapové služby</string>
+    <string name="faq_how_text_2_item_api">nebo z API mapové služby (přímo či přes proxy server)</string>
     <string name="faq_privacy_text_server">V případě některých odkazů zavolá %1$s vzdálený server, %3$s, který je open-source. Tento server poté zavolá API mapové služby (např. Google Maps API). %2$s neukládá záznamy o zpracovaných mapových odkazech. Z důvodu omezení frekvence požadavků, ukládá server veřejný klíč, který identifikuje vaše zařízení, a odděleně od něj IP adresu, po omezenou dobu.</string>
     <string name="conversion_failed_unsupported_source_place_list">Seznamy míst nejsou podporovány</string>
     <string name="network_exception_connect_exception">Spojení zamítnuto</string>
@@ -345,4 +345,6 @@
     <string name="input_waze_warning_route_empty">Trasa je prázdná. Zkuste se vrátit do aplikace Waze, počkat na GPS a sdílet trasu znovu.</string>
     <string name="input_waze_warning_route_expired">Platnost trasy vypršela.</string>
     <string name="network_exception_content_convert">Neplatný obsah odpovědi</string>
+    <string name="copy">Kopírovat</string>
+    <string name="load_more">Načíst další</string>
 </resources>
