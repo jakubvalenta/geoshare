@@ -133,8 +133,8 @@
     <string name="donation_button">Doar no Ko-fi</string>
     <string name="donation_description">Esse app otimiza seu tempo?</string>
     <string name="faq_how_headline">Como funciona</string>
-    <string name="faq_how_text_1">O %1$s converte links de mapa em links geo: que podem ser abertos por qualquer apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O %1$s extrai elas da URL de mapa.</string>
-    <string name="faq_how_text_2">Entretanto, nem todos as URLs de mapa incluem coordenadas. Nesses casos, o %1$s te pedirá para conectar ao mapa (Google Maps, Apple Maps, etc.) e obter as coordenadas de:</string>
+    <string name="faq_how_text_1">O %1$s converte links de mapa em links geo: que podem ser abertos por qualquer apps de mapa. Para criar um link geo:, as coordenadas geográficas são necessárias. O %1$s lê elas da URL de mapa.</string>
+    <string name="faq_how_text_2">Entretanto, nem todos as URLs de mapa incluem coordenadas. Nesses casos, o %1$s te pedirá para conectar ao mapa (Google Maps, Apple Maps, etc.) e ler as coordenadas de:</string>
     <string name="faq_how_text_2_item_http">cabeçalhos HTTP</string>
     <string name="faq_how_text_2_item_html">documento HTML</string>
     <string name="faq_how_text_3">Se não permitir a conexão ao mapa, então o %1$s criará um link geo: com o nome do lugar em vez das coordenadas, ou ele será interrompido, dependendo do link.</string>
@@ -230,7 +230,7 @@
     <string name="conversion_failed_reason_timeout">Tempo esgotado</string>
     <string name="network_exception_too_many_requests">Solicitações demais</string>
     <string name="licenses">Licenças</string>
-    <string name="conversion_succeeded_check_experimental">A localização pode ser imprecisa devido a um método de extração experimental.</string>
+    <string name="conversion_succeeded_check_experimental">A localização pode ser imprecisa, pois o suporte a este link de mapa é experimental.</string>
     <string name="conversion_succeeded_check_srs">A localização pode ser imprecisa devido ao sistema de conversão de coordenadas.</string>
     <string name="converter_cartes_ign_name">Cartes IGN</string>
     <string name="srs_description_mainland_china">China continental</string>
@@ -243,7 +243,7 @@
     <string name="output_send">Enviar ponto</string>
     <string name="output_send_via">Enviar ponto via %1$s</string>
     <string name="conversion_failed_reason_exception">Exceção desconhecida</string>
-    <string name="faq_how_text_2_item_api">ou a API do mapa</string>
+    <string name="faq_how_text_2_item_api">ou a API do mapa (diretamente ou por servidor proxy)</string>
     <string name="faq_privacy_text_server">Para alguns links de mapa, o %1$s fala com um servidor remoto, o %3$s que é de código aberto. E então, esse servidor fala com a API do mapa (como a API do Google Maps). O %2$s não mantém registros dos links de mapa. Para aplicar uma taxa de limite, ele guarda uma chave pública que identifica seu dispositivo, e separadamente seu endereço IP por um tempo limitado.</string>
     <string name="conversion_failed_unsupported_source_place_list">Listas de lugares não são suportadas</string>
     <string name="network_exception_connect_exception">Conexão recusada</string>
@@ -303,7 +303,7 @@
     <string name="conversion_succeeded_check_name_only_points">Falha ao encontrar as coordenadas de alguns pontos.</string>
     <string name="converter_google_navigation_uri_name">URI de navegação do Google</string>
     <string name="faq_name_only_title">Falha ao encontrar coordenadas, usando um nome de lugar</string>
-    <string name="faq_name_only_text_1">O %1$s consegue extrair apenas o nome do lugar, ex. “Monte Everest” de alguns links de mapa. Ao abrir essa localização em outro app de mapa, ele pode mostrar um lugar diferente do que o link original, pois vários lugares com o mesmo nome podem existir.</string>
+    <string name="faq_name_only_text_1">O %1$s consegue ler só o nome do lugar, ex. “Monte Everest” de alguns links de mapa. Ao abrir essa localização em outro app de mapa, ele pode mostrar um lugar diferente do que o link original, pois vários lugares com o mesmo nome podem existir.</string>
     <string name="faq_name_only_text_2">Pontos identificados apenas pelo nome não são inclusos em rotas GPX.</string>
     <string name="network_exception_webview">Exceção do WebView</string>
     <string name="network_exception_too_many_requests_wait">Solicitações demais, aguarde por %1$ds</string>
@@ -339,4 +339,6 @@
     <string name="input_waze_warning_route_empty">A rota está vazia. Tente voltar ao Waze, espere pelo GPS, e compartilhe a rota novamente.</string>
     <string name="input_waze_warning_route_expired">A rota expirou.</string>
     <string name="network_exception_content_convert">Resposta de conteúdo inválida</string>
+    <string name="copy">Copiar</string>
+    <string name="load_more">Carregar mais</string>
 </resources>
