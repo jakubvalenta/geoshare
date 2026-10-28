@@ -332,4 +332,6 @@
     <string name="input_waze_warning_route_empty">Маршрутът е празен. Опитайте се да се върнете в Waze, изчакайте GPS и споделете маршрута отново.</string>
     <string name="input_waze_warning_route_expired">Маршрутът е с изтекъл срок.</string>
     <string name="network_exception_content_convert">Невалидно съдържание на отговора</string>
+    <string name="copy">Копиране</string>
+    <string name="load_more">Зареди още</string>
 </resources>
