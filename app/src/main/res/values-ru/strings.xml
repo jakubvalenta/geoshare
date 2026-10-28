@@ -346,4 +346,6 @@
     <string name="input_waze_warning_route_empty">Маршрут пуст. Попробуйте вернуться в Waze, дождитесь сигнала GPS и снова поделитесь маршрутом.</string>
     <string name="input_waze_warning_route_expired">Срок действия маршрута истёк.</string>
     <string name="network_exception_content_convert">Неправильное содержание ответа</string>
+    <string name="copy">Копировать</string>
+    <string name="load_more">Загрузить ещё</string>
 </resources>
