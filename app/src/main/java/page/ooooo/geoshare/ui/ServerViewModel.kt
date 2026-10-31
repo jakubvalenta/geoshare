@@ -152,7 +152,7 @@ class ServerViewModel @Inject constructor(
                         )
                     )
                     _message.value = Message(context.resources.getString(R.string.server_message_inserted))
-                    // Navigate after saving, because we reset form fields during navigation
+                    // Navigate after saving not before saving, because we reset form fields during navigation
                     navigateTo(null)
                 }
             } else {
@@ -173,7 +173,7 @@ class ServerViewModel @Inject constructor(
                             )
                         )
                         _message.value = Message(context.resources.getString(R.string.server_message_updated))
-                        // Navigate after saving, because we reset form fields during navigation
+                        // Navigate after saving not before saving, because we reset form fields during navigation
                         navigateTo(null)
                     }
                 }
