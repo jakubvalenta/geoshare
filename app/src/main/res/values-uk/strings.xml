@@ -250,7 +250,7 @@
     <string name="output_send">Надіслати точку</string>
     <string name="output_send_via">Надіслати точку через %1$s</string>
     <string name="conversion_failed_reason_exception">Невідоме виключення</string>
-    <string name="faq_how_text_2_item_api">або API мапографічного сервісу</string>
+    <string name="faq_how_text_2_item_api">або через API мапографічного сервісу (безпосередньо або через проксі-сервер)</string>
     <string name="faq_privacy_text_server">Для деяких посилань на мапи %1$s звертається до віддаленого сервера з відкритим вихідним кодом %3$s. Цей сервер, у свою чергу, здійснює виклик API сервісу мап (наприклад, Google Maps API). %2$s не зберігає журналів посилань на мапи. Для застосування обмеження швидкості він зберігає публічний ключ, який ідентифікує ваш пристрій, а окремо — вашу IP-адресу протягом обмеженого часу.</string>
     <string name="conversion_failed_unsupported_source_place_list">Списки місць не підтримуються</string>
     <string name="network_exception_connect_exception">Відмовлено у з’єднанні</string>
@@ -346,4 +346,6 @@
     <string name="input_waze_warning_route_empty">Маршрут порожній. Спробуйте повернутися до Waze, зачекати на GPS і знову поділитися маршрутом.</string>
     <string name="input_waze_warning_route_expired">Термін дії маршруту минув.</string>
     <string name="network_exception_content_convert">Некоректний вміст відповіді</string>
+    <string name="copy">Копіювати</string>
+    <string name="load_more">Завантажити ще</string>
 </resources>
