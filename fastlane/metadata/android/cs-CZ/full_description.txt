@@ -25,6 +25,8 @@ Sdílejte odkaz na mapy s GeoShare a tato aplikace jej otevře v jiné mapové a
 - Yandex Maps
 - souřadnice
 
+GeoShare není spojen s žádnou z uvedených služeb ani není žádnou z nich podporován.
+
 <b>Příklady použití</b>
 
 Když vám někdo pošle odkaz na Google Mapy, ale vy preferujete OpenStreetMap, můžete rychle <b>otevřít tutéž polohu</b> v aplikaci OsmAnd nebo Organic Maps.
@@ -35,9 +37,9 @@ Když rádi hledáte místa v Google Mapách, ale pro navigování preferujete j
 
 - Zobrazuje <b>zeměpisné souřadnice</b> odkazu na mapy a umožňuje je kopírovat do schránky v různých formátech, například jako geo: odkaz.
 - Zobrazuje všechny body <b>seznamu míst</b>.
-- Umožňuje <b>automaticky</b> provést zvolenou akci po zpracování odkazu.
+- Umožňuje <b>automaticky</b> provést zvolenou akci po zpracování odkazu. (Pro funkce)
 - Umožňuje <b>spustit navigaci</b> ve všech aplikacích, které to podporují, včetně TomTom.
-- Umožňuje otevřít místo ve <b>webových mapách</b>, předinstalovaných nebo vašich vlastních.
+- Umožňuje otevřít místo ve <b>webových mapách</b>, předinstalovaných nebo vašich vlastních. (Pro funkce)
 - Umožňuje uložit místo jako <b>soubor GPX</b>.
 - Umožňuje odeslat místo pomocí <b>aplikace na posílání zpráv</b>.
 - Umožňuje uložit místo do <b>kontaktu</b>.
