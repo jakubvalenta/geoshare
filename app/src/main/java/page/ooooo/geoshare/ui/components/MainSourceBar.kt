@@ -301,7 +301,7 @@ private fun DarkExpandedShortTimePreview() {
 private fun TextAndEmptyLogPreview() {
     AppTheme {
         Surface {
-            val source = """
+            val source = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") """
                 Vega de Tera Calle Barrio de Abajo
                 41.9966006N, 6.1223825W
                 https://mapy.com/s/deduduzeha
@@ -329,7 +329,7 @@ private fun TextAndEmptyLogPreview() {
 private fun DarkSubmittedTextAndEmptyLogPreview() {
     AppTheme {
         Surface {
-            val source = """
+            val source = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") """
                 Vega de Tera Calle Barrio de Abajo
                 41.9966006N, 6.1223825W
                 https://mapy.com/s/deduduzeha

@@ -121,18 +121,20 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
             if (testServer is TestServer.Configured) {
                 WGS84Point(
                     51.1982447, 6.4389493,
-                    name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                     source = Source.API,
                 )
             } else if (htmlParsingSupported) {
                 WGS84Point(
                     51.1982447, 6.4389493,
-                    name = "Café Heinemann",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Café Heinemann",
                     source = Source.URI,
                 )
             } else {
                 WGS84Point(
-                    name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                    name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                    "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                     source = Source.URI,
                 )
             },

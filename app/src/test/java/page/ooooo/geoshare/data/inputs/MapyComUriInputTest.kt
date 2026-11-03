@@ -63,7 +63,10 @@ class MapyComUriInputTest : InputTest {
     fun match_matchesCoordinatesInText() {
         assertEquals(
             "41.9966006N, 6.1223825W",
-            input.match("Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha"),
+            input.match(
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                "Vega de Tera Calle Barrio de Abajo 41.9966006N, 6.1223825W https://mapy.com/s/deduduzeha"
+            ),
         )
     }
 

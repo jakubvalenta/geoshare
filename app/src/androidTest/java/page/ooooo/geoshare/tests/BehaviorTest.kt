@@ -135,7 +135,7 @@ private fun AccessibilityNodeInfo.isDenyPermissionButton(): Boolean =
         "don't allow",
         "don\u2019t allow",
         "refuser",
-        "ne pas autoriser",
+        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "ne pas autoriser",
     )
 
 fun UiAutomatorTestScope.isSystemPermissionShown(timeoutMs: Long = 3_000): Boolean =
@@ -250,16 +250,11 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
         } else {
             setOf("Coordinates", @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Coordonnées")
         }
-        onElement {
-            if (viewIdResourceName == "geoShareResultName") {
-                assertTrue(
-                    """Expected "${textAsString()}" to equal one of ${expectedNames.joinToString()}""",
-                    textAsString() in expectedNames,
-                )
-                true
-            } else {
-                false
-            }
+        try {
+            onElement { viewIdResourceName == "geoShareResultName" && textAsString() in expectedNames }
+        } catch (_: ElementNotFoundException) {
+            val text = onElement(500) { viewIdResourceName == "geoShareResultName" }.text
+            assertTrue("""Expected "$text" to equal one of ${expectedNames.joinToString()}""", false)
         }
     }
 
@@ -276,16 +271,11 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
                 )
             }
         }
-        onElement {
-            if (viewIdResourceName == "geoShareResultCoordinates") {
-                assertTrue(
-                    """Expected "${textAsString()}" to equal one of ${expectedCoordinatesOptions.joinToString()}""",
-                    textAsString() in expectedCoordinatesOptions,
-                )
-                true
-            } else {
-                false
-            }
+        try {
+            onElement { viewIdResourceName == "geoShareResultCoordinates" && textAsString() in expectedCoordinatesOptions }
+        } catch (_: ElementNotFoundException) {
+            val text = onElement(500) { viewIdResourceName == "geoShareResultCoordinates" }.text
+            assertTrue("""Expected "$text" to equal one of ${expectedCoordinatesOptions.joinToString()}""", false)
         }
     }
 
@@ -321,16 +311,14 @@ fun UiAutomatorTestScope.assertConversionSucceeds(
     if (expectedPoints.size > 1) {
         // Notice that we don't test the coordinates of the points but only their number
         val expectedPointsNumber = "(${expectedPoints.size})"
-        onElement {
-            if (viewIdResourceName == "geoShareResultPointsHeadline") {
-                assertTrue(
-                    """Expected "${textAsString()}" to contain "$expectedPointsNumber"""",
-                    textAsString()?.contains(expectedPointsNumber) == true,
-                )
-                true
-            } else {
-                false
+        try {
+            onElement {
+                viewIdResourceName == "geoShareResultPointsHeadline" &&
+                    textAsString()?.contains(expectedPointsNumber) == true
             }
+        } catch (_: ElementNotFoundException) {
+            val text = onElement(500) { viewIdResourceName == "geoShareResultPointsHeadline" }
+            assertTrue("""Expected "$text" to contain "$expectedPointsNumber"""", false)
         }
         if (expectedPoints.any { !it.hasCoordinates() }) {
             onElement { viewIdResourceName == "geoShareResultCheckNameOnlyPoints" }
@@ -376,16 +364,11 @@ fun UiAutomatorTestScope.waitAndAssertGoogleMapsContainsElement(block: Accessibi
 }
 
 fun UiAutomatorTestScope.assertConversionFails(expectedMessage: Set<String>, timeoutMs: Long = NETWORK_TIMEOUT) {
-    onElement(timeoutMs) {
-        if (viewIdResourceName == "geoShareConversionErrorMessage") {
-            assertTrue(
-                """Expected "${textAsString()}" to equal one of ${expectedMessage.joinToString()}""",
-                textAsString() in expectedMessage,
-            )
-            true
-        } else {
-            false
-        }
+    try {
+        onElement(timeoutMs) { viewIdResourceName == "geoShareConversionErrorMessage" && textAsString() in expectedMessage }
+    } catch (_: ElementNotFoundException) {
+        val text = onElement(500) { viewIdResourceName == "geoShareConversionErrorMessage" }.text
+        assertTrue("""Expected "$text" to equal one of ${expectedMessage.joinToString()}""", false)
     }
 }
 

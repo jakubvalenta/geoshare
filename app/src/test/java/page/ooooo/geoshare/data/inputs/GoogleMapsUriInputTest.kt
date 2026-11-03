@@ -995,7 +995,8 @@ class GoogleMapsUriInputTest : InputTest {
             ParseResult.Success(
                 persistentListOf(
                     GCJ02MainlandChinaPoint(
-                        name = "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
+                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
+                        "Café Heinemann, Bismarckstraße 91, 41061 Mönchengladbach",
                         source = Source.URI,
                     )
                 ),

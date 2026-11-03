@@ -19,7 +19,7 @@ class GoogleMapsWebViewInput @Inject constructor(
     /**
      * Reads the URL of the page after the page JavaScript has changed the URL.
      *
-     * It waits for a while after a URL change and returns the URL only if no further URL change happens. The reaason is
+     * It waits for a while after a URL change and returns the URL only if no further URL change happens. The reason is
      * that the first URL change often doesn't lead to the final coordinates.
      *
      * It does only a quick check that the URL contains coordinates, so that it doesn't duplicate the Google Maps URI
