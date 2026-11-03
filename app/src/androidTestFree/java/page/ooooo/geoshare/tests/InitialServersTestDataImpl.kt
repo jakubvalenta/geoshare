@@ -30,6 +30,30 @@ object InitialServersTestDataImpl : InitialServersTestData {
             add(
                 Server(
                     name = "Google Maps Geocode Address",
+                    description = "via GeoShare Proxy",
+                    urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/address/{q}",
+                    authType = ServerAuthType.ATTESTATION,
+                    challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
+                    loginUrl = "https://api.geoshare-app.net/v1/auth/login",
+                    registerUrl = "https://api.geoshare-app.net/v1/auth/register",
+                    uuid = UUID.fromString("640f61e6-2bb4-41d3-9b4a-65e656564d03"),
+                )
+            )
+            add(
+                Server(
+                    name = "Google Maps Geocode Place",
+                    description = "via GeoShare Proxy",
+                    urlTemplate = "https://api.geoshare-app.net/v1/google-maps/geocode/places/{q}",
+                    authType = ServerAuthType.ATTESTATION,
+                    challengeUrl = "https://api.geoshare-app.net/v1/auth/challenge",
+                    loginUrl = "https://api.geoshare-app.net/v1/auth/login",
+                    registerUrl = "https://api.geoshare-app.net/v1/auth/register",
+                    uuid = UUID.fromString("e6f6ace9-0f52-42bd-86c4-f42cdebea60c"),
+                ),
+            )
+            add(
+                Server(
+                    name = "Google Maps Geocode Address",
                     description = "via local GeoShare Proxy",
                     urlTemplate = "http://127.0.0.1:8080/v1/google-maps/geocode/address/{q}",
                     authType = ServerAuthType.ATTESTATION,

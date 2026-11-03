@@ -55,8 +55,8 @@ When someone sends you a Google Maps link, but you prefer using OpenStreetMap,
 you can quickly **open the same location** in OsmAnd or Organic Maps.
 
 When you like Google Maps for finding places, but you prefer a different app for
-navigation, you can easily switch from Google Maps to your favorite
-**navigation app**.
+navigation, you can easily switch from Google Maps to your favorite **navigation
+app**.
 
 **Other features**
 
