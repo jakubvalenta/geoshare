@@ -51,7 +51,7 @@ class MapQuestInputBehaviorTest {
 
         // Short link
         testUri(
-            WGS84Point(52.49002, 13.38267, source = Source.HTML_NOT_SEMANTIC),
+            WGS84Point(52.4884774, 13.3801889, source = Source.HTML_NOT_SEMANTIC),
             "https://mapq.st/4s3jg1r",
             grantConnectionPermission = true,
         )
