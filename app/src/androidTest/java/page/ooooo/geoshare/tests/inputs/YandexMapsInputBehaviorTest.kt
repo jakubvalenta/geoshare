@@ -32,8 +32,8 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
 
         // Short link
         testUri(
-            WGS84Point(50.106526, 8.662158, source = Source.HTML_NOT_SEMANTIC),
-            "https://yandex.com/maps/-/CLAvMI18",
+            WGS84Point(50.106526, 8.662158, source = Source.HTML_SEMANTIC),
+            "https://yandex.com/maps/-/CLAvMI18", // Resolves to https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963%2C50.111192&mode=search...
             grantConnectionPermission = true,
         )
 
@@ -51,23 +51,33 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
         // POI Org
         testUri(
             WGS84Point(
-                39.915043, 116.408914,
-                z = 13.0,
+                39.916741, 116.390765,
                 name = "Запретный город",
-                source = Source.HTML_NOT_SEMANTIC,
+                source = Source.HTML_SEMANTIC,
             ),
             "https://yandex.com/maps/org/zapretny_gorod/5867973238",
             grantConnectionPermission = true,
+            fallbackNames = setOf(
+                // Sometimes the HTML document doesn't contain the place name in `itemProp="name"` for some reason.
+                "Coordinates",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Coordonnées",
+            ),
         )
 
         // POI Org with map center
         testUri(
             WGS84Point(
+                39.916741, 116.390765,
                 name = "Запретный город",
-                source = Source.HTML_NOT_SEMANTIC,
+                source = Source.HTML_SEMANTIC,
             ),
             "https://yandex.com/maps/org/zapretny_gorod/5867973238/?ll=116.096354%2C40.045755&z=13",
             grantConnectionPermission = true,
+            fallbackNames = setOf(
+                // Sometimes the HTML document doesn't contain the place name in `itemProp="name"` for some reason.
+                "Coordinates",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Coordonnées",
+            ),
         )
     }
 }
