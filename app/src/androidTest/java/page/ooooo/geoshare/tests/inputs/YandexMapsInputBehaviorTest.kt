@@ -33,7 +33,7 @@ class YandexMapsInputBehaviorTest : InputBehaviorTest {
         // Short link
         testUri(
             WGS84Point(50.106526, 8.662158, source = Source.HTML_NOT_SEMANTIC),
-            "https://yandex.com/maps/-/CLAvMI18",
+            "https://yandex.com/maps/-/CLAvMI18", // Resolves to https://yandex.com/maps/org/94933420809/?display-text=Cafes&ll=8.668963%2C50.111192&mode=search...
             grantConnectionPermission = true,
         )
 

@@ -39,7 +39,24 @@ class YandexMapsHtmlInput @Inject constructor(
         ) { data ->
             parseResultAsync {
                 val uri = Uri.parse(match, uriQuote)
+
+                // Pattern `data-coordinates="{lon},{lat}"`
+                val id = if (uri.pathParts.getOrNull(2) == "org") {
+                    uri.pathParts.getOrNull(3)?.toLongOrNull()
+                        ?: uri.pathParts.getOrNull(4)?.toLongOrNull()
+                } else {
+                    null
+                }
+                val dataPattern = if (id != null) {
+                    Regex("""data-id="$id"[^>]+data-coordinates="$LON,$LAT"""")
+                } else {
+                    null
+                }
+
+                // Pattern `pt={lon}%2C{lat}`
                 val ptPattern = Regex("""pt=$LON%2C$LAT""")
+
+                // Pattern `ll%3D{lon}%252C{lat}`
                 val llPattern = if (!uri.queryParams.contains("ll")) {
                     // Use the '...ll%3D...' pattern only if the place URL doesn't already contain a map center (e.g.
                     // https://yandex.com/maps/org/zapretny_gorod/5867973238). Because if the place URL contains a map
@@ -51,6 +68,8 @@ class YandexMapsHtmlInput @Inject constructor(
                 } else {
                     null
                 }
+
+                // Pattern `itemProp="name">{name}<`
                 val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
 
                 var naivePoint: NaivePoint? = null
@@ -58,13 +77,19 @@ class YandexMapsHtmlInput @Inject constructor(
 
                 while (true) {
                     val line = data.readLine() ?: break
-                    ptPattern.find(line)?.toLonLatPoint(Source.HTML_NOT_SEMANTIC)?.let {
-                        naivePoint = it
-                        continue
-                    }
-                    llPattern?.find(line)?.toLonLatZPoint(Source.HTML_NOT_SEMANTIC)?.let {
-                        naivePoint = it
-                        continue
+                    if (naivePoint == null) {
+                        dataPattern?.find(line)?.toLonLatPoint(Source.HTML_SEMANTIC)?.let {
+                            naivePoint = it
+                            continue
+                        }
+                        ptPattern.find(line)?.toLonLatPoint(Source.HTML_NOT_SEMANTIC)?.let {
+                            naivePoint = it
+                            continue
+                        }
+                        llPattern?.find(line)?.toLonLatZPoint(Source.HTML_NOT_SEMANTIC)?.let {
+                            naivePoint = it
+                            continue
+                        }
                     }
                     if (name == null) {
                         namePattern.find(line)?.groupOrNull()?.let {

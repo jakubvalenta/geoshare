@@ -16,6 +16,54 @@ class YandexMapsHtmlInputTest : InputTest {
     private val input = FakeInputRepository.yandexMapsHtmlInput
 
     @Test
+    fun parse_containsCoordinatesInDataWithCorrectOrgId_returnsPoint() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(WGS84Point(50.106526, 8.662158, source = Source.HTML_SEMANTIC))
+            ),
+            input.parse(
+                "https://yandex.com/maps/org/coffee_fellows/94933420809/",
+                FakeFetchTools(
+                    // language=html
+                    """
+<div class="business-card-view" itemScope="" itemType="http://schema.org/LocalBusiness" data-object="search-result" data-id="94933420809" data-log-id="xxx" data-coordinates="8.662158,50.106526">
+                    """.trimIndent()
+                )
+            ),
+        )
+        assertEquals(
+            ParseResult.Success(
+                persistentListOf(WGS84Point(50.106526, 8.662158, source = Source.HTML_SEMANTIC))
+            ),
+            input.parse(
+                "https://yandex.com/maps/org/94933420809/",
+                FakeFetchTools(
+                    // language=html
+                    """
+<div class="business-card-view" itemScope="" itemType="http://schema.org/LocalBusiness" data-object="search-result" data-id="94933420809" data-log-id="xxx" data-coordinates="8.662158,50.106526">
+                    """.trimIndent()
+                )
+            ),
+        )
+    }
+
+    @Test
+    fun parse_containsCoordinatesInDataWithIncorrectOrgId_returnsNoPoints() = runTest {
+        assertEquals(
+            ParseResult.Success(persistentListOf()),
+            input.parse(
+                "https://yandex.com/maps/org/coffee_fellows/94933420809/",
+                FakeFetchTools(
+                    // language=html
+                    """
+<div class="business-card-view" itemScope="" itemType="http://schema.org/LocalBusiness" data-object="search-result" data-id="123456" data-log-id="xxx" data-coordinates="8.662158,50.106526">
+                    """.trimIndent()
+                )
+            ),
+        )
+    }
+
+    @Test
     fun parse_containsCoordinatesInPT_returnsPoint() = runTest {
         assertEquals(
             ParseResult.Success(
