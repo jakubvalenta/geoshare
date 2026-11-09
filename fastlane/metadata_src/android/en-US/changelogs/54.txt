@@ -1,0 +1,1 @@
+- Fixed Yandex Maps POI links.
