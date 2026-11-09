@@ -110,6 +110,7 @@ class OpenStreetMapInputBehaviorTest : InputBehaviorTest {
                 WGS84Point(45.4771158, 9.2296737, source = Source.API),
                 WGS84Point(45.4771159, 9.2296361, source = Source.API),
                 WGS84Point(45.4772950, 9.2296354, source = Source.API),
+                WGS84Point(45.4770791, 9.2296746, source = Source.API),
             ),
             "https://www.openstreetmap.org/way/596674456",
             grantConnectionPermission = true,
