@@ -48,6 +48,8 @@ class YandexMapsHtmlInput @Inject constructor(
                     null
                 }
                 val dataPattern = if (id != null) {
+                    // Require the data-id to match org id in the URI, so that we don't read another data-coordinates,
+                    // just in case there are several data-coordinates attributes in the document.
                     Regex("""data-id="$id"[^>]+data-coordinates="$LON,$LAT"""")
                 } else {
                     null
@@ -70,7 +72,9 @@ class YandexMapsHtmlInput @Inject constructor(
                 }
 
                 // Pattern `itemProp="name">{name}<`
-                val namePattern = Regex("""itemProp="name"[^>]*>([^<]+)""")
+                // Require the tag to be H1, so that we don't accidentally read the reviews section, which also contains
+                // `itemProp="name"`.
+                val namePattern = Regex("""<h1[^>]+itemProp="name"[^>]*>([^<]+)""")
 
                 var naivePoint: NaivePoint? = null
                 var name: String? = null
@@ -96,6 +100,9 @@ class YandexMapsHtmlInput @Inject constructor(
                             name = it
                             continue
                         }
+                    }
+                    if (naivePoint != null && name != null) {
+                        break
                     }
                 }
 
