@@ -97,7 +97,7 @@ fun getFakeAppDetails(context: Context) =
         ),
         PackageNames.GMAPS_WV to AppDetail(
             packageName = PackageNames.GMAPS_WV,
-            label = @Suppress("SpellCheckingInspection", "GrazieInspectionRunner") "GMaps WV",
+            label = @Suppress("GrazieInspectionRunner") "GMaps WV",
             icon = context.getDrawable(R.mipmap.ic_launcher_round)!!,
         ),
         PackageNames.TOMTOM to AppDetail(

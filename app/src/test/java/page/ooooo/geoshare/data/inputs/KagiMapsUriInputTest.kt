@@ -130,7 +130,7 @@ class KagiMapsUriInputTest : InputTest {
                 persistentListOf(
                     WGS84Point(
                         z = 12.34,
-                        name = @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Špindlerův Mlýn",
+                        name = @Suppress("GrazieInspectionRunner") "Špindlerův Mlýn",
                         source = Source.URI,
                     )
                 ),
