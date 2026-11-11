@@ -1018,6 +1018,19 @@ class GoogleMapsUriInputTest : InputTest {
     }
 
     @Test
+    fun parse_cidOnly() = runTest {
+        assertEquals(
+            ParseResult.Success(
+                next = MatchedInput(
+                    FakeInputRepository.googleMapsHtmlInput,
+                    "https://maps.google.com/maps?cid=6827948439861580867",
+                )
+            ),
+            input.parse("https://maps.google.com/maps?cid=6827948439861580867"),
+        )
+    }
+
+    @Test
     @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
     fun parse_ftidOnly() = runTest {
         assertEquals(

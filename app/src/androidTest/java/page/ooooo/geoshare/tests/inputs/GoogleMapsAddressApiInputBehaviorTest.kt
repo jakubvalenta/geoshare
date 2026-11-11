@@ -405,12 +405,6 @@ class GoogleMapsAddressApiInputBehaviorTest(private val testServerParams: TestSe
         )
 
         // No points found
-        testUriFails(
-            setOf(
-                "No points found",
-                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Aucun point trouvé",
-            ),
-            "https://www.google.com/maps/place//",
-        )
+        testUriFails(unsafeUriString = "https://www.google.com/maps/place//")
     }
 }

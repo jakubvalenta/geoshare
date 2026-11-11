@@ -1,0 +1,1 @@
+- Fixes support for Google Maps links with CID.
