@@ -465,7 +465,10 @@ fun UiAutomatorTestScope.testUri(
 )
 
 fun UiAutomatorTestScope.testUriFails(
-    expectedMessage: Set<String>,
+    expectedMessage: Set<String> = setOf(
+        "No points found",
+        @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "Aucun point trouvé",
+    ),
     unsafeUriString: String,
     grantConnectionPermission: Boolean = false,
     timeoutMs: Long = NETWORK_TIMEOUT,
