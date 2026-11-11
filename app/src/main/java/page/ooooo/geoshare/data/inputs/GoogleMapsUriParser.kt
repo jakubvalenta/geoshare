@@ -44,7 +44,7 @@ object GoogleMapsUriParser {
             // https://www.google.com/share.google?q={id}
             // https://www.google.com/search
             if (!host.contains("maps") && pathParts.getOrNull(1) in setOf("search", "share.google")) {
-                return@run
+                return@googleMapsParseResult
             }
 
             val z = Z_PATTERN.matchEntire(queryParams["zoom"]?.firstOrNull())?.doubleGroupOrNull()
@@ -174,15 +174,25 @@ object GoogleMapsUriParser {
                     points = parseParts(parts, z)
                 }
             }
+            if (points.lastOrNull()?.hasCoordinates() == true) {
+                // The parsing of path parts succeeded
+                return@googleMapsParseResult
+            }
 
             // ID
             // https://maps.google.com/?ftid={id}
-            if (
-                points.lastOrNull()?.hasCoordinates() != true &&
-                !queryParams[@Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "ftid"].isNullOrEmpty()
-            ) {
-                requiresHtmlParsing = true
-            }
+            // https://www.google.com/maps?cid={id}
+            listOf(
+                "cid",
+                @Suppress("GrazieInspectionRunner", "SpellCheckingInspection") "ftid",
+            )
+                .firstOrNull { key ->
+                    !queryParams[key].isNullOrEmpty()
+                }
+                ?.let {
+                    requiresHtmlParsing = true
+                    return@googleMapsParseResult
+                }
         }
     }
 
