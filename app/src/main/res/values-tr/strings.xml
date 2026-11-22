@@ -217,12 +217,12 @@
     <string name="links_update">Web haritasını düzenle</string>
     <string name="network_exception_too_many_requests">Çok fazla istek</string>
     <plurals name="user_preferences_apps_visible_count">
-        <item quantity="one">%2$d uygulamadan %1$d’i görünür</item>
-        <item quantity="other">%2$d uygulamadan %1$d’i görünür</item>
+        <item quantity="one">%2$d uygulamadan %1$d görünür</item>
+        <item quantity="other">%2$d uygulamadan %1$d görünür</item>
     </plurals>
     <string name="intro_how_to_share_google_maps_screenshot_place">Bırakılan işaretçi</string>
     <string name="about_text"><![CDATA[<p>%1$s, ücretsiz ve açık kaynaklı bir uygulamadır <a href=\"https://www.gnu.org/licenses/gpl-3.0.txt\">GPL 3.0</a> veya daha sonraki lisans altında dağıtılmaktadır.</p><br><p>Kodu <a href=\"https://github.com/jakubvalenta/geoshare\">GitHub</a>’ta bulabilirsiniz, ayrıca <a href=\"https://github.com/jakubvalenta/geoshare/issues\">sorun bildirebilirsiniz</a>.</p><br><p>Görüşleriniz bizim için değerlidir. Bana <a href=\"mailto:%2$s\">%2$s</a>’ten ulaşabilirsiniz.</p>]]></string>
-    <string name="conversion_succeeded_check_experimental">Deneysel bir ekstraksiyon yöntemi nedeniyle konum doğruluğunda hatalar olabilir.</string>
+    <string name="conversion_succeeded_check_experimental">Bu harita bağlantısına yönelik destek deneysel olduğu için konum bilgisi doğru olmayabilir.</string>
     <string name="licenses">Lisanslar</string>
     <string name="conversion_succeeded_check_map_center">Konum, bir işaretçi değil harita merkezi olabilir.</string>
     <string name="conversion_succeeded_check_srs">Koordinat sistemi dönüşümü nedeniyle konum bilgisi hatalı olabilir.</string>
@@ -302,4 +302,25 @@
     <string name="network_exception_too_many_requests_wait">Çok fazla istek, %1$d sn bekleyin</string>
     <string name="user_preferences_dynamic_color_title">Dinamik renk</string>
     <string name="user_preferences_section_appearance">Görünüm</string>
+    <string name="conversion_succeeded_copy_name">Adı kopyala</string>
+    <string name="copy">Kopyala</string>
+    <string name="help_open_by_default_action">SSS bölümünde daha fazla bilgi edinebilirsiniz</string>
+    <string name="help_welcome_title">Hoş geldiniz</string>
+    <string name="input_kagi_maps_name">Kagi Maps</string>
+    <string name="input_map_quest_name">MapQuest</string>
+    <string name="input_yahoo_maps_name">Yahoo! Maps</string>
+    <string name="optional">İsteğe bağlı</string>
+    <string name="description">Tanım</string>
+    <string name="load_more">Daha fazla yükle</string>
+    <string name="help_share_source_title">Bir harita uygulamasından GeoShare\'i başlatın</string>
+    <string name="help_share_source_action">%1$s\'da deneyin</string>
+    <string name="help_share_source_text">Birçok harita uygulamasında, bir konumu %2$s\'da açmak için paylaş düğmesini %1$s kullanabilirsiniz.</string>
+    <string name="conversion_processing">%1$s bağlantısının türü işleniyor</string>
+    <string name="help_welcome_action">veya bu örneği kopyalayın:</string>
+    <string name="help_welcome_text">Harita bağlantınız hazır mı? Bağlantıyı forma girin ve %1$s\'e basın.</string>
+    <string name="user_preferences_finish_title">Kapanış</string>
+    <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Bağlantıyı paylaştıktan ve harita uygulamasını açtıktan sonra uygulamayı kapatın</string>
+    <string name="user_preferences_finish_description">Uygulamanın ne zaman otomatik olarak kapanması gerektiğini seçin. Geri tuşunu kullandıktan sonra kapalı bir uygulama görünmez.</string>
+    <string name="user_preferences_finish_never">Uygulamayı otomatik olarak kapatma</string>
+    <string name="user_preferences_finish_after_action_succeeded">Bağlantıyı paylaştıktan ve herhangi bir işlem gerçekleştirdikten sonra (harita uygulamasını açma, koordinatları kopyalama, GPX kaydetme vb.) uygulamayı kapatın</string>
 </resources>
