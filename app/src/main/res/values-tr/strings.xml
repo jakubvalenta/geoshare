@@ -312,12 +312,12 @@
     <string name="optional">İsteğe bağlı</string>
     <string name="description">Tanım</string>
     <string name="load_more">Daha fazla yükle</string>
-    <string name="help_share_source_title">Bir harita uygulamasından GeoShare\'i başlatın</string>
-    <string name="help_share_source_action">%1$s\'da deneyin</string>
-    <string name="help_share_source_text">Birçok harita uygulamasında, bir konumu %2$s\'da açmak için paylaş düğmesini %1$s kullanabilirsiniz.</string>
+    <string name="help_share_source_title">Bir harita uygulamasından GeoShare’i başlatın</string>
+    <string name="help_share_source_action">%1$s’da deneyin</string>
+    <string name="help_share_source_text">Birçok harita uygulamasında, bir konumu %2$s’da açmak için paylaş düğmesini %1$s kullanabilirsiniz.</string>
     <string name="conversion_processing">%1$s bağlantısının türü işleniyor</string>
     <string name="help_welcome_action">veya bu örneği kopyalayın:</string>
-    <string name="help_welcome_text">Harita bağlantınız hazır mı? Bağlantıyı forma girin ve %1$s\'e basın.</string>
+    <string name="help_welcome_text">Harita bağlantınız hazır mı? Bağlantıyı forma girin ve %1$s’e basın.</string>
     <string name="user_preferences_finish_title">Kapanış</string>
     <string name="user_preferences_finish_after_action_succeeded_and_opened_app">Bağlantıyı paylaştıktan ve harita uygulamasını açtıktan sonra uygulamayı kapatın</string>
     <string name="user_preferences_finish_description">Uygulamanın ne zaman otomatik olarak kapanması gerektiğini seçin. Geri tuşunu kullandıktan sonra kapalı bir uygulama görünmez.</string>
