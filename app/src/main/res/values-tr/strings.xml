@@ -323,4 +323,11 @@
     <string name="user_preferences_finish_description">Uygulamanın ne zaman otomatik olarak kapanması gerektiğini seçin. Geri tuşunu kullandıktan sonra kapalı bir uygulama görünmez.</string>
     <string name="user_preferences_finish_never">Uygulamayı otomatik olarak kapatma</string>
     <string name="user_preferences_finish_after_action_succeeded">Bağlantıyı paylaştıktan ve herhangi bir işlem gerçekleştirdikten sonra (harita uygulamasını açma, koordinatları kopyalama, GPX kaydetme vb.) uygulamayı kapatın</string>
+    <string name="faq_open_by_default_headline">Bağlantılar her zaman %1$s’de nasıl açılır</string>
+    <string name="conversion_failed_unsupported_source_google_search">Google Arama bağlantıları desteklenmiyor</string>
+    <string name="network_exception_content_convert">Geçersiz yanıt içeriği</string>
+    <string name="user_preferences_server_edit">Sunucuları düzenle</string>
+    <string name="help_open_by_default_title">Harita bağlantılarını her zaman %1$s’de aç</string>
+    <string name="main_source_open">Orijinal bağlantıyı aç</string>
+    <string name="conversion_automation_copy_name_succeeded">Otomatik olarak kopyalanan isim</string>
 </resources>
