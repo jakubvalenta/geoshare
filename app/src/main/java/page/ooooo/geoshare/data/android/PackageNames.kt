@@ -25,6 +25,10 @@ object PackageNames {
     const val MAGIC_EARTH = "com.generalmagic.magicearth"
     const val MAPS_ME = "com.mapswithme.maps.pro"
     const val MAPY_COM = "cz.seznam.mapy"
+    const val MINI_NA = "de.mini.connected.mobile20.na"
+    const val MINI_ROW = "de.mini.connected.mobile20.row"
+    const val MY_BMW_NA = "de.bmw.connected.mobile20.na"
+    const val MY_BMW_ROW = "de.bmw.connected.mobile20.row"
     const val OEFFI = "de.schildbach.oeffi"
     const val ORGANIC_MAPS = "app.organicmaps"
     const val OSMAND = "net.osmand"
@@ -49,6 +53,33 @@ object PackageNames {
         MAGIC_EARTH,
         MAPS_ME,
     )
+
+    private val messagingApps = setOf(
+        CONVERSATIONS,
+        SIGNAL,
+        TELEGRAM,
+        TELEGRAM_FORK,
+        WHATSAPP,
+    )
+
+    /**
+     * Car companion apps (MyBMW, MINI) that accept a shared Google Maps link as a destination to send to the car. They
+     * only recognize unencoded coordinates (`48.1,11.5`, not `48.1%2C11.5`) and don't recognize search queries.
+     */
+    private val carApps = setOf(
+        MINI_NA,
+        MINI_ROW,
+        MY_BMW_NA,
+        MY_BMW_ROW,
+    )
+
+    /**
+     * Apps that receive a point as shared text.
+     */
+    val textReceivers = messagingApps + carApps
+
+    fun isCarApp(packageName: String?): Boolean =
+        packageName in carApps
 
     fun getSrs(packageName: String?): Srs =
         when (packageName) {

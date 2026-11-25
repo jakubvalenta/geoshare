@@ -8,6 +8,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.android.TextActivity
 import page.ooooo.geoshare.data.formatters.UriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
@@ -17,7 +18,7 @@ import page.ooooo.geoshare.data.uri.UriQuote
 import javax.inject.Inject
 
 /**
- * Creates a Google Maps display URI and sends it via [activity], which is often a messaging app.
+ * Creates a Google Maps display URI and sends it via [activity], which is often a messaging app or a car app.
  */
 class SendPointOutput @Inject constructor(
     override val activity: TextActivity,
@@ -35,12 +36,21 @@ class SendPointOutput @Inject constructor(
     fun getUriString(value: Point): String? =
         UriFormatter.formatUriString(
             point = coordinateConverter.toSrs(value, Srs.GCJ02_MAINLAND_CHINA),
-            // Use https://maps.google.com/?q= instead of https://www.google.com/maps/search/?api=1&q=, because
-            // Telegram doesn't show a map preview when using the API link.
-            coordsUriTemplate = "https://maps.google.com/?q={lat}%2C{lon}",
-            nameUriTemplate = "https://maps.google.com/?q={q}",
+            coordsUriTemplate = if (PackageNames.isCarApp(activity.packageName)) {
+                // Car apps don't decode the URI, so keep the comma unencoded
+                "https://www.google.com/maps/place/{lat},{lon}"
+            } else {
+                // Use https://maps.google.com/?q= instead of https://www.google.com/maps/search/?api=1&q=, because
+                // Telegram doesn't show a map preview when using the API link.
+                "https://maps.google.com/?q={lat}%2C{lon}"
+            },
+            // Car apps don't support search queries, so leave the name template empty for them
+            nameUriTemplate = if (PackageNames.isCarApp(activity.packageName)) "" else "https://maps.google.com/?q={q}",
             uriQuote = uriQuote,
         )
+
+    override fun isEnabled(value: Point) =
+        !getUriString(value).isNullOrEmpty()
 
     override suspend fun execute(value: Point, context: Context) =
         getUriString(value)
