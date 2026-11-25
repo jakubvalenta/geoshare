@@ -18,6 +18,12 @@ suspend fun PackageManager.queryActivities(
         PackageNames.TELEGRAM_FORK,
         PackageNames.WHATSAPP,
     ),
+    allowedTextReceiverApps: Set<String> = setOf(
+        PackageNames.MINI_NA,
+        PackageNames.MINI_ROW,
+        PackageNames.MY_BMW_NA,
+        PackageNames.MY_BMW_ROW,
+    ),
 ): List<AppActivity> = withContext(Dispatchers.Default) {
     buildList {
         for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "geo:".toUri()))) {
@@ -58,9 +64,10 @@ suspend fun PackageManager.queryActivities(
                 type = "text/plain"
             },
         )) {
-            // Allow only selected messaging apps, so that the app list is not flooded with apps no one will use
-            if (packageName in allowedMessagingApps) {
-                add(TextActivity(packageName, MimeType.TEXT_PLAIN))
+            // Allow only selected apps, so that the app list is not flooded with apps no one will use
+            when (packageName) {
+                in allowedMessagingApps -> add(TextActivity(packageName, MimeType.TEXT_PLAIN, isMessagingApp = true))
+                in allowedTextReceiverApps -> add(TextActivity(packageName, MimeType.TEXT_PLAIN))
             }
         }
     }

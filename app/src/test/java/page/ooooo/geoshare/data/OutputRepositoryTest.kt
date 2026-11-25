@@ -345,11 +345,11 @@ class OutputRepositoryTest {
                     AppOutputs(
                         packageName = PackageNames.SIGNAL,
                         defaultOutput = SendPointOutput(
-                            TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN), coordinateConverter, uriQuote
+                            TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN, isMessagingApp = true), coordinateConverter, uriQuote
                         ),
                         allOutputs = listOf(
                             SendPointOutput(
-                                TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN), coordinateConverter, uriQuote
+                                TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN, isMessagingApp = true), coordinateConverter, uriQuote
                             ),
                         )
                     ),
@@ -391,8 +391,53 @@ class OutputRepositoryTest {
                     FileActivity(PackageNames.GOOGLE_MAPS, FileType.GPX),
                     UriActivity(PackageNames.CARTES_IGN, UriScheme.CARTES_IGN),
                     UriActivity(PackageNames.MAGIC_EARTH, UriScheme.MAGIC_EARTH),
-                    TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN),
+                    TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN, isMessagingApp = true),
                     FileActivity(PackageNames.TOMTOM, FileType.GPX_ONE_POINT),
+                ),
+                emptySet(),
+            ),
+        )
+    }
+
+    @Test
+    fun getAppsOutputs_whenTextActivityIsNotMessagingApp_returnsItAsMapApp() {
+        assertEquals(
+            AppsOutputs(
+                mapAppsOutputs = listOf(
+                    AppOutputs(
+                        packageName = PackageNames.MY_BMW_ROW,
+                        defaultOutput = SendPointOutput(
+                            TextActivity(PackageNames.MY_BMW_ROW, MimeType.TEXT_PLAIN), coordinateConverter, uriQuote
+                        ),
+                        allOutputs = listOf(
+                            SendPointOutput(
+                                TextActivity(PackageNames.MY_BMW_ROW, MimeType.TEXT_PLAIN), coordinateConverter, uriQuote
+                            ),
+                        )
+                    ),
+                ),
+                messagingAppsOutputs = listOf(
+                    AppOutputs(
+                        packageName = PackageNames.SIGNAL,
+                        defaultOutput = SendPointOutput(
+                            TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN, isMessagingApp = true),
+                            coordinateConverter,
+                            uriQuote,
+                        ),
+                        allOutputs = listOf(
+                            SendPointOutput(
+                                TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN, isMessagingApp = true),
+                                coordinateConverter,
+                                uriQuote,
+                            ),
+                        )
+                    ),
+                ),
+            ),
+            outputRepository.getAppsOutputs(
+                listOf(
+                    TextActivity(PackageNames.MY_BMW_ROW, MimeType.TEXT_PLAIN),
+                    TextActivity(PackageNames.SIGNAL, MimeType.TEXT_PLAIN, isMessagingApp = true),
                 ),
                 emptySet(),
             ),

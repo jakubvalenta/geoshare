@@ -31,7 +31,11 @@ data class FileActivity(override val packageName: String, val fileType: FileType
         context.openFileInApp(file, packageName, log)
 }
 
-data class TextActivity(override val packageName: String, val mimeType: MimeType) : AppActivity {
+data class TextActivity(
+    override val packageName: String,
+    val mimeType: MimeType,
+    val isMessagingApp: Boolean = false,
+) : AppActivity {
     fun launch(context: Context, text: String): Boolean =
         context.sendTextViaApp(text, packageName, mimeType)
 }
@@ -42,7 +46,7 @@ data class UriActivity(override val packageName: String, val uriScheme: UriSchem
 }
 
 fun AppActivity.isMessagingApp(): Boolean =
-    this is TextActivity
+    (this as? TextActivity)?.isMessagingApp == true
 
 fun Iterable<AppActivity>.getPackageNames(): Set<String> =
     map { it.packageName }.toSet()

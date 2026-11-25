@@ -8,8 +8,9 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.android.AppDetails
+import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.android.TextActivity
-import page.ooooo.geoshare.data.formatters.UriFormatter
+import page.ooooo.geoshare.data.formatters.GoogleMapsUriFormatter
 import page.ooooo.geoshare.data.geo.CoordinateConverter
 import page.ooooo.geoshare.data.geo.Point
 import page.ooooo.geoshare.data.geo.Srs
@@ -33,14 +34,14 @@ class SendPointOutput @Inject constructor(
     override val id = "SendPointOutput(activity=$activity)"
 
     fun getUriString(value: Point): String? =
-        UriFormatter.formatUriString(
-            point = coordinateConverter.toSrs(value, Srs.GCJ02_MAINLAND_CHINA),
-            // Use https://maps.google.com/?q= instead of https://www.google.com/maps/search/?api=1&q=, because
-            // Telegram doesn't show a map preview when using the API link.
-            coordsUriTemplate = "https://maps.google.com/?q={lat}%2C{lon}",
-            nameUriTemplate = "https://maps.google.com/?q={q}",
-            uriQuote = uriQuote,
+        GoogleMapsUriFormatter.formatDisplayUriString(
+            coordinateConverter.toSrs(value, Srs.GCJ02_MAINLAND_CHINA),
+            PackageNames.getGoogleMapsUriFlavor(activity.packageName),
+            uriQuote,
         )
+
+    override fun isEnabled(value: Point) =
+        !getUriString(value).isNullOrEmpty()
 
     override suspend fun execute(value: Point, context: Context) =
         getUriString(value)

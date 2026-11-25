@@ -37,7 +37,7 @@ object AppRepositoryModule {
 val fakeActivities = listOf(
     UriActivity(PackageNames.COMAPS_FDROID, UriScheme.GEO),
     UriActivity(PackageNames.COMAPS_FDROID, UriScheme.GOOGLE_NAVIGATION),
-    TextActivity(PackageNames.CONVERSATIONS, MimeType.TEXT_PLAIN),
+    TextActivity(PackageNames.CONVERSATIONS, MimeType.TEXT_PLAIN, isMessagingApp = true),
     UriActivity(PackageNames.GMAPS_WV, UriScheme.GEO),
     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GEO),
     UriActivity(PackageNames.GOOGLE_MAPS, UriScheme.GOOGLE_NAVIGATION),

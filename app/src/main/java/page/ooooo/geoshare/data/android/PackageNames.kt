@@ -3,6 +3,7 @@
 package page.ooooo.geoshare.data.android
 
 import page.ooooo.geoshare.data.formatters.GeoUriFlavor
+import page.ooooo.geoshare.data.formatters.GoogleMapsUriFlavor
 import page.ooooo.geoshare.data.geo.Srs
 
 object PackageNames {
@@ -25,6 +26,10 @@ object PackageNames {
     const val MAGIC_EARTH = "com.generalmagic.magicearth"
     const val MAPS_ME = "com.mapswithme.maps.pro"
     const val MAPY_COM = "cz.seznam.mapy"
+    const val MINI_NA = "de.mini.connected.mobile20.na"
+    const val MINI_ROW = "de.mini.connected.mobile20.row"
+    const val MY_BMW_NA = "de.bmw.connected.mobile20.na"
+    const val MY_BMW_ROW = "de.bmw.connected.mobile20.row"
     const val OEFFI = "de.schildbach.oeffi"
     const val ORGANIC_MAPS = "app.organicmaps"
     const val OSMAND = "net.osmand"
@@ -49,6 +54,17 @@ object PackageNames {
         MAGIC_EARTH,
         MAPS_ME,
     )
+
+    fun getGoogleMapsUriFlavor(packageName: String?): GoogleMapsUriFlavor =
+        when (packageName) {
+            MINI_NA,
+            MINI_ROW,
+            MY_BMW_NA,
+            MY_BMW_ROW,
+                -> GoogleMapsUriFlavor.PLACE_PATH
+
+            else -> GoogleMapsUriFlavor.Q_PARAM
+        }
 
     fun getSrs(packageName: String?): Srs =
         when (packageName) {
