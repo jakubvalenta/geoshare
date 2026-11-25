@@ -1,6 +1,7 @@
 package page.ooooo.geoshare.data.formatters
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import page.ooooo.geoshare.data.geo.Source
 import page.ooooo.geoshare.data.geo.WGS84Point
@@ -118,5 +119,85 @@ class GoogleMapsUriFormatterTest {
                 uriQuote,
             ),
         )
+    }
+
+    @Test
+    fun formatDisplayUriString_whenFlavorIsPlacePath_returnsPlaceUriWithUnencodedComma() {
+        assertEquals(
+            "https://www.google.com/maps/place/50.123456,-120.123456",
+            GoogleMapsUriFormatter.formatDisplayUriString(
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
+                GoogleMapsUriFlavor.PLACE_PATH,
+                uriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatDisplayUriString_whenFlavorIsPlacePathAndPointHasCoordinatesAndName_ignoresName() {
+        assertEquals(
+            "https://www.google.com/maps/place/50.123456,-120.123456",
+            GoogleMapsUriFormatter.formatDisplayUriString(
+                WGS84Point(50.123456, -120.123456, name = "foo bar", source = Source.GENERATED),
+                GoogleMapsUriFlavor.PLACE_PATH,
+                uriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatDisplayUriString_whenFlavorIsPlacePathAndPointHasOnlyName_returnsNull() {
+        assertNull(
+            GoogleMapsUriFormatter.formatDisplayUriString(
+                WGS84Point(name = "foo bar", source = Source.GENERATED),
+                GoogleMapsUriFlavor.PLACE_PATH,
+                uriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatDisplayUriString_whenFlavorIsPlacePathAndPointHasOnlyLat_returnsNull() {
+        assertNull(
+            GoogleMapsUriFormatter.formatDisplayUriString(
+                WGS84Point(lat = 50.123456, source = Source.GENERATED),
+                GoogleMapsUriFlavor.PLACE_PATH,
+                uriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatDisplayUriString_whenFlavorIsQParam_returnsUriWithEncodedComma() {
+        assertEquals(
+            "https://maps.google.com/?q=50.123456%2C-120.123456",
+            GoogleMapsUriFormatter.formatDisplayUriString(
+                WGS84Point(50.123456, -120.123456, source = Source.GENERATED),
+                GoogleMapsUriFlavor.Q_PARAM,
+                uriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatDisplayUriString_whenFlavorIsQParamAndPointHasOnlyName_returnsUriWithSearchQuery() {
+        assertEquals(
+            "https://maps.google.com/?q=foo%20bar",
+            GoogleMapsUriFormatter.formatDisplayUriString(
+                WGS84Point(name = "foo bar", source = Source.GENERATED),
+                GoogleMapsUriFlavor.Q_PARAM,
+                uriQuote,
+            ),
+        )
+    }
+
+    @Test
+    fun formatDisplayUriString_whenPointHasNeitherCoordinatesNorName_returnsNullForAllFlavors() {
+        for (flavor in GoogleMapsUriFlavor.entries) {
+            assertNull(
+                flavor.name,
+                GoogleMapsUriFormatter.formatDisplayUriString(WGS84Point(source = Source.GENERATED), flavor, uriQuote),
+            )
+        }
     }
 }

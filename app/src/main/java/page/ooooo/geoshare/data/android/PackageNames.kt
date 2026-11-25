@@ -3,6 +3,7 @@
 package page.ooooo.geoshare.data.android
 
 import page.ooooo.geoshare.data.formatters.GeoUriFlavor
+import page.ooooo.geoshare.data.formatters.GoogleMapsUriFlavor
 import page.ooooo.geoshare.data.geo.Srs
 
 object PackageNames {
@@ -54,32 +55,16 @@ object PackageNames {
         MAPS_ME,
     )
 
-    private val messagingApps = setOf(
-        CONVERSATIONS,
-        SIGNAL,
-        TELEGRAM,
-        TELEGRAM_FORK,
-        WHATSAPP,
-    )
+    fun getGoogleMapsUriFlavor(packageName: String?): GoogleMapsUriFlavor =
+        when (packageName) {
+            MINI_NA,
+            MINI_ROW,
+            MY_BMW_NA,
+            MY_BMW_ROW,
+                -> GoogleMapsUriFlavor.PLACE_PATH
 
-    /**
-     * Car companion apps (MyBMW, MINI) that accept a shared Google Maps link as a destination to send to the car. They
-     * only recognize unencoded coordinates (`48.1,11.5`, not `48.1%2C11.5`) and don't recognize search queries.
-     */
-    private val carApps = setOf(
-        MINI_NA,
-        MINI_ROW,
-        MY_BMW_NA,
-        MY_BMW_ROW,
-    )
-
-    /**
-     * Apps that receive a point as shared text.
-     */
-    val textReceivers = messagingApps + carApps
-
-    fun isCarApp(packageName: String?): Boolean =
-        packageName in carApps
+            else -> GoogleMapsUriFlavor.Q_PARAM
+        }
 
     fun getSrs(packageName: String?): Srs =
         when (packageName) {
