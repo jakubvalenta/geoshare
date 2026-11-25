@@ -11,7 +11,7 @@ import page.ooooo.geoshare.BuildConfig
 private const val TAG = "PackageManagerExtensions"
 
 suspend fun PackageManager.queryActivities(
-    allowedMessagingApps: Set<String> = PackageNames.textReceivers,
+    allowedTextReceivers: Set<String> = PackageNames.textReceivers,
 ): List<AppActivity> = withContext(Dispatchers.Default) {
     buildList {
         for (packageName in queryPackageNames(Intent(Intent.ACTION_VIEW, "geo:".toUri()))) {
@@ -53,7 +53,7 @@ suspend fun PackageManager.queryActivities(
             },
         )) {
             // Allow only selected messaging and car apps, so that the app list is not flooded with apps no one will use
-            if (packageName in allowedMessagingApps) {
+            if (packageName in allowedTextReceivers) {
                 add(TextActivity(packageName, MimeType.TEXT_PLAIN))
             }
         }
