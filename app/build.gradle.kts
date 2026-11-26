@@ -17,6 +17,7 @@ kotlin {
 android {
     namespace = "page.ooooo.geoshare"
     compileSdk = 37
+    compileSdkMinor = 2
 
     defaultConfig {
         applicationId = "page.ooooo.geoshare"

@@ -66,6 +66,7 @@ class WazeInputBehaviorTest : InputBehaviorTest {
         )
 
         // Place id
+        // TODO It seems that Waze's HTML has changed and this link is not supported anymore
         testUri(
             WGS84Point(52.000425474, 4.372739102, source = Source.HTML_NOT_SEMANTIC),
             "https://ul.waze.com/ul?venue_id=2884104.28644432.6709020",
