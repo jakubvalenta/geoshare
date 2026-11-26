@@ -33,7 +33,6 @@ import page.ooooo.geoshare.data.InputRepository
 import page.ooooo.geoshare.data.LinkOutputs
 import page.ooooo.geoshare.data.LinkRepository
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.ShareOutputs
 import page.ooooo.geoshare.data.UserPreferenceRepository
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.getUriString
@@ -88,7 +87,7 @@ import kotlin.time.Duration
 
 data class ResultAppsState(
     val appsOutputs: AppsOutputs = AppsOutputs(),
-    val shareOutputs: ShareOutputs? = null,
+    val shareOutputs: List<Output<*>>? = null,
 )
 
 data class ResultCoordinatesState(

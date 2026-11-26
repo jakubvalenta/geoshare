@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.StateFlow
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.AppOutputs
 import page.ooooo.geoshare.data.OutputRepository
-import page.ooooo.geoshare.data.ShareOutputs
 import page.ooooo.geoshare.data.android.AppDetails
 import page.ooooo.geoshare.data.android.PackageNames
 import page.ooooo.geoshare.data.di.fakeActivities
@@ -40,6 +39,7 @@ import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
 import page.ooooo.geoshare.data.outputs.Output
 import page.ooooo.geoshare.data.outputs.PlaceholderIconDescriptor
+import page.ooooo.geoshare.data.outputs.isEnabled
 import page.ooooo.geoshare.data.outputs.toAction
 import page.ooooo.geoshare.data.uri.DefaultUriQuote
 import page.ooooo.geoshare.ui.ResultAppsState
@@ -137,6 +137,7 @@ private fun ResultAppIcon(
     onExecute: (Action<*>) -> Unit,
     onHideApp: () -> Unit,
 ) {
+    val defaultOutput = appOutputs.outputs.firstOrNull { it.isEnabled(lastPoint, points, source) } ?: return
     AppIcon(
         label = appDetails[appOutputs.packageName]?.label.orEmpty(),
         menu = { expanded, onDismissRequest ->
@@ -144,7 +145,7 @@ private fun ResultAppIcon(
                 appDetails = appDetails,
                 expanded = expanded,
                 lastPoint = lastPoint,
-                outputs = appOutputs.allOutputs,
+                outputs = appOutputs.outputs,
                 points = points,
                 source = source,
                 onDismissRequest = onDismissRequest,
@@ -152,13 +153,13 @@ private fun ResultAppIcon(
                 onHide = onHideApp,
             )
         },
-        onClick = { onExecute(appOutputs.defaultOutput.toAction(lastPoint, points, source)) },
+        onClick = { onExecute(defaultOutput.toAction(lastPoint, points, source)) },
         modifier = Modifier
             .width(width)
             .testTag("geoShareApp_${appOutputs.packageName}"),
     ) {
         IconFromDescriptor(
-            appOutputs.defaultOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+            defaultOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
             contentDescription = null,
             size = iconSize,
             placeholderContainerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -169,7 +170,7 @@ private fun ResultAppIcon(
 @Composable
 private fun ResultShareIcon(
     appDetails: AppDetails,
-    shareOutputs: ShareOutputs,
+    shareOutputs: List<Output<*>>,
     iconSize: Dp,
     lastPoint: Point,
     points: Points,
@@ -177,6 +178,7 @@ private fun ResultShareIcon(
     width: Dp,
     onExecute: (action: Action<*>) -> Unit,
 ) {
+    val defaultOutput = shareOutputs.firstOrNull { it.isEnabled(lastPoint, points, source) } ?: return
     AppIcon(
         label = null,
         menu = { expanded, onDismissRequest ->
@@ -184,7 +186,7 @@ private fun ResultShareIcon(
                 appDetails = appDetails,
                 expanded = expanded,
                 lastPoint = lastPoint,
-                outputs = shareOutputs.allOutputs,
+                outputs = shareOutputs,
                 points = points,
                 source = source,
                 onDismissRequest = onDismissRequest,
@@ -192,7 +194,7 @@ private fun ResultShareIcon(
                 onHide = null,
             )
         },
-        onClick = { onExecute(shareOutputs.defaultOutput.toAction(lastPoint, points, source)) },
+        onClick = { onExecute(defaultOutput.toAction(lastPoint, points, source)) },
         modifier = Modifier
             .width(width)
             .testTag("geoShareAppShare"),
@@ -203,8 +205,8 @@ private fun ResultShareIcon(
             shape = CircleShape,
         ) {
             IconFromDescriptor(
-                shareOutputs.defaultOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
-                contentDescription = shareOutputs.defaultOutput.label(appDetails),
+                defaultOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                contentDescription = defaultOutput.label(appDetails),
                 size = 24.dp,
             )
         }

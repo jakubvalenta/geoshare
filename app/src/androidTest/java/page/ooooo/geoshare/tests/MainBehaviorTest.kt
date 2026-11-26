@@ -237,6 +237,32 @@ class MainBehaviorTest {
     }
 
     @Test
+    fun whenLinkIsSharedAndItHasCoordinates_allowsOpeningCarApp() = uiAutomator {
+        val carAppPackageName = PackageNames.MY_BMW_ROW
+        assumeAppInstalled(carAppPackageName)
+
+        // Share a point without coordinates with the app
+        shareUri("geo:?q=foo")
+
+        // Shows result screen
+        assertConversionSucceeds(WGS84Point(name = "foo", source = Source.URI))
+
+        // Does not show the car app
+        scrollToAppIcons()
+        assertNull(onElementOrNull(ELEMENT_DOES_NOT_EXIST_TIMEOUT) { viewIdResourceName == "geoShareApp_$carAppPackageName" })
+
+        // Share a URI with the app
+        shareUri()
+
+        // Tap the car app icon
+        scrollToAppIcons()
+        scrollToAppIcon(carAppPackageName).clickAppIcon()
+
+        // Opens the car app
+        onElement { packageName == carAppPackageName }
+    }
+
+    @Test
     fun whenLinkIsShared_allowsOpeningGoogleMapsSearchLink() = uiAutomator {
         assumeAppInstalled(PackageNames.GOOGLE_MAPS)
 

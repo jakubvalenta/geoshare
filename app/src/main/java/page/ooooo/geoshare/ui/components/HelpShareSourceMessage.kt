@@ -32,6 +32,7 @@ import page.ooooo.geoshare.data.geo.Geometries
 import page.ooooo.geoshare.data.geo.WGS84Point
 import page.ooooo.geoshare.data.log.DefaultLog
 import page.ooooo.geoshare.data.outputs.Action
+import page.ooooo.geoshare.data.outputs.isEnabled
 import page.ooooo.geoshare.data.outputs.toAction
 import page.ooooo.geoshare.data.preferences.HelpMessage
 import page.ooooo.geoshare.data.preferences.isDismissed
@@ -74,15 +75,13 @@ fun HelpShareSourceMessage(
                 }
             },
             onAction = {
-                state.appsOutputs.exampleAppOutputs?.let { appOutputs ->
-                    val examplePoint = WGS84Point.Kilimanjaro
-                    onExecute(
-                        appOutputs.defaultOutput.toAction(
-                            point = examplePoint,
-                            points = persistentListOf(examplePoint),
-                            source = "",
-                        )
-                    )
+                val examplePoint = WGS84Point.Kilimanjaro
+                val examplePoints = persistentListOf(examplePoint)
+                val exampleSource = ""
+                val exampleOutput = state.appsOutputs.exampleAppOutputs?.outputs
+                    ?.firstOrNull { it.isEnabled(examplePoint, examplePoints, exampleSource) }
+                if (exampleOutput != null) {
+                    onExecute(exampleOutput.toAction(examplePoint, examplePoints, exampleSource))
                 }
             },
             onDismissRequest = { onDismissHelpMessage(helpMessage) },

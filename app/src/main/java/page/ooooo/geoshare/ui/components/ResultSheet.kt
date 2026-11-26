@@ -245,13 +245,14 @@ private fun <T> ResultSheetOpenPointContent(
 
     SheetSection(title = title) {
         appsOutputs.forEach { appOutputs ->
+            val defaultOutput = appOutputs.outputs.firstOrNull { it.isEnabled(value) } ?: return@forEach
             SheetListItem(
                 headlineText = appDetails[appOutputs.packageName]?.label.orEmpty(),
-                modifier = Modifier.testTag("geoSharePointOpenSheetItem_${appOutputs.defaultOutput.id}"),
-                enabled = appOutputs.defaultOutput.isEnabled(value),
+                modifier = Modifier.testTag("geoSharePointOpenSheetItem_${defaultOutput.id}"),
+                enabled = defaultOutput.isEnabled(value),
                 onClick = {
                     onHide()
-                    onExecute(appOutputs.defaultOutput.toAction(value))
+                    onExecute(defaultOutput.toAction(value))
                 },
                 icon = appDetails[appOutputs.packageName]?.icon?.let { DrawableIconDescriptor(it) }
                     ?: PlaceholderIconDescriptor,
@@ -284,15 +285,16 @@ private fun ResultSheetSourceContent(
             appsOutputs
                 .sortedBy { appOutputs -> appDetailsForSource[appOutputs.packageName]?.label }
                 .forEach { appOutputs ->
-                    key(appOutputs.defaultOutput.id) {
+                    val defaultOutput = appOutputs.outputs.firstOrNull { it.isEnabled(value) } ?: return@forEach
+                    key(defaultOutput.id) {
                         SheetListItem(
                             headlineText = appDetailsForSource[appOutputs.packageName]?.label.orEmpty(),
-                            modifier = Modifier.testTag("geoShareResultSheetItem_${appOutputs.defaultOutput.id}"),
+                            modifier = Modifier.testTag("geoShareResultSheetItem_${defaultOutput.id}"),
                             onClick = {
                                 onHide()
-                                onExecute(appOutputs.defaultOutput.toAction(value))
+                                onExecute(defaultOutput.toAction(value))
                             },
-                            icon = appOutputs.defaultOutput.getIcon(appDetailsForSource) ?: PlaceholderIconDescriptor,
+                            icon = defaultOutput.getIcon(appDetailsForSource) ?: PlaceholderIconDescriptor,
                         )
                     }
                 }
@@ -592,20 +594,22 @@ private fun ShareSourcePreview() {
                         appsOutputs = listOf(
                             AppOutputs(
                                 packageName = PackageNames.OSMAND_PLUS,
-                                defaultOutput = OpenUnknownUriOutput(
-                                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                outputs = listOf(
+                                    OpenUnknownUriOutput(
+                                        UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                    ),
                                 ),
-                                allOutputs = emptyList(),
                             ),
                             AppOutputs(
                                 packageName = PackageNames.CONVERSATIONS,
-                                defaultOutput = SendStringOutput(
-                                    TextActivity(
-                                        packageName = PackageNames.CONVERSATIONS,
-                                        mimeType = MimeType.TEXT_PLAIN,
-                                    )
+                                outputs = listOf(
+                                    SendStringOutput(
+                                        TextActivity(
+                                            packageName = PackageNames.CONVERSATIONS,
+                                            mimeType = MimeType.TEXT_PLAIN,
+                                        )
+                                    ),
                                 ),
-                                allOutputs = emptyList(),
                             ),
                         ),
                         copyOutput = outputRepository.sourceCopyOutput,
@@ -646,20 +650,22 @@ private fun ShareSourceLoadingPreview() {
                         appsOutputs = listOf(
                             AppOutputs(
                                 packageName = PackageNames.OSMAND_PLUS,
-                                defaultOutput = OpenUnknownUriOutput(
-                                    UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                outputs = listOf(
+                                    OpenUnknownUriOutput(
+                                        UriActivity(packageName = PackageNames.OSMAND_PLUS, uriScheme = UriScheme.GEO)
+                                    ),
                                 ),
-                                allOutputs = emptyList(),
                             ),
                             AppOutputs(
                                 packageName = PackageNames.CONVERSATIONS,
-                                defaultOutput = SendStringOutput(
-                                    TextActivity(
-                                        packageName = PackageNames.CONVERSATIONS,
-                                        mimeType = MimeType.TEXT_PLAIN,
-                                    )
+                                outputs = listOf(
+                                    SendStringOutput(
+                                        TextActivity(
+                                            packageName = PackageNames.CONVERSATIONS,
+                                            mimeType = MimeType.TEXT_PLAIN,
+                                        )
+                                    ),
                                 ),
-                                allOutputs = emptyList(),
                             ),
                         ),
                         copyOutput = outputRepository.sourceCopyOutput,

@@ -90,8 +90,7 @@ import javax.inject.Singleton
 
 data class AppOutputs<T>(
     val packageName: String,
-    val defaultOutput: T,
-    val allOutputs: List<T>,
+    val outputs: List<T>,
 )
 
 data class AppsOutputs(
@@ -102,13 +101,7 @@ data class AppsOutputs(
 
 data class LinkOutputs(
     val group: String,
-    val defaultOutput: Output<Point>,
-    val allOutputs: List<Output<Point>>,
-)
-
-data class ShareOutputs(
-    val defaultOutput: Output<*>,
-    val allOutputs: List<Output<*>>,
+    val outputs: List<Output<Point>>,
 )
 
 @Singleton
@@ -143,12 +136,8 @@ class OutputRepository @Inject constructor(
                     activity
                         .toOutputs()
                         .firstNotNullOfOrNull { it as? PointOutput }
-                        ?.let { defaultOutput ->
-                            AppOutputs(
-                                packageName = activity.packageName,
-                                defaultOutput = defaultOutput,
-                                allOutputs = emptyList(),
-                            )
+                        ?.let { firstPointOutput ->
+                            AppOutputs(packageName = activity.packageName, outputs = listOf(firstPointOutput))
                         }
                 }
             }
@@ -189,16 +178,13 @@ class OutputRepository @Inject constructor(
             }
 
     val shareOutputs by lazy {
-        ShareOutputs(
-            defaultOutput = ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
-            allOutputs = listOf(
-                ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
-                ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
-                ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
-                ShareRouteGpxOutput(coordinateConverter),
-                SharePointsGpxOutput(coordinateConverter),
-                SavePointToContactOutput(coordinateConverter),
-            ),
+        listOf<Output<*>>(
+            ShareDisplayGeoUriOutput(coordinateConverter, uriQuote),
+            ShareNavigationGoogleUriOutput(coordinateConverter, uriQuote),
+            ShareStreetViewGoogleUriOutput(coordinateConverter, uriQuote),
+            ShareRouteGpxOutput(coordinateConverter),
+            SharePointsGpxOutput(coordinateConverter),
+            SavePointToContactOutput(coordinateConverter),
         )
     }
 
@@ -208,14 +194,13 @@ class OutputRepository @Inject constructor(
             .groupBy { it.groupOrName }
             .toSortedMap()
             .mapNotNull { (group, links) ->
-                listOf(
-                    *links.map { ShareLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
-                    *links.map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
-                ).let { all ->
-                    all.firstOrNull()?.let { default ->
-                        LinkOutputs(group = group, defaultOutput = default, allOutputs = all)
-                    }
-                }
+                LinkOutputs(
+                    group = group,
+                    outputs = listOf(
+                        *links.map { ShareLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
+                        *links.map { CopyLinkUriOutput(it, coordinateConverter, uriQuote) }.toTypedArray(),
+                    ),
+                )
             }
 
     fun getPointChipsOutputs(links: List<Link>): List<Output<Point>> =
@@ -248,14 +233,12 @@ class OutputRepository @Inject constructor(
                 is FileActivity -> null
                 is TextActivity -> AppOutputs(
                     packageName = activity.packageName,
-                    defaultOutput = SendStringOutput(activity),
-                    allOutputs = emptyList(),
+                    outputs = listOf(SendStringOutput(activity)),
                 )
 
                 is UriActivity -> AppOutputs(
                     packageName = activity.packageName,
-                    defaultOutput = OpenUnknownUriOutput(activity),
-                    allOutputs = emptyList(),
+                    outputs = listOf(OpenUnknownUriOutput(activity)),
                 )
             }
         }
@@ -263,15 +246,13 @@ class OutputRepository @Inject constructor(
     private fun List<AppActivity>.toOutputsForApps(hiddenApps: Set<String>?): List<AppOutputs<Output<*>>> =
         groupBy { it.packageName }
             .filterKeys { packageName -> hiddenApps?.contains(packageName) != true }
-            .mapNotNull { (packageName, activities) ->
-                activities
-                    .sorted()
-                    .flatMap { activity -> activity.toOutputs() }
-                    .let { all ->
-                        all.firstOrNull()?.let { default ->
-                            AppOutputs(packageName = packageName, defaultOutput = default, allOutputs = all)
-                        }
-                    }
+            .map { (packageName, activities) ->
+                AppOutputs(
+                    packageName = packageName,
+                    outputs = activities
+                        .sorted()
+                        .flatMap { activity -> activity.toOutputs() },
+                )
             }
 
     private fun AppActivity.toOutputs(): List<Output<*>> =

@@ -111,6 +111,7 @@ private fun ResultLinkIcon(
     onDisableLinkGroup: () -> Unit,
 ) {
     val appDetails: AppDetails = emptyMap() // Link outputs never require app details
+    val defaultOutput = linkOutputs.outputs.firstOrNull { it.isEnabled(lastPoint) } ?: return
 
     AppIcon(
         label = linkOutputs.group,
@@ -119,7 +120,7 @@ private fun ResultLinkIcon(
                 appDetails = appDetails,
                 expanded = expanded,
                 lastPoint = lastPoint,
-                outputs = linkOutputs.allOutputs,
+                outputs = linkOutputs.outputs,
                 points = points,
                 source = source,
                 onExecute = onExecute,
@@ -127,14 +128,14 @@ private fun ResultLinkIcon(
                 onHide = onDisableLinkGroup,
             )
         },
-        onClick = { onExecute(linkOutputs.defaultOutput.toAction(lastPoint, points, source)) },
+        onClick = { onExecute(defaultOutput.toAction(lastPoint, points, source)) },
         modifier = Modifier
             .width(width)
             .testTag("geoShareLink_${linkOutputs.group}"),
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.tertiaryContainer) {
             IconFromDescriptor(
-                linkOutputs.defaultOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
+                defaultOutput.getIcon(appDetails) ?: PlaceholderIconDescriptor,
                 contentDescription = null,
                 size = iconSize,
                 inverseContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
