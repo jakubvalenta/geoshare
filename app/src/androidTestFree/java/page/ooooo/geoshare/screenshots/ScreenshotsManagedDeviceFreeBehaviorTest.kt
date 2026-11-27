@@ -862,7 +862,7 @@ class ScreenshotsManagedDeviceFreeBehaviorTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val inputMethodManager = context.getSystemService<InputMethodManager>()
         requireNotNull(inputMethodManager)
-        if (inputMethodManager.isAcceptingText()) {
+        if (inputMethodManager.isAcceptingText) {
             @Suppress("GrazieInspectionRunner", "SpellCheckingInspection")
             // Press back to hide keyboard, because it's more reliable than executing the command `input keyevent 111`
             pressBack()

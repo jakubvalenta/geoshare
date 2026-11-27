@@ -3,9 +3,13 @@ package page.ooooo.geoshare.ui
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -152,6 +156,7 @@ sealed interface ResultTitleState {
     data object LocationPermissionReceived : ResultTitleState
 }
 
+@OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -169,14 +174,13 @@ class MainViewModel @Inject constructor(
 
     // Source
 
-    private val _source = savedStateHandle.getMutableStateFlow("source", "")
-    val source: StateFlow<String> = _source.asStateFlow()
+    val source = savedStateHandle.saveable(key = "source", saver = TextFieldState.Saver) { TextFieldState() }
 
     private val _sourceComesFromIntent = savedStateHandle.getMutableStateFlow("sourceComesFromIntent", false)
     val sourceComesFromIntent: StateFlow<Boolean> = _sourceComesFromIntent.asStateFlow()
 
     fun setSource(newSource: String) {
-        _source.value = newSource
+        source.setTextAndPlaceCursorAtEnd(newSource)
     }
 
     fun setRandomSource() {
@@ -197,7 +201,7 @@ class MainViewModel @Inject constructor(
     private val conversionExceptionHandler = CoroutineExceptionHandler { _, tr ->
         log.e(TAG, "Exception when transitioning state", tr)
         val newState = ConversionFailed(
-            _source.value,
+            source.text.toString(),
             conversionStateContext.resources.getString(R.string.conversion_failed_reason_exception),
             stackTrace = tr.stackTraceToString(),
         )
@@ -222,7 +226,7 @@ class MainViewModel @Inject constructor(
 
     fun start(sourceComesFromIntent: Boolean) {
         _sourceComesFromIntent.value = sourceComesFromIntent
-        transitionConversion(clearLog = true) { SourceReceived(_source.value) }
+        transitionConversion(clearLog = true) { SourceReceived(source.text.toString()) }
     }
 
     fun grant(doNotAsk: Boolean) {

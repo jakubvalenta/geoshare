@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -50,7 +51,7 @@ fun ResultApps(
     appDetails: StateFlow<AppDetails>,
     state: StateFlow<ResultAppsState>,
     points: Points,
-    source: StateFlow<String>,
+    source: TextFieldState,
     modifier: Modifier = Modifier,
     iconSize: Dp = 46.dp,
     onExecute: (Action<*>) -> Unit,
@@ -60,7 +61,7 @@ fun ResultApps(
 
     val appDetails by appDetails.collectAsStateWithLifecycle()
     val state by state.collectAsStateWithLifecycle()
-    val source by source.collectAsStateWithLifecycle()
+    val source = source.text.toString()
 
     Column(modifier) {
         // Map apps
@@ -241,7 +242,7 @@ private fun DefaultPreview() {
                     )
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onExecute = {},
                 onHideApp = {},
             )
@@ -275,7 +276,7 @@ private fun DarkPreview() {
                     )
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onExecute = {},
                 onHideApp = {},
             )
@@ -309,7 +310,7 @@ private fun SmallPreview() {
                     )
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onExecute = {},
                 onHideApp = {},
             )
@@ -343,7 +344,7 @@ private fun TabletPreview() {
                     )
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onExecute = {},
                 onHideApp = {},
             )
@@ -383,7 +384,7 @@ private fun LoadingPreview() {
                     )
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onExecute = {},
                 onHideApp = {},
             )

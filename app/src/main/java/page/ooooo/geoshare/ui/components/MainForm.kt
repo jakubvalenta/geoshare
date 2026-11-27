@@ -5,8 +5,8 @@ import android.view.KeyEvent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
@@ -15,11 +15,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalClipboard
@@ -33,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import page.ooooo.geoshare.R
 import page.ooooo.geoshare.data.android.paste
@@ -42,7 +48,7 @@ import page.ooooo.geoshare.ui.theme.LocalSpacing
 @Composable
 fun MainForm(
     placeholderUris: StateFlow<List<String>>,
-    source: StateFlow<String>,
+    source: TextFieldState,
     initialError: String? = null,
     onSetSource: (newSource: String) -> Unit,
     onSubmit: () -> Unit,
@@ -52,22 +58,26 @@ fun MainForm(
     val spacing = LocalSpacing.current
     val resources = LocalResources.current
 
-    var error by retain { mutableStateOf(initialError) }
+    val empty by remember { derivedStateOf { source.text.isEmpty() } }
+    var error by retain(initialError) { mutableStateOf(initialError) }
     val placeholderUris by placeholderUris.collectAsStateWithLifecycle()
-    val source by source.collectAsStateWithLifecycle()
-
-    fun resetValidationAndSetSource(newSource: String) {
-        error = null
-        onSetSource(newSource)
-    }
 
     fun validateAndSubmit() {
-        if (source.isEmpty()) {
+        if (source.text.isEmpty()) {
             error = resources.getString(R.string.conversion_failed_missing_url)
         } else {
             error = null
             onSubmit()
         }
+    }
+
+    LaunchedEffect(source) {
+        snapshotFlow { source.text.toString() }
+            .drop(1) // Skip initial value
+            .collectLatest { newSource ->
+                error = null
+                onSetSource(newSource)
+            }
     }
 
     Column(Modifier.padding(horizontal = spacing.windowPadding)) {
@@ -78,8 +88,7 @@ fun MainForm(
             style = MaterialTheme.typography.bodyMedium
         )
         AnimatedPlaceholderTextField(
-            value = source,
-            onValueChange = ::resetValidationAndSetSource,
+            state = source,
             placeholders = placeholderUris,
             modifier = Modifier
                 .fillMaxWidth()
@@ -93,8 +102,8 @@ fun MainForm(
                 }
                 .testTag("geoShareMainSourceTextField"),
             trailingIcon = {
-                if (source.isNotEmpty()) {
-                    IconButton({ resetValidationAndSetSource("") }) {
+                if (!empty) {
+                    IconButton({ onSetSource("") }) {
                         Icon(
                             Icons.Default.Clear,
                             stringResource(R.string.main_input_uri_clear_content_description),
@@ -103,7 +112,7 @@ fun MainForm(
                 } else {
                     IconButton({
                         coroutineScope.launch {
-                            resetValidationAndSetSource(clipboard.paste())
+                            onSetSource(clipboard.paste())
                         }
                     }) {
                         Icon(
@@ -119,12 +128,8 @@ fun MainForm(
                 }
             },
             isError = error != null,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = { validateAndSubmit() },
-            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            onKeyboardAction = { validateAndSubmit() },
         )
         LargeButton(
             stringResource(R.string.main_create_geo_uri),
@@ -143,7 +148,7 @@ private fun DefaultPreview() {
         Surface {
             MainForm(
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -158,7 +163,7 @@ private fun DarkPreview() {
         Surface {
             MainForm(
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -173,7 +178,7 @@ private fun FilledPreview() {
         Surface {
             MainForm(
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-                source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                source = TextFieldState("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -188,7 +193,7 @@ private fun DarkFilledPreview() {
         Surface {
             MainForm(
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-                source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                source = TextFieldState("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 onSetSource = {},
                 onSubmit = {},
             )
@@ -203,7 +208,7 @@ private fun ErrorPreview() {
         Surface {
             MainForm(
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-                source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                source = TextFieldState("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 initialError = stringResource(R.string.conversion_failed_missing_url),
                 onSetSource = {},
                 onSubmit = {},
@@ -219,7 +224,7 @@ private fun DarkErrorPreview() {
         Surface {
             MainForm(
                 placeholderUris = MutableStateFlow(listOf("https://maps.app.goo.gl/Q6ZugPBVWvuiVb8e8")),
-                source = MutableStateFlow("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
+                source = TextFieldState("https://maps.app.goo.gl/TmbeHMiLEfTBws9EA"),
                 initialError = stringResource(R.string.conversion_failed_missing_url),
                 onSetSource = {},
                 onSubmit = {},

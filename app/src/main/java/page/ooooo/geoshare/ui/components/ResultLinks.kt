@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FilledIconButton
@@ -51,7 +52,7 @@ import page.ooooo.geoshare.ui.theme.AppTheme
 fun ResultLinks(
     state: StateFlow<ResultLinksState>,
     points: Points,
-    source: StateFlow<String>,
+    source: TextFieldState,
     iconSize: Dp = 46.dp,
     onExecute: (Action<*>) -> Unit,
     onDisableLinkGroup: (group: String?) -> Unit,
@@ -60,7 +61,7 @@ fun ResultLinks(
     val lastPoint = points.lastOrNull() ?: return
 
     val state by state.collectAsStateWithLifecycle()
-    val source by source.collectAsStateWithLifecycle()
+    val source = source.text.toString()
 
     // Links
     if (state.linksOutputs.isNotEmpty()) {
@@ -167,7 +168,7 @@ private fun DefaultPreview() {
                     ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onNavigateToLinkScreen = {},
@@ -196,7 +197,7 @@ private fun DarkPreview() {
                     ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onNavigateToLinkScreen = {},
@@ -225,7 +226,7 @@ private fun SmallPreview() {
                     ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onNavigateToLinkScreen = {},
@@ -254,7 +255,7 @@ private fun TabletPreview() {
                     ResultLinksState(linksOutputs = outputRepository.getLinksOutputs(defaultFakeLinks))
                 ),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onNavigateToLinkScreen = {},
@@ -271,7 +272,7 @@ private fun LoadingPreview() {
             ResultLinks(
                 state = MutableStateFlow(ResultLinksState()),
                 points = persistentListOf(WGS84Point(NaivePoint.example)),
-                source = MutableStateFlow(""),
+                source = TextFieldState(),
                 onDisableLinkGroup = {},
                 onExecute = {},
                 onNavigateToLinkScreen = {},
